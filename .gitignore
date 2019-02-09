@@ -1,0 +1,44 @@
+# Project-specific
+mason/
+demo/
+Servers/
+
+# Eclipse
+.classpath
+.project
+.settings/
+.metadata
+.metadata/
+bin/
+tmp/
+*.tmp
+local.properties
+
+# Maven
+log/
+target/
+
+# Java class files
+*.class
+
+# Windows thumbnail cache files
+Thumbs.db
+
+# Dump file
+*.stackdump
+
+# Folder config file
+[Dd]esktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
