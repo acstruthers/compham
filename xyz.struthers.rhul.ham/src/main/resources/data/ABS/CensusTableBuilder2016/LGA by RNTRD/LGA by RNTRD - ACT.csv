@@ -1,0 +1,22 @@
+Australian Bureau of Statistics
+
+"2016 Census - Selected Dwelling Characteristics"
+"LGA by RNTRD Rent (weekly) Ranges"
+"Counting: Dwellings Location on Census Night"
+
+Filters:
+"Default Summation","Dwellings Location on Census Night"
+
+"RNTRD Rent (weekly) Ranges","Nil payments","$1-$74","$75-$99","$100-$124","$125-$149","$150-$174","$175-$199","$200-$224","$225-$249","$250-$274","$275-$299","$300-$324","$325-$349","$350-$374","$375-$399","$400-$424","$425-$449","$450-$549","$550-$649","$650-$749","$750-$849","$850-$949","$950 and over","Not stated","Not applicable","Total",
+"LGA",
+"Unincorporated ACT",900,663,1386,1988,973,1168,781,1094,905,1311,1012,2827,2168,3876,3255,4692,2329,8357,3057,1042,459,233,378,1360,117320,163539,
+"Migratory - Offshore - Shipping (ACT)",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,6,
+"Total",900,663,1386,1988,973,1168,781,1094,905,1311,1012,2827,2168,3876,3255,4692,2329,8357,3057,1042,459,233,378,1360,117324,163539,
+
+"Data Source: Census of Population and Housing, 2016, TableBuilder"
+
+"INFO","Cells in this table have been randomly adjusted to avoid the release of confidential data. No reliance should be placed on small cells."
+
+
+"Copyright Commonwealth of Australia, 2018, see abs.gov.au/copyright"
+"ABS data licensed under Creative Commons, see abs.gov.au/ccby"

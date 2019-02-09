@@ -1,0 +1,521 @@
+﻿,"Taxation statistics 2015–16 Companies: Count, average and median for selected items for income years 2012–13 to 2015–167",,,,,
+,,,,,,
+c1,Selected items,,2012-13,2013-14,2014-15,2015-16
+1,Number of companies,,"923,280","941,766","914,508","941,166"
+2,,,,,,
+3,Information statement - Calculation of total profit or loss,,,,,
+4,Income,,,,,
+5,Gross payments subject to foreign resident withholding,No.,"1,128","1,090","1,035",968
+6,Gross payments subject to foreign resident withholding,Average $,"642,552","529,422","543,638","628,163"
+7,Gross payments subject to foreign resident withholding,Median $,"64,868","72,077","62,282","60,000"
+8,Gross payments where ABN not quoted,No.,198,178,156,151
+9,Gross payments where ABN not quoted,Average $,"40,281","41,750","34,703","44,262"
+10,Gross payments where ABN not quoted,Median $,"2,067","1,951","1,209","1,442"
+11,Other sales of goods and services,No.,"349,109","360,405","353,511","367,655"
+12,Other sales of goods and services,Average $,"5,775,658","5,681,702","5,832,701","5,752,345"
+13,Other sales of goods and services,Median $,"318,972","318,758","334,323","342,099"
+14,Gross distribution from partnerships,No.,"10,010","9,868","9,195","8,832"
+15,Gross distribution from partnerships,Average $,"538,449","629,323","726,741","482,682"
+16,Gross distribution from partnerships,Median $,"20,092","22,525","25,458","27,139"
+17,Gross distribution from trusts,No.,"64,548","66,992","68,339","72,074"
+18,Gross distribution from trusts,Average $,"485,648","499,871","546,133","572,967"
+19,Gross distribution from trusts,Median $,"78,156","79,915","84,842","91,778"
+20,Forestry managed investment scheme income,No.,213,198,173,169
+21,Forestry managed investment scheme income,Average $,"74,508","59,253","275,249","158,362"
+22,Forestry managed investment scheme income,Median $,"2,470","2,903","1,728","1,287"
+23,Gross interest,No.,"449,469","446,851","434,009","432,155"
+24,Gross interest,Average $,"430,723","401,462","406,632","401,752"
+25,Gross interest,Median $,"1,163","1,084","1,065",916
+26,Gross rent and other leasing and hiring income,No.,"72,650","72,816","69,913","70,301"
+27,Gross rent and other leasing and hiring income,Average $,"601,843","587,669","636,604","609,355"
+28,Gross rent and other leasing and hiring income,Median $,"37,581","38,000","38,653","39,495"
+29,Total dividends,No.,"53,184","53,488","52,284","53,181"
+30,Total dividends,Average $,"922,843","813,752","731,225","970,137"
+31,Total dividends,Median $,"4,026","5,353","6,566","7,265"
+32,Fringe benefit employee contributions,No.,"90,590","93,456","91,466","92,977"
+33,Fringe benefit employee contributions,Average $,"10,656","11,732","11,818","11,642"
+34,Fringe benefit employee contributions,Median $,"4,385","4,480","4,496","4,511"
+35,Assessable government industry payments,No.,"42,151","42,942","41,603","41,051"
+36,Assessable government industry payments,Average $,"114,316","114,907","121,921","132,746"
+37,Assessable government industry payments,Median $,"4,654","5,000","4,896","5,021"
+38,Unrealised gains on revaluation of assets to fair value,No.,"1,902","2,012","1,945","2,029"
+39,Unrealised gains on revaluation of assets to fair value,Average $,"16,471,669","11,754,785","11,915,590","14,144,532"
+40,Unrealised gains on revaluation of assets to fair value,Median $,"95,863","77,224","95,163","87,276"
+41,Income from financial arrangements (TOFA),No.,834,911,993,na
+42,Income from financial arrangements (TOFA),Average $,"79,533,798","39,728,725","37,433,975",na
+43,Income from financial arrangements (TOFA),Median $,"628,659","742,369","735,758",na
+44,Other gross income,No.,"386,237","393,710","385,338","396,984"
+45,Other gross income,Average $,"831,776","839,721","899,872","976,383"
+46,Other gross income,Median $,"70,127","69,795","70,452","72,160"
+47,Total income,No.,"923,280","941,766","914,508","941,166"
+48,Total income,Average $,"2,994,680","2,920,258","3,038,815","3,031,062"
+49,Total income,Median $,"103,617","105,533","112,458","117,490"
+50,,,,,,
+51,Expenses,,,,,
+52,Foreign resident withholding expenses,No.,486,499,296,301
+53,Foreign resident withholding expenses,Average $,"428,922","428,246","476,696","698,524"
+54,Foreign resident withholding expenses,Median $,"93,202","76,455","86,901","82,661"
+55,Cost of sales,No.,"291,064","299,070","291,879","303,818"
+56,Cost of sales,Average $,"4,061,844","3,965,290","4,119,435","4,035,055"
+57,Cost of sales,Median $,"154,543","153,163","161,614","163,629"
+58,"Contractor, sub-contractor and commission expenses",No.,"174,927","178,037","173,931","180,686"
+59,"Contractor, sub-contractor and commission expenses",Average $,"594,797","612,472","635,615","633,912"
+60,"Contractor, sub-contractor and commission expenses",Median $,"31,200","31,452","32,968","34,428"
+61,Superannuation expenses,No.,"367,193","376,253","370,683","381,399"
+62,Superannuation expenses,Average $,"82,273","86,893","95,490","93,204"
+63,Superannuation expenses,Median $,"14,628","15,141","16,180","16,404"
+64,Bad debts,No.,"47,745","47,349","45,555","46,048"
+65,Bad debts,Average $,"190,049","135,463","164,348","181,982"
+66,Bad debts,Median $,"5,029","4,799","4,603","4,600"
+67,Lease expenses within Australia,No.,"44,969","42,726","39,210","38,393"
+68,Lease expenses within Australia,Average $,"211,771","237,666","248,273","247,384"
+69,Lease expenses within Australia,Median $,"8,651","8,795","8,891","9,168"
+70,Lease expenses overseas,No.,"1,545","1,366","1,345","1,258"
+71,Lease expenses overseas,Average $,"1,068,010","1,334,385","1,932,984","2,203,171"
+72,Lease expenses overseas,Median $,"9,923","9,715","10,280","10,501"
+73,Rent expenses,No.,"275,955","283,690","277,142","287,252"
+74,Rent expenses,Average $,"171,494","171,412","179,827","181,048"
+75,Rent expenses,Median $,"31,200","31,636","32,450","32,700"
+76,Interest expenses within Australia,No.,"343,912","343,687","329,320","334,668"
+77,Interest expenses within Australia,Average $,"384,420","339,341","331,547","307,285"
+78,Interest expenses within Australia,Median $,"4,561","4,229","4,014","3,830"
+79,Interest expenses overseas,No.,"4,742","4,754","4,758","4,931"
+80,Interest expenses overseas,Average $,"6,951,180","6,530,891","6,594,109","7,021,318"
+81,Interest expenses overseas,Median $,"103,348","114,867","128,877","139,613"
+82,Royalty expenses overseas,No.,"1,526","1,572","1,605","1,605"
+83,Royalty expenses overseas,Average $,"4,052,529","4,254,874","4,492,964","4,722,269"
+84,Royalty expenses overseas,Median $,"417,281","401,059","402,160","452,062"
+85,Royalty expenses within Australia,No.,"6,666","7,023","6,907","7,138"
+86,Royalty expenses within Australia,Average $,"1,844,126","2,047,834","1,854,504","1,618,770"
+87,Royalty expenses within Australia,Median $,"31,912","31,729","32,515","33,056"
+88,Depreciation expenses,No.,"510,211","506,816","491,437","485,658"
+89,Depreciation expenses,Average $,"162,318","165,923","181,801","195,183"
+90,Depreciation expenses,Median $,"7,871","7,347","8,461","9,842"
+91,Motor vehicle expenses,No.,"400,505","407,897","395,414","408,163"
+92,Motor vehicle expenses,Average $,"33,719","34,097","33,386","31,023"
+93,Motor vehicle expenses,Median $,"8,551","8,625","8,359","8,027"
+94,Repairs and maintenance,No.,"311,408","315,064","306,045","314,018"
+95,Repairs and maintenance,Average $,"74,206","73,514","75,203","71,087"
+96,Repairs and maintenance,Median $,"2,427","2,441","2,501","2,564"
+97,Unrealised losses on revaluation of assets to fair value,No.,"2,371","2,391","2,403","3,862"
+98,Unrealised losses on revaluation of assets to fair value,Average $,"9,110,477","13,358,990","19,417,840","14,248,366"
+99,Unrealised losses on revaluation of assets to fair value,Median $,"89,881","92,006","97,797","95,004"
+100,Expenses from financial arrangements (TOFA),No.,"1,031","1,121","1,201",na
+101,Expenses from financial arrangements (TOFA),Average $,"59,483,498","27,208,838","22,331,665",na
+102,Expenses from financial arrangements (TOFA),Median $,"428,894","573,552","453,943",na
+103,All other expenses,No.,"821,937","840,165","820,118","845,367"
+104,All other expenses,Average $,"933,619","940,181","991,231","1,033,802"
+105,All other expenses,Median $,"54,301","54,977","56,877","58,269"
+106,Total expenses,No.,"923,280","941,766","914,508","941,166"
+107,Total expenses,Average $,"2,748,541","2,694,009","2,832,862","2,831,537"
+108,Total expenses,Median $,"79,160","80,226","84,261","88,146"
+109,Total profit or loss,No.,"923,280","941,766","914,508","941,166"
+110,Total profit or loss,Average $,"246,139","226,249","205,953","199,525"
+111,Total profit or loss,Median $,132,216,432,495
+112,,,,,,
+113,Reconciliation to taxable income or loss,,,,,
+114,Add:,,,,,
+115,Net capital gain,No.,"14,738","16,575","18,005","18,420"
+116,Net capital gain,Average $,"812,242","581,508","1,116,988","907,549"
+117,Net capital gain,Median $,"24,344","26,821","25,962","23,707"
+118,Non-deductible exempt income expenditure,No.,"1,642","1,409","1,277","1,278"
+119,Non-deductible exempt income expenditure,Average $,"5,335,997","5,478,877","1,094,760","1,311,526"
+120,Non-deductible exempt income expenditure,Median $,"7,557","7,317","8,084","7,992"
+121,Franking credits,No.,"43,343","44,352","43,409","44,631"
+122,Franking credits,Average $,"151,560","237,429","177,361","285,972"
+123,Franking credits,Median $,"2,411","3,199","3,918","4,122"
+124,Australian franking credits from a New Zealand company,No.,355,263,319,236
+125,Australian franking credits from a New Zealand company,Average $,"29,234","5,314","23,128","63,954"
+126,Australian franking credits from a New Zealand company,Median $,106,98,50,190
+127,TOFA income from financial arrangements not included in item 6,No.,291,306,279,253
+128,TOFA income from financial arrangements not included in item 6,Average $,"12,737,083","15,441,729","14,321,706","12,716,074"
+129,TOFA income from financial arrangements not included in item 6,Median $,"568,745","508,234","433,288","450,485"
+130,Other assessable income,No.,"47,003","46,973","46,033","47,049"
+131,Other assessable income,Average $,"1,396,654","1,418,226","1,656,019","1,724,667"
+132,Other assessable income,Median $,"21,806","21,240","21,382","22,300"
+133,Non-deductible expenses,No.,"507,427","511,352","492,714","495,663"
+134,Non-deductible expenses,Average $,"597,513","633,164","737,639","729,301"
+135,Non-deductible expenses,Median $,"8,819","8,383","9,234","10,294"
+136,Accounting expenditure in item 6 subject to R&D tax incentive,No.,"9,617","10,937","11,553","12,237"
+137,Accounting expenditure in item 6 subject to R&D tax incentive,Average $,"1,886,842","1,477,819","1,242,337","1,004,701"
+138,Accounting expenditure in item 6 subject to R&D tax incentive,Median $,"315,814","299,802","288,073","278,955"
+139,Subtotal,No.,"835,718","855,504","835,135","860,710"
+140,Subtotal,Average $,"772,104","762,404","808,323","786,677"
+141,Subtotal,Median $,"7,356","7,525","8,767","9,525"
+142,,,,,,
+143,Less:,,,,,
+144,Section 46FA deductions for flow-on dividends,No.,49,49,36,51
+145,Section 46FA deductions for flow-on dividends,Average $,"779,194","950,303","657,899","499,070"
+146,Section 46FA deductions for flow-on dividends,Median $,"18,449","18,214","12,000","20,000"
+147,Deduction for decline in value of depreciating assets,No.,"445,804","441,651","420,925","407,740"
+148,Deduction for decline in value of depreciating assets,Average $,"192,382","202,059","221,846","247,963"
+149,Deduction for decline in value of depreciating assets,Median $,"7,722","7,235","8,154","9,470"
+150,Forestry managed investment scheme deduction,No.,71,44,43,35
+151,Forestry managed investment scheme deduction,Average $,"80,021","142,549","548,862","344,740"
+152,Forestry managed investment scheme deduction,Median $,"6,073","6,880","8,469","8,832"
+153,Immediate deduction for capital expenditure,No.,"4,375","3,001","3,730","5,549"
+154,Immediate deduction for capital expenditure,Average $,"2,357,114","2,629,117","1,531,855","770,066"
+155,Immediate deduction for capital expenditure,Median $,"5,226","5,000","5,990","8,861"
+156,Deduction for project pool,No.,458,429,423,469
+157,Deduction for project pool,Average $,"4,265,203","6,968,471","5,668,739","5,426,773"
+158,Deduction for project pool,Median $,"48,874","43,977","55,479","50,264"
+159,Capital works deductions,No.,"12,830","13,320","13,560","14,005"
+160,Capital works deductions,Average $,"183,579","188,349","201,898","217,264"
+161,Capital works deductions,Median $,"6,442","6,102","6,063","6,095"
+162,Section 40-880 deduction,No.,"17,780","18,751","18,618","18,890"
+163,Section 40-880 deduction,Average $,"145,545","130,633","118,188","132,092"
+164,Section 40-880 deduction,Median $,533,480,475,646
+165,Landcare operations and deduction for decline in value of water facility,No.,380,370,408,491
+166,Landcare operations and deduction for decline in value of water facility,Average $,"130,964","103,367","131,508","288,242"
+167,Landcare operations and deduction for decline in value of water facility,Median $,"6,496","6,493","12,831","24,858"
+168,Deduction for environmental protection expenses,No.,40,44,32,38
+169,Deduction for environmental protection expenses,Average $,"623,656","1,175,593","1,690,022","1,452,331"
+170,Deduction for environmental protection expenses,Median $,"26,280","46,981","88,652","46,067"
+171,Offshore banking unit adjustment,No.,41,49,48,45
+172,Offshore banking unit adjustment,Average $,"15,541,427","16,076,676","19,842,544","23,993,639"
+173,Offshore banking unit adjustment,Median $,"2,829,646","1,609,731","3,465,781","4,929,804"
+174,Exempt income,No.,"1,981","3,657","3,509","3,553"
+175,Exempt income,Average $,"5,654,301","3,609,454","1,111,246","1,204,889"
+176,Exempt income,Median $,"21,849","38,131","38,500","42,184"
+177,Other income not included in assessable income,No.,"56,957","58,338","58,487","59,489"
+178,Other income not included in assessable income,Average $,"2,840,331","2,498,063","2,957,852","2,719,956"
+179,Other income not included in assessable income,Median $,"28,181","27,601","27,531","28,428"
+180,TOFA deductions from financial arrangements not included in item 6,No.,348,385,371,361
+181,TOFA deductions from financial arrangements not included in item 6,Average $,"16,450,832","18,126,505","17,486,109","20,206,343"
+182,TOFA deductions from financial arrangements not included in item 6,Median $,"610,841","703,915","755,467","681,810"
+183,Other deductible expenses,No.,"124,770","131,864","134,823","143,928"
+184,Other deductible expenses,Average $,"1,017,826","958,525","1,023,451","964,602"
+185,Other deductible expenses,Median $,"9,587","9,539","9,542","9,756"
+186,Tax losses deducted,No.,"157,994","162,159","159,844","163,108"
+187,Tax losses deducted,Average $,"119,281","116,854","123,878","135,007"
+188,Tax losses deducted,Median $,"8,447","8,542","8,607","8,760"
+189,Tax losses transferred in (from or to a foreign bank branch or a PE of a foreign financial entity),No.,"2,294","2,106","2,012","1,873"
+190,Tax losses transferred in (from or to a foreign bank branch or a PE of a foreign financial entity),Average $,"212,220","98,658","87,054","40,794"
+191,Tax losses transferred in (from or to a foreign bank branch or a PE of a foreign financial entity),Median $,"8,134","7,747","7,851","8,275"
+192,Subtraction items subtotal,No.,"545,217","550,770","534,239","536,875"
+193,Subtraction items subtotal,Average $,"786,401","757,975","840,226","836,485"
+194,Subtraction items subtotal,Median $,"11,591","11,212","12,169","13,648"
+195,Taxable income or loss,No.,"923,280","941,766","914,508","941,166"
+196,Taxable income or loss,Average $,"234,498","249,246","247,902","242,272"
+197,Taxable income or loss,Median $,,,,
+198,,,,,,
+199,Financial and other information,,,,,
+200,Opening stock,No.,"136,250","136,685","132,164","134,288"
+201,Opening stock,Average $,"1,396,548","1,477,450","1,526,863","1,531,282"
+202,Opening stock,Median $,"54,993","54,461","56,100","57,490"
+203,Purchases and other costs,No.,"207,722","211,095","204,737","211,171"
+204,Purchases and other costs,Average $,"4,719,942","4,538,710","4,808,089","4,825,989"
+205,Purchases and other costs,Median $,"189,933","193,398","205,792","211,661"
+206,Closing stock,No.,"141,112","141,558","136,492","138,081"
+207,Closing stock,Average $,"1,455,453","1,468,431","1,524,636","1,584,052"
+208,Closing stock,Median $,"52,651","54,126","55,000","57,888"
+209,Trade debtors,No.,"221,706","224,178","218,858","224,316"
+210,Trade debtors,Average $,"1,291,059","1,175,126","1,222,946","1,177,870"
+211,Trade debtors,Median $,"48,084","47,366","48,384","47,807"
+212,All current assets,No.,"713,367","725,086","708,279","730,210"
+213,All current assets,Average $,"2,759,466","2,745,197","3,245,526","3,053,975"
+214,All current assets,Median $,"55,202","55,736","58,470","59,219"
+215,Total assets,No.,"737,619","748,897","730,225","752,347"
+216,Total assets,Average $,"9,588,037","10,802,482","11,771,508","11,678,927"
+217,Total assets,Median $,"155,989","156,909","162,959","164,951"
+218,Trade creditors,No.,"239,560","240,937","231,617","233,981"
+219,Trade creditors,Average $,"835,694","925,236","947,476","932,541"
+220,Trade creditors,Median $,"28,844","28,758","29,425","29,587"
+221,All current liabilities,No.,"641,513","651,521","635,186","652,873"
+222,All current liabilities,Average $,"3,799,302","4,051,177","4,944,147","4,407,235"
+223,All current liabilities,Median $,"46,795","46,285","46,004","45,640"
+224,Total liabilities,No.,"695,261","706,657","688,530","709,590"
+225,Total liabilities,Average $,"7,279,545","7,479,499","9,505,646","9,501,210"
+226,Total liabilities,Median $,"94,870","94,580","95,507","96,378"
+227,Total debt,No.,"163,261","162,368","153,852","154,640"
+228,Total debt,Average $,"12,616,850","14,601,683","16,917,622","17,867,000"
+229,Total debt,Median $,"90,954","91,163","91,561","92,097"
+230,Commercial debt forgiveness,No.,"1,525","1,470","1,360","1,345"
+231,Commercial debt forgiveness,Average $,"3,530,068","2,805,972","4,102,897","2,145,730"
+232,Commercial debt forgiveness,Median $,"84,539","99,522","91,239","71,727"
+233,Franked dividends paid,No.,"159,815","162,392","161,412","167,575"
+234,Franked dividends paid,Average $,"638,875","769,577","686,517","778,209"
+235,Franked dividends paid,Median $,"48,000","50,000","50,000","50,000"
+236,Unfranked dividends paid,No.,"8,996","9,002","8,842","9,032"
+237,Unfranked dividends paid,Average $,"1,328,984","1,346,757","1,642,757","1,601,401"
+238,Unfranked dividends paid,Median $,"17,995","18,000","18,136","18,088"
+239,Franking account balance,No.,"378,085","403,197","400,078","413,585"
+240,Franking account balance,Average $,"733,615","745,589","793,741","801,977"
+241,Franking account balance,Median $,"46,744","46,509","48,730","49,534"
+242,Excess franking offsets,No.,"9,495","9,227","9,205","10,440"
+243,Excess franking offsets,Average $,"52,280","52,903","59,817","61,142"
+244,Excess franking offsets,Median $,"1,200","1,237","1,301","1,491"
+245,Loans to shareholders and their associates,No.,"70,968","74,784","75,463","78,629"
+246,Loans to shareholders and their associates,Average $,"733,046","699,371","729,580","725,652"
+247,Loans to shareholders and their associates,Median $,"89,270","91,970","94,661","95,806"
+248,Total salary and wage expenses,No.,"365,472","376,850","371,753","384,573"
+249,Total salary and wage expenses,Average $,"948,586","945,229","979,981","977,934"
+250,Total salary and wage expenses,Median $,"101,723","102,897","106,249","109,000"
+251,Payments to associated persons,No.,"237,564","245,079","241,567","247,337"
+252,Payments to associated persons,Average $,"111,587","101,769","103,684","106,417"
+253,Payments to associated persons,Median $,"60,971","62,000","64,360","65,200"
+254,Gross foreign income,No.,"13,243","13,781","14,635","16,122"
+255,Gross foreign income,Average $,"1,062,696","1,278,386","1,450,229","1,583,999"
+256,Gross foreign income,Median $,"2,213","3,289","4,939","6,050"
+257,Net foreign income,No.,"12,826","13,351","14,191","15,728"
+258,Net foreign income,Average $,"658,287","728,777","906,294","1,074,577"
+259,Net foreign income,Median $,"1,808","2,685","4,138","5,127"
+260,Attributed foreign income - Listed country,No.,115,114,95,105
+261,Attributed foreign income - Listed country,Average $,"832,078","954,782","1,230,166","1,206,541"
+262,Attributed foreign income - Listed country,Median $,"86,873","48,514","90,136","102,871"
+263,Attributed foreign income - Section 404 country,No.,188,183,158,na
+264,Attributed foreign income - Section 404 country,Average $,"4,581,654","5,150,057","6,723,465",na
+265,Attributed foreign income - Section 404 country,Median $,"225,921","256,370","339,259",na
+266,Attributed foreign income - Unlisted country,No.,238,243,245,364
+267,Attributed foreign income - Unlisted country,Average $,"6,263,773","6,128,449","9,235,553","9,009,427"
+268,Attributed foreign income - Unlisted country,Median $,"148,276","224,689","280,504","269,011"
+269,Attributed foreign income - Transferor trust,No.,4,5,5,5
+270,Attributed foreign income - Transferor trust,Average $,"103,165","1,849","13,244","7,970,258"
+271,Attributed foreign income - Transferor trust,Median $,"28,107",4,298,"42,475"
+272,Total TOFA gains,No.,"2,543","3,161","3,695","4,050"
+273,Total TOFA gains,Average $,"90,268,988","61,545,598","52,954,495","61,683,452"
+274,Total TOFA gains,Median $,"432,331","303,226","261,254","246,482"
+275,Total TOFA losses,No.,"2,299","2,843","3,259","3,604"
+276,Total TOFA losses,Average $,"82,469,758","53,912,337","45,577,723","58,076,453"
+277,Total TOFA losses,Median $,"905,960","988,352","888,373","891,619"
+278,TOFA transitional balancing adjustment,No.,170,181,88,na
+279,TOFA transitional balancing adjustment,Average $,"8,632,674","-325,722","-980,487",na
+280,TOFA transitional balancing adjustment,Median $,"123,032","75,839","78,229",na
+281,TOFA gains from unrealised movements in the value of financial arrangements,No.,145,68,61,105
+282,TOFA gains from unrealised movements in the value of financial arrangements,Average $,"95,693,156","179,484,445","162,945,862","336,631,593"
+283,TOFA gains from unrealised movements in the value of financial arrangements,Median $,"352,389","248,554","329,229","296,471"
+284,,,,,,
+285,Capital allowances,,,,,
+286,Depreciating assets first deducted in this income year,,,,,
+287,Intangible depreciating assets first deducted,No.,"5,291","5,351","5,312","4,881"
+288,Intangible depreciating assets first deducted,Average $,"3,285,279","2,893,642","2,611,603","3,205,102"
+289,Intangible depreciating assets first deducted,Median $,"15,307","14,695","16,459","22,230"
+290,Other depreciating assets first deducted,No.,"74,992","75,360","76,291","69,458"
+291,Other depreciating assets first deducted,Average $,"1,630,142","1,683,481","1,763,250","1,698,841"
+292,Other depreciating assets first deducted,Median $,"28,674","26,485","27,232","33,699"
+293,,,,,,
+294,For all depreciating assets,,,,,
+295,Total adjustable values at end of income year,No.,"72,952","84,060","87,967","85,916"
+296,Total adjustable values at end of income year,Average $,"5,828,764","6,976,901","7,105,963","8,053,452"
+297,Total adjustable values at end of income year,Median $,"45,878","43,771","46,482","51,085"
+298,Assessable balancing adjustments on the disposal of intangible depreciating assets,No.,"1,500","1,213","1,109",988
+299,Assessable balancing adjustments on the disposal of intangible depreciating assets,Average $,"2,829,647","1,158,223","850,726","1,021,034"
+300,Assessable balancing adjustments on the disposal of intangible depreciating assets,Median $,"8,000","6,832","7,425","8,135"
+301,Deductible balancing adjustments on the disposal of intangible depreciating assets,No.,"2,675","2,140","1,848","1,476"
+302,Deductible balancing adjustments on the disposal of intangible depreciating assets,Average $,"146,463","182,212","386,272","439,929"
+303,Deductible balancing adjustments on the disposal of intangible depreciating assets,Median $,"4,907","4,571","4,809","4,899"
+304,Termination value of intangible depreciating assets,No.,"1,389","1,360","1,308","1,194"
+305,Termination value of intangible depreciating assets,Average $,"4,473,303","1,675,953","839,380","432,011"
+306,Termination value of intangible depreciating assets,Median $,"10,587","11,151","11,111","10,909"
+307,Termination value of other depreciating assets,No.,"32,981","30,855","29,533","26,329"
+308,Termination value of other depreciating assets,Average $,"478,569","631,547","505,424","587,942"
+309,Termination value of other depreciating assets,Median $,"25,964","25,455","26,819","28,874"
+310,,,,,,
+311,"For entities connected with mining operations, exploration or prospecting",,,,,
+312,Total mining capital expenditure and/or transport capital that you allocated to a project pool and for which you can claim a deduction this income year,No.,135,137,133,111
+313,Total mining capital expenditure and/or transport capital that you allocated to a project pool and for which you can claim a deduction this income year,Average $,"21,663,791","43,160,323","29,692,679","38,942,944"
+314,Total mining capital expenditure and/or transport capital that you allocated to a project pool and for which you can claim a deduction this income year,Median $,"1,743,885","3,105,348","1,172,855","1,470,316"
+315,Total deduction for decline in value of intangible depreciating assets used in exploration or prospecting,No.,217,194,161,178
+316,Total deduction for decline in value of intangible depreciating assets used in exploration or prospecting,Average $,"31,630,060","12,702,310","8,179,494","4,742,052"
+317,Total deduction for decline in value of intangible depreciating assets used in exploration or prospecting,Median $,"335,235","231,527","172,641","179,614"
+318,Total deduction for decline in value of other depreciating assets used in exploration or prospecting,No.,307,302,250,204
+319,Total deduction for decline in value of other depreciating assets used in exploration or prospecting,Average $,"5,127,546","5,717,516","6,006,943","4,332,638"
+320,Total deduction for decline in value of other depreciating assets used in exploration or prospecting,Median $,"57,824","54,096","62,112","33,050"
+321,,,,,,
+322,Small business entity simplified depreciation,,,,,
+323,"Deduction for certain assets (costing less than $6,500)",No.,"64,069","47,800","53,592","74,464"
+324,"Deduction for certain assets (costing less than $6,500)",Average $,"6,692","5,315","7,133","12,183"
+325,"Deduction for certain assets (costing less than $6,500)",Median $,"3,438","2,147","2,508","4,950"
+326,Deduction for general small business pool,No.,"100,626","97,877","106,984","99,183"
+327,Deduction for general small business pool,Average $,"16,938","15,915","16,734","19,489"
+328,Deduction for general small business pool,Median $,"8,066","7,683","9,412","11,256"
+329,,,,,,
+330,"Consolidation deductions relating to rights to future income, consumable stores and work in progress",,,,,
+331,Pre rules deductions,No.,12,11,7,7
+332,Pre rules deductions,Average $,"4,605,080","4,855,414","5,023,443","5,543,310"
+333,Pre rules deductions,Median $,"40,699","16,027","20,400","51,521"
+334,Interim rules deductions,No.,25,24,15,12
+335,Interim rules deductions,Average $,"3,437,849","3,190,012","4,306,116","4,139,957"
+336,Interim rules deductions,Median $,"446,313","392,057","446,313","302,554"
+337,Prospective rules deductions,No.,24,21,15,17
+338,Prospective rules deductions,Average $,"5,067,215","2,407,807","6,676,680","11,572,882"
+339,Prospective rules deductions,Median $,"764,516","981,036","262,332","1,045,961"
+340,,,,,,
+341,National rental affordability scheme,,,,,
+342,National rental affordability scheme tax offset entitlement,No.,107,133,139,135
+343,National rental affordability scheme tax offset entitlement,Average $,"55,883","56,290","79,423","189,096"
+344,National rental affordability scheme tax offset entitlement,Median $,"14,450","14,978","14,985","16,376"
+345,,,,,,
+346,Losses information,,,,,
+347,Tax losses carried forward to later income years,No.,"395,851","401,346","387,205","399,935"
+348,Tax losses carried forward to later income years,Average $,"681,209","711,522","795,358","869,799"
+349,Tax losses carried forward to later income years,Median $,"19,932","19,730","18,916","19,613"
+350,Net capital losses carried forward to later income years,No.,"57,342","56,817","54,176","52,896"
+351,Net capital losses carried forward to later income years,Average $,"1,382,814","1,410,628","1,494,162","1,527,937"
+352,Net capital losses carried forward to later income years,Median $,"30,000","31,989","33,564","35,153"
+353,,,,,,
+354,Personal services income,,,,,
+355,Total amount of PSI included at item 6 income labels,No.,"24,819","26,100","25,283","25,279"
+356,Total amount of PSI included at item 6 income labels,Average $,"187,913","216,465","191,162","189,691"
+357,Total amount of PSI included at item 6 income labels,Median $,"115,550","112,499","113,100","113,287"
+358,Total amount of deductions against PSI included at item 6 expense labels,No.,"24,094","25,388","24,675","24,736"
+359,Total amount of deductions against PSI included at item 6 expense labels,Average $,"166,697","160,890","162,457","162,762"
+360,Total amount of deductions against PSI included at item 6 expense labels,Median $,"91,903","89,280","90,935","90,635"
+361,,,,,,
+362,Life insurance companies and friendly societies only,,,,,
+363,Complying superannuation/FHSA class,No.,16,19,21,17
+364,Complying superannuation/FHSA class,Average $,"630,832,357","516,769,125","486,443,850","650,851,057"
+365,Complying superannuation/FHSA class,Median $,"59,288,832","8,220,654","6,962,637","39,320,081"
+366,Net capital gain - ordinary class,No.,8,9,11,11
+367,Net capital gain - ordinary class,Average $,"12,158,823","60,747,776","41,389,333","31,000,500"
+368,Net capital gain - ordinary class,Median $,"1,033,348","3,315,668","2,588,243","11,988,827"
+369,Assessable contributions,No.,11,10,9,6
+370,Assessable contributions,Average $,"610,149,850","637,723,156","735,912,121","842,524,963"
+371,Assessable contributions,Median $,"26,421,644","26,140,969","27,889,288","188,908,187"
+372,Fees and charges,No.,24,26,24,25
+373,Fees and charges,Average $,"174,998,903","167,494,816","188,857,891","171,956,721"
+374,Fees and charges,Median $,"7,682,925","7,028,344","6,530,001","13,475,591"
+375,,,,,,
+376,First home saver account (FHSA) providers only,,,,,
+377,Amounts credited to FHSAs,No.,18,17,17,na
+378,Amounts credited to FHSAs,Average $,"886,346","1,019,468","1,057,565",na
+379,Amounts credited to FHSAs,Median $,"168,576","144,346","133,375",na
+380,Fees and charges applied to FHSAs,No.,3,2,2,na
+381,Fees and charges applied to FHSAs,Average $,"1,549",138,101,na
+382,Fees and charges applied to FHSAs,Median $,158,138,101,na
+383,Net amounts credited to FHSAs,No.,16,17,17,na
+384,Net amounts credited to FHSAs,Average $,"614,534","1,019,452","1,057,553",na
+385,Net amounts credited to FHSAs,Median $,"102,995","144,346","133,375",na
+386,,,,,,
+387,Pooled development funds,,,,,
+388,Small and medium sized enterprises income,No.,17,44,39,35
+389,Small and medium sized enterprises income,Average $,"1,572,914","1,598,507","1,405,072","1,035,762"
+390,Small and medium sized enterprises income,Median $,"294,043","173,471","221,548","117,303"
+391,Unregulated investment income,No.,10,5,4,7
+392,Unregulated investment income,Average $,"78,837","51,182","62,212","125,340"
+393,Unregulated investment income,Median $,"49,200","27,653","34,919","11,764"
+394,,,,,,
+395,Retirement savings accounts (RSAs) providers only,,,,,
+396,No-TFN contributions income,No.,5,4,2,4
+397,No-TFN contributions income,Average $,"244,983","394,312","525,754","313,080"
+398,No-TFN contributions income,Median $,"89,861","242,167","525,754","366,261"
+399,Income tax payable on no-TFN contributions income,No.,2,2,na,na
+400,Income tax payable on no-TFN contributions income,Average $,"155,626","172,134",na,na
+401,Income tax payable on no-TFN contributions income,Median $,"155,626","172,134",na,na
+402,Net taxable income from RSAs,No.,9,10,10,8
+403,Net taxable income from RSAs,Average $,"22,624,344","17,387,338","15,404,967","16,733,119"
+404,Net taxable income from RSAs,Median $,"3,602,230","2,789,389","3,124,067","3,124,691"
+405,,,,,,
+406,Foreign income tax offset,,,,,
+407,Foreign income tax offset,No.,"8,841","9,321","10,140","11,588"
+408,Foreign income tax offset,Average $,"58,837","63,521","65,901","69,435"
+409,Foreign income tax offset,Median $,184,327,444,522
+410,,,,,,
+411,Research and development tax incentive6,,,,,
+412,Non-refundable R&D tax offset,,,,,
+413,Non-refundable R&D tax offset,No.,"1,862","1,902","1,690","1,750"
+414,Non-refundable R&D tax offset,Average $,"3,517,982","2,839,415","3,028,057","2,012,803"
+415,Non-refundable R&D tax offset,Median $,"639,732","598,733","603,126","538,417"
+416,Non-refundable R&D tax offset carried forward from previous year,No.,400,719,816,865
+417,Non-refundable R&D tax offset carried forward from previous year,Average $,"2,307,285","3,489,003","4,340,979","5,129,719"
+418,Non-refundable R&D tax offset carried forward from previous year,Median $,"346,577","493,875","523,629","625,363"
+419,Non-refundable R&D tax offset to be utilised in current year,No.,"1,411","1,536","1,421","1,445"
+420,Non-refundable R&D tax offset to be utilised in current year,Average $,"3,387,269","2,712,702","2,589,816","2,186,371"
+421,Non-refundable R&D tax offset to be utilised in current year,Median $,"591,313","575,235","541,224","508,076"
+422,Non-refundable R&D tax offset carried forward to next year,No.,834,967,974,"1,010"
+423,Non-refundable R&D tax offset carried forward to next year,Average $,"3,053,431","3,835,661","5,141,697","4,682,518"
+424,Non-refundable R&D tax offset carried forward to next year,Median $,"439,613","482,460","497,529","534,135"
+425,,,,,,
+426,Refundable R&D tax offset,,,,,
+427,Refundable R&D tax offset,No.,"7,973","9,272","10,116","10,710"
+428,Refundable R&D tax offset,Average $,"251,180","247,209","239,616","239,081"
+429,Refundable R&D tax offset,Median $,"119,862","114,731","114,348","111,666"
+430,,,,,,
+431,Feedstock adjustment,,,,,
+432,Feedstock adjustment - additional assessable income,No.,307,430,473,433
+433,Feedstock adjustment - additional assessable income,Average $,"3,203,679","1,652,486","1,049,493","569,139"
+434,Feedstock adjustment - additional assessable income,Median $,"52,042","49,464","40,983","37,131"
+435,,,,,,
+436,Calculation statement,,,,,
+437,Taxable or net income,No.,"376,028","388,830","390,774","406,664"
+438,Taxable or net income,Average $,"711,177","734,324","719,201","717,364"
+439,Taxable or net income,Median $,"33,814","34,479","36,221","38,048"
+440,Tax on taxable income,No.,"375,588","388,546","390,442","406,424"
+441,Tax on taxable income,Average $,"209,195","216,136","211,130","210,082"
+442,Tax on taxable income,Median $,"10,177","10,362","10,888","11,108"
+443,R&D recoupment tax,No.,281,281,243,223
+444,R&D recoupment tax,Average $,"62,912","54,732","48,597","41,800"
+445,R&D recoupment tax,Median $,"16,492","19,926","13,150","14,065"
+446,Gross tax,No.,"375,710","388,633","390,468","406,467"
+447,Gross tax,Average $,"209,175","216,124","211,142","209,988"
+448,Gross tax,Median $,"10,177","10,365","10,890","11,110"
+449,Non-refundable non-carry forward tax offsets,No.,"49,673","52,103","52,962","55,974"
+450,Non-refundable non-carry forward tax offsets,Average $,"184,912","242,258","199,259","280,681"
+451,Non-refundable non-carry forward tax offsets,Median $,"5,672","6,857","8,372","8,503"
+452,Subtotal 1,No.,"365,261","377,748","379,362","393,844"
+453,Subtotal 1,Average $,"190,950","189,865","190,740","178,139"
+454,Subtotal 1,Median $,"9,248","9,389","9,789","9,947"
+455,Non-refundable carry forward tax offsets,No.,"3,027","2,989","2,948","3,146"
+456,Non-refundable carry forward tax offsets,Average $,"2,265,564","2,542,514","2,441,502","2,203,268"
+457,Non-refundable carry forward tax offsets,Median $,"172,799","244,595","208,723","188,378"
+458,Subtotal 2,No.,"364,444","376,977","378,586","393,038"
+459,Subtotal 2,Average $,"178,298","177,999","180,969","169,684"
+460,Subtotal 2,Median $,"9,207","9,342","9,741","9,901"
+461,Refundable tax offsets,No.,"24,027","13,888","14,304","14,873"
+462,Refundable tax offsets,Average $,"126,397","246,091","255,732","266,452"
+463,Refundable tax offsets,Median $,"14,428","70,111","74,670","75,301"
+464,Subtotal 3,No.,"360,612","372,610","373,854","388,384"
+465,Subtotal 3,Average $,"176,661","176,275","179,375","167,313"
+466,Subtotal 3,Median $,"8,988","9,090","9,484","9,641"
+467,Franking deficit tax offset,No.,348,442,494,472
+468,Franking deficit tax offset,Average $,"484,546","191,881","274,021","227,257"
+469,Franking deficit tax offset,Median $,"14,122","17,143","14,711","17,419"
+470,Tax payable,No.,"360,743","372,582","373,915","388,361"
+471,Tax payable,Average $,"176,219","176,089","179,083","167,227"
+472,Tax payable,Median $,"8,972","9,078","9,461","9,629"
+473,Section 102AAM interest charge,No.,14,12,11,na
+474,Section 102AAM interest charge,Average $,677,"2,298",214,na
+475,Section 102AAM interest charge,Median $,261,380,135,na
+476,Credit for interest on early payments - amount of interest,No.,127,126,109,126
+477,Credit for interest on early payments - amount of interest,Average $,"2,585","2,357","2,123",757
+478,Credit for interest on early payments - amount of interest,Median $,61,121,50,24
+479,Credit for tax withheld - foreign resident withholding,No.,"1,553","1,468","1,362","1,321"
+480,Credit for tax withheld - foreign resident withholding,Average $,"102,882","107,958","78,220","72,550"
+481,Credit for tax withheld - foreign resident withholding,Median $,"1,345","1,791","1,470","1,413"
+482,Credit for tax withheld where ABN is not quoted,No.,151,120,98,100
+483,Credit for tax withheld where ABN is not quoted,Average $,"4,816","8,491","1,756","7,156"
+484,Credit for tax withheld where ABN is not quoted,Median $,368,226,163,209
+485,Tax withheld from interest or investments,No.,"17,320","16,536","15,715","14,922"
+486,Tax withheld from interest or investments,Average $,"2,222","2,202","1,876","1,635"
+487,Tax withheld from interest or investments,Median $,170,168,177,154
+488,Credit for TFN amounts withheld from payments from closely held trusts,No.,247,190,227,230
+489,Credit for TFN amounts withheld from payments from closely held trusts,Average $,"5,417","3,484","3,126","4,733"
+490,Credit for TFN amounts withheld from payments from closely held trusts,Median $,184,226,174,162
+491,Other credits,No.,"7,522","5,898","5,409","5,382"
+492,Other credits,Average $,"54,133","57,704","69,768","82,230"
+493,Other credits,Median $,"1,193","1,002","1,089","1,097"
+494,Eligible credits,No.,"25,947","23,568","22,226","21,374"
+495,Eligible credits,Average $,"23,422","22,781","23,138","26,415"
+496,Eligible credits,Median $,283,256,261,242
+497,Remainder of refundable tax offsets,No.,"20,083","10,389","11,139","11,708"
+498,Remainder of refundable tax offsets,Average $,"87,540","192,054","197,262","192,301"
+499,Remainder of refundable tax offsets,Median $,"11,965","53,901","56,893","60,287"
+500,PAYG instalments raised,No.,"340,116","346,087","336,588","348,409"
+501,PAYG instalments raised,Average $,"162,566","164,346","163,145","153,340"
+502,PAYG instalments raised,Median $,"6,984","6,959","7,102","7,000"
+503,Amount due or refundable,No.,"465,431","473,283","468,619","485,850"
+504,Amount due or refundable,Average $,"12,704","13,094","19,926","17,914"
+505,Amount due or refundable,Median $,19,48,125,167
+506,Net tax,No.,"364,616","377,000","378,669","393,048"
+507,Net tax,Average $,"178,009","177,823","180,685","169,605"
+508,Net tax,Median $,"9,194","9,330","9,722","9,889"
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,

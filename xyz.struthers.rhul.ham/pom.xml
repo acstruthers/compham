@@ -1,0 +1,462 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.green_n_gold.rhul.ham</groupId>
+	<artifactId>com.green_n_gold.rhul.ham</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Computational Heterogeneous Agent Model</name>
+	<description>MSc International Management dissertation model</description>
+	<inceptionYear>2018</inceptionYear>
+	<developers>
+		<developer>
+			<id>adam</id>
+			<name>Adam Struthers</name>
+			<email>acstruthers@gmail.com</email>
+			<roles>
+				<role>owner</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+10</timezone>
+		</developer>
+	</developers>
+
+	<properties>
+		<!-- Stops the following error message, per https://maven.apache.org/general.html: 
+			"[WARNING] Using platform encoding (Cp1252 actually) to copy filtered resources, 
+			i.e. build is platform dependent!" -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<version.java>1.8</version.java><!-- Glassfish 5 is only compatible with 
+			Java 8, so don't use 9 or 10 yet -->
+		<version.maven-compiler-plugin>3.5.1</version.maven-compiler-plugin><!-- 
+			3.5.x for Java 8 -->
+		<version.aspectj-maven-plugin>1.11</version.aspectj-maven-plugin><!-- AspectJ 
+			weaver plugin 7 is for Java 8 (version 1.6 is for Java 7) -->
+		<version.aspectj>1.8.7</version.aspectj>
+		<version.aspectjlib>1.6.2</version.aspectjlib><!-- current as at Aug-18 -->
+		<version.org.springframework>5.1.4.RELEASE</version.org.springframework>
+		<version.org.springframework.boot>2.1.2.RELEASE</version.org.springframework.boot>
+
+		<version.maven>3.5.4</version.maven>
+		<version.maven-enforcer-plugin>1.4.1</version.maven-enforcer-plugin>
+		<version.maven-remote-resources-plugin>1.5</version.maven-remote-resources-plugin><!-- 
+			current as at Aug-18 -->
+
+		<version.edu.gmu.cs.mason>19.0</version.edu.gmu.cs.mason><!-- the repository 
+			only has v14.0, so copy the JAR file for v19.0 manually -->
+
+		<version.mysql>8.0.12</version.mysql>
+		<version.eclipse.persistence.eclipselink>2.7.3</version.eclipse.persistence.eclipselink>
+		<version.eclipse.persistence.javax.persistence>2.1.1</version.eclipse.persistence.javax.persistence>
+		<version.apache.commons-lang3>3.7</version.apache.commons-lang3>
+
+		<version.shiro>1.4.0</version.shiro>
+		<version.google.guava>26.0-jre</version.google.guava>
+		<version.opencsv>3.8</version.opencsv>
+		<version.slf4j>1.7.25</version.slf4j>
+		<version.logback>1.2.3</version.logback>
+		<version.jcl>1.2</version.jcl><!-- commons-logging -->
+		<version.groovy>2.4.6</version.groovy><!-- need Groovy to use a *.groovy 
+			config file instead of XML config file -->
+
+		<version.junit>4.12</version.junit>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- Spring dependencies -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-core</artifactId>
+				<version>${version.org.springframework}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${version.org.springframework}</version>
+				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-beans</artifactId>
+				<version>${version.org.springframework}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-jdbc</artifactId>
+				<version>${version.org.springframework}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot</artifactId>
+				<version>${version.org.springframework.boot}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter</artifactId>
+				<version>${version.org.springframework.boot}</version>
+			</dependency>
+
+			<!-- Simulation-specific libraries -->
+			<dependency>
+				<groupId>edu.gmu.cs</groupId>
+				<artifactId>mason</artifactId>
+				<version>${version.edu.gmu.cs.mason}</version>
+			</dependency>
+
+			<!-- Matrix maths -->
+			<dependency>
+				<!-- http://ejml.org/wiki/index.php?title=Main_Page -->
+				<groupId>org.ejml</groupId>
+				<artifactId>ejml-core</artifactId>
+				<version>${version.ejml-core}</version>
+			</dependency>
+
+			<!-- JPA dependencies -->
+			<dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<version>${version.mysql}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.persistence</groupId>
+				<artifactId>eclipselink</artifactId>
+				<version>${version.eclipse.persistence.eclipselink}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.persistence</groupId>
+				<artifactId>javax.persistence</artifactId>
+				<version>${version.eclipse.persistence.javax.persistence}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>${version.apache.commons-lang3}</version>
+			</dependency>
+			<!-- <dependency> <groupId>org.eclipse.persistence</groupId> <artifactId>org.eclipse.persistence.jpa</artifactId> 
+				<version>2.7.3</version><!- was 2.6.2 -> </dependency> -->
+
+			<!-- AOP dependencies -->
+			<dependency>
+				<groupId>org.aspectj</groupId>
+				<artifactId>aspectjlib</artifactId>
+				<version>${version.aspectjlib}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.aspectj</groupId>
+				<artifactId>aspectjrt</artifactId>
+				<version>${version.aspectj}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.aspectj</groupId>
+				<artifactId>aspectjtools</artifactId>
+				<version>${version.aspectj}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.aspectj</groupId>
+				<artifactId>aspectjweaver</artifactId>
+				<version>${version.aspectj}</version>
+			</dependency>
+
+			<!-- security dependencies -->
+			<dependency>
+				<groupId>org.apache.shiro</groupId>
+				<artifactId>shiro-all</artifactId>
+				<version>${version.shiro}</version>
+			</dependency>
+
+			<!-- comms dependencies -->
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>${version.google.guava}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.opencsv</groupId>
+				<artifactId>opencsv</artifactId>
+				<version>${version.opencsv}</version>
+			</dependency>
+
+			<!-- logging dependencies -->
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${version.slf4j}</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>${version.logback}</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-core</artifactId>
+				<version>${version.logback}</version>
+			</dependency>
+			<dependency>
+				<!-- need Groovy to use a *.groovy config file instead of XML config 
+					file -->
+				<groupId>org.codehaus.groovy</groupId>
+				<artifactId>groovy</artifactId>
+				<version>${version.groovy}</version>
+			</dependency>
+			<!-- exclude Commons Logging (JCL) by declaring it in 'provided' scope, 
+				then using jcl-over-slf4j -->
+			<!-- http://www.slf4j.org/faq.html#excludingJCL -->
+			<dependency>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging</artifactId>
+				<version>${version.jcl}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jcl-over-slf4j</artifactId>
+				<version>${version.slf4j}</version>
+			</dependency>
+
+			<!-- testing dependencies -->
+			<!-- https://junit.org/junit5/docs/current/user-guide/ -->
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${version.junit}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-test</artifactId>
+				<version>${version.org.springframework}</version>
+				<scope>test</scope>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<!-- Spring dependencies -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+
+		<!-- Simulation-specific libraries -->
+		<dependency>
+			<groupId>edu.gmu.cs</groupId>
+			<artifactId>mason</artifactId>
+		</dependency>
+
+		<!-- AOP dependencies -->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjlib</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjtools</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+		</dependency>
+
+		<!-- comms dependencies -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+		</dependency>
+
+
+		<!-- logging dependencies -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+		</dependency>
+		<!-- <dependency> <groupId>commons-logging</groupId> <artifactId>commons-logging-api</artifactId> 
+			</dependency> <dependency> <groupId>org.apache.logging.log4j</groupId> <artifactId>log4j-api</artifactId> 
+			</dependency> <dependency> <groupId>org.apache.logging.log4j</groupId> <artifactId>log4j-core</artifactId> 
+			</dependency> <dependency> <groupId>org.apache.logging.log4j</groupId> <artifactId>log4j-jcl</artifactId> 
+			</dependency> -->
+
+		<!-- testing dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<!-- AOP plugin -->
+				<!-- http://www.mojohaus.org/aspectj-maven-plugin/usage.html -->
+				<!-- http://www.javacodegeeks.com/2010/07/aspect-oriented-programming-with-spring.html -->
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>aspectj-maven-plugin</artifactId>
+					<version>${version.aspectj-maven-plugin}</version>
+					<configuration>
+						<complianceLevel>${version.java}</complianceLevel>
+						<source>${version.java}</source>
+						<target>${version.java}</target>
+					</configuration>
+
+					<executions>
+						<execution>
+							<goals>
+								<goal>compile</goal>       <!-- use this goal to weave all your main classes -->
+								<goal>test-compile</goal>  <!-- use this goal to weave all your test classes -->
+							</goals>
+						</execution>
+					</executions>
+					<dependencies>
+						<dependency>
+							<groupId>org.aspectj</groupId>
+							<artifactId>aspectjrt</artifactId>
+							<version>${version.aspectj}</version>
+						</dependency>
+						<dependency>
+							<groupId>org.aspectj</groupId>
+							<artifactId>aspectjtools</artifactId>
+							<version>${version.aspectj}</version>
+						</dependency>
+						<dependency>
+							<groupId>org.aspectj</groupId>
+							<artifactId>aspectjweaver</artifactId>
+							<version>${version.aspectj}</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+
+				<!-- Java 8 SE compiler plugin -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${version.maven-compiler-plugin}</version>
+					<configuration>
+						<!-- https://maven.apache.org/plugins/maven-compiler-plugin/examples/set-compiler-source-and-target.html -->
+						<source>${version.java}</source>
+						<target>${version.java}</target>
+						<release>${version.java}</release>
+						<!-- http://maven.apache.org/plugins/maven-compiler-plugin/examples/compile-using-different-jdk.html -->
+						<verbose>true</verbose>
+						<fork>true</fork>
+						<executable>${JAVA_HOME}\..\bin\javac</executable><!-- J8 points to 
+							jdk\jre so need to go up a folder -->
+						<!-- <executable>${JAVA_HOME}\bin\javac</executable> -->
+						<compilerVersion>${version.java}</compilerVersion>
+					</configuration>
+					<dependencies>
+						<!-- https://stackoverflow.com/questions/49398894/unable-to-compile-simple-java-10-project-with-maven 
+							maven-compiler-plugin depends on the old version of ASM which does not support 
+							Java 10 (and Java 11) yet. However, it is possible to explicitly specify 
+							the right version of ASM: -->
+						<dependency>
+							<groupId>org.ow2.asm</groupId>
+							<artifactId>asm</artifactId>
+							<version>6.2.1</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+
+				<!-- Maven enforcer plugin -->
+				<plugin>
+					<!-- Helps to ensure that the build environment complies with certain 
+						prerequisites. This can minimise/avoid silly little bugs with incomprehensible 
+						error messages. https://maven.apache.org/enforcer/maven-enforcer-plugin/usage.html -->
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-enforcer-plugin</artifactId>
+					<version>${version.maven-enforcer-plugin}</version>
+					<executions>
+						<execution>
+							<id>enforce-versions</id>
+							<goals>
+								<goal>enforce</goal>
+							</goals>
+							<configuration>
+								<rules>
+									<requireMavenVersion>
+										<version>${version.maven}</version>
+									</requireMavenVersion>
+									<requireJavaVersion>
+										<version>${version.java}</version>
+									</requireJavaVersion>
+									<requireOS>
+										<family>windows</family><!-- should use profiles for POM variables 
+											rather than requireOS -->
+									</requireOS>
+								</rules>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+		<plugins>
+			<!-- Maven plugins -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+			</plugin>
+
+			<!-- AOP plugin -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>aspectj-maven-plugin</artifactId>
+			</plugin>
+
+			<!-- Java 8 SE compiler plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

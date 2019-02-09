@@ -2,6 +2,7 @@
 mason/
 demo/
 Servers/
+.recommenders/
 
 # Eclipse
 .classpath

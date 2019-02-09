@@ -1,0 +1,22 @@
+Australian Bureau of Statistics
+
+"2016 Census - Selected Dwelling Characteristics"
+"LGA by HIND Total Household Income (weekly)"
+"Counting: Dwellings Location on Census Night"
+
+Filters:
+"Default Summation","Dwellings Location on Census Night"
+
+"HIND Total Household Income (weekly)","Negative income","Nil income","$1-$149 ($1-$7,799)","$150-$299 ($7,800-$15,599)","$300-$399 ($15,600-$20,799)","$400-$499 ($20,800-$25,999)","$500-$649 ($26,000-$33,799)","$650-$799 ($33,800-$41,599)","$800-$999 ($41,600-$51,999)","$1,000-$1,249 ($52,000-$64,999)","$1,250-$1,499 ($65,000-$77,999)","$1,500-$1,749 ($78,000-$90,999)","$1,750-$1,999 ($91,000-$103,999)","$2,000-$2,499 ($104,000-$129,999)","$2,500-$2,999 ($130,000-$155,999)","$3,000-$3,499 ($156,000-$181,999)","$3,500-$3,999 ($182,000-$207,999)","$4,000-$4,499 ($208,000-$233,999)","$4,500-$4,999 ($234,000-$259,999)","$5,000-$5,999 ($260,000-$311,999)","$6,000-$7,999 ($312,000-$415,999)","$8,000 or more ($416,000 or more)","Partial income stated","All incomes not stated","Not applicable","Total",
+"LGA",
+"Unincorp. Other Territories",8,8,21,31,31,86,69,92,104,134,117,103,88,163,78,47,48,22,18,12,14,0,123,69,533,2010,
+"Migratory - Offshore - Shipping (OT)",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+"Total",8,8,21,31,31,86,69,92,104,134,117,103,88,163,78,47,48,22,18,12,14,0,123,69,533,2006,
+
+"Data Source: Census of Population and Housing, 2016, TableBuilder"
+
+"INFO","Cells in this table have been randomly adjusted to avoid the release of confidential data. No reliance should be placed on small cells."
+
+
+"Copyright Commonwealth of Australia, 2018, see abs.gov.au/copyright"
+"ABS data licensed under Creative Commons, see abs.gov.au/ccby"
