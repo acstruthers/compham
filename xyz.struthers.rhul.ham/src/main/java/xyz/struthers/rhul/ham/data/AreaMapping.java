@@ -4,8 +4,9 @@
 package xyz.struthers.rhul.ham.data;
 
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -298,32 +299,23 @@ public class AreaMapping {
 		final boolean[] absLoadColumn = { false, false, false, false, false, false, false, false, false, false, false,
 				true, true, true, true, false };
 		this.absData = new HashMap<String, Map<String, String>>();
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\1270.0.55.001_AbsMeshblock\\MB_2016_ACT.csv",
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_ACT.csv",
 				this.absData, absLoadColumn);
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\1270.0.55.001_AbsMeshblock\\MB_2016_NSW.csv",
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_NSW.csv",
 				this.absData, absLoadColumn);
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\1270.0.55.001_AbsMeshblock\\MB_2016_NT.csv", this.absData,
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_NT.csv", this.absData,
 				absLoadColumn);
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\1270.0.55.001_AbsMeshblock\\MB_2016_OT.csv", this.absData,
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_OT.csv", this.absData,
 				absLoadColumn);
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\1270.0.55.001_AbsMeshblock\\MB_2016_QLD.csv",
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_QLD.csv",
 				this.absData, absLoadColumn);
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\1270.0.55.001_AbsMeshblock\\MB_2016_SA.csv", this.absData,
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_SA.csv", this.absData,
 				absLoadColumn);
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\1270.0.55.001_AbsMeshblock\\MB_2016_TAS.csv",
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_TAS.csv",
 				this.absData, absLoadColumn);
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\1270.0.55.001_AbsMeshblock\\MB_2016_VIC.csv",
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_VIC.csv",
 				this.absData, absLoadColumn);
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\1270.0.55.001_AbsMeshblock\\MB_2016_WA.csv", this.absData,
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_WA.csv", this.absData,
 				absLoadColumn);
 
 		// load LGA data
@@ -332,47 +324,35 @@ public class AreaMapping {
 
 		final boolean[] lgaLoadColumn = { false, true, true, false, false, false };
 		this.lgaData = new HashMap<String, Map<String, String>>();
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\1270.0.55.003_NonAbsMeshblock\\LGA_2018_ACT.csv",
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_ACT.csv",
 				this.lgaData, lgaLoadColumn);
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\1270.0.55.003_NonAbsMeshblock\\LGA_2018_NSW.csv",
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_NSW.csv",
 				this.lgaData, lgaLoadColumn);
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\1270.0.55.003_NonAbsMeshblock\\LGA_2018_NT.csv",
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_NT.csv",
 				this.lgaData, lgaLoadColumn);
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\1270.0.55.003_NonAbsMeshblock\\LGA_2018_OT.csv",
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_OT.csv",
 				this.lgaData, lgaLoadColumn);
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\1270.0.55.003_NonAbsMeshblock\\LGA_2018_QLD.csv",
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_QLD.csv",
 				this.lgaData, lgaLoadColumn);
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\1270.0.55.003_NonAbsMeshblock\\LGA_2018_SA.csv",
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_SA.csv",
 				this.lgaData, lgaLoadColumn);
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\1270.0.55.003_NonAbsMeshblock\\LGA_2018_TAS.csv",
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_TAS.csv",
 				this.lgaData, lgaLoadColumn);
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\1270.0.55.003_NonAbsMeshblock\\LGA_2018_VIC.csv",
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_VIC.csv",
 				this.lgaData, lgaLoadColumn);
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\1270.0.55.003_NonAbsMeshblock\\LGA_2018_WA.csv",
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_WA.csv",
 				this.lgaData, lgaLoadColumn);
 
 		// load POA data
 		final boolean[] poaLoadColumn = { false, true, false, false };
 		this.poaData = new HashMap<String, Map<String, String>>();
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\1270.0.55.003_NonAbsMeshblock\\POA_2016_AUST.csv",
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/POA_2016_AUST.csv",
 				this.poaData, poaLoadColumn);
 
 		// load mesh block counts
 		final boolean[] countLoadColumn = { false, false, false, true, true, false };
 		this.countData = new HashMap<String, Map<String, String>>();
-		this.readMeshblockCsvData(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\2074.0_MeshblockCounts\\2016 Census Mesh Block Counts.csv",
+		this.readMeshblockCsvData("/data/ABS/2074.0_MeshblockCounts/2016 Census Mesh Block Counts.csv",
 				this.countData, countLoadColumn);
 
 		// load postcode latitude and longitude
@@ -387,7 +367,7 @@ public class AreaMapping {
 	/**
 	 * Reads in a single Meshblock CSV file.
 	 * 
-	 * @param fileURI
+	 * @param fileResourceLocation
 	 *            - the URI to the CSV file
 	 * @param title
 	 *            - the column titles in the CSV file
@@ -398,14 +378,15 @@ public class AreaMapping {
 	 *            in the CSV file when reading them. It always excludes the first
 	 *            column regardless of the value in loadColumn[0].
 	 */
-	private void readMeshblockCsvData(String fileURI, Map<String, Map<String, String>> data, boolean[] loadColumn) {
+	private void readMeshblockCsvData(String fileResourceLocation, Map<String, Map<String, String>> data, boolean[] loadColumn) {
 
 		final int LGA_NAME_COL = 4;
 
 		CSVReader reader = null;
 		try {
 			// open file
-			reader = new CSVReader(new FileReader(fileURI));
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
 
 			// read column headings from row 1
 			String[] title = reader.readNext();
@@ -456,6 +437,9 @@ public class AreaMapping {
 					break; // data has finished, so break out of loop before copyright notice, etc.
 				}
 			}
+			// close reader
+			reader.close();
+			reader = null;
 		} catch (FileNotFoundException e) {
 			// open file
 			e.printStackTrace();

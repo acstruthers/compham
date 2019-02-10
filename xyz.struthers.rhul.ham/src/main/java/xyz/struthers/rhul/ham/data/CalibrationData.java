@@ -4,8 +4,9 @@
 package xyz.struthers.rhul.ham.data;
 
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -227,9 +228,8 @@ public class CalibrationData {
 	/**
 	 * Gets the total Australian population as at a given date
 	 * 
-	 * @param date
-	 *            - Dates in the data file are MMM-yyyy, so date argument should be
-	 *            the first day of each Month.
+	 * @param date - Dates in the data file are MMM-yyyy, so date argument should be
+	 *             the first day of each Month.
 	 * @return total Australian population
 	 */
 	public int getTotalPopulation(Date date) {
@@ -295,23 +295,27 @@ public class CalibrationData {
 		// load ABS 1292.0.55.002 ANZSIC mapping table
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 1292.0.55.002 ANZSIC mapping table");
 		this.abs1292_0_55_002ANZSIC = new HashMap<String, Map<String, String>>(4 + 4 + 3 + 2 + 1);
-		this.loadAbsDataCsv_1292_0_55_002(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\1292.0.55.002_ANZSIC\\1292.0.55.002_ANZSIC codes formatted.csv",
+		/*
+		 * this.loadAbsDataCsv_1292_0_55_002(
+		 * 
+		 * + "/data/ABS/1292.0.55.002_ANZSIC/1292.0.55.002_ANZSIC codes formatted.csv",
+		 * ABS1292_0_55_002_ANZSIC, this.title, this.abs1292_0_55_002ANZSIC);
+		 */
+		this.loadAbsDataCsv_1292_0_55_002("/data/ABS/1292.0.55.002_ANZSIC/1292.0.55.002_ANZSIC codes formatted.csv",
 				ABS1292_0_55_002_ANZSIC, this.title, this.abs1292_0_55_002ANZSIC);
 
 		// load RBA data
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading RBA E1 data");
 		this.rbaE1 = new HashMap<String, Map<Date, String>>();
 		int[] rbaE1Columns = { 1, 3, 4, 8, 9, 10, 11, 14, 15, 16, 17, 18, 20, 23 };
-		this.loadRbaDataCsv(Properties.RESOURCE_DIRECTORY + "\\data\\RBA\\\\E_HouseholdBusiness\\e1-data.csv", RBA_E1,
-				rbaE1Columns, this.title, this.unitType, this.rbaE1);
+		this.loadRbaDataCsv("/data/RBA/E_HouseholdBusiness/e1-data.csv", RBA_E1, rbaE1Columns, this.title,
+				this.unitType, this.rbaE1);
 
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading RBA E2 data");
 		this.rbaE2 = new HashMap<String, Map<Date, String>>();
 		int[] rbaE2Columns = { 3, 6, 8, 9, 10 };
-		this.loadRbaDataCsv(Properties.RESOURCE_DIRECTORY + "\\data\\RBA\\E_HouseholdBusiness\\e2-data.csv", RBA_E2,
-				rbaE2Columns, this.title, this.unitType, this.rbaE2);
+		this.loadRbaDataCsv("/data/RBA/E_HouseholdBusiness/e2-data.csv", RBA_E2, rbaE2Columns, this.title,
+				this.unitType, this.rbaE2);
 
 		// load ABS 1410.0 data
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 1410.0 Economy data");
@@ -319,9 +323,7 @@ public class CalibrationData {
 		int[] abs1410_0EconomyColumns = { 49, 50, 51, 52, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99,
 				100, 101, 102, 103, 104 };
 		String[] abs1410_0EconomyYears = { "2016" };
-		this.loadAbsDataCsv_1410_0(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\1410.0_DataByRegion\\Economy and Industry, LGA, 2011 to 2017.csv",
+		this.loadAbsDataCsv_1410_0("/data/ABS/1410.0_DataByRegion/Economy and Industry, LGA, 2011 to 2017.csv",
 				ABS1410_0_ECONOMY, abs1410_0EconomyColumns, abs1410_0EconomyYears, this.title, this.unitType,
 				this.abs1410_0Economy);
 
@@ -330,9 +332,7 @@ public class CalibrationData {
 		int[] abs1410_0FamilyColumns = { 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 41, 42, 49, 57, 58, 59, 60,
 				61, 62, 63 };
 		String[] abs1410_0FamilyYears = { "2016" };
-		this.loadAbsDataCsv_1410_0(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\1410.0_DataByRegion\\Family and Community, LGA, 2011 to 2017.csv",
+		this.loadAbsDataCsv_1410_0("/data/ABS/1410.0_DataByRegion/Family and Community, LGA, 2011 to 2017.csv",
 				ABS1410_0_FAMILY, abs1410_0FamilyColumns, abs1410_0FamilyYears, this.title, this.unitType,
 				this.abs1410_0Family);
 
@@ -340,8 +340,8 @@ public class CalibrationData {
 		this.abs1410_0Income = new HashMap<String, Map<String, Map<String, String>>>(7); // 7 years in the data file
 		int[] abs1410_0IncomeColumns = { 15, 19, 20, 21, 25, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60 };
 		String[] abs1410_0IncomeYears = { "2016" };
-		this.loadAbsDataCsv_1410_0(Properties.RESOURCE_DIRECTORY
-				+ "\\data\\ABS\\1410.0_DataByRegion\\Income (including Government Allowances), LGA, 2011 to 2017.csv",
+		this.loadAbsDataCsv_1410_0(
+				"/data/ABS/1410.0_DataByRegion/Income (including Government Allowances), LGA, 2011 to 2017.csv",
 				ABS1410_0_INCOME, abs1410_0IncomeColumns, abs1410_0IncomeYears, this.title, this.unitType,
 				this.abs1410_0Income);
 
@@ -355,9 +355,8 @@ public class CalibrationData {
 				283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302,
 				303 }; // loads count of Persons 0 - 100
 		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\3222.0_PopnProjections\\Table B9. Population projections - Series B.csv",
-				ABS_3222_0, abs3220_0Columns, this.title, this.unitType, this.abs3222_0);
+				"/data/ABS/3222.0_PopnProjections/Table B9. Population projections - Series B.csv", ABS_3222_0,
+				abs3220_0Columns, this.title, this.unitType, this.abs3222_0);
 
 		// load ABS 5368.0 International Trade data
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 5368.0 International Trade data");
@@ -375,119 +374,100 @@ public class CalibrationData {
 				206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226,
 				227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247,
 				248, 249, 250, 251, 252 };
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5368.0_IntlTrade\\5368014a - exports by country.csv",
-				ABS_5368_0_T14A, abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table14a);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368014a - exports by country.csv", ABS_5368_0_T14A,
+				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table14a);
 
 		System.out.print(", 14b");
 		this.abs5368_0Table14b = new HashMap<String, Map<Date, String>>();
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5368.0_IntlTrade\\5368014b - imports by country.csv",
-				ABS_5368_0_T14B, abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table14b);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368014b - imports by country.csv", ABS_5368_0_T14B,
+				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table14b);
 
 		System.out.print(", 36a");
 		this.abs5368_0Table36a = new HashMap<String, Map<Date, String>>();
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5368.0_IntlTrade\\5368036a - merch exports NSW.csv",
-				ABS_5368_0_T36A, abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36a);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036a - merch exports NSW.csv", ABS_5368_0_T36A,
+				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36a);
 
 		System.out.print(", 36b");
 		this.abs5368_0Table36b = new HashMap<String, Map<Date, String>>();
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5368.0_IntlTrade\\5368036b - merch exports VIC.csv",
-				ABS_5368_0_T36B, abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36b);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036b - merch exports VIC.csv", ABS_5368_0_T36B,
+				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36b);
 
 		System.out.print(", 36c");
 		this.abs5368_0Table36c = new HashMap<String, Map<Date, String>>();
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5368.0_IntlTrade\\5368036c - merch exports QLD.csv",
-				ABS_5368_0_T36C, abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36c);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036c - merch exports QLD.csv", ABS_5368_0_T36C,
+				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36c);
 
 		System.out.print(", 36d");
 		this.abs5368_0Table36d = new HashMap<String, Map<Date, String>>();
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5368.0_IntlTrade\\5368036d - merch exports SA.csv",
-				ABS_5368_0_T36D, abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36d);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036d - merch exports SA.csv", ABS_5368_0_T36D,
+				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36d);
 
 		System.out.print(", 36e");
 		this.abs5368_0Table36e = new HashMap<String, Map<Date, String>>();
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5368.0_IntlTrade\\5368036e - merch exports WA.csv",
-				ABS_5368_0_T36E, abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36e);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036e - merch exports WA.csv", ABS_5368_0_T36E,
+				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36e);
 
 		System.out.print(", 36f");
 		this.abs5368_0Table36f = new HashMap<String, Map<Date, String>>();
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5368.0_IntlTrade\\5368036f - merch exports TAS.csv",
-				ABS_5368_0_T36F, abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36f);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036f - merch exports TAS.csv", ABS_5368_0_T36F,
+				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36f);
 
 		System.out.print(", 36g");
 		this.abs5368_0Table36g = new HashMap<String, Map<Date, String>>();
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5368.0_IntlTrade\\5368036g - merch exports NT.csv",
-				ABS_5368_0_T36G, abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36g);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036g - merch exports NT.csv", ABS_5368_0_T36G,
+				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36g);
 
 		System.out.print(", 36h");
 		this.abs5368_0Table36h = new HashMap<String, Map<Date, String>>();
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5368.0_IntlTrade\\5368036h - merch exports ACT.csv",
-				ABS_5368_0_T36H, abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36h);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036h - merch exports ACT.csv", ABS_5368_0_T36H,
+				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36h);
 
 		System.out.print(", 37a");
 		this.abs5368_0Table37a = new HashMap<String, Map<Date, String>>();
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5368.0_IntlTrade\\5368037a - merch imports NSW.csv",
-				ABS_5368_0_T37A, abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37a);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037a - merch imports NSW.csv", ABS_5368_0_T37A,
+				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37a);
 
 		System.out.print(", 37b");
 		this.abs5368_0Table37b = new HashMap<String, Map<Date, String>>();
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5368.0_IntlTrade\\5368037b - merch imports VIC.csv",
-				ABS_5368_0_T37B, abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37b);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037b - merch imports VIC.csv", ABS_5368_0_T37B,
+				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37b);
 
 		System.out.print(", 37c");
 		this.abs5368_0Table37c = new HashMap<String, Map<Date, String>>();
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5368.0_IntlTrade\\5368037c - merch imports QLD.csv",
-				ABS_5368_0_T37C, abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37c);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037c - merch imports QLD.csv", ABS_5368_0_T37C,
+				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37c);
 
 		System.out.print(", 37d");
 		this.abs5368_0Table37d = new HashMap<String, Map<Date, String>>();
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5368.0_IntlTrade\\5368037d - merch imports SA.csv",
-				ABS_5368_0_T37D, abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37d);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037d - merch imports SA.csv", ABS_5368_0_T37D,
+				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37d);
 
 		System.out.print(", 37e");
 		this.abs5368_0Table37e = new HashMap<String, Map<Date, String>>();
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5368.0_IntlTrade\\5368037e - merch imports WA.csv",
-				ABS_5368_0_T37E, abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37e);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037e - merch imports WA.csv", ABS_5368_0_T37E,
+				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37e);
 
 		System.out.print(", 37f");
 		this.abs5368_0Table37f = new HashMap<String, Map<Date, String>>();
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5368.0_IntlTrade\\5368037f - merch imports TAS.csv",
-				ABS_5368_0_T37F, abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37f);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037f - merch imports TAS.csv", ABS_5368_0_T37F,
+				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37f);
 
 		System.out.print(", 37g");
 		this.abs5368_0Table37g = new HashMap<String, Map<Date, String>>();
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5368.0_IntlTrade\\5368037g - merch imports NT.csv",
-				ABS_5368_0_T37G, abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37g);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037g - merch imports NT.csv", ABS_5368_0_T37G,
+				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37g);
 
 		System.out.println(", 37h");
 		this.abs5368_0Table37h = new HashMap<String, Map<Date, String>>();
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5368.0_IntlTrade\\5368037h - merch imports ACT.csv",
-				ABS_5368_0_T37H, abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37h);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037h - merch imports ACT.csv", ABS_5368_0_T37H,
+				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37h);
 
 		// load ABS 53686.0 exporters data
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": Loading ABS 5368.0.55.006 Exporters (formatted data)");
 		this.abs5368_0Exporters = new HashMap<String, Map<String, Map<String, Map<String, String>>>>(16);
 		int[] abs5368_0ExportersColumns = { 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20 };
-		this.loadAbsDataCsv_5368_0Exporters(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5368.0.55.006_Exporters\\5368.0_exporter data.csv",
+		this.loadAbsDataCsv_5368_0Exporters("/data/ABS/5368.0.55.006_Exporters/5368.0_exporter data.csv",
 				ABS_5368_0_EXPORTERS, abs5368_0ExportersColumns, this.title, this.unitType, this.abs5368_0Exporters);
 
 		// load ABS 5676.0 data
@@ -495,25 +475,22 @@ public class CalibrationData {
 				+ ": Loading ABS 5676.0 Business Indicators: Table 7, Sales by State");
 		this.abs5676_0Table7 = new HashMap<String, Map<Date, String>>();
 		int[] abs5676_0Table7Columns = { 9, 10, 11, 12, 13, 14, 15, 16 }; // loads seasonally adjusted sales
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5676.0_BusinessIndicators\\Table7_SalesByState.csv",
-				ABS_5676_0_T7, abs5676_0Table7Columns, this.title, this.unitType, this.abs5676_0Table7);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5676.0_BusinessIndicators/Table7_SalesByState.csv", ABS_5676_0_T7,
+				abs5676_0Table7Columns, this.title, this.unitType, this.abs5676_0Table7);
 
 		System.out.println(new Date(System.currentTimeMillis())
 				+ ": Loading ABS 5676.0 Business Indicators: Table 19, Wages by State");
 		this.abs5676_0Table19 = new HashMap<String, Map<Date, String>>();
 		int[] abs5676_0Table19Columns = { 10, 11, 12, 13, 14, 15, 16, 17, 18 }; // loads seasonally adjusted wages
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5676.0_BusinessIndicators\\Table19_WagesByState.csv",
-				ABS_5676_0_T19, abs5676_0Table19Columns, this.title, this.unitType, this.abs5676_0Table19);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5676.0_BusinessIndicators/Table19_WagesByState.csv", ABS_5676_0_T19,
+				abs5676_0Table19Columns, this.title, this.unitType, this.abs5676_0Table19);
 
 		System.out.println(new Date(System.currentTimeMillis())
 				+ ": Loading ABS 5676.0 Business Indicators: Table 21, Sales vs Wages Ratio");
 		this.abs5676_0Table21 = new HashMap<String, Map<Date, String>>();
 		int[] abs5676_0Table21Columns = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }; // loads sales to wages
 																								// ratio by industry
-		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\5676.0_BusinessIndicators\\Table21_SalesVsWagesRatio.csv",
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5676.0_BusinessIndicators/Table21_SalesVsWagesRatio.csv",
 				ABS_5676_0_T21, abs5676_0Table21Columns, this.title, this.unitType, this.abs5676_0Table21);
 
 		System.out.println(new Date(System.currentTimeMillis())
@@ -522,16 +499,15 @@ public class CalibrationData {
 		int[] abs5676_0Table22Columns = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }; // loads profit to sales
 																								// ratio by industry
 		this.loadAbsDataCsv_Catalogue(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\5676.0_BusinessIndicators\\Table22_ProfitsVsSalesRatio.csv",
-				ABS_5676_0_T22, abs5676_0Table22Columns, this.title, this.unitType, this.abs5676_0Table22);
+
+				"/data/ABS/5676.0_BusinessIndicators/Table22_ProfitsVsSalesRatio.csv", ABS_5676_0_T22,
+				abs5676_0Table22Columns, this.title, this.unitType, this.abs5676_0Table22);
 
 		// load ABS 6524 employee
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 6524.055.002 Employee data");
 		this.abs6524_055_002EmployeeTable5 = new HashMap<String, Map<String, Map<String, String>>>(6); // 6 years
 		int[] abs6524_055_002EmployeeTable5Columns = { 19 };
-		this.loadAbsDataCsv_6524_0(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\6524.0.55.002_IncomeByLGA\\Employee income_Table5.csv",
+		this.loadAbsDataCsv_6524_0("/data/ABS/6524.0.55.002_IncomeByLGA/Employee income_Table5.csv",
 				ABS6524_055_002_EMPLOYEE_T5, abs6524_055_002EmployeeTable5Columns, this.title, this.unitType,
 				this.abs6524_055_002EmployeeTable5);
 
@@ -539,8 +515,7 @@ public class CalibrationData {
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 6524.055.002 Investment data");
 		this.abs6524_055_002InvestmentTable5 = new HashMap<String, Map<String, Map<String, String>>>(6); // 6 years
 		int[] abs6524_055_002InvestmentTable5Columns = { 7, 13, 19, 25, 31, 37 };
-		this.loadAbsDataCsv_6524_0(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\6524.0.55.002_IncomeByLGA\\Investment income_Table5.csv",
+		this.loadAbsDataCsv_6524_0("/data/ABS/6524.0.55.002_IncomeByLGA/Investment income_Table5.csv",
 				ABS6524_055_002_INVEST_T5, abs6524_055_002InvestmentTable5Columns, this.title, this.unitType,
 				this.abs6524_055_002InvestmentTable5);
 
@@ -548,8 +523,7 @@ public class CalibrationData {
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 6524.055.002 Income data");
 		this.abs6524_055_002IncomeTable5 = new HashMap<String, Map<String, Map<String, String>>>(6); // 6 years
 		int[] abs6524_055_002IncomeTable5Columns = { 7, 13, 19, 25, 31 };
-		this.loadAbsDataCsv_6524_0(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\6524.0.55.002_IncomeByLGA\\Total income_Table5.csv",
+		this.loadAbsDataCsv_6524_0("/data/ABS/6524.0.55.002_IncomeByLGA/Total income_Table5.csv",
 				ABS6524_055_002_INCOME_T5, abs6524_055_002IncomeTable5Columns, this.title, this.unitType,
 				this.abs6524_055_002IncomeTable5);
 
@@ -562,10 +536,9 @@ public class CalibrationData {
 		String[] abs8155_0Table2Years = { "2016–17" };
 		int abs8155_0Table2TitleRow = 4;
 		int abs8155_0Table2UnitsRow = 5;
-		this.loadAbsDataCsv_8155_0T2T4(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\8155.0_IndustryByDivision\\Table2_LabourCosts.csv",
-				ABS8155_0_T2, abs8155_0Table2Columns, abs8155_0Table2Years, abs8155_0Table2TitleRow,
-				abs8155_0Table2UnitsRow, this.title, this.unitType, this.abs8155_0Table2);
+		this.loadAbsDataCsv_8155_0T2T4("/data/ABS/8155.0_IndustryByDivision/Table2_LabourCosts.csv", ABS8155_0_T2,
+				abs8155_0Table2Columns, abs8155_0Table2Years, abs8155_0Table2TitleRow, abs8155_0Table2UnitsRow,
+				this.title, this.unitType, this.abs8155_0Table2);
 
 		System.out.print(", Table 4");
 		this.abs8155_0Table4 = new HashMap<String, Map<String, Map<String, String>>>();
@@ -574,30 +547,28 @@ public class CalibrationData {
 		int abs8155_0Table4TitleRow = 6;
 		int abs8155_0Table4UnitsRow = 7;
 		this.loadAbsDataCsv_8155_0T2T4(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\8155.0_IndustryByDivision\\Table4_IndustryPerformance.csv",
-				ABS8155_0_T4, abs8155_0Table4Columns, abs8155_0Table4Years, abs8155_0Table4TitleRow,
-				abs8155_0Table4UnitsRow, this.title, this.unitType, this.abs8155_0Table4);
+
+				"/data/ABS/8155.0_IndustryByDivision/Table4_IndustryPerformance.csv", ABS8155_0_T4,
+				abs8155_0Table4Columns, abs8155_0Table4Years, abs8155_0Table4TitleRow, abs8155_0Table4UnitsRow,
+				this.title, this.unitType, this.abs8155_0Table4);
 
 		System.out.print(", Table 5");
 		this.abs8155_0Table5 = new HashMap<String, Map<String, Map<String, Map<String, String>>>>();
 		int[] abs8155_0Table5Columns = { 3, 6, 9, 12, 15, 18, 21 };
 		int abs8155_0Table5TitleRow = 4;
 		int abs8155_0Table5UnitsRow = 6;
-		this.loadAbsDataCsv_8155_0T5T6(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\8155.0_IndustryByDivision\\Table5_BusinessSize.csv",
-				ABS8155_0_T5, abs8155_0Table5Columns, abs8155_0Table5TitleRow, abs8155_0Table5UnitsRow, this.title,
-				this.unitType, this.abs8155_0Table5);
+		this.loadAbsDataCsv_8155_0T5T6("/data/ABS/8155.0_IndustryByDivision/Table5_BusinessSize.csv", ABS8155_0_T5,
+				abs8155_0Table5Columns, abs8155_0Table5TitleRow, abs8155_0Table5UnitsRow, this.title, this.unitType,
+				this.abs8155_0Table5);
 
 		System.out.print(", Table 6.");
 		this.abs8155_0Table6 = new HashMap<String, Map<String, Map<String, Map<String, String>>>>();
-		int[] abs8155_0Table6Columns = { 3, 6, 9, 12, 15, 18, 21 };
+		int[] abs8155_0Table6Columns = { 3, 6, 9 };
 		int abs8155_0Table6TitleRow = 4;
 		int abs8155_0Table6UnitsRow = 6;
-		this.loadAbsDataCsv_8155_0T5T6(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\8155.0_IndustryByDivision\\Table6_States.csv",
-				ABS8155_0_T6, abs8155_0Table6Columns, abs8155_0Table6TitleRow, abs8155_0Table6UnitsRow, this.title,
-				this.unitType, this.abs8155_0Table6);
+		this.loadAbsDataCsv_8155_0T5T6("/data/ABS/8155.0_IndustryByDivision/Table6_States.csv", ABS8155_0_T6,
+				abs8155_0Table6Columns, abs8155_0Table6TitleRow, abs8155_0Table6UnitsRow, this.title, this.unitType,
+				this.abs8155_0Table6);
 
 		// ABS 8165.0 Count of Businesses
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 8165.0 count of businesses");
@@ -608,8 +579,8 @@ public class CalibrationData {
 		this.abs8165_0StateEmployment = new HashMap<String, Map<String, Map<String, String>>>(
 				abs8165_0StateEmploymentColumns.length);
 		this.loadAbsDataCsv_8165_0State(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\8165.0_CountOfBusinesses\\8165.0_by State, Industry Code & Employment Size.csv",
+
+				"/data/ABS/8165.0_CountOfBusinesses/8165.0_by State, Industry Code & Employment Size.csv",
 				ABS8165_0_STATE_EMPLOYMENT, abs8165_0StateEmploymentColumns, abs8165_0StateEmploymentTitleRow,
 				abs8165_0StateEmploymentUnitsRow, this.title, this.unitType, this.abs8165_0StateEmployment);
 
@@ -620,8 +591,8 @@ public class CalibrationData {
 		this.abs8165_0StateTurnover = new HashMap<String, Map<String, Map<String, String>>>(
 				abs8165_0StateTurnoverColumns.length);
 		this.loadAbsDataCsv_8165_0State(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\8165.0_CountOfBusinesses\\8165.0_by State, Industry Code & Turnover.csv",
+
+				"/data/ABS/8165.0_CountOfBusinesses/8165.0_by State, Industry Code & Turnover.csv",
 				ABS8165_0_STATE_TURNOVER, abs8165_0StateTurnoverColumns, abs8165_0StateTurnoverTitleRow,
 				abs8165_0StateTurnoverUnitsRow, this.title, this.unitType, this.abs8165_0StateTurnover);
 
@@ -630,8 +601,8 @@ public class CalibrationData {
 		this.abs8165_0LgaEmployment = new HashMap<String, Map<String, Map<String, Map<String, String>>>>(
 				abs8165_0LgaEmploymentColumns.length);
 		this.loadAbsDataCsv_8165_0Lga(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\8165.0_CountOfBusinesses\\8165.0_by State, LGA, Industry & Employment Size.csv",
+
+				"/data/ABS/8165.0_CountOfBusinesses/8165.0_by State, LGA, Industry & Employment Size.csv",
 				ABS8165_0_LGA_EMPLOYMENT, abs8165_0LgaEmploymentColumns, this.title, this.unitType,
 				this.abs8165_0LgaEmployment);
 
@@ -640,8 +611,8 @@ public class CalibrationData {
 		this.abs8165_0LgaTurnover = new HashMap<String, Map<String, Map<String, Map<String, String>>>>(
 				abs8165_0LgaTurnoverColumns.length);
 		this.loadAbsDataCsv_8165_0Lga(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\8165.0_CountOfBusinesses\\8165.0_by State, LGA, Industry & Turnover.csv",
+
+				"/data/ABS/8165.0_CountOfBusinesses/8165.0_by State, LGA, Industry & Turnover.csv",
 				ABS8165_0_LGA_TURNOVER, abs8165_0LgaTurnoverColumns, this.title, this.unitType,
 				this.abs8165_0LgaTurnover);
 
@@ -650,10 +621,8 @@ public class CalibrationData {
 		int[] abs8165_0Table4Columns = { 4 };
 		int[] abs8165_0Table4Rows = { 40, 41, 42, 43, 44, 45, 46, 47, 48 };
 		int abs8165_0Table4TitleRow = 4;
-		this.loadAbsDataRowsColumnsCsv(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\8165.0_CountOfBusinesses\\8165.0_Table4_State.csv",
-				ABS8165_0_T4, abs8165_0Table4Columns, abs8165_0Table4Rows, abs8165_0Table4TitleRow, this.title,
-				this.abs8165_0Table4);
+		this.loadAbsDataRowsColumnsCsv("/data/ABS/8165.0_CountOfBusinesses/8165.0_Table4_State.csv", ABS8165_0_T4,
+				abs8165_0Table4Columns, abs8165_0Table4Rows, abs8165_0Table4TitleRow, this.title, this.abs8165_0Table4);
 
 		System.out.print(", Table 13");
 		this.abs8165_0Table13 = new HashMap<String, Map<String, String>>(1);
@@ -661,9 +630,9 @@ public class CalibrationData {
 		int[] abs8165_0Table13Rows = { 34, 36, 37, 38, 39 };
 		int abs8165_0Table13TitleRow = 4;
 		this.loadAbsDataRowsColumnsCsv(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\8165.0_CountOfBusinesses\\8165.0_Table13_EmploymentSize.csv",
-				ABS8165_0_T13, abs8165_0Table13Columns, abs8165_0Table13Rows, abs8165_0Table13TitleRow, this.title,
+
+				"/data/ABS/8165.0_CountOfBusinesses/8165.0_Table13_EmploymentSize.csv", ABS8165_0_T13,
+				abs8165_0Table13Columns, abs8165_0Table13Rows, abs8165_0Table13TitleRow, this.title,
 				this.abs8165_0Table13);
 
 		System.out.print(", Table 17");
@@ -671,9 +640,8 @@ public class CalibrationData {
 		int[] abs8165_0Table17Columns = { 5 };
 		int[] abs8165_0Table17Rows = { 31, 32, 33, 34, 35, 36 };
 		int abs8165_0Table17TitleRow = 4;
-		this.loadAbsDataRowsColumnsCsv(
-				Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\8165.0_CountOfBusinesses\\8165.0_Table17_Turnover.csv",
-				ABS8165_0_T17, abs8165_0Table17Columns, abs8165_0Table17Rows, abs8165_0Table17TitleRow, this.title,
+		this.loadAbsDataRowsColumnsCsv("/data/ABS/8165.0_CountOfBusinesses/8165.0_Table17_Turnover.csv", ABS8165_0_T17,
+				abs8165_0Table17Columns, abs8165_0Table17Rows, abs8165_0Table17TitleRow, this.title,
 				this.abs8165_0Table17);
 
 		System.out.print(", state & employment");
@@ -691,66 +659,55 @@ public class CalibrationData {
 		int[] abs8167_0Table3Columns = { 1, 2, 3, 4, 5 };
 		int[] abs8167_0Table3Rows = { 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 };
 		int abs8167_0titleRow = 6;
-		this.loadAbsDataRowsColumnsCsv(Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\8167.0_BusMktAndComp\\Table3.csv",
-				ABS8167_0_T3, abs8167_0Table3Columns, abs8167_0Table3Rows, abs8167_0titleRow, this.title,
-				this.abs8167_0Table3);
+		this.loadAbsDataRowsColumnsCsv("/data/ABS/8167.0_BusMktAndComp/Table3.csv", ABS8167_0_T3,
+				abs8167_0Table3Columns, abs8167_0Table3Rows, abs8167_0titleRow, this.title, this.abs8167_0Table3);
 
 		this.abs8167_0Table6 = new HashMap<String, Map<String, String>>();
 		int[] abs8167_0Table6Columns = { 1, 2, 3, 4, 5 };
 		int[] abs8167_0Table6Rows = { 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 };
-		this.loadAbsDataRowsColumnsCsv(Properties.RESOURCE_DIRECTORY + "\\data\\ABS\\8167.0_BusMktAndComp\\Table6.csv",
-				ABS8167_0_T6, abs8167_0Table6Columns, abs8167_0Table6Rows, abs8167_0titleRow, this.title,
-				this.abs8167_0Table6);
+		this.loadAbsDataRowsColumnsCsv("/data/ABS/8167.0_BusMktAndComp/Table6.csv", ABS8167_0_T6,
+				abs8167_0Table6Columns, abs8167_0Table6Rows, abs8167_0titleRow, this.title, this.abs8167_0Table6);
 
 		// ABS Census: LGA by INCP
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS Census LGA by INCP data");
 		this.censusLgaByINCP = new HashMap<String, Map<String, String>>();
 		int[] censusLgaByINCPColumns = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 };
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by INCP\\LGA (UR) by INCP - ACT.csv",
-				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title,
-				this.censusLgaByINCP);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - ACT.csv", CalibrationData.LGA_BY_INCP,
+				censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title, this.censusLgaByINCP);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by INCP\\LGA (UR) by INCP - NSW.csv",
-				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title,
-				this.censusLgaByINCP);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - NSW.csv", CalibrationData.LGA_BY_INCP,
+				censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title, this.censusLgaByINCP);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by INCP\\LGA (UR) by INCP - NT.csv",
-				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title,
-				this.censusLgaByINCP);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - NT.csv", CalibrationData.LGA_BY_INCP,
+				censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title, this.censusLgaByINCP);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by INCP\\LGA (UR) by INCP - OT.csv",
-				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title,
-				this.censusLgaByINCP);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - OT.csv", CalibrationData.LGA_BY_INCP,
+				censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title, this.censusLgaByINCP);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by INCP\\LGA (UR) by INCP - QLD.csv",
-				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title,
-				this.censusLgaByINCP);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - QLD.csv", CalibrationData.LGA_BY_INCP,
+				censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title, this.censusLgaByINCP);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by INCP\\LGA (UR) by INCP - SA.csv",
-				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title,
-				this.censusLgaByINCP);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - SA.csv", CalibrationData.LGA_BY_INCP,
+				censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title, this.censusLgaByINCP);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by INCP\\LGA (UR) by INCP - TAS.csv",
-				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title,
-				this.censusLgaByINCP);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - TAS.csv", CalibrationData.LGA_BY_INCP,
+				censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title, this.censusLgaByINCP);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by INCP\\LGA (UR) by INCP - VIC.csv",
-				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title,
-				this.censusLgaByINCP);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - VIC.csv", CalibrationData.LGA_BY_INCP,
+				censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title, this.censusLgaByINCP);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by INCP\\LGA (UR) by INCP - WA.csv",
-				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title,
-				this.censusLgaByINCP);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - WA.csv", CalibrationData.LGA_BY_INCP,
+				censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title, this.censusLgaByINCP);
 
 		// ABS Census: LGA by MRERD
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS Census LGA by MRERD data");
@@ -758,50 +715,41 @@ public class CalibrationData {
 		int[] censusLgaByMRERDColumns = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
 				22 };
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by MRERD\\LGA by MRERD - ACT.csv",
-				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title,
-				this.censusLgaByMRERD);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - ACT.csv", CalibrationData.LGA_BY_MRERD,
+				censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title, this.censusLgaByMRERD);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by MRERD\\LGA by MRERD - NSW.csv",
-				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title,
-				this.censusLgaByMRERD);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - NSW.csv", CalibrationData.LGA_BY_MRERD,
+				censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title, this.censusLgaByMRERD);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by MRERD\\LGA by MRERD - NT.csv",
-				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title,
-				this.censusLgaByMRERD);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - NT.csv", CalibrationData.LGA_BY_MRERD,
+				censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title, this.censusLgaByMRERD);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by MRERD\\LGA by MRERD - OT.csv",
-				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title,
-				this.censusLgaByMRERD);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - OT.csv", CalibrationData.LGA_BY_MRERD,
+				censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title, this.censusLgaByMRERD);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by MRERD\\LGA by MRERD - QLD.csv",
-				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title,
-				this.censusLgaByMRERD);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - QLD.csv", CalibrationData.LGA_BY_MRERD,
+				censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title, this.censusLgaByMRERD);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by MRERD\\LGA by MRERD - SA.csv",
-				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title,
-				this.censusLgaByMRERD);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - SA.csv", CalibrationData.LGA_BY_MRERD,
+				censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title, this.censusLgaByMRERD);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by MRERD\\LGA by MRERD - TAS.csv",
-				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title,
-				this.censusLgaByMRERD);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - TAS.csv", CalibrationData.LGA_BY_MRERD,
+				censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title, this.censusLgaByMRERD);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by MRERD\\LGA by MRERD - VIC.csv",
-				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title,
-				this.censusLgaByMRERD);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - VIC.csv", CalibrationData.LGA_BY_MRERD,
+				censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title, this.censusLgaByMRERD);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by MRERD\\LGA by MRERD - WA.csv",
-				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title,
-				this.censusLgaByMRERD);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - WA.csv", CalibrationData.LGA_BY_MRERD,
+				censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title, this.censusLgaByMRERD);
 
 		// ABS Census: LGA by RNTRD
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS Census LGA by RNTRD data");
@@ -809,50 +757,41 @@ public class CalibrationData {
 		int[] censusLgaByRNTRDColumns = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
 				23, 24, 25, 26 };
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by RNTRD\\LGA by RNTRD - ACT.csv",
-				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title,
-				this.censusLgaByRNTRD);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - ACT.csv", CalibrationData.LGA_BY_RNTRD,
+				censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title, this.censusLgaByRNTRD);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by RNTRD\\LGA by RNTRD - NSW.csv",
-				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title,
-				this.censusLgaByRNTRD);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - NSW.csv", CalibrationData.LGA_BY_RNTRD,
+				censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title, this.censusLgaByRNTRD);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by RNTRD\\LGA by RNTRD - NT.csv",
-				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title,
-				this.censusLgaByRNTRD);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - NT.csv", CalibrationData.LGA_BY_RNTRD,
+				censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title, this.censusLgaByRNTRD);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by RNTRD\\LGA by RNTRD - OT.csv",
-				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title,
-				this.censusLgaByRNTRD);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - OT.csv", CalibrationData.LGA_BY_RNTRD,
+				censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title, this.censusLgaByRNTRD);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by RNTRD\\LGA by RNTRD - QLD.csv",
-				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title,
-				this.censusLgaByRNTRD);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - QLD.csv", CalibrationData.LGA_BY_RNTRD,
+				censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title, this.censusLgaByRNTRD);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by RNTRD\\LGA by RNTRD - SA.csv",
-				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title,
-				this.censusLgaByRNTRD);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - SA.csv", CalibrationData.LGA_BY_RNTRD,
+				censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title, this.censusLgaByRNTRD);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by RNTRD\\LGA by RNTRD - TAS.csv",
-				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title,
-				this.censusLgaByRNTRD);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - TAS.csv", CalibrationData.LGA_BY_RNTRD,
+				censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title, this.censusLgaByRNTRD);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by RNTRD\\LGA by RNTRD - VIC.csv",
-				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title,
-				this.censusLgaByRNTRD);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - VIC.csv", CalibrationData.LGA_BY_RNTRD,
+				censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title, this.censusLgaByRNTRD);
 		this.loadAbsCensusTableCsv2D(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\CensusTableBuilder2016\\LGA by RNTRD\\LGA by RNTRD - WA.csv",
-				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title,
-				this.censusLgaByRNTRD);
+
+				"/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - WA.csv", CalibrationData.LGA_BY_RNTRD,
+				censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title, this.censusLgaByRNTRD);
 
 		// load pre-formatted ADI data
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ADI data");
@@ -861,22 +800,22 @@ public class CalibrationData {
 				28, 29, 30, 31, 32, 34, 35, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 50, 51, 52, 56, 57, 58, 59,
 				60, 63, 66, 67, 68, 79 };
 		String[] adiCategories = { "Major Bank", "Other Domestic Bank", "Foreign Bank", "Mutual ADI" };
-		this.loadAdiDataCsv(Properties.RESOURCE_DIRECTORY + "\\data\\ADI\\ADI_data.csv", CalibrationData.ADI_DATA,
-				adiColumns, adiCategories, this.title, this.unitType, this.adiData);
+		this.loadAdiDataCsv("/data/ADI/ADI_data.csv", CalibrationData.ADI_DATA, adiColumns, adiCategories, this.title,
+				this.unitType, this.adiData);
 
 		// load pre-formatted currency data (approx 5.51 kB)
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading currency data");
 		this.currencyData = new HashMap<String, Map<String, String>>();
 		int[] currencyColumns = { 1, 61, 62, 63, 64 };
-		this.loadCurrencyDataCsv(Properties.RESOURCE_DIRECTORY + "\\data\\FxRates\\FX Rates_Monthly.csv",
-				CalibrationData.CCY_DATA, currencyColumns, this.title, this.currencyData);
+		this.loadCurrencyDataCsv("/data/FxRates/FX Rates_Monthly.csv", CalibrationData.CCY_DATA, currencyColumns,
+				this.title, this.currencyData);
 
 		// load pre-formatted country data (approx 4.83 kB)
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading country data");
 		this.countryData = new HashMap<String, Map<String, String>>();
 		int[] countryColumns = { 1, 3 };
-		this.loadCountryDataCsv(Properties.RESOURCE_DIRECTORY + "\\data\\FxRates\\CountriesCurrencies_ABS.csv",
-				CalibrationData.COUNTRY_DATA, countryColumns, this.title, this.countryData);
+		this.loadCountryDataCsv("/data/FxRates/CountriesCurrencies_ABS.csv", CalibrationData.COUNTRY_DATA,
+				countryColumns, this.title, this.countryData);
 
 		// load RBA Balance Sheet (337 bytes) and Profit & Loss Statement (335 bytes)
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading RBA financial statements");
@@ -884,15 +823,14 @@ public class CalibrationData {
 		int[] rbaBalShtRows = { 3, 4, 5, 6, 7, 11, 12, 13, 14, 18, 19, 25, 26, 27, 28, 29, 30, 31 };
 		int rbaBalShtColumn = 2;
 		double rbaMultiplier = 1d;
-		this.loadFinancialStatementCsv(Properties.RESOURCE_DIRECTORY + "\\data\\RBA\\RBA_BalSht.csv",
-				CalibrationData.RBA_BS, rbaBalShtColumn, rbaBalShtRows, this.title, this.rbaBalSht, rbaMultiplier);
+		this.loadFinancialStatementCsv("/data/RBA/RBA_BalSht.csv", CalibrationData.RBA_BS, rbaBalShtColumn,
+				rbaBalShtRows, this.title, this.rbaBalSht, rbaMultiplier);
 
 		this.rbaProfitLoss = new HashMap<String, Double>();
 		int[] rbaProfitLossRows = { 3, 4, 5, 6, 7, 8, 9, 13, 14, 15, 18, 19 };
 		int rbaProfitLossColumn = 2;
-		this.loadFinancialStatementCsv(Properties.RESOURCE_DIRECTORY + "\\data\\RBA\\RBA_PnL.csv",
-				CalibrationData.RBA_PL, rbaProfitLossColumn, rbaProfitLossRows, this.title, this.rbaProfitLoss,
-				rbaMultiplier);
+		this.loadFinancialStatementCsv("/data/RBA/RBA_PnL.csv", CalibrationData.RBA_PL, rbaProfitLossColumn,
+				rbaProfitLossRows, this.title, this.rbaProfitLoss, rbaMultiplier);
 
 		// load Australian Government Financial Statistics
 		System.out
@@ -902,18 +840,17 @@ public class CalibrationData {
 		int govtBalShtColumn = 10;
 		double govtMultiplier = 1000000d;
 		this.loadFinancialStatementCsv(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\5512.0_GovtFinStats\\55120DO057_201617 - Table 3 - Bal Sht.csv",
-				CalibrationData.GOVT_PL, govtBalShtColumn, govtBalShtRows, this.title, this.govtBalSht, govtMultiplier);
+
+				"/data/ABS/5512.0_GovtFinStats/55120DO057_201617 - Table 3 - Bal Sht.csv", CalibrationData.GOVT_PL,
+				govtBalShtColumn, govtBalShtRows, this.title, this.govtBalSht, govtMultiplier);
 
 		this.govtProfitLoss = new HashMap<String, Double>();
 		int[] govtProfitLossRows = { 7, 9, 10, 12, 17, 18, 22, 23, 37, 48 };
 		int govtProfitLossColumn = 10;
 		this.loadFinancialStatementCsv(
-				Properties.RESOURCE_DIRECTORY
-						+ "\\data\\ABS\\5512.0_GovtFinStats\\55120DO057_201617 - Table 1 - P&L.csv",
-				CalibrationData.GOVT_PL, govtProfitLossColumn, govtProfitLossRows, this.title, this.govtProfitLoss,
-				govtMultiplier);
+
+				"/data/ABS/5512.0_GovtFinStats/55120DO057_201617 - Table 1 - P&L.csv", CalibrationData.GOVT_PL,
+				govtProfitLossColumn, govtProfitLossRows, this.title, this.govtProfitLoss, govtMultiplier);
 
 		// set flag so we only load the data once
 		System.out.println(new Date(System.currentTimeMillis()) + ": Data loaded");
@@ -938,28 +875,25 @@ public class CalibrationData {
 	 * Data sources this works for include: E1 Household & Business Balance Sheets
 	 * E2 Household Finances - Selected Ratios
 	 * 
-	 * @param fileURI
-	 *            - the URI of the file to import
-	 * @param dataSourceName
-	 *            - the name used to store this series' data in the maps
-	 * @param columnsToImport
-	 *            - a zero-based array of integers specifying which columns to
-	 *            import (i.e. the first column is column 0). The first column is
-	 *            assumed to be the date and is imported only as the key for the
-	 *            other columns' data.
-	 * @param titles
-	 *            - column titles in CSV file
-	 * @param units
-	 *            - unit type (e.g. $Billions, Number, '000)
-	 * @param data
-	 *            - the data map that the values are returned in
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param dataSourceName       - the name used to store this series' data in the
+	 *                             maps
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0). The first column is assumed to be the
+	 *                             date and is imported only as the key for the
+	 *                             other columns' data.
+	 * @param titles               - column titles in CSV file
+	 * @param units                - unit type (e.g. $Billions, Number, '000)
+	 * @param data                 - the data map that the values are returned in
 	 */
-	private void loadRbaDataCsv(String fileURI, String dataSourceName, int[] columnsToImport,
+	private void loadRbaDataCsv(String fileResourceLocation, String dataSourceName, int[] columnsToImport,
 			Map<String, List<String>> titles, Map<String, List<String>> units, Map<String, Map<Date, String>> data) {
 
 		CSVReader reader = null;
 		try {
-			reader = new CSVReader(new FileReader(fileURI));
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
 			boolean header = true;
 			boolean footer = false;
 			String[] seriesId = new String[columnsToImport.length];
@@ -999,6 +933,7 @@ public class CalibrationData {
 				}
 			}
 			reader.close();
+			reader = null;
 		} catch (FileNotFoundException e) {
 			// open file
 			e.printStackTrace();
@@ -1014,23 +949,21 @@ public class CalibrationData {
 	/**
 	 * Imports an ANZSIC code table so we can map between levels in the hierarchy.
 	 * 
-	 * @param -
-	 *            the URI of the file to import
-	 * @param catalogueName
-	 *            - the name used to store this series' data in the maps
-	 * @param titles
-	 *            - this is a list of the mapping pairs (e.g. "Group Code to
-	 *            Subdivision Code")
-	 * @param data
-	 *            - key 1 is mapping per the titles (e.g. "Class Code to Division")
-	 *            while key 2 is the code or description (e.g. "Division Code").
+	 * @param               - the URI of the file to import
+	 * @param catalogueName - the name used to store this series' data in the maps
+	 * @param titles        - this is a list of the mapping pairs (e.g. "Group Code
+	 *                      to Subdivision Code")
+	 * @param data          - key 1 is mapping per the titles (e.g. "Class Code to
+	 *                      Division") while key 2 is the code or description (e.g.
+	 *                      "Division Code").
 	 */
-	private void loadAbsDataCsv_1292_0_55_002(String fileURI, String catalogueName, Map<String, List<String>> titles,
-			Map<String, Map<String, String>> data) {
+	private void loadAbsDataCsv_1292_0_55_002(String fileResourceLocation, String catalogueName,
+			Map<String, List<String>> titles, Map<String, Map<String, String>> data) {
 
 		CSVReader reader = null;
 		try {
-			reader = new CSVReader(new FileReader(fileURI));
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
 			boolean header = true;
 			int currentRow = 1;
 			final int titleRow = 4;
@@ -1083,6 +1016,7 @@ public class CalibrationData {
 				}
 			}
 			reader.close();
+			reader = null;
 		} catch (FileNotFoundException e) {
 			// open file
 			e.printStackTrace();
@@ -1091,38 +1025,83 @@ public class CalibrationData {
 			e.printStackTrace();
 		}
 	}
+	/*
+	 * private void loadAbsDataCsv_1292_0_55_002(String fileURI, String
+	 * catalogueName, Map<String, List<String>> titles, Map<String, Map<String,
+	 * String>> data) {
+	 * 
+	 * CSVReader reader = null; try { reader = new CSVReader(new
+	 * FileReader(fileURI)); boolean header = true; int currentRow = 1; final int
+	 * titleRow = 4; String[] line = null; while ((line = reader.readNext()) !=
+	 * null) { if (header) { if (currentRow == titleRow) { // store title
+	 * List<String> mappingTitles = new ArrayList<String>(4 + 4 + 3 + 2 + 1);
+	 * mappingTitles.add("Division Code to Division");
+	 * mappingTitles.add("Subdivision Code to Subdivision");
+	 * mappingTitles.add("Group Code to Group");
+	 * mappingTitles.add("Class Code to Class");
+	 * mappingTitles.add("Division to Division Code");
+	 * mappingTitles.add("Subdivision to Subdivision Code");
+	 * mappingTitles.add("Group to Group Code");
+	 * mappingTitles.add("Class to Class Code");
+	 * mappingTitles.add("Class Code to Group Code");
+	 * mappingTitles.add("Class Code to Subdivision Code");
+	 * mappingTitles.add("Class Code to Division Code");
+	 * mappingTitles.add("Group Code to Subdivision Code");
+	 * mappingTitles.add("Group Code to Division Code");
+	 * mappingTitles.add("Subdivision Code to Division Code");
+	 * titles.put(catalogueName, mappingTitles);
+	 * 
+	 * // store mapping titles as key with blank collections to populate with data
+	 * // below for (int i = 0; i < mappingTitles.size(); i++) {
+	 * data.put(mappingTitles.get(i), new HashMap<String, String>()); } header =
+	 * false; } currentRow++; } else { // parse the body of the data
+	 * data.get("Division Code to Division").put(line[0], line[1]);
+	 * data.get("Subdivision Code to Subdivision").put(line[2], line[3]);
+	 * data.get("Group Code to Group").put(line[4], line[5]);
+	 * data.get("Class Code to Class").put(line[6], line[7]);
+	 * data.get("Division to Division Code").put(line[1], line[0]);
+	 * data.get("Subdivision to Subdivision Code").put(line[3], line[2]);
+	 * data.get("Group to Group Code").put(line[5], line[4]);
+	 * data.get("Class to Class Code").put(line[7], line[6]);
+	 * data.get("Class Code to Group Code").put(line[6], line[4]);
+	 * data.get("Class Code to Subdivision Code").put(line[6], line[2]);
+	 * data.get("Class Code to Division Code").put(line[6], line[0]);
+	 * data.get("Group Code to Subdivision Code").put(line[4], line[2]);
+	 * data.get("Group Code to Division Code").put(line[4], line[0]);
+	 * data.get("Subdivision Code to Division Code").put(line[2], line[0]); } }
+	 * reader.close(); } catch (FileNotFoundException e) { // open file
+	 * e.printStackTrace(); } catch (IOException e) { // read next
+	 * e.printStackTrace(); } }
+	 */
 
 	/**
 	 * Loads ABS 1410.0 catalogue data.
 	 * 
 	 * TODO: check if the column titles are too long to be keys in a Map<String, T>
 	 * 
-	 * @param fileURI
-	 *            - the URI of the file to import
-	 * @param catalogueName
-	 *            - the name used to store this series' data in the maps
-	 * @param columnsToImport
-	 *            - a zero-based array of integers specifying which columns to
-	 *            import (i.e. the first column is column 0). The first column is
-	 *            assumed to be the date and is imported only as the key for the
-	 *            other columns' data.
-	 * @param yearsToImport
-	 *            - a list of years to import data for (e.g. "2016")
-	 * @param titles
-	 *            - column titles in CSV file
-	 * @param units
-	 *            - unit type (e.g. $Billions, Number, '000)
-	 * @param data
-	 *            - the data map that the values are returned in. Keys are: Year,
-	 *            Series ID, LGA.
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param catalogueName        - the name used to store this series' data in the
+	 *                             maps
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0). The first column is assumed to be the
+	 *                             date and is imported only as the key for the
+	 *                             other columns' data.
+	 * @param yearsToImport        - a list of years to import data for (e.g.
+	 *                             "2016")
+	 * @param titles               - column titles in CSV file
+	 * @param units                - unit type (e.g. $Billions, Number, '000)
+	 * @param data                 - the data map that the values are returned in.
+	 *                             Keys are: Year, Series ID, LGA.
 	 */
-	private void loadAbsDataCsv_1410_0(String fileURI, String catalogueName, int[] columnsToImport,
+	private void loadAbsDataCsv_1410_0(String fileResourceLocation, String catalogueName, int[] columnsToImport,
 			String[] yearsToImport, Map<String, List<String>> titles, Map<String, List<String>> units,
 			Map<String, Map<String, Map<String, String>>> data) {
 
 		CSVReader reader = null;
 		try {
-			reader = new CSVReader(new FileReader(fileURI));
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
 			boolean header = true;
 			int currentRow = 1;
 			final int titleRow = 7;
@@ -1174,6 +1153,7 @@ public class CalibrationData {
 				}
 			}
 			reader.close();
+			reader = null;
 		} catch (FileNotFoundException e) {
 			// open file
 			e.printStackTrace();
@@ -1194,28 +1174,25 @@ public class CalibrationData {
 	 * 
 	 * Catalogues this works for include: ABS3222.0
 	 * 
-	 * @param fileURI
-	 *            - the URI of the file to import
-	 * @param catalogueName
-	 *            - the name used to store this series' data in the maps
-	 * @param columnsToImport
-	 *            - a zero-based array of integers specifying which columns to
-	 *            import (i.e. the first column is column 0). The first column is
-	 *            assumed to be the date and is imported only as the key for the
-	 *            other columns' data.
-	 * @param titles
-	 *            - column titles in CSV file
-	 * @param units
-	 *            - unit type (e.g. $Billions, Number, '000)
-	 * @param data
-	 *            - the data map that the values are returned in
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param catalogueName        - the name used to store this series' data in the
+	 *                             maps
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0). The first column is assumed to be the
+	 *                             date and is imported only as the key for the
+	 *                             other columns' data.
+	 * @param titles               - column titles in CSV file
+	 * @param units                - unit type (e.g. $Billions, Number, '000)
+	 * @param data                 - the data map that the values are returned in
 	 */
-	private void loadAbsDataCsv_Catalogue(String fileURI, String catalogueName, int[] columnsToImport,
+	private void loadAbsDataCsv_Catalogue(String fileResourceLocation, String catalogueName, int[] columnsToImport,
 			Map<String, List<String>> titles, Map<String, List<String>> units, Map<String, Map<Date, String>> data) {
 
 		CSVReader reader = null;
 		try {
-			reader = new CSVReader(new FileReader(fileURI));
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
 			boolean header = true;
 			boolean titleRow = true;
 			String[] seriesId = new String[columnsToImport.length];
@@ -1252,6 +1229,7 @@ public class CalibrationData {
 				}
 			}
 			reader.close();
+			reader = null;
 		} catch (FileNotFoundException e) {
 			// open file
 			e.printStackTrace();
@@ -1272,20 +1250,21 @@ public class CalibrationData {
 	 * new child map easier because the key will be different to the previous line's
 	 * key.
 	 * 
-	 * @param fileURI
+	 * @param fileResourceLocation
 	 * @param catalogueName
 	 * @param columnsToImport
 	 * @param titles
 	 * @param units
 	 * @param data
 	 */
-	private void loadAbsDataCsv_5368_0Exporters(String fileURI, String catalogueName, int[] columnsToImport,
-			Map<String, List<String>> titles, Map<String, List<String>> units,
+	private void loadAbsDataCsv_5368_0Exporters(String fileResourceLocation, String catalogueName,
+			int[] columnsToImport, Map<String, List<String>> titles, Map<String, List<String>> units,
 			Map<String, Map<String, Map<String, Map<String, String>>>> data) {
 
 		CSVReader reader = null;
 		try {
-			reader = new CSVReader(new FileReader(fileURI));
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
 			boolean header = true;
 			int currentRow = 0;
 			int titleRow = 4; // zero-based
@@ -1336,6 +1315,7 @@ public class CalibrationData {
 				}
 			}
 			reader.close();
+			reader = null;
 		} catch (FileNotFoundException e) {
 			// open file
 			e.printStackTrace();
@@ -1350,26 +1330,22 @@ public class CalibrationData {
 	 * 
 	 * TODO: check if the column titles are too long to be keys in a Map<String, T>
 	 * 
-	 * @param fileURI
-	 *            - the URI of the file to import
-	 * @param catalogueName
-	 *            - the name used to store this series' data in the maps
-	 * @param columnsToImport
-	 *            - a zero-based array of integers specifying which columns to
-	 *            import (i.e. the first column is column 0). The first column is
-	 *            assumed to be the date and is imported only as the key for the
-	 *            other columns' data.
-	 * @param yearsToImport
-	 *            - a list of years to import data for (e.g. "2016")
-	 * @param titles
-	 *            - column titles in CSV file
-	 * @param units
-	 *            - unit type (e.g. $Billions, Number, '000)
-	 * @param data
-	 *            - the data map that the values are returned in. Keys are: Year,
-	 *            Series ID, LGA.
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param catalogueName        - the name used to store this series' data in the
+	 *                             maps
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0). The first column is assumed to be the
+	 *                             date and is imported only as the key for the
+	 *                             other columns' data.
+	 * @param yearsToImport        - a list of years to import data for (e.g.
+	 *                             "2016")
+	 * @param titles               - column titles in CSV file
+	 * @param units                - unit type (e.g. $Billions, Number, '000)
+	 * @param data                 - the data map that the values are returned in.
+	 *                             Keys are: Year, Series ID, LGA.
 	 */
-	private void loadAbsDataCsv_6524_0(String fileURI, String catalogueName, int[] columnsToImport,
+	private void loadAbsDataCsv_6524_0(String fileResourceLocation, String catalogueName, int[] columnsToImport,
 			Map<String, List<String>> titles, Map<String, List<String>> units,
 			Map<String, Map<String, Map<String, String>>> data) {
 
@@ -1381,7 +1357,8 @@ public class CalibrationData {
 
 		CSVReader reader = null;
 		try {
-			reader = new CSVReader(new FileReader(fileURI));
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
 			boolean header = true;
 			int currentRow = 1;
 			int titleRow = 6;
@@ -1454,6 +1431,7 @@ public class CalibrationData {
 				}
 			}
 			reader.close();
+			reader = null;
 		} catch (FileNotFoundException e) {
 			// open file
 			e.printStackTrace();
@@ -1466,34 +1444,29 @@ public class CalibrationData {
 	/**
 	 * Loads ABS 8155.0 Table 2 and Table 4 data.
 	 * 
-	 * @param fileURI
-	 *            - the URI of the file to import
-	 * @param catalogueName
-	 *            - the name used to store this series' data in the maps
-	 * @param columnsToImport
-	 *            - a zero-based array of integers specifying which columns to
-	 *            import (i.e. the first column is column 0).
-	 * @param yearsToImport
-	 *            - a list of years to import data for (e.g. "2016")
-	 * @param titleRow
-	 *            - the zero-based row number of the series titles.
-	 * @param unitsRow
-	 *            - the zero-based rown number of the unit types.
-	 * @param titles
-	 *            - column titles in CSV file
-	 * @param units
-	 *            - unit type (e.g. $Billions, Number, '000)
-	 * @param data
-	 *            - the data map that the values are returned in. Keys are: Year,
-	 *            Series Title, Industry.
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param catalogueName        - the name used to store this series' data in the
+	 *                             maps
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0).
+	 * @param yearsToImport        - a list of years to import data for (e.g.
+	 *                             "2016")
+	 * @param titleRow             - the zero-based row number of the series titles.
+	 * @param unitsRow             - the zero-based rown number of the unit types.
+	 * @param titles               - column titles in CSV file
+	 * @param units                - unit type (e.g. $Billions, Number, '000)
+	 * @param data                 - the data map that the values are returned in.
+	 *                             Keys are: Year, Series Title, Industry.
 	 */
-	private void loadAbsDataCsv_8155_0T2T4(String fileURI, String catalogueName, int[] columnsToImport,
+	private void loadAbsDataCsv_8155_0T2T4(String fileResourceLocation, String catalogueName, int[] columnsToImport,
 			String[] yearsToImport, int titleRow, int unitsRow, Map<String, List<String>> titles,
 			Map<String, List<String>> units, Map<String, Map<String, Map<String, String>>> data) {
 
 		CSVReader reader = null;
 		try {
-			reader = new CSVReader(new FileReader(fileURI));
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
 			boolean header = true;
 			boolean footer = false;
 			int currentRow = 0;
@@ -1560,6 +1533,7 @@ public class CalibrationData {
 				}
 			}
 			reader.close();
+			reader = null;
 		} catch (FileNotFoundException e) {
 			// open file
 			e.printStackTrace();
@@ -1572,32 +1546,28 @@ public class CalibrationData {
 	/**
 	 * Loads ABS 8155.0 Table 5 and Table 6 data.
 	 * 
-	 * @param fileURI
-	 *            - the URI of the file to import
-	 * @param catalogueName
-	 *            - the name used to store this series' data in the maps
-	 * @param columnsToImport
-	 *            - a zero-based array of integers specifying which columns to
-	 *            import (i.e. the first column is column 0).
-	 * @param titleRow
-	 *            - the zero-based row number of the series titles.
-	 * @param unitsRow
-	 *            - the zero-based rown number of the unit types.
-	 * @param titles
-	 *            - column titles in CSV file
-	 * @param units
-	 *            - unit type (e.g. $Billions, Number, '000)
-	 * @param data
-	 *            - the data map that the values are returned in. Keys are: Year,
-	 *            Series Title, State/Size, Industry.
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param catalogueName        - the name used to store this series' data in the
+	 *                             maps
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0).
+	 * @param titleRow             - the zero-based row number of the series titles.
+	 * @param unitsRow             - the zero-based rown number of the unit types.
+	 * @param titles               - column titles in CSV file
+	 * @param units                - unit type (e.g. $Billions, Number, '000)
+	 * @param data                 - the data map that the values are returned in.
+	 *                             Keys are: Year, Series Title, State/Size,
+	 *                             Industry.
 	 */
-	private void loadAbsDataCsv_8155_0T5T6(String fileURI, String catalogueName, int[] columnsToImport, int titleRow,
-			int unitsRow, Map<String, List<String>> titles, Map<String, List<String>> units,
+	private void loadAbsDataCsv_8155_0T5T6(String fileResourceLocation, String catalogueName, int[] columnsToImport,
+			int titleRow, int unitsRow, Map<String, List<String>> titles, Map<String, List<String>> units,
 			Map<String, Map<String, Map<String, Map<String, String>>>> data) {
 
 		CSVReader reader = null;
 		try {
-			reader = new CSVReader(new FileReader(fileURI));
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
 			boolean header = true;
 			boolean footer = false;
 			int currentRow = 0;
@@ -1605,8 +1575,9 @@ public class CalibrationData {
 			String[] seriesId = new String[columnsToImport.length];
 			String[] years = new String[columnsToImport.length];
 			String sizeOrState = "";
+			boolean isNewCategory = false;
 			String[] line = null;
-			while ((line = reader.readNext()) != null && !footer) {
+			while (((line = reader.readNext()) != null) && !footer) {
 				if (header) {
 					if (currentRow == titleRow) {
 						// store title
@@ -1638,6 +1609,8 @@ public class CalibrationData {
 						}
 						titles.put(catalogueName, titlesList);
 					} else if (currentRow == yearRow) {
+						// KEYS: Year, Series Title, State/Size, Industry
+
 						// get unique list of all years
 						Set<String> uniqueYears = new HashSet<String>();
 						for (int i = 0; i < columnsToImport.length; i++) {
@@ -1669,26 +1642,30 @@ public class CalibrationData {
 					currentRow++;
 				} else {
 					// check if this is a category row
-					boolean isNewCategory = false;
-					if (!line[1].isEmpty()) {
+					if (line[0].isEmpty()) {
+						footer = true;
+					} else if (line[1].isEmpty()) {
 						// size or state category
 						sizeOrState = line[0];
 						isNewCategory = true;
-					} else if (line[0].isEmpty()) {
-						footer = true;
 					} else {
 						// year, column title, state/size, industry
-						for (int i = 0; i < columnsToImport.length; i++) {
-							// parse the body of the data
-							if (isNewCategory) {
+						if (isNewCategory) {
+							// initialise category maps
+							for (int i = 0; i < columnsToImport.length; i++) {
 								data.get(years[i]).get(seriesId[i]).put(sizeOrState, new HashMap<String, String>());
 							}
-							data.get(years[i]).get(seriesId[i]).get(sizeOrState).put(line[0], line[columnsToImport[i]]); //FIXME null pointer exception
+							isNewCategory = false;
+						}
+						for (int i = 0; i < columnsToImport.length; i++) {
+							// parse the body of the data
+							data.get(years[i]).get(seriesId[i]).get(sizeOrState).put(line[0], line[columnsToImport[i]]);
 						}
 					}
 				}
 			}
 			reader.close();
+			reader = null;
 		} catch (FileNotFoundException e) {
 			// open file
 			e.printStackTrace();
@@ -1701,32 +1678,28 @@ public class CalibrationData {
 	/**
 	 * Loads ABS 8165.0 State-based data.
 	 * 
-	 * @param fileURI
-	 *            - the URI of the file to import
-	 * @param catalogueName
-	 *            - the name used to store this series' data in the maps
-	 * @param columnsToImport
-	 *            - a zero-based array of integers specifying which columns to
-	 *            import (i.e. the first column is column 0).
-	 * @param titleRow
-	 *            - the zero-based row number of the series titles.
-	 * @param unitsRow
-	 *            - the zero-based rown number of the unit types.
-	 * @param titles
-	 *            - column titles in CSV file
-	 * @param units
-	 *            - unit type (e.g. $Billions, Number, '000)
-	 * @param data
-	 *            - the data map that the values are returned in. Keys are:
-	 *            Employment or Turnover Range, State, Industry.
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param catalogueName        - the name used to store this series' data in the
+	 *                             maps
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0).
+	 * @param titleRow             - the zero-based row number of the series titles.
+	 * @param unitsRow             - the zero-based rown number of the unit types.
+	 * @param titles               - column titles in CSV file
+	 * @param units                - unit type (e.g. $Billions, Number, '000)
+	 * @param data                 - the data map that the values are returned in.
+	 *                             Keys are: Employment or Turnover Range, State,
+	 *                             Industry.
 	 */
-	private void loadAbsDataCsv_8165_0State(String fileURI, String catalogueName, int[] columnsToImport, int titleRow,
-			int unitsRow, Map<String, List<String>> titles, Map<String, List<String>> units,
+	private void loadAbsDataCsv_8165_0State(String fileResourceLocation, String catalogueName, int[] columnsToImport,
+			int titleRow, int unitsRow, Map<String, List<String>> titles, Map<String, List<String>> units,
 			Map<String, Map<String, Map<String, String>>> data) {
 
 		CSVReader reader = null;
 		try {
-			reader = new CSVReader(new FileReader(fileURI));
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
 			boolean header = true;
 			boolean footer = false;
 			String[] seriesId = new String[columnsToImport.length];
@@ -1778,6 +1751,7 @@ public class CalibrationData {
 				}
 			}
 			reader.close();
+			reader = null;
 		} catch (FileNotFoundException e) {
 			// open file
 			e.printStackTrace();
@@ -1790,33 +1764,28 @@ public class CalibrationData {
 	/**
 	 * Loads ABS 8165.0 LGA-based data.
 	 * 
-	 * @param fileURI
-	 *            - the URI of the file to import
-	 * @param catalogueName
-	 *            - the name used to store this series' data in the maps
-	 * @param columnsToImport
-	 *            - a zero-based array of integers specifying which columns to
-	 *            import (i.e. the first column is column 0).
-	 * @param titleRow
-	 *            - the zero-based row number of the series titles.
-	 * @param unitsRow
-	 *            - the zero-based rown number of the unit types.
-	 * @param titles
-	 *            - column titles in CSV file
-	 * @param units
-	 *            - unit type (e.g. $Billions, Number, '000)
-	 * @param data
-	 *            - the data map that the values are returned in. Keys are:
-	 *            Employment or Turnover Range, State acronym, LGA code, Industry
-	 *            division code.
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param catalogueName        - the name used to store this series' data in the
+	 *                             maps
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0).
+	 * @param titleRow             - the zero-based row number of the series titles.
+	 * @param unitsRow             - the zero-based rown number of the unit types.
+	 * @param titles               - column titles in CSV file
+	 * @param units                - unit type (e.g. $Billions, Number, '000)
+	 * @param data                 - the data map that the values are returned in.
+	 *                             Keys are: Employment or Turnover Range, State
+	 *                             acronym, LGA code, Industry division code.
 	 */
-	private void loadAbsDataCsv_8165_0Lga(String fileURI, String catalogueName, int[] columnsToImport,
+	private void loadAbsDataCsv_8165_0Lga(String fileResourceLocation, String catalogueName, int[] columnsToImport,
 			Map<String, List<String>> titles, Map<String, List<String>> units,
 			Map<String, Map<String, Map<String, Map<String, String>>>> data) {
 
 		CSVReader reader = null;
 		try {
-			reader = new CSVReader(new FileReader(fileURI));
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
 			boolean header = true;
 			boolean footer = false;
 			String prevLgaCode = "";
@@ -1889,6 +1858,7 @@ public class CalibrationData {
 				}
 			}
 			reader.close();
+			reader = null;
 		} catch (FileNotFoundException e) {
 			// open file
 			e.printStackTrace();
@@ -1902,27 +1872,24 @@ public class CalibrationData {
 	 * Loads a set range of rows and columns. First key is the column titles, second
 	 * key is the first cell of the rows.
 	 * 
-	 * @param fileURI
-	 *            - the URI of the file to import
-	 * @param dataSourceName
-	 *            - the name used to identify this data source (in the shared maps)
-	 * @param columnsToImport
-	 *            - a zero-based array of integers specifying which columns to
-	 *            import (i.e. the first column is column 0).
-	 * @param rowsToImport
-	 *            - a zero-based array of integers specifying which rows to import
-	 *            (i.e. the first row is row 0).
-	 * @param titles
-	 *            - column titles in CSV file
-	 * @param data
-	 *            - the data map that the values are returned in
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param dataSourceName       - the name used to identify this data source (in
+	 *                             the shared maps)
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0).
+	 * @param rowsToImport         - a zero-based array of integers specifying which
+	 *                             rows to import (i.e. the first row is row 0).
+	 * @param titles               - column titles in CSV file
+	 * @param data                 - the data map that the values are returned in
 	 */
-	private void loadAbsDataRowsColumnsCsv(String fileURI, String dataSourceName, int[] columnsToImport,
+	private void loadAbsDataRowsColumnsCsv(String fileResourceLocation, String dataSourceName, int[] columnsToImport,
 			int[] rowsToImport, int titleRow, Map<String, List<String>> titles, Map<String, Map<String, String>> data) {
 
 		CSVReader reader = null;
 		try {
-			reader = new CSVReader(new FileReader(fileURI));
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
 			boolean header = true;
 			int currentRow = 0;
 			String[] seriesId = new String[columnsToImport.length];
@@ -1954,6 +1921,7 @@ public class CalibrationData {
 				currentRow++;
 			}
 			reader.close();
+			reader = null;
 		} catch (FileNotFoundException e) {
 			// open file
 			e.printStackTrace();
@@ -1972,24 +1940,22 @@ public class CalibrationData {
 	 * 3. Data starts on row 12.<br>
 	 * 4. The first column contains the LGA names (not codes).
 	 * 
-	 * @param fileURI
-	 *            - the URI of the file to import
-	 * @param columnsToImport
-	 *            - a zero-based array of integers specifying which columns to
-	 *            import (i.e. the first column is column 0). The first column is
-	 *            assumed to be the date and is imported only as the key for the
-	 *            other columns' data.
-	 * @param titles
-	 *            - column titles in CSV file
-	 * @param data
-	 *            - the data map that the values are returned in
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0). The first column is assumed to be the
+	 *                             date and is imported only as the key for the
+	 *                             other columns' data.
+	 * @param titles               - column titles in CSV file
+	 * @param data                 - the data map that the values are returned in
 	 */
-	private void loadAbsCensusTableCsv2D(String fileURI, String tableName, int[] columnsToImport, boolean isInitialised,
-			Map<String, List<String>> titles, Map<String, Map<String, String>> data) {
+	private void loadAbsCensusTableCsv2D(String fileResourceLocation, String tableName, int[] columnsToImport,
+			boolean isInitialised, Map<String, List<String>> titles, Map<String, Map<String, String>> data) {
 
 		CSVReader reader = null;
 		try {
-			reader = new CSVReader(new FileReader(fileURI));
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
 			boolean header = true;
 			boolean footer = false;
 			int currentRow = 1;
@@ -2031,6 +1997,7 @@ public class CalibrationData {
 				}
 			}
 			reader.close();
+			reader = null;
 		} catch (FileNotFoundException e) {
 			// open file
 			e.printStackTrace();
@@ -2042,31 +2009,27 @@ public class CalibrationData {
 
 	/**
 	 * 
-	 * @param fileURI
-	 *            - the URI of the file to import
-	 * @param dataSourceName
-	 *            - the name used to identify this data source (in the shared maps)
-	 * @param columnsToImport
-	 *            - a zero-based array of integers specifying which columns to
-	 *            import (i.e. the first column is column 0). The first column is
-	 *            assumed to be the ADI's ABN and is imported only as the key for
-	 *            the other columns' data.
-	 * @param adiCategoriesToImport
-	 *            - a list of ADI categories to import
-	 * @param titles
-	 *            - column titles in CSV file
-	 * @param units
-	 *            - units in CSV file
-	 * @param data
-	 *            - the data map that the values are returned in
+	 * @param fileResourceLocation  - the URI of the file to import
+	 * @param dataSourceName        - the name used to identify this data source (in
+	 *                              the shared maps)
+	 * @param columnsToImport       - a zero-based array of integers specifying
+	 *                              which columns to import (i.e. the first column
+	 *                              is column 0). The first column is assumed to be
+	 *                              the ADI's ABN and is imported only as the key
+	 *                              for the other columns' data.
+	 * @param adiCategoriesToImport - a list of ADI categories to import
+	 * @param titles                - column titles in CSV file
+	 * @param units                 - units in CSV file
+	 * @param data                  - the data map that the values are returned in
 	 */
-	private void loadAdiDataCsv(String fileURI, String dataSourceName, int[] columnsToImport,
+	private void loadAdiDataCsv(String fileResourceLocation, String dataSourceName, int[] columnsToImport,
 			String[] adiCategoriesToImport, Map<String, List<String>> titles, Map<String, List<String>> units,
 			Map<String, Map<String, String>> data) {
 
 		CSVReader reader = null;
 		try {
-			reader = new CSVReader(new FileReader(fileURI));
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
 			boolean header = true;
 			final int titleRow = 6;
 			final int unitTypeRow = 7;
@@ -2107,6 +2070,7 @@ public class CalibrationData {
 				}
 			}
 			reader.close();
+			reader = null;
 		} catch (FileNotFoundException e) {
 			// open file
 			e.printStackTrace();
@@ -2118,26 +2082,24 @@ public class CalibrationData {
 
 	/**
 	 * 
-	 * @param fileURI
-	 *            - the URI of the file to import
-	 * @param dataSourceName
-	 *            - the name used to identify this data source (in the shared maps)
-	 * @param columnsToImport
-	 *            - a zero-based array of integers specifying which columns to
-	 *            import (i.e. the first column is column 0). The first column is
-	 *            assumed to be the currency's ISO-4217 code and is imported only as
-	 *            the key for the other columns' data.
-	 * @param titles
-	 *            - column titles in CSV file
-	 * @param data
-	 *            - the data map that the values are returned in
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param dataSourceName       - the name used to identify this data source (in
+	 *                             the shared maps)
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0). The first column is assumed to be the
+	 *                             currency's ISO-4217 code and is imported only as
+	 *                             the key for the other columns' data.
+	 * @param titles               - column titles in CSV file
+	 * @param data                 - the data map that the values are returned in
 	 */
-	private void loadCurrencyDataCsv(String fileURI, String dataSourceName, int[] columnsToImport,
+	private void loadCurrencyDataCsv(String fileResourceLocation, String dataSourceName, int[] columnsToImport,
 			Map<String, List<String>> titles, Map<String, Map<String, String>> data) {
 
 		CSVReader reader = null;
 		try {
-			reader = new CSVReader(new FileReader(fileURI));
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
 			boolean header = true;
 			final int titleRow = 2;
 			int currentRow = 1;
@@ -2166,6 +2128,7 @@ public class CalibrationData {
 				}
 			}
 			reader.close();
+			reader = null;
 		} catch (FileNotFoundException e) {
 			// open file
 			e.printStackTrace();
@@ -2177,26 +2140,24 @@ public class CalibrationData {
 
 	/**
 	 * 
-	 * @param fileURI
-	 *            - the URI of the file to import
-	 * @param dataSourceName
-	 *            - the name used to identify this data source (in the shared maps)
-	 * @param columnsToImport
-	 *            - a zero-based array of integers specifying which columns to
-	 *            import (i.e. the first column is column 0). The first column is
-	 *            assumed to be the currency's ISO-4217 code and is imported only as
-	 *            the key for the other columns' data.
-	 * @param titles
-	 *            - column titles in CSV file
-	 * @param data
-	 *            - the data map that the values are returned in
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param dataSourceName       - the name used to identify this data source (in
+	 *                             the shared maps)
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0). The first column is assumed to be the
+	 *                             currency's ISO-4217 code and is imported only as
+	 *                             the key for the other columns' data.
+	 * @param titles               - column titles in CSV file
+	 * @param data                 - the data map that the values are returned in
 	 */
-	private void loadCountryDataCsv(String fileURI, String dataSourceName, int[] columnsToImport,
+	private void loadCountryDataCsv(String fileResourceLocation, String dataSourceName, int[] columnsToImport,
 			Map<String, List<String>> titles, Map<String, Map<String, String>> data) {
 
 		CSVReader reader = null;
 		try {
-			reader = new CSVReader(new FileReader(fileURI));
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
 			boolean header = true;
 			final int titleRow = 4;
 			int currentRow = 1;
@@ -2225,6 +2186,7 @@ public class CalibrationData {
 				}
 			}
 			reader.close();
+			reader = null;
 		} catch (FileNotFoundException e) {
 			// open file
 			e.printStackTrace();
@@ -2238,31 +2200,29 @@ public class CalibrationData {
 	 * Loads a single year's values from a pre-formatted CSV file containing a
 	 * Balance Sheet or Profit and Loss Statement.
 	 * 
-	 * @param fileURI
-	 *            - the URI of the file to import
-	 * @param dataSourceName
-	 *            - the name used to identify this data source (in the shared maps)
-	 * @param columnToImport
-	 *            - a zero-based integer specifying which column to import (i.e. the
-	 *            first column is column 0). The first column is assumed to be the
-	 *            field's name and is imported only as the key for the other
-	 *            column's data.
-	 * @param rowsToImport
-	 *            - a zero-based array of integers specifying which rows to import
-	 * @param titles
-	 *            - row titles in CSV file
-	 * @param data
-	 *            - the data map that the values are returned in
-	 * @param multiplier
-	 *            - the amounts in the file are multiplied by this number. The
-	 *            intention is to scale them from $m to $.
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param dataSourceName       - the name used to identify this data source (in
+	 *                             the shared maps)
+	 * @param columnToImport       - a zero-based integer specifying which column to
+	 *                             import (i.e. the first column is column 0). The
+	 *                             first column is assumed to be the field's name
+	 *                             and is imported only as the key for the other
+	 *                             column's data.
+	 * @param rowsToImport         - a zero-based array of integers specifying which
+	 *                             rows to import
+	 * @param titles               - row titles in CSV file
+	 * @param data                 - the data map that the values are returned in
+	 * @param multiplier           - the amounts in the file are multiplied by this
+	 *                             number. The intention is to scale them from $m to
+	 *                             $.
 	 */
-	private void loadFinancialStatementCsv(String fileURI, String dataSourceName, int columnToImport,
+	private void loadFinancialStatementCsv(String fileResourceLocation, String dataSourceName, int columnToImport,
 			int[] rowsToImport, Map<String, List<String>> titles, Map<String, Double> data, double multiplier) {
 
 		CSVReader reader = null;
 		try {
-			reader = new CSVReader(new FileReader(fileURI));
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
 			int currentRow = 0;
 			String[] seriesId = new String[rowsToImport.length];
 			titles.put(dataSourceName, new ArrayList<String>(rowsToImport.length));
@@ -2287,6 +2247,7 @@ public class CalibrationData {
 				currentRow++;
 			}
 			reader.close();
+			reader = null;
 		} catch (FileNotFoundException e) {
 			// open file
 			e.printStackTrace();
@@ -2937,8 +2898,7 @@ public class CalibrationData {
 	}
 
 	/**
-	 * @param area
-	 *            the area to set
+	 * @param area the area to set
 	 */
 	@Autowired
 	public void setArea(AreaMapping area) {
