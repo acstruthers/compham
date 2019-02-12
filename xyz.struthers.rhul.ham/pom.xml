@@ -2,8 +2,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.green_n_gold.rhul.ham</groupId>
-	<artifactId>com.green_n_gold.rhul.ham</artifactId>
+	<groupId>xyz.struthers.rhul.ham</groupId>
+	<artifactId>xyz.struthers.rhul.ham</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Computational Heterogeneous Agent Model</name>
 	<description>MSc International Management dissertation model</description>
@@ -26,6 +26,7 @@
 			"[WARNING] Using platform encoding (Cp1252 actually) to copy filtered resources, 
 			i.e. build is platform dependent!" -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding> -->
 
 		<version.java>11</version.java><!-- Glassfish 5 is only compatible with 
 			Java 8, so don't use 9+ yet -->
@@ -52,7 +53,7 @@
 		<version.apache.commons-lang3>3.8.1</version.apache.commons-lang3>
 
 		<version.shiro>1.4.0</version.shiro>
-		<version.google.guava>27.0.1-jre</version.google.guava>
+		<version.google.guava>27.0-jre</version.google.guava><!-- 27.0.1-jre -->
 		<version.opencsv>4.5</version.opencsv>
 		<version.slf4j>1.8.0-beta2</version.slf4j>
 		<version.logback>1.3.0-alpha4</version.logback>
@@ -232,11 +233,8 @@
 	</dependencyManagement>
 
 	<dependencies>
-		<dependency>
-			<groupId>javax.annotation</groupId>
-			<artifactId>javax.annotation-api</artifactId>
-			<version>1.3.2</version>
-		</dependency>
+		<!-- <dependency> <groupId>javax.annotation</groupId> <artifactId>javax.annotation-api</artifactId> 
+			<version>1.3.2</version> </dependency> -->
 
 		<!-- Spring dependencies -->
 		<dependency>
@@ -353,18 +351,20 @@
 					</configuration>
 				</plugin>
 
-				
+
 
 				<!-- Java 8 SE compiler plugin -->
 				<plugin>
-				<!-- https://stackoverflow.com/questions/49398894/unable-to-compile-simple-java-10-java-11-project-with-maven/51586202#51586202 -->
+					<!-- https://stackoverflow.com/questions/49398894/unable-to-compile-simple-java-10-java-11-project-with-maven/51586202#51586202 -->
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${version.maven-compiler-plugin}</version>
 					<configuration>
 						<release>${version.java}</release>
-						<!-- <verbose>true</verbose>
-						<fork>true</fork> -->
+						<source>${version.java}</source>
+						<target>${version.java}</target>
+						<verbose>true</verbose>
+						<fork>true</fork>
 					</configuration>
 				</plugin>
 

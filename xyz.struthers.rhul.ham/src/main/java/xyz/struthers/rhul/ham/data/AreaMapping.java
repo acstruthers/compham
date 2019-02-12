@@ -21,8 +21,6 @@ import org.springframework.stereotype.Component;
 
 import com.opencsv.CSVReader;
 
-import xyz.struthers.rhul.ham.config.Properties;
-
 /**
  * Loads ASGS boundary data from the ABS, downloaded in CSV format. Uses
  * meshblocks as the common field to map between Postal Area (POA), Local

@@ -3,12 +3,8 @@
  */
 package xyz.struthers.rhul.ham.config;
 
-import java.io.InputStream;
-
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import xyz.struthers.rhul.ham.Foobar;
 
 /**
  * @author Adam Struthers

@@ -2457,6 +2457,13 @@ public class CalibrationData {
 	}
 
 	/**
+	 * @return the abs5368_0Exporters
+	 */
+	public Map<String, Map<String, Map<String, Map<String, String>>>> getAbs5368_0Exporters() {
+		return abs5368_0Exporters;
+	}
+
+	/**
 	 * @return the abs5368_0Table14a
 	 */
 	public Map<String, Map<Date, String>> getAbs5368_0Table14a() {
@@ -2744,6 +2751,34 @@ public class CalibrationData {
 			this.loadData();
 		}
 		return abs8155_0Table6;
+	}
+
+	/**
+	 * @return the abs8165_0StateEmployment
+	 */
+	public Map<String, Map<String, Map<String, String>>> getAbs8165_0StateEmployment() {
+		return abs8165_0StateEmployment;
+	}
+
+	/**
+	 * @return the abs8165_0StateTurnover
+	 */
+	public Map<String, Map<String, Map<String, String>>> getAbs8165_0StateTurnover() {
+		return abs8165_0StateTurnover;
+	}
+
+	/**
+	 * @return the abs8165_0LgaEmployment
+	 */
+	public Map<String, Map<String, Map<String, Map<String, String>>>> getAbs8165_0LgaEmployment() {
+		return abs8165_0LgaEmployment;
+	}
+
+	/**
+	 * @return the abs8165_0LgaTurnover
+	 */
+	public Map<String, Map<String, Map<String, Map<String, String>>>> getAbs8165_0LgaTurnover() {
+		return abs8165_0LgaTurnover;
 	}
 
 	/**
