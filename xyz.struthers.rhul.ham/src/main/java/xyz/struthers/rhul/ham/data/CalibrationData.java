@@ -93,6 +93,8 @@ public class CalibrationData {
 	public static final String ABS8165_0_T17 = "ABS_8165.0_Table17";
 	public static final String ABS8167_0_T3 = "ABS_8167.0_Table3";
 	public static final String ABS8167_0_T6 = "ABS_8167.0_Table3";
+	public static final String ATO_COMPANY_T4A = "ATO_CompanyTable4A";
+	public static final String ATO_COMPANY_T4B = "ATO_CompanyTable4B";
 	public static final String LGA_BY_INCP = "Census_LGA_INCP";
 	public static final String LGA_BY_MRERD = "Census_LGA_MRERD";
 	public static final String LGA_BY_RNTRD = "Census_LGA_RNTRD";
@@ -193,6 +195,8 @@ public class CalibrationData {
 	private Map<String, Map<String, String>> abs8165_0Table17; // businesses by annual turnover range
 	private Map<String, Map<String, String>> abs8167_0Table3; // main source of income
 	private Map<String, Map<String, String>> abs8167_0Table6; // main supplier
+	private Map<String, Map<String, String>> atoCompanyTable4a; // ATO Fine Industry Detailed P&L and Bal Sht
+	private Map<String, Map<String, String>> atoCompanyTable4b; // Industry Code Total P&L
 	private Map<String, Map<String, String>> censusLgaByINCP; // LGA by INCP: Household income (title, LGA code, value)
 	private Map<String, Map<String, String>> censusLgaByMRERD; // LGA by MRERD: Mortgage repayments (title, LGA code,
 																// value)
@@ -282,10 +286,13 @@ public class CalibrationData {
 
 	/**
 	 * Deletes all the field variables, freeing up memory.
+	 * 
+	 * Does not do a deep delete because most objects are passed to other classes by
+	 * reference, and the other classes will probably still need to refer to them.
 	 */
 	@PreDestroy
 	public void close() {
-		// TODO: implement me
+		this.init(); // set all the pointers to null
 	}
 
 	private void loadData() {
@@ -498,10 +505,8 @@ public class CalibrationData {
 		this.abs5676_0Table22 = new HashMap<String, Map<Date, String>>();
 		int[] abs5676_0Table22Columns = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }; // loads profit to sales
 																								// ratio by industry
-		this.loadAbsDataCsv_Catalogue(
-
-				"/data/ABS/5676.0_BusinessIndicators/Table22_ProfitsVsSalesRatio.csv", ABS_5676_0_T22,
-				abs5676_0Table22Columns, this.title, this.unitType, this.abs5676_0Table22);
+		this.loadAbsDataCsv_Catalogue("/data/ABS/5676.0_BusinessIndicators/Table22_ProfitsVsSalesRatio.csv",
+				ABS_5676_0_T22, abs5676_0Table22Columns, this.title, this.unitType, this.abs5676_0Table22);
 
 		// load ABS 6524 employee
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 6524.055.002 Employee data");
@@ -546,11 +551,9 @@ public class CalibrationData {
 		String[] abs8155_0Table4Years = { "2016–17" };
 		int abs8155_0Table4TitleRow = 6;
 		int abs8155_0Table4UnitsRow = 7;
-		this.loadAbsDataCsv_8155_0T2T4(
-
-				"/data/ABS/8155.0_IndustryByDivision/Table4_IndustryPerformance.csv", ABS8155_0_T4,
-				abs8155_0Table4Columns, abs8155_0Table4Years, abs8155_0Table4TitleRow, abs8155_0Table4UnitsRow,
-				this.title, this.unitType, this.abs8155_0Table4);
+		this.loadAbsDataCsv_8155_0T2T4("/data/ABS/8155.0_IndustryByDivision/Table4_IndustryPerformance.csv",
+				ABS8155_0_T4, abs8155_0Table4Columns, abs8155_0Table4Years, abs8155_0Table4TitleRow,
+				abs8155_0Table4UnitsRow, this.title, this.unitType, this.abs8155_0Table4);
 
 		System.out.print(", Table 5");
 		this.abs8155_0Table5 = new HashMap<String, Map<String, Map<String, Map<String, String>>>>();
@@ -579,7 +582,6 @@ public class CalibrationData {
 		this.abs8165_0StateEmployment = new HashMap<String, Map<String, Map<String, String>>>(
 				abs8165_0StateEmploymentColumns.length);
 		this.loadAbsDataCsv_8165_0State(
-
 				"/data/ABS/8165.0_CountOfBusinesses/8165.0_by State, Industry Code & Employment Size.csv",
 				ABS8165_0_STATE_EMPLOYMENT, abs8165_0StateEmploymentColumns, abs8165_0StateEmploymentTitleRow,
 				abs8165_0StateEmploymentUnitsRow, this.title, this.unitType, this.abs8165_0StateEmployment);
@@ -591,7 +593,6 @@ public class CalibrationData {
 		this.abs8165_0StateTurnover = new HashMap<String, Map<String, Map<String, String>>>(
 				abs8165_0StateTurnoverColumns.length);
 		this.loadAbsDataCsv_8165_0State(
-
 				"/data/ABS/8165.0_CountOfBusinesses/8165.0_by State, Industry Code & Turnover.csv",
 				ABS8165_0_STATE_TURNOVER, abs8165_0StateTurnoverColumns, abs8165_0StateTurnoverTitleRow,
 				abs8165_0StateTurnoverUnitsRow, this.title, this.unitType, this.abs8165_0StateTurnover);
@@ -601,7 +602,6 @@ public class CalibrationData {
 		this.abs8165_0LgaEmployment = new HashMap<String, Map<String, Map<String, Map<String, String>>>>(
 				abs8165_0LgaEmploymentColumns.length);
 		this.loadAbsDataCsv_8165_0Lga(
-
 				"/data/ABS/8165.0_CountOfBusinesses/8165.0_by State, LGA, Industry & Employment Size.csv",
 				ABS8165_0_LGA_EMPLOYMENT, abs8165_0LgaEmploymentColumns, this.title, this.unitType,
 				this.abs8165_0LgaEmployment);
@@ -611,7 +611,6 @@ public class CalibrationData {
 		this.abs8165_0LgaTurnover = new HashMap<String, Map<String, Map<String, Map<String, String>>>>(
 				abs8165_0LgaTurnoverColumns.length);
 		this.loadAbsDataCsv_8165_0Lga(
-
 				"/data/ABS/8165.0_CountOfBusinesses/8165.0_by State, LGA, Industry & Turnover.csv",
 				ABS8165_0_LGA_TURNOVER, abs8165_0LgaTurnoverColumns, this.title, this.unitType,
 				this.abs8165_0LgaTurnover);
@@ -629,13 +628,11 @@ public class CalibrationData {
 		int[] abs8165_0Table13Columns = { 5 };
 		int[] abs8165_0Table13Rows = { 34, 36, 37, 38, 39 };
 		int abs8165_0Table13TitleRow = 4;
-		this.loadAbsDataRowsColumnsCsv(
-
-				"/data/ABS/8165.0_CountOfBusinesses/8165.0_Table13_EmploymentSize.csv", ABS8165_0_T13,
-				abs8165_0Table13Columns, abs8165_0Table13Rows, abs8165_0Table13TitleRow, this.title,
+		this.loadAbsDataRowsColumnsCsv("/data/ABS/8165.0_CountOfBusinesses/8165.0_Table13_EmploymentSize.csv",
+				ABS8165_0_T13, abs8165_0Table13Columns, abs8165_0Table13Rows, abs8165_0Table13TitleRow, this.title,
 				this.abs8165_0Table13);
 
-		System.out.print(", Table 17");
+		System.out.println(", Table 17.");
 		this.abs8165_0Table17 = new HashMap<String, Map<String, String>>(1);
 		int[] abs8165_0Table17Columns = { 5 };
 		int[] abs8165_0Table17Rows = { 31, 32, 33, 34, 35, 36 };
@@ -643,14 +640,6 @@ public class CalibrationData {
 		this.loadAbsDataRowsColumnsCsv("/data/ABS/8165.0_CountOfBusinesses/8165.0_Table17_Turnover.csv", ABS8165_0_T17,
 				abs8165_0Table17Columns, abs8165_0Table17Rows, abs8165_0Table17TitleRow, this.title,
 				this.abs8165_0Table17);
-
-		System.out.print(", state & employment");
-
-		System.out.print(", state & turnover");
-
-		System.out.print(", LGA & employment");
-
-		System.out.println(", LGA & turnover.");
 
 		// ABS 8167.0 Business Markets and Competition
 		System.out.println(
@@ -672,126 +661,113 @@ public class CalibrationData {
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS Census LGA by INCP data");
 		this.censusLgaByINCP = new HashMap<String, Map<String, String>>();
 		int[] censusLgaByINCPColumns = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 };
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - ACT.csv", CalibrationData.LGA_BY_INCP,
-				censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title, this.censusLgaByINCP);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - NSW.csv", CalibrationData.LGA_BY_INCP,
-				censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title, this.censusLgaByINCP);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - NT.csv", CalibrationData.LGA_BY_INCP,
-				censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title, this.censusLgaByINCP);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - OT.csv", CalibrationData.LGA_BY_INCP,
-				censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title, this.censusLgaByINCP);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - QLD.csv", CalibrationData.LGA_BY_INCP,
-				censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title, this.censusLgaByINCP);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - SA.csv", CalibrationData.LGA_BY_INCP,
-				censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title, this.censusLgaByINCP);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - TAS.csv", CalibrationData.LGA_BY_INCP,
-				censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title, this.censusLgaByINCP);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - VIC.csv", CalibrationData.LGA_BY_INCP,
-				censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title, this.censusLgaByINCP);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - WA.csv", CalibrationData.LGA_BY_INCP,
-				censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title, this.censusLgaByINCP);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - ACT.csv",
+				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title,
+				this.censusLgaByINCP);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - NSW.csv",
+				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title,
+				this.censusLgaByINCP);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - NT.csv",
+				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title,
+				this.censusLgaByINCP);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - OT.csv",
+				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title,
+				this.censusLgaByINCP);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - QLD.csv",
+				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title,
+				this.censusLgaByINCP);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - SA.csv",
+				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title,
+				this.censusLgaByINCP);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - TAS.csv",
+				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title,
+				this.censusLgaByINCP);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - VIC.csv",
+				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title,
+				this.censusLgaByINCP);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - WA.csv",
+				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLgaByINCP, this.title,
+				this.censusLgaByINCP);
 
 		// ABS Census: LGA by MRERD
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS Census LGA by MRERD data");
 		this.censusLgaByMRERD = new HashMap<String, Map<String, String>>();
 		int[] censusLgaByMRERDColumns = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
 				22 };
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - ACT.csv", CalibrationData.LGA_BY_MRERD,
-				censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title, this.censusLgaByMRERD);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - NSW.csv", CalibrationData.LGA_BY_MRERD,
-				censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title, this.censusLgaByMRERD);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - NT.csv", CalibrationData.LGA_BY_MRERD,
-				censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title, this.censusLgaByMRERD);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - OT.csv", CalibrationData.LGA_BY_MRERD,
-				censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title, this.censusLgaByMRERD);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - QLD.csv", CalibrationData.LGA_BY_MRERD,
-				censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title, this.censusLgaByMRERD);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - SA.csv", CalibrationData.LGA_BY_MRERD,
-				censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title, this.censusLgaByMRERD);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - TAS.csv", CalibrationData.LGA_BY_MRERD,
-				censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title, this.censusLgaByMRERD);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - VIC.csv", CalibrationData.LGA_BY_MRERD,
-				censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title, this.censusLgaByMRERD);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - WA.csv", CalibrationData.LGA_BY_MRERD,
-				censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title, this.censusLgaByMRERD);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - ACT.csv",
+				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title,
+				this.censusLgaByMRERD);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - NSW.csv",
+				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title,
+				this.censusLgaByMRERD);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - NT.csv",
+				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title,
+				this.censusLgaByMRERD);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - OT.csv",
+				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title,
+				this.censusLgaByMRERD);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - QLD.csv",
+				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title,
+				this.censusLgaByMRERD);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - SA.csv",
+				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title,
+				this.censusLgaByMRERD);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - TAS.csv",
+				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title,
+				this.censusLgaByMRERD);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - VIC.csv",
+				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title,
+				this.censusLgaByMRERD);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - WA.csv",
+				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLgaByMRERD, this.title,
+				this.censusLgaByMRERD);
 
 		// ABS Census: LGA by RNTRD
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS Census LGA by RNTRD data");
 		this.censusLgaByRNTRD = new HashMap<String, Map<String, String>>();
 		int[] censusLgaByRNTRDColumns = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
 				23, 24, 25, 26 };
-		this.loadAbsCensusTableCsv2D(
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - ACT.csv",
+				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title,
+				this.censusLgaByRNTRD);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - NSW.csv",
+				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title,
+				this.censusLgaByRNTRD);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - NT.csv",
+				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title,
+				this.censusLgaByRNTRD);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - OT.csv",
+				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title,
+				this.censusLgaByRNTRD);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - QLD.csv",
+				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title,
+				this.censusLgaByRNTRD);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - SA.csv",
+				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title,
+				this.censusLgaByRNTRD);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - TAS.csv",
+				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title,
+				this.censusLgaByRNTRD);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - VIC.csv",
+				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title,
+				this.censusLgaByRNTRD);
+		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - WA.csv",
+				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title,
+				this.censusLgaByRNTRD);
 
-				"/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - ACT.csv", CalibrationData.LGA_BY_RNTRD,
-				censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title, this.censusLgaByRNTRD);
-		this.loadAbsCensusTableCsv2D(
+		// load ATO Company Table 4
+		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Company Table 4A data");
+		this.atoCompanyTable4a = new HashMap<String, Map<String, String>>();
+		int[] atoCompanyTable4aColumns = { 2, 3, 4, 9, 10, 11, 12, 17, 18, 21, 22, 23, 24, 31, 32, 33, 34, 35, 36, 37,
+				38, 41, 42, 51, 52, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 111, 112, 115, 116 };
+		this.loadAtoCompanyTable4A("/data/ATO/Company/CompanyTable4A.csv", CalibrationData.ATO_COMPANY_T4A,
+				atoCompanyTable4aColumns, this.title, this.atoCompanyTable4a);
 
-				"/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - NSW.csv", CalibrationData.LGA_BY_RNTRD,
-				censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title, this.censusLgaByRNTRD);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - NT.csv", CalibrationData.LGA_BY_RNTRD,
-				censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title, this.censusLgaByRNTRD);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - OT.csv", CalibrationData.LGA_BY_RNTRD,
-				censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title, this.censusLgaByRNTRD);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - QLD.csv", CalibrationData.LGA_BY_RNTRD,
-				censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title, this.censusLgaByRNTRD);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - SA.csv", CalibrationData.LGA_BY_RNTRD,
-				censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title, this.censusLgaByRNTRD);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - TAS.csv", CalibrationData.LGA_BY_RNTRD,
-				censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title, this.censusLgaByRNTRD);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - VIC.csv", CalibrationData.LGA_BY_RNTRD,
-				censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title, this.censusLgaByRNTRD);
-		this.loadAbsCensusTableCsv2D(
-
-				"/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - WA.csv", CalibrationData.LGA_BY_RNTRD,
-				censusLgaByRNTRDColumns, this.initialisedCensusLgaByRNTRD, this.title, this.censusLgaByRNTRD);
+		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Company Table 4B data");
+		this.atoCompanyTable4b = new HashMap<String, Map<String, String>>();
+		int[] atoCompanyTable4bColumns = { 2, 3, 4, 5, 6 };
+		this.loadAtoCompanyTable4B("/data/ATO/Company/CompanyTable4B.csv", CalibrationData.ATO_COMPANY_T4B,
+				atoCompanyTable4bColumns, this.title, this.atoCompanyTable4b);
 
 		// load pre-formatted ADI data
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ADI data");
@@ -977,10 +953,16 @@ public class CalibrationData {
 						mappingTitles.add("Subdivision Code to Subdivision");
 						mappingTitles.add("Group Code to Group");
 						mappingTitles.add("Class Code to Class");
+						mappingTitles.add("Industry Code to Industry");
 						mappingTitles.add("Division to Division Code");
 						mappingTitles.add("Subdivision to Subdivision Code");
 						mappingTitles.add("Group to Group Code");
 						mappingTitles.add("Class to Class Code");
+						mappingTitles.add("Industry to Industry Code");
+						mappingTitles.add("Industry Code to Class Code");
+						mappingTitles.add("Industry Code to Group Code");
+						mappingTitles.add("Industry Code to Subdivision Code");
+						mappingTitles.add("Industry Code to Division Code");
 						mappingTitles.add("Class Code to Group Code");
 						mappingTitles.add("Class Code to Subdivision Code");
 						mappingTitles.add("Class Code to Division Code");
@@ -1003,10 +985,16 @@ public class CalibrationData {
 					data.get("Subdivision Code to Subdivision").put(line[2], line[3]);
 					data.get("Group Code to Group").put(line[4], line[5]);
 					data.get("Class Code to Class").put(line[6], line[7]);
+					data.get("Industry Code to Industry").put(line[8], line[9]);
 					data.get("Division to Division Code").put(line[1], line[0]);
 					data.get("Subdivision to Subdivision Code").put(line[3], line[2]);
 					data.get("Group to Group Code").put(line[5], line[4]);
 					data.get("Class to Class Code").put(line[7], line[6]);
+					data.get("Industry to Industry Code").put(line[9], line[8]);
+					data.get("Industry Code to Class Code").put(line[8], line[6]);
+					data.get("Industry Code to Group Code").put(line[8], line[4]);
+					data.get("Industry Code to Subdivision Code").put(line[8], line[2]);
+					data.get("Industry Code to Division Code").put(line[8], line[0]);
 					data.get("Class Code to Group Code").put(line[6], line[4]);
 					data.get("Class Code to Subdivision Code").put(line[6], line[2]);
 					data.get("Class Code to Division Code").put(line[6], line[0]);
@@ -1025,59 +1013,13 @@ public class CalibrationData {
 			e.printStackTrace();
 		}
 	}
-	/*
-	 * private void loadAbsDataCsv_1292_0_55_002(String fileURI, String
-	 * catalogueName, Map<String, List<String>> titles, Map<String, Map<String,
-	 * String>> data) {
-	 * 
-	 * CSVReader reader = null; try { reader = new CSVReader(new
-	 * FileReader(fileURI)); boolean header = true; int currentRow = 1; final int
-	 * titleRow = 4; String[] line = null; while ((line = reader.readNext()) !=
-	 * null) { if (header) { if (currentRow == titleRow) { // store title
-	 * List<String> mappingTitles = new ArrayList<String>(4 + 4 + 3 + 2 + 1);
-	 * mappingTitles.add("Division Code to Division");
-	 * mappingTitles.add("Subdivision Code to Subdivision");
-	 * mappingTitles.add("Group Code to Group");
-	 * mappingTitles.add("Class Code to Class");
-	 * mappingTitles.add("Division to Division Code");
-	 * mappingTitles.add("Subdivision to Subdivision Code");
-	 * mappingTitles.add("Group to Group Code");
-	 * mappingTitles.add("Class to Class Code");
-	 * mappingTitles.add("Class Code to Group Code");
-	 * mappingTitles.add("Class Code to Subdivision Code");
-	 * mappingTitles.add("Class Code to Division Code");
-	 * mappingTitles.add("Group Code to Subdivision Code");
-	 * mappingTitles.add("Group Code to Division Code");
-	 * mappingTitles.add("Subdivision Code to Division Code");
-	 * titles.put(catalogueName, mappingTitles);
-	 * 
-	 * // store mapping titles as key with blank collections to populate with data
-	 * // below for (int i = 0; i < mappingTitles.size(); i++) {
-	 * data.put(mappingTitles.get(i), new HashMap<String, String>()); } header =
-	 * false; } currentRow++; } else { // parse the body of the data
-	 * data.get("Division Code to Division").put(line[0], line[1]);
-	 * data.get("Subdivision Code to Subdivision").put(line[2], line[3]);
-	 * data.get("Group Code to Group").put(line[4], line[5]);
-	 * data.get("Class Code to Class").put(line[6], line[7]);
-	 * data.get("Division to Division Code").put(line[1], line[0]);
-	 * data.get("Subdivision to Subdivision Code").put(line[3], line[2]);
-	 * data.get("Group to Group Code").put(line[5], line[4]);
-	 * data.get("Class to Class Code").put(line[7], line[6]);
-	 * data.get("Class Code to Group Code").put(line[6], line[4]);
-	 * data.get("Class Code to Subdivision Code").put(line[6], line[2]);
-	 * data.get("Class Code to Division Code").put(line[6], line[0]);
-	 * data.get("Group Code to Subdivision Code").put(line[4], line[2]);
-	 * data.get("Group Code to Division Code").put(line[4], line[0]);
-	 * data.get("Subdivision Code to Division Code").put(line[2], line[0]); } }
-	 * reader.close(); } catch (FileNotFoundException e) { // open file
-	 * e.printStackTrace(); } catch (IOException e) { // read next
-	 * e.printStackTrace(); } }
-	 */
 
 	/**
 	 * Loads ABS 1410.0 catalogue data.
 	 * 
-	 * TODO: check if the column titles are too long to be keys in a Map<String, T>
+	 * The size of the key in a HashMap is largely irrelevant, so the tiele lengths
+	 * are fine. SOURCE:
+	 * https://stackoverflow.com/questions/16506593/at-which-length-is-a-string-key-of-a-hashmap-considered-bad-practice
 	 * 
 	 * @param fileResourceLocation - the URI of the file to import
 	 * @param catalogueName        - the name used to store this series' data in the
@@ -1327,8 +1269,6 @@ public class CalibrationData {
 
 	/**
 	 * Loads ABS 6524.0.55.002 catalogue data.
-	 * 
-	 * TODO: check if the column titles are too long to be keys in a Map<String, T>
 	 * 
 	 * @param fileResourceLocation - the URI of the file to import
 	 * @param catalogueName        - the name used to store this series' data in the
@@ -2081,6 +2021,135 @@ public class CalibrationData {
 	}
 
 	/**
+	 * Load data from ATO Company Table 4A
+	 * 
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param dataSourceName       - the name used to identify this data source (in
+	 *                             the shared maps)
+	 * @param tableName            - the name used to store this series' data in the
+	 *                             maps
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0).
+	 * @param titles               - column titles in CSV file
+	 * @param data                 - the data map that the values are returned in
+	 */
+	private void loadAtoCompanyTable4A(String fileResourceLocation, String tableName, int[] columnsToImport,
+			Map<String, List<String>> titles, Map<String, Map<String, String>> data) {
+
+		CSVReader reader = null;
+		try {
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
+			boolean header = true;
+			boolean footer = false;
+			String[] seriesId = new String[columnsToImport.length];
+
+			String[] line = null;
+			while ((line = reader.readNext()) != null && !footer) {
+				if (header) {
+					if (line[0].equals("Broad Industry2")) {
+						// title row
+						List<String> thesecolumnNames = new ArrayList<String>(columnsToImport.length);
+						for (int i = 0; i < columnsToImport.length; i++) {
+							// store title
+							seriesId[i] = line[columnsToImport[i]];
+							thesecolumnNames.add(line[columnsToImport[i]]);
+
+							// store series ID as key with blank collections to populate with data below
+							data.put(line[columnsToImport[i]], new HashMap<String, String>());
+						}
+						titles.put(tableName, thesecolumnNames);
+						header = false;
+					}
+				} else {
+					if (!line[1].equals("Other")) {
+						for (int i = 0; i < columnsToImport.length; i++) {
+							// parse the body of the data
+							String fineIndustryCode = line[1].substring(0, 3);
+							data.get(seriesId[i]).put(fineIndustryCode, line[columnsToImport[i]]);
+						}
+					} else {
+						footer = true;
+					}
+				}
+			}
+			reader.close();
+			reader = null;
+		} catch (FileNotFoundException e) {
+			// open file
+			e.printStackTrace();
+		} catch (IOException e) {
+			// read next
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Load data from ATO Company Table 4B
+	 * 
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param dataSourceName       - the name used to identify this data source (in
+	 *                             the shared maps)
+	 * @param tableName            - the name used to store this series' data in the
+	 *                             maps
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0).
+	 * @param titles               - column titles in CSV file
+	 * @param data                 - the data map that the values are returned in
+	 */
+	private void loadAtoCompanyTable4B(String fileResourceLocation, String tableName, int[] columnsToImport,
+			Map<String, List<String>> titles, Map<String, Map<String, String>> data) {
+
+		CSVReader reader = null;
+		try {
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
+			boolean header = true;
+			boolean footer = false;
+			String[] seriesId = new String[columnsToImport.length];
+
+			String[] line = null;
+			while ((line = reader.readNext()) != null && !footer) {
+				if (header) {
+					if (line[0].equals("Industry code")) {
+						// title row
+						List<String> thesecolumnNames = new ArrayList<String>(columnsToImport.length);
+						for (int i = 0; i < columnsToImport.length; i++) {
+							// store title
+							seriesId[i] = line[columnsToImport[i]];
+							thesecolumnNames.add(line[columnsToImport[i]]);
+
+							// store series ID as key with blank collections to populate with data below
+							data.put(line[columnsToImport[i]], new HashMap<String, String>());
+						}
+						titles.put(tableName, thesecolumnNames);
+						header = false;
+					}
+				} else {
+					if (!line[0].equals("Other")) {
+						for (int i = 0; i < columnsToImport.length; i++) {
+							// parse the body of the data
+							data.get(seriesId[i]).put(line[0], line[columnsToImport[i]]);
+						}
+					} else {
+						footer = true;
+					}
+				}
+			}
+			reader.close();
+			reader = null;
+		} catch (FileNotFoundException e) {
+			// open file
+			e.printStackTrace();
+		} catch (IOException e) {
+			// read next
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * 
 	 * @param fileResourceLocation - the URI of the file to import
 	 * @param dataSourceName       - the name used to identify this data source (in
@@ -2351,6 +2420,8 @@ public class CalibrationData {
 		this.abs8165_0Table17 = null;
 		this.abs8167_0Table3 = null;
 		this.abs8167_0Table6 = null;
+		this.atoCompanyTable4a = null;
+		this.atoCompanyTable4b = null;
 		this.censusLgaByINCP = null;
 		this.censusLgaByMRERD = null;
 		this.censusLgaByRNTRD = null;
@@ -2829,6 +2900,26 @@ public class CalibrationData {
 			this.loadData();
 		}
 		return abs8167_0Table6;
+	}
+
+	/**
+	 * @return the atoCompanyTable4a
+	 */
+	public Map<String, Map<String, String>> getAtoCompanyTable4a() {
+		if (!this.dataLoaded) {
+			this.loadData();
+		}
+		return atoCompanyTable4a;
+	}
+
+	/**
+	 * @return the atoCompanyTable4b
+	 */
+	public Map<String, Map<String, String>> getAtoCompanyTable4b() {
+		if (!this.dataLoaded) {
+			this.loadData();
+		}
+		return atoCompanyTable4b;
 	}
 
 	/**
