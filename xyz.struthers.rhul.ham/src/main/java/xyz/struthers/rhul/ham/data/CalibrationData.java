@@ -925,6 +925,31 @@ public class CalibrationData {
 	/**
 	 * Imports an ANZSIC code table so we can map between levels in the hierarchy.
 	 * 
+	 * Stores description-to-code mapping in UPPER CASE, so use toUpperCase() when
+	 * getting the mapping from descriptions to codes.
+	 * 
+	 * Mappings are:<br>
+	 * "Division Code to Division"<br>
+	 * "Subdivision Code to Subdivision"<br>
+	 * "Group Code to Group"<br>
+	 * "Class Code to Class"<br>
+	 * "Industry Code to Industry"<br>
+	 * "Division to Division Code"<br>
+	 * "Subdivision to Subdivision Code"<br>
+	 * "Group to Group Code"<br>
+	 * "Class to Class Code"<br>
+	 * "Industry to Industry Code"<br>
+	 * "Industry Code to Class Code"<br>
+	 * "Industry Code to Group Code"<br>
+	 * "Industry Code to Subdivision Code"<br>
+	 * "Industry Code to Division Code"<br>
+	 * "Class Code to Group Code"<br>
+	 * "Class Code to Subdivision Code"<br>
+	 * "Class Code to Division Code"<br>
+	 * "Group Code to Subdivision Code"<br>
+	 * "Group Code to Division Code"<br>
+	 * "Subdivision Code to Division Code"<br>
+	 * 
 	 * @param               - the URI of the file to import
 	 * @param catalogueName - the name used to store this series' data in the maps
 	 * @param titles        - this is a list of the mapping pairs (e.g. "Group Code
@@ -986,11 +1011,11 @@ public class CalibrationData {
 					data.get("Group Code to Group").put(line[4], line[5]);
 					data.get("Class Code to Class").put(line[6], line[7]);
 					data.get("Industry Code to Industry").put(line[8], line[9]);
-					data.get("Division to Division Code").put(line[1], line[0]);
-					data.get("Subdivision to Subdivision Code").put(line[3], line[2]);
-					data.get("Group to Group Code").put(line[5], line[4]);
-					data.get("Class to Class Code").put(line[7], line[6]);
-					data.get("Industry to Industry Code").put(line[9], line[8]);
+					data.get("Division to Division Code").put(line[1].toUpperCase(), line[0]);
+					data.get("Subdivision to Subdivision Code").put(line[3].toUpperCase(), line[2]);
+					data.get("Group to Group Code").put(line[5].toUpperCase(), line[4]);
+					data.get("Class to Class Code").put(line[7].toUpperCase(), line[6]);
+					data.get("Industry to Industry Code").put(line[9].toUpperCase(), line[8]);
 					data.get("Industry Code to Class Code").put(line[8], line[6]);
 					data.get("Industry Code to Group Code").put(line[8], line[4]);
 					data.get("Industry Code to Subdivision Code").put(line[8], line[2]);
@@ -1448,7 +1473,8 @@ public class CalibrationData {
 					// check if this is an industry category row
 					if (!line[0].contains("–")) {
 						// industry category
-						industry = line[0];
+						// CHECKME: store industry code not description
+						industry = abs1292_0_55_002ANZSIC.get("Division to Division Code").get(line[0].toUpperCase());
 					} else if (line[0].isEmpty()) {
 						footer = true;
 					} else {
@@ -1498,7 +1524,7 @@ public class CalibrationData {
 	 * @param units                - unit type (e.g. $Billions, Number, '000)
 	 * @param data                 - the data map that the values are returned in.
 	 *                             Keys are: Year, Series Title, State/Size,
-	 *                             Industry.
+	 *                             Industry Division Code.
 	 */
 	private void loadAbsDataCsv_8155_0T5T6(String fileResourceLocation, String catalogueName, int[] columnsToImport,
 			int titleRow, int unitsRow, Map<String, List<String>> titles, Map<String, List<String>> units,
@@ -1585,9 +1611,49 @@ public class CalibrationData {
 					if (line[0].isEmpty()) {
 						footer = true;
 					} else if (line[1].isEmpty()) {
-						// size or state category
-						sizeOrState = line[0];
+						// change size or state category from description to code
 						isNewCategory = true;
+						switch (line[0].toUpperCase()) {
+						case "SMALL":
+							sizeOrState = "S";
+							break;
+						case "MEDIUM":
+							sizeOrState = "M";
+							break;
+						case "LARGE":
+							sizeOrState = "L";
+							break;
+						case "NEW SOUTH WALES":
+							sizeOrState = "NSW";
+							break;
+						case "VICTORIA":
+							sizeOrState = "VIC";
+							break;
+						case "QUEENSLAND":
+							sizeOrState = "QLD";
+							break;
+						case "SOUTH AUSTRALIA":
+							sizeOrState = "SA";
+							break;
+						case "WESTERN AUSTRALIA":
+							sizeOrState = "WA";
+							break;
+						case "TASMANIA":
+							sizeOrState = "TAS";
+							break;
+						case "NORTHERN TERRITORY":
+							sizeOrState = "NT";
+							break;
+						case "AUSTRALIAN CAPITAL TERRITORY":
+							sizeOrState = "ACT";
+							break;
+						case "AUSTRALIA":
+						case "TOTAL":
+							sizeOrState = "AU";
+							break;
+						default:
+							sizeOrState = "Other";
+						}
 					} else {
 						// year, column title, state/size, industry
 						if (isNewCategory) {
@@ -1599,7 +1665,11 @@ public class CalibrationData {
 						}
 						for (int i = 0; i < columnsToImport.length; i++) {
 							// parse the body of the data
-							data.get(years[i]).get(seriesId[i]).get(sizeOrState).put(line[0], line[columnsToImport[i]]);
+							// CHECKME: store industry code not description
+							String anzsicCode = abs1292_0_55_002ANZSIC.get("Division to Division Code")
+									.get(line[0].toUpperCase());
+							data.get(years[i]).get(seriesId[i]).get(sizeOrState).put(anzsicCode,
+									line[columnsToImport[i]]);
 						}
 					}
 				}
