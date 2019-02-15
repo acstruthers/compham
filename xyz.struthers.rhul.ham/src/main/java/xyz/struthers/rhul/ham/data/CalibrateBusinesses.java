@@ -4,7 +4,6 @@
 package xyz.struthers.rhul.ham.data;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +31,14 @@ public class CalibrateBusinesses {
 	public static final String ABS8155_TITLE_SALES = "Sales and service income";
 	public static final String ABS8155_TITLE_INCOME = "Total income";
 	public static final String ABS8155_TITLE_EXPENSES = "Total expenses";
+
+	public static final String ABS8165_TITLE_EMPLOYMENT_1 = "Non employing";
+	public static final String ABS8165_TITLE_EMPLOYMENT_2 = "1-19 Employees";
+	public static final String ABS8165_TITLE_EMPLOYMENT_3 = "20-199 Employees";
+	public static final String ABS8165_TITLE_EMPLOYMENT_4 = "200+ Employees";
+
+	private static final double MILLION = 1000000d;
+	private static final double THOUSAND = 1000d;
 
 	// beans
 	private CalibrationData data;
@@ -77,12 +84,12 @@ public class CalibrateBusinesses {
 	private Map<String, Map<String, Map<String, String>>> abs8165_0StateTurnover;
 	/**
 	 * Count by LGA, industry & employment range<br>
-	 * Keys: employment range, state, LGA code, industry division code
+	 * Keys: employment range, state acronym, LGA code, industry division code
 	 */
 	private Map<String, Map<String, Map<String, Map<String, String>>>> abs8165_0LgaEmployment;
 	/**
 	 * Count by LGA, industry & turnover range<br>
-	 * Keys: turnover range, state, LGA code, industry division code
+	 * Keys: turnover range, state acronym, LGA code, industry division code
 	 */
 	private Map<String, Map<String, Map<String, Map<String, String>>>> abs8165_0LgaTurnover;
 	/**
@@ -120,6 +127,7 @@ public class CalibrateBusinesses {
 	 * ------------------------------------------------------------------------<br>
 	 * 1. ATO Company Table 4A: First calculate per-company figures, then calculate
 	 * the ratios between the various P&L line items.<br>
+	 * 
 	 * 2. ATO Company Table 4B: Calculate per-company figures, then multiply by the
 	 * ratios from 4A to get a more detailed P&L. This gives per-company P&L for 574
 	 * industries. Calculate the ratio of the number of companies in each of the
@@ -129,37 +137,50 @@ public class CalibrateBusinesses {
 	 * N.B. Uses the ratio of assets and liabilities to income to calibrate the
 	 * balance sheet based on the P&L statement.
 	 * 
-	 * We now have representative business P&L and Bal Shts for each industry.
+	 * We now have representative company P&L and Bal Shts for each of the 574
+	 * industry codes.
 	 * 
 	 * ------------------------------------------------------------<br>
 	 * PART B: INDUSTRY BUSINESS FINANCIALS SPLIT BY SIZE AND STATE<br>
 	 * ------------------------------------------------------------<br>
 	 * 3. ABS 8155.0 Table 6: Calculate ratios between states (for employment count,
 	 * wages and sales) by industry.<br>
+	 * 
 	 * 4. ABS 8155.0 Table 5: Use the ratios from Table 6 to split Size by State,
 	 * assuming that all income is split in the same ratio as sales, and all
 	 * expenses are split in the same ratio as wages. Calculate gross profit by
 	 * subtracting total expenses from total income.
 	 * 
-	 * We now have total $ amounts by state, industry, and size. 8 states x 574
-	 * industries x 3 sizes = 13,776 distinct Business agents
+	 * We now have total $ amounts by state, industry, and size.<br>
+	 * 8 states x 18 industries x 3 sizes = 432 categories.
 	 * 
 	 * ----------------------------------------------------------<br>
 	 * PART C: ADJUST INDUSTRY P&L AND BAL SHTS BY SIZE AND STATE<br>
 	 * ----------------------------------------------------------<br>
 	 * 
-	 * rough algorithm: use number of businesses per state / industry / size from
-	 * 8165.0 to determine the mean dollars and employees per business from 8155.0.
-	 * Also calculate a total national mean dollars and employees per business.
-	 * Divide each state / industry / size's figures by the national average to
-	 * produce a multiplier. Multiply the ATO industry figures by this multiplier to
-	 * calibrate the ATO company P&L and Bal Shts so they're now representative of
-	 * businesses per state / industry / size.
+	 * 5. ABS 8165.0 LGA Employment Range: Get the number of businesses per state /
+	 * industry / size then divide the dollar amounts from 8155.0 to determine the
+	 * mean dollars per business. Divide the number of employees from 8155.0 by the
+	 * number of businesses in 8165.0 to get the mean employees per business by
+	 * state / industry / size. Also calculate a total national mean dollars and
+	 * employees per business.
+	 * 
+	 * 6. Divide each state / industry / size's figures by the national average to
+	 * produce a multiplier for each category combination.
+	 * 
+	 * 7. For each state / industry / size, multiply the ATO industry figures by
+	 * this multiplier to calibrate the ATO company P&L and Bal Shts so they're now
+	 * representative of businesses per state / industry / size.
+	 * 
+	 * We now have employee count and detailed P&L and Bal Sht by state, industry
+	 * code, and size.<br>
+	 * 8 states x 574 industry codes x 3 sizes = 13,776 distinct Business agents
 	 * 
 	 * -----------------------------------------------------<br>
 	 * PART D: ASSIGN BUSINESSES TO LGA BY SIZE AND INDUSTRY<br>
 	 * -----------------------------------------------------<br>
 	 * 
+	 * rough algorithm:
 	 * 
 	 */
 	public void createBusinessAgents() {
@@ -469,27 +490,28 @@ public class CalibrateBusinesses {
 		for (String thisState : states) {
 			for (int i = 0; i < industries8155.length; i++) {
 				totalStateEmploymentByIndustry[i] += Double.valueOf(this.abs8155_0Table6.get(ABS8155_YEAR)
-						.get(ABS8155_TITLE_EMPLOYMENT).get(thisState).get(industries8155[i]).replace(",", ""));
+						.get(ABS8155_TITLE_EMPLOYMENT).get(thisState).get(industries8155[i]).replace(",", ""))
+						* THOUSAND;
 				totalStateWagesByIndustry[i] += Double.valueOf(this.abs8155_0Table6.get(ABS8155_YEAR)
-						.get(ABS8155_TITLE_WAGES).get(thisState).get(industries8155[i]).replace(",", ""));
+						.get(ABS8155_TITLE_WAGES).get(thisState).get(industries8155[i]).replace(",", "")) * MILLION;
 				totalStateSalesByIndustry[i] += Double.valueOf(this.abs8155_0Table6.get(ABS8155_YEAR)
-						.get(ABS8155_TITLE_SALES).get(thisState).get(industries8155[i]).replace(",", ""));
+						.get(ABS8155_TITLE_SALES).get(thisState).get(industries8155[i]).replace(",", "")) * MILLION;
 			}
 		}
 		// calculate ratios between states for each industry
 		for (int i = 0; i < industries8155.length; i++) {
 			for (int j = 0; j < states.length; j++) {
 				double cellValue = Double.valueOf(this.abs8155_0Table6.get(ABS8155_YEAR).get(ABS8155_TITLE_EMPLOYMENT)
-						.get(states[j]).get(industries8155[i]).replace(",", ""));
+						.get(states[j]).get(industries8155[i]).replace(",", "")) * THOUSAND;
 				stateRatioEmploymentCount[i][j] = totalStateEmploymentByIndustry[i] > 0d
 						? cellValue / totalStateEmploymentByIndustry[i]
 						: 0d;
 				cellValue = Double.valueOf(this.abs8155_0Table6.get(ABS8155_YEAR).get(ABS8155_TITLE_WAGES)
-						.get(states[j]).get(industries8155[i]).replace(",", ""));
+						.get(states[j]).get(industries8155[i]).replace(",", "")) * MILLION;
 				stateRatioWages[i][j] = totalStateWagesByIndustry[i] > 0d ? cellValue / totalStateWagesByIndustry[i]
 						: 0d;
 				cellValue = Double.valueOf(this.abs8155_0Table6.get(ABS8155_YEAR).get(ABS8155_TITLE_SALES)
-						.get(states[j]).get(industries8155[i]).replace(",", ""));
+						.get(states[j]).get(industries8155[i]).replace(",", "")) * MILLION;
 				stateRatioSales[i][j] = totalStateSalesByIndustry[i] > 0d ? cellValue / totalStateSalesByIndustry[i]
 						: 0d;
 
@@ -521,15 +543,16 @@ public class CalibrateBusinesses {
 		for (String thisSize : sizes) {
 			for (int i = 0; i < industries8155.length; i++) {
 				totalSizeEmploymentByIndustry[i] += Double.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR)
-						.get(ABS8155_TITLE_EMPLOYMENT).get(thisSize).get(industries8155[i]).replace(",", ""));
+						.get(ABS8155_TITLE_EMPLOYMENT).get(thisSize).get(industries8155[i]).replace(",", ""))
+						* THOUSAND;
 				totalSizeWagesByIndustry[i] += Double.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR)
-						.get(ABS8155_TITLE_WAGES).get(thisSize).get(industries8155[i]).replace(",", ""));
+						.get(ABS8155_TITLE_WAGES).get(thisSize).get(industries8155[i]).replace(",", "")) * MILLION;
 				totalSizeSalesByIndustry[i] += Double.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR)
-						.get(ABS8155_TITLE_SALES).get(thisSize).get(industries8155[i]).replace(",", ""));
+						.get(ABS8155_TITLE_SALES).get(thisSize).get(industries8155[i]).replace(",", "")) * MILLION;
 				totalIncomeByIndustry[i] += Double.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR)
-						.get(ABS8155_TITLE_INCOME).get(thisSize).get(industries8155[i]).replace(",", ""));
+						.get(ABS8155_TITLE_INCOME).get(thisSize).get(industries8155[i]).replace(",", "")) * MILLION;
 				totalExpensesByIndustry[i] += Double.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR)
-						.get(ABS8155_TITLE_EXPENSES).get(thisSize).get(industries8155[i]).replace(",", ""));
+						.get(ABS8155_TITLE_EXPENSES).get(thisSize).get(industries8155[i]).replace(",", "")) * MILLION;
 			}
 		}
 		// apply state ratios to sizes, joining on industry
@@ -537,19 +560,22 @@ public class CalibrateBusinesses {
 			for (int idxSize = 0; idxSize < sizes.length; idxSize++) {
 				double industrySizeEmployment = Double
 						.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_EMPLOYMENT)
-								.get(sizes[idxSize]).get(industries8155[idxIndustry]).replace(",", ""));
-				double industrySizeWages = Double
-						.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_WAGES).get(sizes[idxSize])
-								.get(industries8155[idxIndustry]).replace(",", ""));
-				double industrySizeSales = Double
-						.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_SALES).get(sizes[idxSize])
-								.get(industries8155[idxIndustry]).replace(",", ""));
+								.get(sizes[idxSize]).get(industries8155[idxIndustry]).replace(",", ""))
+						* THOUSAND;
+				double industrySizeWages = Double.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR)
+						.get(ABS8155_TITLE_WAGES).get(sizes[idxSize]).get(industries8155[idxIndustry]).replace(",", ""))
+						* MILLION;
+				double industrySizeSales = Double.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR)
+						.get(ABS8155_TITLE_SALES).get(sizes[idxSize]).get(industries8155[idxIndustry]).replace(",", ""))
+						* MILLION;
 				double industrySizeTotalIncome = Double
 						.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_INCOME).get(sizes[idxSize])
-								.get(industries8155[idxIndustry]).replace(",", ""));
+								.get(industries8155[idxIndustry]).replace(",", ""))
+						* MILLION;
 				double industrySizeTotalExpenses = Double
 						.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_EXPENSES).get(sizes[idxSize])
-								.get(industries8155[idxIndustry]).replace(",", ""));
+								.get(industries8155[idxIndustry]).replace(",", ""))
+						* MILLION;
 				for (int idxState = 0; idxState < states.length; idxState++) {
 					employmentCountByStateIndustrySize[idxState][idxIndustry][idxSize] = industrySizeEmployment
 							* stateRatioEmploymentCount[idxIndustry][idxState];
@@ -566,8 +592,137 @@ public class CalibrateBusinesses {
 		}
 		// we now have total $ amounts by state, industry, and size.
 
-		// FIXME: up to here on train
+		/**
+		 * 5. ABS 8165.0 LGA Employment Range: Get the number of businesses per state /
+		 * industry / size then divide the dollar amounts from 8155.0 to determine the
+		 * mean dollars per business. Divide the number of employees from 8155.0 by the
+		 * number of businesses in 8165.0 to get the mean employees per business by
+		 * state / industry / size. Also calculate a total national mean dollars and
+		 * employees per business.
+		 */
+		double businessCountAU = 0d;
+		double employmentCountAU = 0d;
+		double wagesAU = 0d;
+		double salesAU = 0d;
+		double totalIncomeAU = 0d;
+		double totalExpensesAU = 0d;
+		double[][][] businessCountByStateIndustrySize = new double[states.length][industries8155.length][sizes.length];
+		double[][][] employmentCountPerBusiness = new double[states.length][industries8155.length][sizes.length];
+		double[][][] wagesPerBusiness = new double[states.length][industries8155.length][sizes.length];
+		double[][][] salesPerBusiness = new double[states.length][industries8155.length][sizes.length];
+		double[][][] totalIncomePerBusiness = new double[states.length][industries8155.length][sizes.length];
+		double[][][] totalExpensesPerBusiness = new double[states.length][industries8155.length][sizes.length];
+		Set<String> lgaCodes8165 = this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[0]).keySet();
+		for (int idxIndustry = 0; idxIndustry < industries8155.length; idxIndustry++) {
+			for (int idxState = 0; idxState < states.length; idxState++) {
+				// count number of businesses in each category
+				double smallCount = 0d;
+				double mediumCount = 0d;
+				double largeCount = 0d;
+				for (String lgaCode : lgaCodes8165) {
+					smallCount += Double.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
+							.get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]).replace(",", ""));
+					smallCount += Double.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_2)
+							.get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]).replace(",", ""));
+					mediumCount += Double.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_3)
+							.get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]).replace(",", ""));
+					largeCount += Double.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_4)
+							.get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]).replace(",", ""));
+				}
+				businessCountAU += smallCount + mediumCount + largeCount;
+				businessCountByStateIndustrySize[idxState][idxIndustry][0] = smallCount;
+				businessCountByStateIndustrySize[idxState][idxIndustry][1] = mediumCount;
+				businessCountByStateIndustrySize[idxState][idxIndustry][2] = largeCount;
 
+				// calculate mean amounts per business
+				employmentCountPerBusiness[idxState][idxIndustry][0] = smallCount == 0 ? 0
+						: employmentCountByStateIndustrySize[idxState][idxIndustry][0] / smallCount;
+				employmentCountPerBusiness[idxState][idxIndustry][1] = mediumCount == 0 ? 0
+						: employmentCountByStateIndustrySize[idxState][idxIndustry][1] / mediumCount;
+				employmentCountPerBusiness[idxState][idxIndustry][2] = largeCount == 0 ? 0
+						: employmentCountByStateIndustrySize[idxState][idxIndustry][2] / largeCount;
+
+				wagesPerBusiness[idxState][idxIndustry][0] = smallCount == 0 ? 0
+						: wagesByStateIndustrySize[idxState][idxIndustry][0] / smallCount;
+				wagesPerBusiness[idxState][idxIndustry][1] = mediumCount == 0 ? 0
+						: wagesByStateIndustrySize[idxState][idxIndustry][1] / mediumCount;
+				wagesPerBusiness[idxState][idxIndustry][2] = largeCount == 0 ? 0
+						: wagesByStateIndustrySize[idxState][idxIndustry][2] / largeCount;
+
+				salesPerBusiness[idxState][idxIndustry][0] = smallCount == 0 ? 0
+						: salesByStateIndustrySize[idxState][idxIndustry][0] / smallCount;
+				salesPerBusiness[idxState][idxIndustry][1] = mediumCount == 0 ? 0
+						: salesByStateIndustrySize[idxState][idxIndustry][1] / mediumCount;
+				salesPerBusiness[idxState][idxIndustry][2] = largeCount == 0 ? 0
+						: salesByStateIndustrySize[idxState][idxIndustry][2] / largeCount;
+
+				totalIncomePerBusiness[idxState][idxIndustry][0] = smallCount == 0 ? 0
+						: totalIncomeByStateIndustrySize[idxState][idxIndustry][0] / smallCount;
+				totalIncomePerBusiness[idxState][idxIndustry][1] = mediumCount == 0 ? 0
+						: totalIncomeByStateIndustrySize[idxState][idxIndustry][1] / mediumCount;
+				totalIncomePerBusiness[idxState][idxIndustry][2] = largeCount == 0 ? 0
+						: totalIncomeByStateIndustrySize[idxState][idxIndustry][2] / largeCount;
+
+				totalExpensesPerBusiness[idxState][idxIndustry][0] = smallCount == 0 ? 0
+						: totalExpensesByStateIndustrySize[idxState][idxIndustry][0] / smallCount;
+				totalExpensesPerBusiness[idxState][idxIndustry][1] = mediumCount == 0 ? 0
+						: totalExpensesByStateIndustrySize[idxState][idxIndustry][1] / mediumCount;
+				totalExpensesPerBusiness[idxState][idxIndustry][2] = largeCount == 0 ? 0
+						: totalExpensesByStateIndustrySize[idxState][idxIndustry][2] / largeCount;
+
+				// sum national totals per category
+				for (int idxSize = 0; idxSize < sizes.length; idxSize++) {
+					employmentCountAU += employmentCountByStateIndustrySize[idxState][idxIndustry][idxSize];
+					wagesAU += wagesByStateIndustrySize[idxState][idxIndustry][idxSize];
+					salesAU += salesByStateIndustrySize[idxState][idxIndustry][idxSize];
+					totalIncomeAU += totalIncomeByStateIndustrySize[idxState][idxIndustry][idxSize];
+					totalExpensesAU += totalExpensesByStateIndustrySize[idxState][idxIndustry][idxSize];
+				}
+			}
+		}
+		// calculate national means
+		double employmentCountPerBusinessAU = employmentCountAU / businessCountAU;
+		double wagesPerBusinessAU = wagesAU / businessCountAU;
+		double salesPerBusinessAU = salesAU / businessCountAU;
+		double totalIncomePerBusinessAU = totalIncomeAU / businessCountAU;
+		double totalExpensesPerBusinessAU = totalExpensesAU / businessCountAU;
+
+		/**
+		 * 6. Divide each state / industry / size's figures by the national average to
+		 * produce a multiplier for each category combination.
+		 */
+		double[][][] employmentCountMultiplier = new double[states.length][industries8155.length][sizes.length];
+		double[][][] wagesMultiplier = new double[states.length][industries8155.length][sizes.length];
+		double[][][] salesMultiplier = new double[states.length][industries8155.length][sizes.length];
+		double[][][] totalIncomeMultiplier = new double[states.length][industries8155.length][sizes.length];
+		double[][][] totalExpensesMultiplier = new double[states.length][industries8155.length][sizes.length];
+		for (int idxState = 0; idxState < states.length; idxState++) {
+			for (int idxIndustry = 0; idxIndustry < industries8155.length; idxIndustry++) {
+				for (int idxSize = 0; idxSize < sizes.length; idxSize++) {
+					employmentCountMultiplier[idxState][idxIndustry][idxSize] = employmentCountPerBusiness[idxState][idxIndustry][idxSize]
+							/ employmentCountPerBusinessAU;
+					wagesMultiplier[idxState][idxIndustry][idxSize] = wagesPerBusiness[idxState][idxIndustry][idxSize]
+							/ wagesPerBusinessAU;
+					salesMultiplier[idxState][idxIndustry][idxSize] = salesPerBusiness[idxState][idxIndustry][idxSize]
+							/ salesPerBusinessAU;
+					totalIncomeMultiplier[idxState][idxIndustry][idxSize] = totalIncomePerBusiness[idxState][idxIndustry][idxSize]
+							/ totalIncomePerBusinessAU;
+					totalExpensesMultiplier[idxState][idxIndustry][idxSize] = totalExpensesPerBusiness[idxState][idxIndustry][idxSize]
+							/ totalExpensesPerBusinessAU;
+				}
+			}
+		}
+
+		/**
+		 * 7. For each state / industry / size, multiply the ATO industry figures by
+		 * this multiplier to calibrate the ATO company P&L and Bal Shts so they're now
+		 * representative of businesses per state / industry / size.
+		 */
+		// FIXME: <<< UP TO HERE >>>
+
+		
+		//businessCountByStateIndustrySize[idxState][idxIndustry][idxSize]
+		
 		// Create agents and add to economy
 		Business businessAgent = new Business();
 		this.businessAgents.add(businessAgent);
