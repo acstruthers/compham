@@ -24,6 +24,7 @@ public class Properties {
 	//public static final String HOME_DIRECTORY = "D:\\Git\\compham\\xyz.struthers.rhul.ham"; // NUC
 	public static final String RESOURCE_DIRECTORY = HOME_DIRECTORY + "\\src\\main\\resources";
 	
+	public static final double SUPERANNUATION_RATE = 0.095; // 9.5%
 
 	// static data fields
 	public static int peoplePerAgent = 1; // change to 1000 if 1 is too slow.

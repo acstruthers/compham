@@ -34,6 +34,10 @@ import com.opencsv.CSVReader;
 @Scope(value = "singleton")
 public class AreaMapping {
 
+	// zero-based column numbers
+	private static final int LGA_NAME_COL = 2;
+	private static final int LGA_STATE_COL = 4;
+
 	// column headings in CSV files
 	private static final String ABS_GCCSA_CODE = "GCCSA_CODE_2016";
 	private static final String LGA_LGA_CODE = "LGA_CODE_2018";
@@ -57,6 +61,7 @@ public class AreaMapping {
 												// determine which LGAs are close to each other
 	private Map<String, String> mapLgaNameToCode;
 	private Map<String, String> mapLgaCodeToName;
+	private Map<String, String> mapLgaCodeToState;
 	private Map<String, Set<String>> lgaMeshblocks; // key: LGA code, value: Meshblock codes
 	private Map<String, Set<String>> poaMeshblocks; // key: POA code, value: Meshblock codes
 
@@ -153,8 +158,7 @@ public class AreaMapping {
 
 	/**
 	 * 
-	 * @param poaCode
-	 *            - Postal Area (POA) code
+	 * @param poaCode - Postal Area (POA) code
 	 * @return Local Government Area (LGA) code
 	 */
 	public String getLgaCodeFromPoa(String poaCode) {
@@ -166,8 +170,7 @@ public class AreaMapping {
 
 	/**
 	 * 
-	 * @param lgaCode
-	 *            - Local Government Area (LGA) code
+	 * @param lgaCode - Local Government Area (LGA) code
 	 * @return Postal Area (POA) code
 	 */
 	public String getPoaCodeFromLga(String lgaCode) {
@@ -176,11 +179,10 @@ public class AreaMapping {
 		}
 		return this.mapLgaToPoa.get(lgaCode);
 	}
-	
+
 	/**
 	 * 
-	 * @param lgaCode
-	 *            - Local Government Area (LGA) code
+	 * @param lgaCode - Local Government Area (LGA) code
 	 * @return Greater Capital City Statistical Area (GCCSA) code
 	 */
 	public String getGccsaCodeFromLga(String lgaCode) {
@@ -204,7 +206,12 @@ public class AreaMapping {
 		return this.mapLgaNameToCode.get(lgaName);
 	}
 
-	// TODO: String getStateFromLga(String lgaCode)
+	public String getLgaStateFromCode(String lgaCode) {
+		if (!this.dataMapped) {
+			this.mapMeshblocks();
+		}
+		return this.mapLgaCodeToState.get(lgaCode);
+	}
 
 	// TODO: boolean isInGccsa(String lgaCode)
 
@@ -297,61 +304,53 @@ public class AreaMapping {
 		final boolean[] absLoadColumn = { false, false, false, false, false, false, false, false, false, false, false,
 				true, true, true, true, false };
 		this.absData = new HashMap<String, Map<String, String>>();
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_ACT.csv",
-				this.absData, absLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_NSW.csv",
-				this.absData, absLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_NT.csv", this.absData,
-				absLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_OT.csv", this.absData,
-				absLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_QLD.csv",
-				this.absData, absLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_SA.csv", this.absData,
-				absLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_TAS.csv",
-				this.absData, absLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_VIC.csv",
-				this.absData, absLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_WA.csv", this.absData,
-				absLoadColumn);
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_ACT.csv", this.absData, absLoadColumn);
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_NSW.csv", this.absData, absLoadColumn);
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_NT.csv", this.absData, absLoadColumn);
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_OT.csv", this.absData, absLoadColumn);
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_QLD.csv", this.absData, absLoadColumn);
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_SA.csv", this.absData, absLoadColumn);
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_TAS.csv", this.absData, absLoadColumn);
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_VIC.csv", this.absData, absLoadColumn);
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_WA.csv", this.absData, absLoadColumn);
 
 		// load LGA data
 		this.mapLgaNameToCode = new HashMap<String, String>();
 		this.mapLgaCodeToName = new HashMap<String, String>();
+		this.mapLgaCodeToState = new HashMap<String, String>();
 
 		final boolean[] lgaLoadColumn = { false, true, true, false, false, false };
 		this.lgaData = new HashMap<String, Map<String, String>>();
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_ACT.csv",
-				this.lgaData, lgaLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_NSW.csv",
-				this.lgaData, lgaLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_NT.csv",
-				this.lgaData, lgaLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_OT.csv",
-				this.lgaData, lgaLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_QLD.csv",
-				this.lgaData, lgaLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_SA.csv",
-				this.lgaData, lgaLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_TAS.csv",
-				this.lgaData, lgaLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_VIC.csv",
-				this.lgaData, lgaLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_WA.csv",
-				this.lgaData, lgaLoadColumn);
-
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_NSW.csv", this.lgaData,
+				lgaLoadColumn);
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_VIC.csv", this.lgaData,
+				lgaLoadColumn);
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_QLD.csv", this.lgaData,
+				lgaLoadColumn);
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_SA.csv", this.lgaData,
+				lgaLoadColumn);
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_WA.csv", this.lgaData,
+				lgaLoadColumn);
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_TAS.csv", this.lgaData,
+				lgaLoadColumn);
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_NT.csv", this.lgaData,
+				lgaLoadColumn);
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_ACT.csv", this.lgaData,
+				lgaLoadColumn);
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_OT.csv", this.lgaData,
+				lgaLoadColumn);
+		
 		// load POA data
 		final boolean[] poaLoadColumn = { false, true, false, false };
 		this.poaData = new HashMap<String, Map<String, String>>();
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/POA_2016_AUST.csv",
-				this.poaData, poaLoadColumn);
+		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/POA_2016_AUST.csv", this.poaData,
+				poaLoadColumn);
 
 		// load mesh block counts
 		final boolean[] countLoadColumn = { false, false, false, true, true, false };
 		this.countData = new HashMap<String, Map<String, String>>();
-		this.readMeshblockCsvData("/data/ABS/2074.0_MeshblockCounts/2016 Census Mesh Block Counts.csv",
-				this.countData, countLoadColumn);
+		this.readMeshblockCsvData("/data/ABS/2074.0_MeshblockCounts/2016 Census Mesh Block Counts.csv", this.countData,
+				countLoadColumn);
 
 		// load postcode latitude and longitude
 		/*
@@ -365,20 +364,16 @@ public class AreaMapping {
 	/**
 	 * Reads in a single Meshblock CSV file.
 	 * 
-	 * @param fileResourceLocation
-	 *            - the URI to the CSV file
-	 * @param title
-	 *            - the column titles in the CSV file
-	 * @param data
-	 *            - the data rows in the CSV file
-	 * @param loadColumn
-	 *            - boolean values to include (true) or exclude (false) each column
-	 *            in the CSV file when reading them. It always excludes the first
-	 *            column regardless of the value in loadColumn[0].
+	 * @param fileResourceLocation - the URI to the CSV file
+	 * @param title                - the column titles in the CSV file
+	 * @param data                 - the data rows in the CSV file
+	 * @param loadColumn           - boolean values to include (true) or exclude
+	 *                             (false) each column in the CSV file when reading
+	 *                             them. It always excludes the first column
+	 *                             regardless of the value in loadColumn[0].
 	 */
-	private void readMeshblockCsvData(String fileResourceLocation, Map<String, Map<String, String>> data, boolean[] loadColumn) {
-
-		final int LGA_NAME_COL = 4;
+	private void readMeshblockCsvData(String fileResourceLocation, Map<String, Map<String, String>> data,
+			boolean[] loadColumn) {
 
 		CSVReader reader = null;
 		try {
@@ -406,7 +401,7 @@ public class AreaMapping {
 						if (loadColumn[i]) {
 							data.get(title[i]).put(line[0], line[i]); // assumes line[0] is the Meshblock Code
 						}
-						if (title[i].equals(AreaMapping.LGA_LGA_CODE)) {
+						if (title[i].equals(LGA_LGA_CODE)) {
 							// add faster mapping for LGA: a set of the meshblocks that it comprises of
 							if (!this.lgaMeshblocks.containsKey(line[i])) {
 								this.lgaMeshblocks.put(line[i], new HashSet<String>());
@@ -416,6 +411,40 @@ public class AreaMapping {
 							// map LGA code to name
 							if (!this.mapLgaCodeToName.containsKey(line[i])) {
 								this.mapLgaCodeToName.put(line[i], line[LGA_NAME_COL]);
+							}
+
+							// map LGA code to state
+							if (!this.mapLgaCodeToState.containsKey(line[i])) {
+								String thisState = null;
+								switch (line[LGA_STATE_COL].toUpperCase()) {
+								case "NEW SOUTH WALES":
+									thisState = "NSW";
+									break;
+								case "VICTORIA":
+									thisState = "VIC";
+									break;
+								case "QUEENSLAND":
+									thisState = "QLD";
+									break;
+								case "SOUTH AUSTRALIA":
+									thisState = "SA";
+									break;
+								case "WESTERN AUSTRALIA":
+									thisState = "WA";
+									break;
+								case "TASMANIA":
+									thisState = "TAS";
+									break;
+								case "NORTHERN TERRITORY":
+									thisState = "NT";
+									break;
+								case "AUSTRALIAN CAPITAL TERRITORY":
+									thisState = "ACT";
+									break;
+								default:
+									thisState = "Other";
+								}
+								this.mapLgaCodeToState.put(line[i], thisState);
 							}
 
 							// map LGA name to code
@@ -480,6 +509,7 @@ public class AreaMapping {
 		this.mapLgaToPoa = null;
 		this.mapLgaNameToCode = null;
 		this.mapLgaCodeToName = null;
+		this.mapLgaCodeToState = null;
 		this.lgaMeshblocks = null;
 		this.poaMeshblocks = null;
 	}

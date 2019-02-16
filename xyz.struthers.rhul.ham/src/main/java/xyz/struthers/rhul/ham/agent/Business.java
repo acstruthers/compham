@@ -19,6 +19,13 @@ public class Business extends Agent {
 
 	public static final double COMPANY_TAX_RATE = 0.30d;
 
+	/**
+	 * Identifies agents that were calibrated using the same industry / size / state
+	 * data. They will later differ based on their linkages to other agents in the
+	 * economy (e.g. employees and banks).
+	 */
+	protected int businessTypeId;
+
 	// Business Details (25 bytes)
 	protected char industryDivisionCode;
 	protected String industrySubdivisionCode; // 2 chars
@@ -32,31 +39,40 @@ public class Business extends Agent {
 	protected char size; // S = small, M = medium, L = large
 	protected boolean isExporter;
 
+	protected int employeeCountTarget;
 	protected Map<Individual, Double> employeeWages;
 
 	// P&L (88 bytes)
+	protected double totalIncome;
 	protected double salesDomestic;
 	protected double salesGovernment;
 	protected double salesForeign;
 	protected double interestIncome;
 	protected double rentIncome;
-	protected double otherIncome;
+	protected double otherIncome; // balancing item
 
-	protected double personnelExpenses; // (wages, super, w/comp, FBT, payroll tax)
+	protected double totalExpenses;
+	protected double wageExpenses; // wages, super, payroll tax ... ignore w/comp & FBT
+	protected double superannuationExpense; // 9.5%
+	protected double payrollTaxExpense; // calculated according to each state's rules
 	protected double foreignExpenses;
 	protected double interestExpense;
 	protected double rentExpense;
 	protected double depreciationExpense;
-	protected double otherExpenses;
+	protected double otherExpenses; // balancing item
 
 	// Bal Sht (56 bytes)
+	protected double totalAssets;
 	protected double bankDeposits;
 	protected double foreignEquities;
 	protected double otherFinancialAssets;
-	protected double otherNonFinancialAssets;
+	protected double otherNonFinancialAssets; // balancing item
 
+	protected double totalLiabilities;
+	protected double tradeCreditors;
 	protected double loans;
-	protected double otherLiabilities;
+	protected double otherCurrentLiabilities;
+	protected double otherNonCurrentLiabilities; // balancing item
 
 	protected double totalEquity;
 
@@ -94,9 +110,11 @@ public class Business extends Agent {
 		this.size = business.size;
 		this.isExporter = business.isExporter;
 
+		this.employeeCountTarget = business.employeeCountTarget;
 		// N.B. Don't copy the employeeWages because they're unique to each business.
 
 		// P&L
+		this.totalIncome=business.totalIncome;
 		this.salesDomestic = business.salesDomestic;
 		this.salesGovernment = business.salesGovernment;
 		this.salesForeign = business.salesForeign;
@@ -104,20 +122,28 @@ public class Business extends Agent {
 		this.rentIncome = business.rentIncome;
 		this.otherIncome = business.otherIncome;
 
-		this.personnelExpenses = business.personnelExpenses;
+		this.totalExpenses=business.totalExpenses;
+		this.wageExpenses = business.wageExpenses;
+		this.superannuationExpense = business.superannuationExpense;
+		this.payrollTaxExpense = business.payrollTaxExpense;
 		this.foreignExpenses = business.foreignExpenses;
 		this.interestExpense = business.interestExpense;
 		this.rentExpense = business.rentExpense;
+		this.depreciationExpense=business.depreciationExpense;
 		this.otherExpenses = business.otherExpenses;
 
 		// Bal Sht
+		this.totalAssets=business.totalAssets;
 		this.bankDeposits = business.bankDeposits;
 		this.foreignEquities = business.foreignEquities;
 		this.otherFinancialAssets = business.otherFinancialAssets;
 		this.otherNonFinancialAssets = business.otherNonFinancialAssets;
 
+		this.totalLiabilities=business.totalLiabilities;
+		this.tradeCreditors=business.tradeCreditors;
 		this.loans = business.loans;
-		this.otherLiabilities = business.otherLiabilities;
+		this.otherCurrentLiabilities=business.otherCurrentLiabilities;
+		this.otherNonCurrentLiabilities = business.otherNonCurrentLiabilities;
 
 		this.totalEquity = business.totalEquity;
 
@@ -151,9 +177,11 @@ public class Business extends Agent {
 		this.size = '\0';
 		this.isExporter = false;
 
+		this.employeeCountTarget = 0;
 		this.employeeWages = null;
 
 		// P&L
+		this.totalIncome=0d;
 		this.salesDomestic = 0d;
 		this.salesGovernment = 0d;
 		this.salesForeign = 0d;
@@ -161,20 +189,28 @@ public class Business extends Agent {
 		this.rentIncome = 0d;
 		this.otherIncome = 0d;
 
-		this.personnelExpenses = 0d;
+		this.totalExpenses=0d;
+		this.wageExpenses = 0d;
+		this.superannuationExpense = 0d;
+		this.payrollTaxExpense = 0d;
 		this.foreignExpenses = 0d;
 		this.interestExpense = 0d;
 		this.rentExpense = 0d;
+		this.depreciationExpense=0d;
 		this.otherExpenses = 0d;
 
 		// Bal Sht
+		this.totalAssets=0d;
 		this.bankDeposits = 0d;
 		this.foreignEquities = 0d;
 		this.otherFinancialAssets = 0d;
 		this.otherNonFinancialAssets = 0d;
 
+		this.totalLiabilities = 0d;
+		this.tradeCreditors=0d;
 		this.loans = 0d;
-		this.otherLiabilities = 0d;
+		this.otherCurrentLiabilities = 0d;
+		this.otherNonCurrentLiabilities = 0d;
 
 		this.totalEquity = 0d;
 
@@ -183,20 +219,13 @@ public class Business extends Agent {
 		this.interestRateDeposits = 0d;
 	}
 
-	public double getTotalIncome() {
-		return this.salesDomestic + this.salesGovernment + this.interestIncome + this.otherIncome;
-	}
-
-	public double getTotalExpenses() {
-		return this.personnelExpenses + this.rentExpense + this.interestExpense + this.foreignExpenses
-				+ this.otherExpenses;
-	}
-
 	public double getGrossProfit() {
 		return this.getTotalIncome() - this.getTotalExpenses();
 	}
 
 	public double getTax() {
+		// FIXME: re-factor to use the tax rate based on revenue (27.5% < $50m, 30%
+		// otherwise)
 		return this.getGrossProfit() * Business.COMPANY_TAX_RATE;
 	}
 
@@ -204,6 +233,550 @@ public class Business extends Agent {
 		return this.getGrossProfit() - this.getTax();
 	}
 
-	// FIXME: implement getters & setters once the fields stop changing
+	/**
+	 * @return the businessTypeId
+	 */
+	public int getBusinessTypeId() {
+		return businessTypeId;
+	}
+
+	/**
+	 * @param businessTypeId the businessTypeId to set
+	 */
+	public void setBusinessTypeId(int businessTypeId) {
+		this.businessTypeId = businessTypeId;
+	}
+
+	/**
+	 * @return the industryDivisionCode
+	 */
+	public char getIndustryDivisionCode() {
+		return industryDivisionCode;
+	}
+
+	/**
+	 * @param industryDivisionCode the industryDivisionCode to set
+	 */
+	public void setIndustryDivisionCode(char industryDivisionCode) {
+		this.industryDivisionCode = industryDivisionCode;
+	}
+
+	/**
+	 * @return the industrySubdivisionCode
+	 */
+	public String getIndustrySubdivisionCode() {
+		return industrySubdivisionCode;
+	}
+
+	/**
+	 * @param industrySubdivisionCode the industrySubdivisionCode to set
+	 */
+	private void setIndustrySubdivisionCode(String industrySubdivisionCode) {
+		this.industrySubdivisionCode = industrySubdivisionCode;
+	}
+
+	/**
+	 * @return the industryGroupCode
+	 */
+	public String getIndustryGroupCode() {
+		return industryGroupCode;
+	}
+
+	/**
+	 * @param industryGroupCode the industryGroupCode to set
+	 */
+	private void setIndustryGroupCode(String industryGroupCode) {
+		this.industryGroupCode = industryGroupCode;
+	}
+
+	/**
+	 * @return the industryClassCode
+	 */
+	public String getIndustryClassCode() {
+		return industryClassCode;
+	}
+
+	/**
+	 * @param industryClassCode the industryClassCode to set
+	 */
+	private void setIndustryClassCode(String industryClassCode) {
+		this.industryClassCode = industryClassCode;
+	}
+
+	/**
+	 * @return the industryCode
+	 */
+	public String getIndustryCode() {
+		return industryCode;
+	}
+
+	/**
+	 * @param industryCode the industryCode to set
+	 */
+	public void setIndustryCode(String industryCode) {
+		this.industryCode = industryCode;
+	}
+
+	/**
+	 * @return the state
+	 */
+	public String getState() {
+		return state;
+	}
+
+	/**
+	 * @param state the state to set
+	 */
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	/**
+	 * @return the lgaCode
+	 */
+	public String getLgaCode() {
+		return lgaCode;
+	}
+
+	/**
+	 * @param lgaCode the lgaCode to set
+	 */
+	public void setLgaCode(String lgaCode) {
+		this.lgaCode = lgaCode;
+	}
+
+	/**
+	 * @return the size
+	 */
+	public char getSize() {
+		return size;
+	}
+
+	/**
+	 * @param size the size to set
+	 */
+	public void setSize(char size) {
+		this.size = size;
+	}
+
+	/**
+	 * @return the isExporter
+	 */
+	public boolean isExporter() {
+		return isExporter;
+	}
+
+	/**
+	 * @param isExporter the isExporter to set
+	 */
+	public void setExporter(boolean isExporter) {
+		this.isExporter = isExporter;
+	}
+
+	/**
+	 * @return the employeeCountTarget
+	 */
+	public int getEmployeeCountTarget() {
+		return employeeCountTarget;
+	}
+
+	/**
+	 * @param employeeCountTarget the employeeCountTarget to set
+	 */
+	public void setEmployeeCountTarget(int employeeCountTarget) {
+		this.employeeCountTarget = employeeCountTarget;
+	}
+
+	/**
+	 * @return the employeeWages
+	 */
+	public Map<Individual, Double> getEmployeeWages() {
+		return employeeWages;
+	}
+
+	/**
+	 * @param employeeWages the employeeWages to set
+	 */
+	public void setEmployeeWages(Map<Individual, Double> employeeWages) {
+		this.employeeWages = employeeWages;
+	}
+
+	/**
+	 * @return the totalIncome
+	 */
+	public double getTotalIncome() {
+		return totalIncome;
+	}
+
+	/**
+	 * @param totalIncome the totalIncome to set
+	 */
+	public void setTotalIncome(double totalIncome) {
+		this.totalIncome = totalIncome;
+	}
+
+	/**
+	 * @return the salesDomestic
+	 */
+	public double getSalesDomestic() {
+		return salesDomestic;
+	}
+
+	/**
+	 * @param salesDomestic the salesDomestic to set
+	 */
+	public void setSalesDomestic(double salesDomestic) {
+		this.salesDomestic = salesDomestic;
+	}
+
+	/**
+	 * @return the salesGovernment
+	 */
+	public double getSalesGovernment() {
+		return salesGovernment;
+	}
+
+	/**
+	 * @param salesGovernment the salesGovernment to set
+	 */
+	public void setSalesGovernment(double salesGovernment) {
+		this.salesGovernment = salesGovernment;
+	}
+
+	/**
+	 * @return the salesForeign
+	 */
+	public double getSalesForeign() {
+		return salesForeign;
+	}
+
+	/**
+	 * @param salesForeign the salesForeign to set
+	 */
+	public void setSalesForeign(double salesForeign) {
+		this.salesForeign = salesForeign;
+	}
+
+	/**
+	 * @return the interestIncome
+	 */
+	public double getInterestIncome() {
+		return interestIncome;
+	}
+
+	/**
+	 * @param interestIncome the interestIncome to set
+	 */
+	public void setInterestIncome(double interestIncome) {
+		this.interestIncome = interestIncome;
+	}
+
+	/**
+	 * @return the rentIncome
+	 */
+	public double getRentIncome() {
+		return rentIncome;
+	}
+
+	/**
+	 * @param rentIncome the rentIncome to set
+	 */
+	public void setRentIncome(double rentIncome) {
+		this.rentIncome = rentIncome;
+	}
+
+	/**
+	 * @return the otherIncome
+	 */
+	public double getOtherIncome() {
+		return otherIncome;
+	}
+
+	/**
+	 * @return the totalExpenses
+	 */
+	public double getTotalExpenses() {
+		return totalExpenses;
+	}
+
+	/**
+	 * @param totalExpenses the totalExpenses to set
+	 */
+	public void setTotalExpenses(double totalExpenses) {
+		this.totalExpenses = totalExpenses;
+	}
+
+	/**
+	 * @return the personnelExpenses
+	 */
+	public double getWageExpenses() {
+		return wageExpenses;
+	}
+
+	/**
+	 * @param personnelExpenses the personnelExpenses to set
+	 */
+	public void setWageExpenses(double personnelExpenses) {
+		this.wageExpenses = personnelExpenses;
+	}
+
+	/**
+	 * @return the superannuationExpense
+	 */
+	public double getSuperannuationExpense() {
+		return superannuationExpense;
+	}
+
+	/**
+	 * @param superannuationExpense the superannuationExpense to set
+	 */
+	public void setSuperannuationExpense(double superannuationExpense) {
+		this.superannuationExpense = superannuationExpense;
+	}
+
+	/**
+	 * @return the payrollTaxExpense
+	 */
+	public double getPayrollTaxExpense() {
+		return payrollTaxExpense;
+	}
+
+	/**
+	 * @param payrollTaxExpense the payrollTaxExpense to set
+	 */
+	public void setPayrollTaxExpense(double payrollTaxExpense) {
+		this.payrollTaxExpense = payrollTaxExpense;
+	}
+
+	/**
+	 * @return the foreignExpenses
+	 */
+	public double getForeignExpenses() {
+		return foreignExpenses;
+	}
+
+	/**
+	 * @param foreignExpenses the foreignExpenses to set
+	 */
+	public void setForeignExpenses(double foreignExpenses) {
+		this.foreignExpenses = foreignExpenses;
+	}
+
+	/**
+	 * @return the interestExpense
+	 */
+	public double getInterestExpense() {
+		return interestExpense;
+	}
+
+	/**
+	 * @param interestExpense the interestExpense to set
+	 */
+	public void setInterestExpense(double interestExpense) {
+		this.interestExpense = interestExpense;
+	}
+
+	/**
+	 * @return the rentExpense
+	 */
+	public double getRentExpense() {
+		return rentExpense;
+	}
+
+	/**
+	 * @param rentExpense the rentExpense to set
+	 */
+	public void setRentExpense(double rentExpense) {
+		this.rentExpense = rentExpense;
+	}
+
+	/**
+	 * @return the depreciationExpense
+	 */
+	public double getDepreciationExpense() {
+		return depreciationExpense;
+	}
+
+	/**
+	 * @param depreciationExpense the depreciationExpense to set
+	 */
+	public void setDepreciationExpense(double depreciationExpense) {
+		this.depreciationExpense = depreciationExpense;
+	}
+
+	/**
+	 * @return the otherExpenses
+	 */
+	public double getOtherExpenses() {
+		return otherExpenses;
+	}
+
+	/**
+	 * @return the totalAssets
+	 */
+	public double getTotalAssets() {
+		return totalAssets;
+	}
+
+	/**
+	 * @param totalAssets the totalAssets to set
+	 */
+	public void setTotalAssets(double totalAssets) {
+		this.totalAssets = totalAssets;
+	}
+
+	/**
+	 * @return the bankDeposits
+	 */
+	public double getBankDeposits() {
+		return bankDeposits;
+	}
+
+	/**
+	 * @param bankDeposits the bankDeposits to set
+	 */
+	public void setBankDeposits(double bankDeposits) {
+		this.bankDeposits = bankDeposits;
+	}
+
+	/**
+	 * @return the foreignEquities
+	 */
+	public double getForeignEquities() {
+		return foreignEquities;
+	}
+
+	/**
+	 * @param foreignEquities the foreignEquities to set
+	 */
+	public void setForeignEquities(double foreignEquities) {
+		this.foreignEquities = foreignEquities;
+	}
+
+	/**
+	 * @return the otherFinancialAssets
+	 */
+	public double getOtherFinancialAssets() {
+		return otherFinancialAssets;
+	}
+
+	/**
+	 * @param otherFinancialAssets the otherFinancialAssets to set
+	 */
+	public void setOtherFinancialAssets(double otherFinancialAssets) {
+		this.otherFinancialAssets = otherFinancialAssets;
+	}
+
+	/**
+	 * @return the otherNonFinancialAssets
+	 */
+	public double getOtherNonFinancialAssets() {
+		return otherNonFinancialAssets;
+	}
+
+	/**
+	 * @return the totalLiabilities
+	 */
+	public double getTotalLiabilities() {
+		return totalLiabilities;
+	}
+
+	/**
+	 * @param totalLiabilities the totalLiabilities to set
+	 */
+	public void setTotalLiabilities(double totalLiabilities) {
+		this.totalLiabilities = totalLiabilities;
+	}
+
+	/**
+	 * @return the tradeCreditors
+	 */
+	public double getTradeCreditors() {
+		return tradeCreditors;
+	}
+
+	/**
+	 * @param tradeCreditors the tradeCreditors to set
+	 */
+	public void setTradeCreditors(double tradeCreditors) {
+		this.tradeCreditors = tradeCreditors;
+	}
+
+	/**
+	 * @return the loans
+	 */
+	public double getLoans() {
+		return loans;
+	}
+
+	/**
+	 * @param loans the loans to set
+	 */
+	public void setLoans(double loans) {
+		this.loans = loans;
+	}
+
+	/**
+	 * @return the otherCurrentLiabilities
+	 */
+	public double getOtherCurrentLiabilities() {
+		return otherCurrentLiabilities;
+	}
+
+	/**
+	 * @param otherCurrentLiabilities the otherCurrentLiabilities to set
+	 */
+	public void setOtherCurrentLiabilities(double otherCurrentLiabilities) {
+		this.otherCurrentLiabilities = otherCurrentLiabilities;
+	}
+
+	/**
+	 * @return the otherLiabilities
+	 */
+	public double getOtherNonCurrentLiabilities() {
+		return otherNonCurrentLiabilities;
+	}
+
+	/**
+	 * @return the totalEquity
+	 */
+	public double getTotalEquity() {
+		return totalEquity;
+	}
+
+	/**
+	 * @param totalEquity the totalEquity to set
+	 */
+	public void setTotalEquity(double totalEquity) {
+		this.totalEquity = totalEquity;
+	}
+
+	/**
+	 * @return the interestRateLoans
+	 */
+	public double getInterestRateLoans() {
+		return interestRateLoans;
+	}
+
+	/**
+	 * @param interestRateLoans the interestRateLoans to set
+	 */
+	public void setInterestRateLoans(double interestRateLoans) {
+		this.interestRateLoans = interestRateLoans;
+	}
+
+	/**
+	 * @return the interestRateDeposits
+	 */
+	public double getInterestRateDeposits() {
+		return interestRateDeposits;
+	}
+
+	/**
+	 * @param interestRateDeposits the interestRateDeposits to set
+	 */
+	public void setInterestRateDeposits(double interestRateDeposits) {
+		this.interestRateDeposits = interestRateDeposits;
+	}
 
 }
