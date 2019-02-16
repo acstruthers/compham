@@ -719,7 +719,19 @@ public class CalibrateBusinesses {
 		 * representative of businesses per state / industry / size.
 		 */
 		// FIXME: <<< UP TO HERE >>>
-
+		// get ATO
+		for (int idxState = 0; idxState < states.length; idxState++) {
+			for (int idxSize = 0; idxSize < sizes.length; idxSize++) {
+				
+				for (int idxIndustry = 0; idxIndustry < industries8155.length; idxIndustry++) {
+					employmentCountMultiplier[idxState][idxIndustry][idxSize]
+					wagesMultiplier[idxState][idxIndustry][idxSize]
+					salesMultiplier[idxState][idxIndustry][idxSize]
+					totalIncomeMultiplier[idxState][idxIndustry][idxSize]
+					totalExpensesMultiplier[idxState][idxIndustry][idxSize]
+				}
+			}
+		}
 		
 		//businessCountByStateIndustrySize[idxState][idxIndustry][idxSize]
 		
