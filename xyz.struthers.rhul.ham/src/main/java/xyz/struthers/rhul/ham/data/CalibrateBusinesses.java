@@ -225,7 +225,22 @@ public class CalibrateBusinesses {
 	 * PART D: ASSIGN BUSINESSES TO LGA BY SIZE AND INDUSTRY<br>
 	 * -----------------------------------------------------<br>
 	 * 
-	 * rough algorithm:
+	 * 9. ABS 8165.0 State Employment Range: Load the data into a multi-dimensional
+	 * array, and add Industry Division as an extra key to map by. For each
+	 * combination of state and size, calculate the ratio of the number of
+	 * businesses in each industry code within each industry division.
+	 * 
+	 * 10. ABS 8165.0 LGA Employment Range: For each LGA, size and division,
+	 * multiply the number of businesses by the industry code ratios from ABS 8165.0
+	 * State Employment Range. Round to integers, adding or subtracting epsilon and
+	 * repeating until the difference in the total number is either equal to zero or
+	 * grows larger again. This gives us the count of businesses by state, LGA, size
+	 * and industry code.
+	 * 
+	 * 554 LGAs x 3 sizes x 574 industry codes = 953,988 distinct Business agents
+	 * 
+	 * Deal with exporters later when linking the agents to create the network
+	 * topology.
 	 * 
 	 * TODO: count how many times each agent is instantiated when assigned to LGAs.
 	 * This will allow me to do a frequency histogram to show the degree of
@@ -250,6 +265,10 @@ public class CalibrateBusinesses {
 		this.businessAgents = new ArrayList<Business>();
 
 		/*
+		 * -------------------------------------------------------------------------
+		 * PART A: INDUSTRY DETAIL WITH MODERATELY DETAILED COMPANY P&L AND BAL SHT
+		 * -------------------------------------------------------------------------
+		 * 
 		 * 1. ATO Company Table 4A: First calculate per-company figures, then calculate
 		 * the ratios between the various P&L line items.
 		 * 
@@ -555,6 +574,10 @@ public class CalibrateBusinesses {
 		}
 
 		/*
+		 * -------------------------------------------------------------------------
+		 * PART B: INDUSTRY BUSINESS FINANCIALS SPLIT BY SIZE AND STATE
+		 * -------------------------------------------------------------------------
+		 * 
 		 * 3. ABS 8155.0 Table 6: Calculate ratios between states (for employment count,
 		 * wages and sales) by industry.
 		 * 
@@ -606,7 +629,7 @@ public class CalibrateBusinesses {
 			}
 		}
 
-		/*
+		/**
 		 * 4. ABS 8155.0 Table 5: Use the ratios from Table 6 to split Size by State,
 		 * assuming that all income is split in the same ratio as sales, and all
 		 * expenses are split in the same ratio as wages. Calculate gross profit by
@@ -680,7 +703,11 @@ public class CalibrateBusinesses {
 		}
 		// we now have total $ amounts by state, industry, and size.
 
-		/**
+		/*
+		 * -------------------------------------------------------------------------
+		 * PART C: ADJUST INDUSTRY P&L AND BAL SHTS BY SIZE AND STATE
+		 * -------------------------------------------------------------------------
+		 * 
 		 * 5. ABS 8165.0 LGA Employment Range: Get the number of businesses per state /
 		 * industry / size then divide the dollar amounts from 8155.0 to determine the
 		 * mean dollars per business. Divide the number of employees from 8155.0 by the
@@ -775,7 +802,7 @@ public class CalibrateBusinesses {
 		double totalIncomePerBusinessAU = totalIncomeAU / businessCountAU;
 		double totalExpensesPerBusinessAU = totalExpensesAU / businessCountAU;
 
-		/**
+		/*
 		 * 6. Divide each state / industry / size's figures by the national average to
 		 * produce a multiplier for each category combination.
 		 */
@@ -801,7 +828,7 @@ public class CalibrateBusinesses {
 			}
 		}
 
-		/**
+		/*
 		 * 7. RBA E1: For the national total balance sheet, calculate the ratio of
 		 * business bank deposits to total financial assets, and business foreign
 		 * equities to total financial assets. Below we will assume that total financial
@@ -818,7 +845,7 @@ public class CalibrateBusinesses {
 		double bankDepositRatioE1 = totalFinancialAssetsE1 > 0d ? bankDepositsE1 / totalFinancialAssetsE1 : 0d;
 		double foreignEquitiesRatioE1 = totalFinancialAssetsE1 > 0d ? foreignEquitiesE1 / totalFinancialAssetsE1 : 0d;
 
-		/**
+		/*
 		 * 8. For each state / industry / size, multiply the ATO industry figures by
 		 * this multiplier to calibrate the ATO company P&L and Bal Shts so they're now
 		 * representative of businesses per state / industry / size.
@@ -928,12 +955,37 @@ public class CalibrateBusinesses {
 			}
 		}
 
-		/**
-		 * -----------------------------------------------------<br>
-		 * PART D: ASSIGN BUSINESSES TO LGA BY SIZE AND INDUSTRY<br>
-		 * -----------------------------------------------------<br>
+		/*
+		 * -------------------------------------------------------------------------
+		 * PART D: ASSIGN BUSINESSES TO LGA BY SIZE AND INDUSTRY
+		 * -------------------------------------------------------------------------
+		 * 
+		 * 9. ABS 8165.0 State Employment Range: Load the data into a multi-dimensional
+		 * array, and add Industry Division as an extra key to map by. For each
+		 * combination of state and size, calculate the ratio of the number of
+		 * businesses in each industry code within each industry division.
+		 * 
+		 * 10. ABS 8165.0 LGA Employment Range: For each LGA, size and division,
+		 * multiply the number of businesses by the industry code ratios from ABS 8165.0
+		 * State Employment Range. Round to integers, adding or subtracting epsilon and
+		 * repeating until the difference in the total number is either equal to zero or
+		 * grows larger again. This gives us the count of businesses by state, LGA, size
+		 * and industry code.
+		 * 
+		 * 554 LGAs x 3 sizes x 574 industry codes = 953,988 distinct Business agents
+		 * 
+		 * Deal with exporters later when linking the agents to create the network
+		 * topology.
+		 * 
+		 * TODO: Count how many times each agent is instantiated when assigned to LGAs.
+		 * This will allow me to do a frequency histogram to show the degree of
+		 * heterogeneity among Business agents.
 		 */
 		// FIXME: <<< UP TO HERE >>>
+
+		// 8165.0 Keys: employment range, state, industry class code
+		// private Map<String, Map<String, Map<String, String>>>
+		// abs8165_0StateEmployment;
 
 		// Create agents and add to economy
 		Business businessAgent = new Business();
