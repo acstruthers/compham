@@ -4,6 +4,7 @@
 package xyz.struthers.rhul.ham.data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,6 +40,7 @@ public class CalibrateBusinesses {
 	public static final String ABS8165_TITLE_EMPLOYMENT_2 = "1-19 Employees";
 	public static final String ABS8165_TITLE_EMPLOYMENT_3 = "20-199 Employees";
 	public static final String ABS8165_TITLE_EMPLOYMENT_4 = "200+ Employees";
+	public static final int ABS8165_NUM_CLASS_CODES = 497;
 
 	private static final double MILLION = 1000000d;
 	private static final double THOUSAND = 1000d;
@@ -964,7 +966,80 @@ public class CalibrateBusinesses {
 		 * array, and add Industry Division as an extra key to map by. For each
 		 * combination of state and size, calculate the ratio of the number of
 		 * businesses in each industry code within each industry division.
-		 * 
+		 */
+		// FIXME: <<< UP TO HERE >>>
+
+		// LGA employment Keys: employment range, state acronym, LGA code, industry
+		// division code
+		// private Map<String, Map<String, Map<String, Map<String, String>>>>
+		// abs8165_0LgaEmployment;
+		Set<String> divisionsKeySet8165 = abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[0])
+				.get("10050").keySet();
+		Set<String> divisionsToAddTo8165 = new HashSet<String>(divisionsKeySet8165);
+		String[] divisions8165 = new String[Math.max(industries8155.length, divisionsKeySet8165.size())];
+		for (int i = 0; i < industries8155.length; i++) {
+			divisions8165[i] = industries8155[i];
+			divisionsToAddTo8165.remove(industries8155[i]);
+		}
+		{// just to limit the scope of i
+			int i = industries8155.length;
+			for (String div : divisionsToAddTo8165) {
+				divisions8165[i++] = div;
+			}
+		}
+		Map<String, Integer> divisionIndexMap8165 = new HashMap<String, Integer>(divisions8165.length);
+		for (int i = 0; i < divisions8165.length; i++) {
+			divisionIndexMap8165.put(divisions8165[i], i);
+		}
+
+		// 8165.0 state employment Keys: employment range, state, industry class code
+		Set<String> industryClassCodeSet8165 = this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
+				.get(states[0]).keySet();
+		String[] industryClassCodes8165 = new String[ABS8165_NUM_CLASS_CODES];
+		industryClassCodes8165 = industryClassCodeSet8165.toArray(industryClassCodes8165);
+		double[][][] industryDivisionTotals = new double[states.length][sizes.length][divisions8165.length];
+		double[][][][] industryDivisionRatios = new double[states.length][sizes.length][divisions8165.length][industryClassCodes8165.length];
+		for (int idxState = 0; idxState < states.length; idxState++) {
+
+			//////////////////////////////////////////////////////////////////////////////
+			// FIXME: need to convert to explicitly set small / medium / large rather than
+			// using the column titles
+			//////////////////////////////////////////////////////////////////////////////
+
+			for (int idxSize = 0; idxSize < sizes.length; idxSize++) {
+				// initialise the division totals to zero
+				Arrays.fill(industryDivisionTotals[idxState][idxSize], 0d);
+
+				// set the division totals
+				for (String industryClassCode8165 : industryClassCodeSet8165) {
+					String div = this.abs1292_0_55_002ANZSIC.get("Class Code to Division Code")
+							.get(industryClassCode8165);
+					int idxDiv = divisionIndexMap8165.get(div);
+					double value = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
+							.get(states[0]).get(industryClassCode8165).replace(",", ""));
+					industryDivisionTotals[idxState][idxSize][idxDiv] += value;
+				}
+
+				// calculate the ratios
+				for (int idxDiv = 0; idxDiv < industryClassCodes8165.length; idxDiv++) {
+					for (int idxClass = 0; idxClass < industryClassCodes8165.length; idxClass++) {
+						double total = industryDivisionTotals[idxState][idxSize][idxDiv];
+						double value = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
+								.get(states[idxState]).get(industryClassCodes8165[idxClass]).replace(",", ""));
+						industryDivisionRatios[idxState][idxSize][idxDiv][idxClass] = total > 0d ? value / total : 0d;
+					}
+				}
+			}
+		}
+
+		/*
+		 * for( int idxState = 0;idxState<states.length;idxState++) { for (int idxSize =
+		 * 0; idxSize < sizes.length; idxSize++) {
+		 * industryDivisionTotals[idxState][idxSize] for (String industryClassCode8165 :
+		 * industryClassCodeSet8165) { industryDivisionTotals[idxState][idxSize] } } }
+		 */
+
+		/*
 		 * 10. ABS 8165.0 LGA Employment Range: For each LGA, size and division,
 		 * multiply the number of businesses by the industry code ratios from ABS 8165.0
 		 * State Employment Range. Round to integers, adding or subtracting epsilon and
@@ -981,11 +1056,6 @@ public class CalibrateBusinesses {
 		 * This will allow me to do a frequency histogram to show the degree of
 		 * heterogeneity among Business agents.
 		 */
-		// FIXME: <<< UP TO HERE >>>
-
-		// 8165.0 Keys: employment range, state, industry class code
-		// private Map<String, Map<String, Map<String, String>>>
-		// abs8165_0StateEmployment;
 
 		// Create agents and add to economy
 		Business businessAgent = new Business();
