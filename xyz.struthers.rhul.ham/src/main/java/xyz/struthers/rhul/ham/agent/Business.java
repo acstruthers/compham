@@ -5,6 +5,10 @@ package xyz.struthers.rhul.ham.agent;
 
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import xyz.struthers.rhul.ham.process.Tax;
+
 /**
  * There are approximately 2.25 million businesses (including exporters) in the
  * model. Each instance uses 193 bytes of RAM, so they will consume
@@ -17,7 +21,8 @@ public class Business extends Agent {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final double COMPANY_TAX_RATE = 0.30d;
+	// beans
+	protected Tax tax;
 
 	/**
 	 * Identifies agents that were calibrated using the same industry / size / state
@@ -114,7 +119,7 @@ public class Business extends Agent {
 		// N.B. Don't copy the employeeWages because they're unique to each business.
 
 		// P&L
-		this.totalIncome=business.totalIncome;
+		this.totalIncome = business.totalIncome;
 		this.salesDomestic = business.salesDomestic;
 		this.salesGovernment = business.salesGovernment;
 		this.salesForeign = business.salesForeign;
@@ -122,27 +127,27 @@ public class Business extends Agent {
 		this.rentIncome = business.rentIncome;
 		this.otherIncome = business.otherIncome;
 
-		this.totalExpenses=business.totalExpenses;
+		this.totalExpenses = business.totalExpenses;
 		this.wageExpenses = business.wageExpenses;
 		this.superannuationExpense = business.superannuationExpense;
 		this.payrollTaxExpense = business.payrollTaxExpense;
 		this.foreignExpenses = business.foreignExpenses;
 		this.interestExpense = business.interestExpense;
 		this.rentExpense = business.rentExpense;
-		this.depreciationExpense=business.depreciationExpense;
+		this.depreciationExpense = business.depreciationExpense;
 		this.otherExpenses = business.otherExpenses;
 
 		// Bal Sht
-		this.totalAssets=business.totalAssets;
+		this.totalAssets = business.totalAssets;
 		this.bankDeposits = business.bankDeposits;
 		this.foreignEquities = business.foreignEquities;
 		this.otherFinancialAssets = business.otherFinancialAssets;
 		this.otherNonFinancialAssets = business.otherNonFinancialAssets;
 
-		this.totalLiabilities=business.totalLiabilities;
-		this.tradeCreditors=business.tradeCreditors;
+		this.totalLiabilities = business.totalLiabilities;
+		this.tradeCreditors = business.tradeCreditors;
 		this.loans = business.loans;
-		this.otherCurrentLiabilities=business.otherCurrentLiabilities;
+		this.otherCurrentLiabilities = business.otherCurrentLiabilities;
 		this.otherNonCurrentLiabilities = business.otherNonCurrentLiabilities;
 
 		this.totalEquity = business.totalEquity;
@@ -181,7 +186,7 @@ public class Business extends Agent {
 		this.employeeWages = null;
 
 		// P&L
-		this.totalIncome=0d;
+		this.totalIncome = 0d;
 		this.salesDomestic = 0d;
 		this.salesGovernment = 0d;
 		this.salesForeign = 0d;
@@ -189,25 +194,25 @@ public class Business extends Agent {
 		this.rentIncome = 0d;
 		this.otherIncome = 0d;
 
-		this.totalExpenses=0d;
+		this.totalExpenses = 0d;
 		this.wageExpenses = 0d;
 		this.superannuationExpense = 0d;
 		this.payrollTaxExpense = 0d;
 		this.foreignExpenses = 0d;
 		this.interestExpense = 0d;
 		this.rentExpense = 0d;
-		this.depreciationExpense=0d;
+		this.depreciationExpense = 0d;
 		this.otherExpenses = 0d;
 
 		// Bal Sht
-		this.totalAssets=0d;
+		this.totalAssets = 0d;
 		this.bankDeposits = 0d;
 		this.foreignEquities = 0d;
 		this.otherFinancialAssets = 0d;
 		this.otherNonFinancialAssets = 0d;
 
 		this.totalLiabilities = 0d;
-		this.tradeCreditors=0d;
+		this.tradeCreditors = 0d;
 		this.loans = 0d;
 		this.otherCurrentLiabilities = 0d;
 		this.otherNonCurrentLiabilities = 0d;
@@ -223,10 +228,15 @@ public class Business extends Agent {
 		return this.getTotalIncome() - this.getTotalExpenses();
 	}
 
+	/**
+	 * Calculates tax rates per ATO company tax rates, taking into account the lower
+	 * rate for small businesses.
+	 * 
+	 * @return the tax expense
+	 */
 	public double getTax() {
-		// FIXME: re-factor to use the tax rate based on revenue (27.5% < $50m, 30%
-		// otherwise)
-		return this.getGrossProfit() * Business.COMPANY_TAX_RATE;
+		return this.getGrossProfit()
+				* this.tax.calculateCompanyTax(this.totalIncome, this.totalIncome - this.totalExpenses);
 	}
 
 	public double getNetProfit() {
@@ -777,6 +787,14 @@ public class Business extends Agent {
 	 */
 	public void setInterestRateDeposits(double interestRateDeposits) {
 		this.interestRateDeposits = interestRateDeposits;
+	}
+
+	/**
+	 * @param tax the tax to set
+	 */
+	@Autowired
+	public void setTax(Tax tax) {
+		this.tax = tax;
 	}
 
 }

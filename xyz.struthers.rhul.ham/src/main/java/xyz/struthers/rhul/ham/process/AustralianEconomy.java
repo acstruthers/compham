@@ -49,6 +49,8 @@ public class AustralianEconomy implements Serializable {
 	ReserveBankOfAustralia rba;
 	AustralianGovernment government;
 
+	// Analytics
+	int[] businessTypeCount;
 	/**
 	 * 
 	 */
@@ -59,6 +61,7 @@ public class AustralianEconomy implements Serializable {
 
 	@PostConstruct
 	private void init() {
+		// Agents
 		this.households = null;
 		this.individuals = null;
 		this.businesses = null;
@@ -67,6 +70,9 @@ public class AustralianEconomy implements Serializable {
 		this.currencies = null;
 		this.rba = null;
 		this.government = null;
+		
+		// Analytics
+		this.businessTypeCount = null;
 	}
 
 	/**
@@ -197,4 +203,18 @@ public class AustralianEconomy implements Serializable {
 		this.government = government;
 	}
 
+	/**
+	 * @return the businessTypeCount
+	 */
+	public int[] getBusinessTypeCount() {
+		return businessTypeCount;
+	}
+
+	/**
+	 * @param businessTypeCount the businessTypeCount to set
+	 */
+	public void setBusinessTypeCount(int[] businessTypeCount) {
+		this.businessTypeCount = businessTypeCount;
+	}
+	
 }

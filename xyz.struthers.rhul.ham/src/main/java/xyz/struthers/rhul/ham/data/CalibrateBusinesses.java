@@ -41,9 +41,11 @@ public class CalibrateBusinesses {
 	public static final String ABS8165_TITLE_EMPLOYMENT_3 = "20-199 Employees";
 	public static final String ABS8165_TITLE_EMPLOYMENT_4 = "200+ Employees";
 	public static final int ABS8165_NUM_CLASS_CODES = 497;
+	public static final int ABS8165_NUM_LGAS = 554;
 
 	private static final double MILLION = 1000000d;
 	private static final double THOUSAND = 1000d;
+	private static final double EPSILON = 0.1d; // to round business counts so the integer sums match
 
 	// beans
 	private Properties properties;
@@ -51,6 +53,8 @@ public class CalibrateBusinesses {
 	private AreaMapping area;
 	private AustralianEconomy economy;
 	private List<Business> businessAgents;
+
+	protected int[] businessTypeCount; // number of businesses of each type that were instantiated
 
 	// data sets
 	/**
@@ -110,20 +114,10 @@ public class CalibrateBusinesses {
 	 */
 	private Map<String, Map<String, Map<String, String>>> abs8165_0StateEmployment;
 	/**
-	 * Count by state, industry & turnover range<br>
-	 * Keys: turnover range, state, industry class code
-	 */
-	private Map<String, Map<String, Map<String, String>>> abs8165_0StateTurnover;
-	/**
 	 * Count by LGA, industry & employment range<br>
 	 * Keys: employment range, state acronym, LGA code, industry division code
 	 */
 	private Map<String, Map<String, Map<String, Map<String, String>>>> abs8165_0LgaEmployment;
-	/**
-	 * Count by LGA, industry & turnover range<br>
-	 * Keys: turnover range, state acronym, LGA code, industry division code
-	 */
-	private Map<String, Map<String, Map<String, Map<String, String>>>> abs8165_0LgaTurnover;
 	/**
 	 * ATO Fine Industry Detailed P&L and Bal Sht<br>
 	 * Keys: column title, fine industry code
@@ -144,8 +138,6 @@ public class CalibrateBusinesses {
 	}
 
 	/**
-	 * FIXME: implement me (to create all the Business agents)
-	 * 
 	 * Creates all the Business agents in the model, and stores them in the
 	 * AustralianEconomy. Does not link businesses with employees, banks, suppliers,
 	 * etc.
@@ -239,15 +231,14 @@ public class CalibrateBusinesses {
 	 * grows larger again. This gives us the count of businesses by state, LGA, size
 	 * and industry code.
 	 * 
+	 * Counts how many times each agent is instantiated when assigned to LGAs. This
+	 * will allow me to do a frequency histogram to show the degree of heterogeneity
+	 * among Business agents.
+	 * 
 	 * 554 LGAs x 3 sizes x 574 industry codes = 953,988 distinct Business agents
 	 * 
 	 * Deal with exporters later when linking the agents to create the network
 	 * topology.
-	 * 
-	 * TODO: count how many times each agent is instantiated when assigned to LGAs.
-	 * This will allow me to do a frequency histogram to show the degree of
-	 * heterogeneity among Business agents.
-	 * 
 	 */
 	public void createBusinessAgents() {
 		// get just the relevant business data from the CalibrationData
@@ -257,9 +248,7 @@ public class CalibrateBusinesses {
 		this.abs8155_0Table5 = this.data.getAbs8155_0Table5();
 		this.abs8155_0Table6 = this.data.getAbs8155_0Table6();
 		this.abs8165_0StateEmployment = this.data.getAbs8165_0StateEmployment();
-		this.abs8165_0StateTurnover = this.data.getAbs8165_0StateTurnover();
 		this.abs8165_0LgaEmployment = this.data.getAbs8165_0LgaEmployment();
-		this.abs8165_0LgaTurnover = this.data.getAbs8165_0LgaTurnover();
 		this.atoCompanyTable4a = this.data.getAtoCompanyTable4a();
 		this.atoCompanyTable4b = this.data.getAtoCompanyTable4b();
 
@@ -859,10 +848,18 @@ public class CalibrateBusinesses {
 		}
 		int businessTypeId = 1;
 		Business[][][] agentMatrix = new Business[states.length][numIndustryCodeKeys][sizes.length];
-		for (int i = 0; i < numIndustryCodeKeys; i++) { // for all 574 ATO industry codes
+		Map<String, List<String>> classIndustryCodes = new HashMap<String, List<String>>();
+		for (int idxIndustryCode = 0; idxIndustryCode < numIndustryCodeKeys; idxIndustryCode++) { // for all 574 ATO
+																									// industry codes
 			// get the industries8155 index (18 values) for this industry code (574 values)
 			String divisionCode = this.abs1292_0_55_002ANZSIC.get("Industry Code to Division Code")
-					.get(industryCodes[i]);
+					.get(industryCodes[idxIndustryCode]);
+			String classCode = this.abs1292_0_55_002ANZSIC.get("Industry Code to Class Code")
+					.get(industryCodes[idxIndustryCode]);
+			if (!classIndustryCodes.containsKey(classCode)) {
+				classIndustryCodes.put(classCode, new ArrayList<String>(1));
+			}
+			classIndustryCodes.get(classCode).add(industryCodes[idxIndustryCode]);
 			if (!divisionCode.equals("K")) { // deal with financial services separately
 				int divisionCodeIndex8155 = divisionCodeKeyIndex.get(divisionCode);
 				for (int idxState = 0; idxState < states.length; idxState++) {
@@ -873,39 +870,36 @@ public class CalibrateBusinesses {
 						double incMult = totalIncomeMultiplier[idxState][divisionCodeIndex8155][idxSize];
 						double expMult = totalExpensesMultiplier[idxState][divisionCodeIndex8155][idxSize];
 
-						// TODO: multiply ABS 8155 employee counts by an ATO Table 4B multiplier based
-						// on the ratio of company wages to AU average wages.
-
 						// multiply P&L lines by the relevant multipliers
-						double agentTotalIncome = totalIncome[i] * incMult;
-						double agentSales = sales[i] * saleMult;
-						double agentInterestIncome = interestIncome[i] * incMult;
-						double agentRentIncome = rentIncome[i] * incMult;
-						double agentGovernmentIncome = governmentIncome[i] * incMult;
-						double agentForeignIncome = foreignIncome[i] * incMult;
+						double agentTotalIncome = totalIncome[idxIndustryCode] * incMult;
+						double agentSales = sales[idxIndustryCode] * saleMult;
+						double agentInterestIncome = interestIncome[idxIndustryCode] * incMult;
+						double agentRentIncome = rentIncome[idxIndustryCode] * incMult;
+						double agentGovernmentIncome = governmentIncome[idxIndustryCode] * incMult;
+						double agentForeignIncome = foreignIncome[idxIndustryCode] * incMult;
 
-						double agentTotalExpense = totalExpense[i] * expMult;
-						double agentCostOfSales = costOfSales[i] * expMult;
-						double agentRentLeaseExpense = rentLeaseExpense[i] * expMult;
-						double agentInterestExpense = interestExpense[i] * expMult;
-						double agentForeignInterestExpense = foreignInterestExpense[i] * expMult;
-						double agentDepreciationExpense = depreciationExpense[i] * expMult;
-						double agentSalaryWage = salaryWage[i] * wageMult;
+						double agentTotalExpense = totalExpense[idxIndustryCode] * expMult;
+						double agentCostOfSales = costOfSales[idxIndustryCode] * expMult;
+						double agentRentLeaseExpense = rentLeaseExpense[idxIndustryCode] * expMult;
+						double agentInterestExpense = interestExpense[idxIndustryCode] * expMult;
+						double agentForeignInterestExpense = foreignInterestExpense[idxIndustryCode] * expMult;
+						double agentDepreciationExpense = depreciationExpense[idxIndustryCode] * expMult;
+						double agentSalaryWage = salaryWage[idxIndustryCode] * wageMult;
 
 						// multiply Bal sht items by the income multiplier because that's the method
 						// used in step 2 above
-						double agentTotalAssets = totalAssets[i] * incMult;
-						double agentCurrentAssets = currentAssets[i] * incMult;
+						double agentTotalAssets = totalAssets[idxIndustryCode] * incMult;
+						double agentCurrentAssets = currentAssets[idxIndustryCode] * incMult;
 
-						double agentTotalLiabilities = totalLiabilities[i] * incMult;
-						double agentTradeCreditors = tradeCreditors[i] * incMult;
-						double agentCurrentLiabilities = currentLiabilities[i] * incMult;
-						double agentDebt = debt[i] * incMult;
+						double agentTotalLiabilities = totalLiabilities[idxIndustryCode] * incMult;
+						double agentTradeCreditors = tradeCreditors[idxIndustryCode] * incMult;
+						double agentCurrentLiabilities = currentLiabilities[idxIndustryCode] * incMult;
+						double agentDebt = debt[idxIndustryCode] * incMult;
 
 						// create representative agent
 						Business agent = new Business();
 						agent.setBusinessTypeId(businessTypeId++);
-						agent.setIndustryCode(industryCodes[i]);
+						agent.setIndustryCode(industryCodes[idxIndustryCode]);
 						agent.setIndustryDivisionCode(divisionCode.charAt(0));
 
 						agent.setSize(sizes[idxSize].charAt(0));
@@ -914,7 +908,7 @@ public class CalibrateBusinesses {
 						// set employee count target
 						agent.setEmployeeCountTarget(
 								(int) Math.round(employmentCountPerBusiness[idxState][divisionCodeIndex8155][idxSize]
-										* wagesDivisionMultiplierPerIndustryCode[i]));
+										* wagesDivisionMultiplierPerIndustryCode[idxIndustryCode]));
 						// set employeeWages later when linking Individual agents in here
 
 						agent.setTotalIncome(agentTotalIncome);
@@ -951,7 +945,7 @@ public class CalibrateBusinesses {
 						agent.setTotalEquity(agentTotalAssets - agentTotalLiabilities);
 
 						// store agent in a multi-dimensional array
-						agentMatrix[idxState][i][idxSize] = agent;
+						agentMatrix[idxState][idxIndustryCode][idxSize] = agent; // i == industry code index
 					}
 				}
 			}
@@ -967,12 +961,7 @@ public class CalibrateBusinesses {
 		 * combination of state and size, calculate the ratio of the number of
 		 * businesses in each industry code within each industry division.
 		 */
-		// FIXME: <<< UP TO HERE >>>
-
-		// LGA employment Keys: employment range, state acronym, LGA code, industry
-		// division code
-		// private Map<String, Map<String, Map<String, Map<String, String>>>>
-		// abs8165_0LgaEmployment;
+		// LGA emp Keys: emp range, state, LGA code, industry division code
 		Set<String> divisionsKeySet8165 = abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[0])
 				.get("10050").keySet();
 		Set<String> divisionsToAddTo8165 = new HashSet<String>(divisionsKeySet8165);
@@ -997,47 +986,55 @@ public class CalibrateBusinesses {
 				.get(states[0]).keySet();
 		String[] industryClassCodes8165 = new String[ABS8165_NUM_CLASS_CODES];
 		industryClassCodes8165 = industryClassCodeSet8165.toArray(industryClassCodes8165);
+		Map<String, Integer> industryClassCodes8165Index = new HashMap<String, Integer>(industryClassCodes8165.length);
 		double[][][] industryDivisionTotals = new double[states.length][sizes.length][divisions8165.length];
 		double[][][][] industryDivisionRatios = new double[states.length][sizes.length][divisions8165.length][industryClassCodes8165.length];
 		for (int idxState = 0; idxState < states.length; idxState++) {
+			// initialise the division totals to zero
+			Arrays.fill(industryDivisionTotals[idxState][0], 0d);
+			Arrays.fill(industryDivisionTotals[idxState][1], 0d);
+			Arrays.fill(industryDivisionTotals[idxState][2], 0d);
 
-			//////////////////////////////////////////////////////////////////////////////
-			// FIXME: need to convert to explicitly set small / medium / large rather than
-			// using the column titles
-			//////////////////////////////////////////////////////////////////////////////
+			// set the division totals
+			for (String industryClassCode8165 : industryClassCodeSet8165) {
+				String div = this.abs1292_0_55_002ANZSIC.get("Class Code to Division Code").get(industryClassCode8165);
+				int idxDiv = divisionIndexMap8165.get(div);
+				double smallValue = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
+						.get(states[idxState]).get(industryClassCode8165).replace(",", ""));
+				smallValue += Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_2)
+						.get(states[idxState]).get(industryClassCode8165).replace(",", ""));
+				double mediumValue = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_3)
+						.get(states[idxState]).get(industryClassCode8165).replace(",", ""));
+				double largeValue = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_4)
+						.get(states[idxState]).get(industryClassCode8165).replace(",", ""));
+				industryDivisionTotals[idxState][0][idxDiv] += smallValue;
+				industryDivisionTotals[idxState][1][idxDiv] += mediumValue;
+				industryDivisionTotals[idxState][2][idxDiv] += largeValue;
+			}
 
-			for (int idxSize = 0; idxSize < sizes.length; idxSize++) {
-				// initialise the division totals to zero
-				Arrays.fill(industryDivisionTotals[idxState][idxSize], 0d);
-
-				// set the division totals
-				for (String industryClassCode8165 : industryClassCodeSet8165) {
-					String div = this.abs1292_0_55_002ANZSIC.get("Class Code to Division Code")
-							.get(industryClassCode8165);
-					int idxDiv = divisionIndexMap8165.get(div);
-					double value = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
-							.get(states[0]).get(industryClassCode8165).replace(",", ""));
-					industryDivisionTotals[idxState][idxSize][idxDiv] += value;
-				}
-
-				// calculate the ratios
-				for (int idxDiv = 0; idxDiv < industryClassCodes8165.length; idxDiv++) {
-					for (int idxClass = 0; idxClass < industryClassCodes8165.length; idxClass++) {
-						double total = industryDivisionTotals[idxState][idxSize][idxDiv];
-						double value = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
-								.get(states[idxState]).get(industryClassCodes8165[idxClass]).replace(",", ""));
-						industryDivisionRatios[idxState][idxSize][idxDiv][idxClass] = total > 0d ? value / total : 0d;
-					}
-				}
+			// calculate the ratios
+			for (int idxClass = 0; idxClass < industryClassCodes8165.length; idxClass++) {
+				industryClassCodes8165Index.put(industryClassCodes8165[idxClass], idxClass);
+				String div = this.abs1292_0_55_002ANZSIC.get("Class Code to Division Code")
+						.get(industryClassCodes8165[idxClass]);
+				int idxDiv = divisionIndexMap8165.get(div);
+				double smallTotal = industryDivisionTotals[idxState][0][idxDiv];
+				double mediumTotal = industryDivisionTotals[idxState][1][idxDiv];
+				double largeTotal = industryDivisionTotals[idxState][2][idxDiv];
+				double smallValue = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
+						.get(states[idxState]).get(industryClassCodes8165[idxClass]).replace(",", ""));
+				smallValue += Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_2)
+						.get(states[idxState]).get(industryClassCodes8165[idxClass]).replace(",", ""));
+				double mediumValue = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_3)
+						.get(states[idxState]).get(industryClassCodes8165[idxClass]).replace(",", ""));
+				double largeValue = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_4)
+						.get(states[idxState]).get(industryClassCodes8165[idxClass]).replace(",", ""));
+				industryDivisionRatios[idxState][0][idxDiv][idxClass] = smallTotal > 0d ? smallValue / smallTotal : 0d;
+				industryDivisionRatios[idxState][1][idxDiv][idxClass] = mediumTotal > 0d ? mediumValue / mediumTotal
+						: 0d;
+				industryDivisionRatios[idxState][2][idxDiv][idxClass] = largeTotal > 0d ? largeValue / largeTotal : 0d;
 			}
 		}
-
-		/*
-		 * for( int idxState = 0;idxState<states.length;idxState++) { for (int idxSize =
-		 * 0; idxSize < sizes.length; idxSize++) {
-		 * industryDivisionTotals[idxState][idxSize] for (String industryClassCode8165 :
-		 * industryClassCodeSet8165) { industryDivisionTotals[idxState][idxSize] } } }
-		 */
 
 		/*
 		 * 10. ABS 8165.0 LGA Employment Range: For each LGA, size and division,
@@ -1047,30 +1044,140 @@ public class CalibrateBusinesses {
 		 * grows larger again. This gives us the count of businesses by state, LGA, size
 		 * and industry code.
 		 * 
+		 * Breaks the business count down from Class Code to Industry Code so we can use
+		 * all the granularity from ATO Company Table 4B.
+		 * 
+		 * Counts how many times each agent is instantiated when assigned to LGAs. This
+		 * will allow me to do a frequency histogram to show the degree of heterogeneity
+		 * among Business agents.
+		 * 
 		 * 554 LGAs x 3 sizes x 574 industry codes = 953,988 distinct Business agents
 		 * 
 		 * Deal with exporters later when linking the agents to create the network
 		 * topology.
-		 * 
-		 * TODO: Count how many times each agent is instantiated when assigned to LGAs.
-		 * This will allow me to do a frequency histogram to show the degree of
-		 * heterogeneity among Business agents.
 		 */
+		// calculate ratio of no. businesses in each Industry Code by Industry Class
+		Map<String, Double> industryCodeClassRatio4B = new HashMap<String, Double>(industryCodes.length);
+		Map<String, Integer> industryClassCompanyCount4B = new HashMap<String, Integer>(industryCodes.length);
+		// calculate totals per Industry Class
+		for (String industryCode : industryCodes) {
+			String classCode = this.abs1292_0_55_002ANZSIC.get("Industry Code to Class Code").get(industryCode);
+			if (!industryClassCompanyCount4B.containsKey(classCode)) {
+				industryClassCompanyCount4B.put(classCode, 0);
+			}
+			int industryCodeCount = Integer
+					.valueOf(this.atoCompanyTable4b.get("Number of companies no.").get(industryCode).replace(",", ""));
+			industryClassCompanyCount4B.put(classCode, industryClassCompanyCount4B.get(classCode) + industryCodeCount);
+		}
+		// calculate ratios per Industry Code
+		for (String industryCode : industryCodes) {
+			String classCode = this.abs1292_0_55_002ANZSIC.get("Industry Code to Class Code").get(industryCode);
+			double total = industryClassCompanyCount4B.get(classCode);
+			double value = Double
+					.valueOf(this.atoCompanyTable4b.get("Number of companies no.").get(industryCode).replace(",", ""));
+			industryCodeClassRatio4B.put(industryCode, total > 0d ? value / total : 0d);
+		}
 
-		// Create agents and add to economy
-		Business businessAgent = new Business();
-		this.businessAgents.add(businessAgent);
+		List<String> lgaCodes = new ArrayList<String>(ABS8165_NUM_LGAS);
+		this.businessTypeCount = new int[businessTypeId];
+		Arrays.fill(this.businessTypeCount, 0);
+		for (int idxState = 0; idxState < states.length; idxState++) {
+			Set<String> lgaCodeSet = this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[idxState])
+					.keySet();
+			for (String lgaCode : lgaCodeSet) {
+				lgaCodes.add(lgaCode);
+				for (int idxIndustryCode = 0; idxIndustryCode < industryCodes.length; idxIndustryCode++) {
+					String industryCode = industryCodes[idxIndustryCode];
+					String classCode = this.abs1292_0_55_002ANZSIC.get("Industry Code to Class Code").get(industryCode);
+					if (industryClassCodeSet8165.contains(classCode)) {
+						String divCode = this.abs1292_0_55_002ANZSIC.get("Industry Code to Division Code")
+								.get(industryCode);
+						int idxDiv = divisionIndexMap8165.get(divCode);
+						int idxClass = industryClassCodes8165Index.get(classCode);
+						double smallTotal = 0d;
+						double mediumTotal = 0d;
+						double largeTotal = 0d;
+						// One of the values is a char, so need to make it 0d.
+						try {
+							smallTotal += Double.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
+									.get(states[idxState]).get(lgaCode).get(divCode).replace(",", ""));
+						} catch (NumberFormatException e) {
+							// do nothing - which is the same as making the invalid "number" 0d
+						}
+						try {
+							smallTotal += Double.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_2)
+									.get(states[idxState]).get(lgaCode).get(divCode).replace(",", ""));
+						} catch (NumberFormatException e) {
+							// do nothing - which is the same as making the invalid "number" 0d
+						}
+						try {
+							mediumTotal += Double.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_3)
+									.get(states[idxState]).get(lgaCode).get(divCode).replace(",", ""));
+						} catch (NumberFormatException e) {
+							// do nothing - which is the same as making the invalid "number" 0d
+						}
+						try {
+							largeTotal += Double.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_4)
+									.get(states[idxState]).get(lgaCode).get(divCode).replace(",", ""));
+						} catch (NumberFormatException e) {
+							// do nothing - which is the same as making the invalid "number" 0d
+						}
 
+						/*
+						 * TODO: Loop over this section, using multiples of epsilon until the number of
+						 * agents equals the number in the ABS8165 LGA data. Need to do this at a higher
+						 * level though, not industry level. Would need to re-factor the loops, which is
+						 * too hard for now. I can just manually tweak the EPSILON constant for now
+						 * until the number of business agents created is about right.
+						 */
+						// calculate number of business agents to instantiate
+						int numSmallBusinesses = (int) Math
+								.round(smallTotal * industryDivisionRatios[idxState][0][idxDiv][idxClass]
+										* industryCodeClassRatio4B.get(industryCode) + EPSILON);
+						int numMediumBusinesses = (int) Math
+								.round(mediumTotal * industryDivisionRatios[idxState][1][idxDiv][idxClass]
+										* industryCodeClassRatio4B.get(industryCode) + EPSILON);
+						int numLargeBusinesses = (int) Math
+								.round(largeTotal * industryDivisionRatios[idxState][2][idxDiv][idxClass]
+										* industryCodeClassRatio4B.get(industryCode) + EPSILON);
+
+						// Create agents and add to list
+						for (int i = 0; i < numSmallBusinesses; i++) {
+							Business businessAgent = new Business(agentMatrix[idxState][idxIndustryCode][0]);
+							this.businessAgents.add(businessAgent);
+							int typeId = businessAgent.getBusinessTypeId();
+							this.businessTypeCount[typeId]++;
+						}
+						for (int i = 0; i < numMediumBusinesses; i++) {
+							Business businessAgent = new Business(agentMatrix[idxState][idxIndustryCode][1]);
+							this.businessAgents.add(businessAgent);
+							int typeId = businessAgent.getBusinessTypeId();
+							this.businessTypeCount[typeId]++;
+						}
+						for (int i = 0; i < numLargeBusinesses; i++) {
+							Business businessAgent = new Business(agentMatrix[idxState][idxIndustryCode][2]);
+							this.businessAgents.add(businessAgent);
+							int typeId = businessAgent.getBusinessTypeId();
+							this.businessTypeCount[typeId]++;
+						}
+					}
+				}
+			}
+		}
+
+		// Add agents to economy
 		this.addAgentsToEconomy();
 	}
 
 	private void addAgentsToEconomy() {
 		this.economy.setBusinesses(this.businessAgents);
+		this.economy.setBusinessTypeCount(this.businessTypeCount);
 	}
 
 	@PostConstruct
 	private void init() {
 		this.businessAgents = null;
+		this.businessTypeCount = null;
 
 		this.rbaE1 = null;
 		this.abs1292_0_55_002ANZSIC = null;
@@ -1078,9 +1185,7 @@ public class CalibrateBusinesses {
 		this.abs8155_0Table5 = null;
 		this.abs8155_0Table6 = null;
 		this.abs8165_0StateEmployment = null;
-		this.abs8165_0StateTurnover = null;
 		this.abs8165_0LgaEmployment = null;
-		this.abs8165_0LgaTurnover = null;
 	}
 
 	/**
