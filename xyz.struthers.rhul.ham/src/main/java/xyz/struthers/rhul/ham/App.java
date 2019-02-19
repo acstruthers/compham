@@ -11,6 +11,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import xyz.struthers.rhul.ham.config.SpringConfiguration;
 import xyz.struthers.rhul.ham.data.AreaMapping;
+import xyz.struthers.rhul.ham.data.CalibrateBusinesses;
 import xyz.struthers.rhul.ham.data.CalibrationData;
 
 /**
@@ -54,7 +55,12 @@ public class App {
 			e.printStackTrace();
 		}
 		System.out.println("Finished Calibration Data Load: " + new Date(System.currentTimeMillis()));
-
+		
+		System.out.println("Starting Business agent calibration: " + new Date(System.currentTimeMillis()));
+		CalibrateBusinesses calBus = new CalibrateBusinesses();
+		calBus.createBusinessAgents();
+		System.out.println("Finished Business agent calibration: " + new Date(System.currentTimeMillis()));
+		
 		//while (true) {}
 		ctx.close();
 	}

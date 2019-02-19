@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,7 +38,7 @@ import xyz.struthers.rhul.ham.config.Properties;
  * @author Adam Struthers
  * @since 2018-11-20
  */
-@Component
+@Component("calibrationData")
 @Scope(value = "singleton")
 public class CalibrationData {
 
@@ -874,7 +876,7 @@ public class CalibrationData {
 			boolean footer = false;
 			String[] seriesId = new String[columnsToImport.length];
 			String[] line = null;
-			SimpleDateFormat dateFormat = new SimpleDateFormat("MMM-yyyy");
+			DateFormat dateFormat = new SimpleDateFormat("MMM-yyyy", Locale.ENGLISH);
 			while ((line = reader.readNext()) != null && !footer) {
 				if (header) {
 					if (line[0].equals("Title")) {
@@ -1164,7 +1166,7 @@ public class CalibrationData {
 			boolean titleRow = true;
 			String[] seriesId = new String[columnsToImport.length];
 			String[] line = null;
-			SimpleDateFormat dateFormat = new SimpleDateFormat("MMM-yyyy");
+			DateFormat dateFormat = new SimpleDateFormat("MMM-yyyy", Locale.ENGLISH);
 			while ((line = reader.readNext()) != null) {
 				if (header) {
 					if (titleRow) {

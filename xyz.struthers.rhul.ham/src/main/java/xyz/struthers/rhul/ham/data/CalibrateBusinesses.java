@@ -15,6 +15,7 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import xyz.struthers.rhul.ham.agent.Business;
 import xyz.struthers.rhul.ham.config.Properties;
@@ -242,6 +243,7 @@ public class CalibrateBusinesses {
 	 */
 	public void createBusinessAgents() {
 		// get just the relevant business data from the CalibrationData
+		System.out.println("this.data: " + this.data);
 		this.rbaE1 = this.data.getRbaE1();
 		this.abs1292_0_55_002ANZSIC = this.data.getAbs1292_0_55_002ANZSIC();
 		this.abs5368_0Exporters = this.data.getAbs5368_0Exporters();
@@ -270,6 +272,8 @@ public class CalibrateBusinesses {
 		 * pay the same rate, which is unrealistic but good enough for the sake of this
 		 * model and its stated aims and degree of accuracy.
 		 */
+		System.out.println("Step 1: " + new Date(System.currentTimeMillis()));
+		
 		Set<String> fineIndustryKeySet = new HashSet<String>(this.atoCompanyTable4a.get("Total Income3 no.").keySet());
 		int numFineIndustryKeys = fineIndustryKeySet.size();
 		Map<String, Integer> fineIndustryKeyIndex = new HashMap<String, Integer>(numFineIndustryKeys);
@@ -482,6 +486,8 @@ public class CalibrateBusinesses {
 		 * relevant industry codes for each of the 18 industry divisions. This allows us
 		 * to break the ABS data for 18 industries down into 574 industry codes.
 		 */
+		System.out.println("Step 2: " + new Date(System.currentTimeMillis()));
+		
 		Set<String> industryCodeKeySet = new HashSet<String>(
 				this.atoCompanyTable4b.get("Number of companies").keySet());
 		int numIndustryCodeKeys = industryCodeKeySet.size();
@@ -574,6 +580,7 @@ public class CalibrateBusinesses {
 		 * 
 		 * Keys: year, column title, state, industry
 		 */
+		System.out.println("Step 3: " + new Date(System.currentTimeMillis()));
 
 		String[] states = { "NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT", "Other" };
 		Set<String> industriesSet8155 = this.abs8155_0Table6.get(ABS8155_YEAR).get(ABS8155_TITLE_EMPLOYMENT)
@@ -620,7 +627,7 @@ public class CalibrateBusinesses {
 			}
 		}
 
-		/**
+		/*
 		 * 4. ABS 8155.0 Table 5: Use the ratios from Table 6 to split Size by State,
 		 * assuming that all income is split in the same ratio as sales, and all
 		 * expenses are split in the same ratio as wages. Calculate gross profit by
@@ -628,7 +635,8 @@ public class CalibrateBusinesses {
 		 * 
 		 * Keys: year, column title, size, industry
 		 */
-
+		System.out.println("Step 4: " + new Date(System.currentTimeMillis()));
+		
 		String[] sizes = { "S", "M", "L" };
 		double[] totalSizeEmploymentByIndustry = new double[industries8155.length];
 		double[] totalSizeWagesByIndustry = new double[industries8155.length];
@@ -706,6 +714,8 @@ public class CalibrateBusinesses {
 		 * state / industry / size. Also calculate a total national mean dollars and
 		 * employees per business.
 		 */
+		System.out.println("Step 5: " + new Date(System.currentTimeMillis()));
+		
 		double businessCountAU = 0d;
 		double employmentCountAU = 0d;
 		double wagesAU = 0d;
@@ -797,6 +807,8 @@ public class CalibrateBusinesses {
 		 * 6. Divide each state / industry / size's figures by the national average to
 		 * produce a multiplier for each category combination.
 		 */
+		System.out.println("Step 6: " + new Date(System.currentTimeMillis()));
+		
 		double[][][] employmentCountMultiplier = new double[states.length][industries8155.length][sizes.length];
 		double[][][] wagesMultiplier = new double[states.length][industries8155.length][sizes.length];
 		double[][][] salesMultiplier = new double[states.length][industries8155.length][sizes.length];
@@ -828,6 +840,7 @@ public class CalibrateBusinesses {
 		 * that only large businesses hold foreign equities (i.e. multi-national
 		 * corporations and large investment firms).
 		 */
+		System.out.println("Step 7: " + new Date(System.currentTimeMillis()));
 
 		double bankDepositsE1 = Double.valueOf(this.rbaE1.get("Business bank deposits").get(RBA_E1_DATE));
 		double foreignEquitiesE1 = Double.valueOf(this.rbaE1.get("Business foreign equities").get(RBA_E1_DATE));
@@ -841,6 +854,8 @@ public class CalibrateBusinesses {
 		 * this multiplier to calibrate the ATO company P&L and Bal Shts so they're now
 		 * representative of businesses per state / industry / size.
 		 */
+		System.out.println("Step 8: " + new Date(System.currentTimeMillis()));
+		
 		// make a map so we can look up division indices cheaply
 		Map<String, Integer> divisionCodeKeyIndex = new HashMap<String, Integer>(industries8155.length);
 		for (int i = 0; i < industries8155.length; i++) {
@@ -961,6 +976,8 @@ public class CalibrateBusinesses {
 		 * combination of state and size, calculate the ratio of the number of
 		 * businesses in each industry code within each industry division.
 		 */
+		System.out.println("Step 9: " + new Date(System.currentTimeMillis()));
+		
 		// LGA emp Keys: emp range, state, LGA code, industry division code
 		Set<String> divisionsKeySet8165 = abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[0])
 				.get("10050").keySet();
@@ -1056,6 +1073,8 @@ public class CalibrateBusinesses {
 		 * Deal with exporters later when linking the agents to create the network
 		 * topology.
 		 */
+		System.out.println("Step 10: " + new Date(System.currentTimeMillis()));
+		
 		// calculate ratio of no. businesses in each Industry Code by Industry Class
 		Map<String, Double> industryCodeClassRatio4B = new HashMap<String, Double>(industryCodes.length);
 		Map<String, Integer> industryClassCompanyCount4B = new HashMap<String, Integer>(industryCodes.length);
@@ -1165,6 +1184,7 @@ public class CalibrateBusinesses {
 			}
 		}
 
+		System.out.println("Adding business agents to economy: " + new Date(System.currentTimeMillis()));
 		// Add agents to economy
 		this.addAgentsToEconomy();
 	}
@@ -1200,7 +1220,8 @@ public class CalibrateBusinesses {
 	 * @param data the calibration data to set
 	 */
 	@Autowired
-	public void setData(CalibrationData data) {
+	@Qualifier("calibrationData")
+	public void setCalibrationData(CalibrationData data) {
 		this.data = data;
 	}
 
@@ -1208,7 +1229,7 @@ public class CalibrateBusinesses {
 	 * @param area the area to set
 	 */
 	@Autowired
-	public void setArea(AreaMapping area) {
+	public void setAreaMapping(AreaMapping area) {
 		this.area = area;
 	}
 
@@ -1216,7 +1237,7 @@ public class CalibrateBusinesses {
 	 * @param economy the economy to set
 	 */
 	@Autowired
-	public void setEconomy(AustralianEconomy economy) {
+	public void setAustralianEconomy(AustralianEconomy economy) {
 		this.economy = economy;
 	}
 
