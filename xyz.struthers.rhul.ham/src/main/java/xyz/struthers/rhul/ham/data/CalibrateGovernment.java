@@ -6,6 +6,8 @@ package xyz.struthers.rhul.ham.data;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import xyz.struthers.rhul.ham.agent.AustralianGovernment;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
@@ -14,13 +16,19 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
  * @author Adam Struthers
  * @since 29-Jan-2019
  */
+@Component
+@Scope(value = "singleton")
 public class CalibrateGovernment {
 
+	// beans
 	private CalibrationData data;
+	private AustralianEconomy economy;
+	
+	// field variables
 	private Map<String, Double> govtBalSht;
 	private Map<String, Double> govtProfitLoss;
 	private AustralianGovernment govtAgent;
-	private AustralianEconomy economy;
+	
 	
 	/**
 	 * 

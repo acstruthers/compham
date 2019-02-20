@@ -12,6 +12,8 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import xyz.struthers.rhul.ham.agent.ForeignCountry;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
@@ -22,6 +24,8 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
  * @author Adam Struthers
  * @since 27-Jan-2019
  */
+@Component
+@Scope(value = "singleton")
 public class CalibrateCountries {
 
 	private CalibrationData data;

@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import xyz.struthers.rhul.ham.agent.Individual;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
@@ -24,14 +26,17 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
  * @author Adam Struthers
  * @since 11-Dec-2018
  */
+@Component
+@Scope(value = "singleton")
 public class CalibrateIndividuals {
 
-	// individuals should have an LGA
+	// beans
 	private CalibrationData data;
 	private AreaMapping area;
 	private AustralianEconomy economy;
+	
+	// individuals should have an LGA
 	private int peoplePerAgent;
-
 	private List<Individual> individualAgents;
 
 	// A single Bal Sht using national-level data

@@ -11,6 +11,8 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.util.CollectionTools;
@@ -25,13 +27,15 @@ import xyz.struthers.rhul.ham.util.CollectionTools;
  * @author Adam Struthers
  * @since 03-Dec-2018
  */
+@Component
+@Scope(value = "singleton")
 public class CalibratePopulationData {
 
-	@Autowired
+	// beans
 	private CalibrationData data;
-	@Autowired
 	private AreaMapping mapping;
 	
+	// field variables
 	Map<String, Integer> peopleByLga;
 	Map<String, Double> peopleByLgaPercent;
 
@@ -104,6 +108,22 @@ public class CalibratePopulationData {
 	private void init() {
 		this.peopleByLga = null;
 		this.peopleByLgaPercent = null;
+	}
+
+	/**
+	 * @param data the data to set
+	 */
+	@Autowired
+	public void setData(CalibrationData data) {
+		this.data = data;
+	}
+
+	/**
+	 * @param mapping the mapping to set
+	 */
+	@Autowired
+	public void setMapping(AreaMapping mapping) {
+		this.mapping = mapping;
 	}
 
 }

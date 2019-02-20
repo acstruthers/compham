@@ -6,6 +6,8 @@ package xyz.struthers.rhul.ham.data;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import xyz.struthers.rhul.ham.agent.Household;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
@@ -17,13 +19,16 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
  * @author Adam Struthers
  * @since 10-Dec-2018
  */
+@Component
+@Scope(value = "singleton")
 public class CalibrateHouseholds {
 
-	// households should have an LGA
+	// beans
 	private CalibrationData data;
 	private AreaMapping area;
 	private AustralianEconomy economy;
 
+	// households should have an LGA
 	List<Household> householdAgents;
 
 	/**

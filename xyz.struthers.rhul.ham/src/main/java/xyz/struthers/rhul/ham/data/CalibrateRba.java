@@ -6,6 +6,8 @@ package xyz.struthers.rhul.ham.data;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import xyz.struthers.rhul.ham.agent.ReserveBankOfAustralia;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
@@ -14,13 +16,18 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
  * @author Adam Struthers
  * @since 29-Jan-2018
  */
+@Component
+@Scope(value = "singleton")
 public class CalibrateRba {
 
+	// beans
 	private CalibrationData data;
+	private AustralianEconomy economy;
+
+	// field variables
 	private Map<String, Double> rbaBalSht;
 	private Map<String, Double> rbaProfitLoss;
 	private ReserveBankOfAustralia rbaAgent;
-	private AustralianEconomy economy;
 
 	/**
 	 * Default constructor
@@ -34,10 +41,10 @@ public class CalibrateRba {
 		this.rbaBalSht = data.getRbaBalSht();
 		this.rbaProfitLoss = data.getRbaProfitLoss();
 		this.rbaAgent = new ReserveBankOfAustralia(this.rbaBalSht, this.rbaProfitLoss);
-		
+
 		this.addAgentToEconomy();
 	}
-	
+
 	private void addAgentToEconomy() {
 		this.economy.setRba(this.rbaAgent);
 	}
@@ -49,14 +56,13 @@ public class CalibrateRba {
 	}
 
 	/**
-	 * @param data
-	 *            the calibration data to set
+	 * @param data the calibration data to set
 	 */
 	@Autowired
 	public void setData(CalibrationData data) {
 		this.data = data;
 	}
-	
+
 	/**
 	 * @param economy the economy to set
 	 */

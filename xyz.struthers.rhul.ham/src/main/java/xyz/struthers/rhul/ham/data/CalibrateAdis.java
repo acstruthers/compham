@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import xyz.struthers.rhul.ham.agent.AuthorisedDepositTakingInstitution;
 import xyz.struthers.rhul.ham.agent.ForeignBank;
@@ -23,6 +25,8 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
  * @author Adam Struthers
  * @since 26-Jan-2019
  */
+@Component
+@Scope(value = "singleton")
 public class CalibrateAdis {
 
 	private CalibrationData data;

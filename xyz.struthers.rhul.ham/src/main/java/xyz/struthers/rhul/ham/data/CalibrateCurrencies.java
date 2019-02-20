@@ -10,6 +10,8 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
 
@@ -17,12 +19,16 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
  * @author Adam Struthers
  * @since 27-Jan-2019
  */
+@Component
+@Scope(value = "singleton")
 public class CalibrateCurrencies {
 
+	// beans
 	private CalibrationData data;
-	private Map<String, Map<String, String>> allCurrencyData;
-	private Currencies currencies;
 	private AustralianEconomy economy;
+	private Currencies currencies;
+
+	private Map<String, Map<String, String>> allCurrencyData;
 
 	/**
 	 * 
@@ -38,7 +44,7 @@ public class CalibrateCurrencies {
 	 */
 	public void createExchangeRates() {
 		this.allCurrencyData = this.data.getCurrencyData();
-		
+
 		Set<String> ccyKeySet = new HashSet<String>(this.allCurrencyData.keySet());
 		for (String key : ccyKeySet) {
 			String isoCode = key;
@@ -51,37 +57,25 @@ public class CalibrateCurrencies {
 					standardDeviation5yr);
 			this.currencies.setCurrency(ccy);
 		}
-		
+
 		this.addAgentsToEconomy();
 	}
 
 	private void addAgentsToEconomy() {
 		this.economy.setCurrencies(this.currencies);
 	}
-	
+
 	@PostConstruct
 	private void init() {
 		this.allCurrencyData = null;
 	}
 
 	/**
-	 * @param data
-	 *            the calibration data to set
+	 * @param data the calibration data to set
 	 */
 	@Autowired
 	public void setData(CalibrationData data) {
 		this.data = data;
-	}
-
-	/**
-	 * @return the exchangeRates
-	 */
-	@Autowired
-	public Currencies getExchangeRates() {
-		if (currencies == null) {
-			this.createExchangeRates();
-		}
-		return currencies;
 	}
 
 	/**
@@ -91,5 +85,23 @@ public class CalibrateCurrencies {
 	public void setEconomy(AustralianEconomy economy) {
 		this.economy = economy;
 	}
-	
+
+	/**
+	 * @param currencies the currencies to set
+	 */
+	@Autowired
+	public void setCurrencies(Currencies currencies) {
+		this.currencies = currencies;
+	}
+
+	/**
+	 * @return the currencies
+	 */
+	public Currencies getCurrencies() {
+		if (currencies == null) {
+			this.createExchangeRates();
+		}
+		return currencies;
+	}
+
 }

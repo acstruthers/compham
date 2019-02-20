@@ -16,6 +16,8 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import xyz.struthers.rhul.ham.agent.Business;
 import xyz.struthers.rhul.ham.config.Properties;
@@ -25,6 +27,8 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
  * @author Adam Struthers
  * @since 12-Feb-2019
  */
+@Component
+@Scope(value = "singleton")
 public class CalibrateBusinesses {
 
 	// constants

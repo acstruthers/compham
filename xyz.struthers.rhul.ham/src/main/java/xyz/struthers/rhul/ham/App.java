@@ -57,7 +57,8 @@ public class App {
 		System.out.println("Finished Calibration Data Load: " + new Date(System.currentTimeMillis()));
 		
 		System.out.println("Starting Business agent calibration: " + new Date(System.currentTimeMillis()));
-		CalibrateBusinesses calBus = new CalibrateBusinesses();
+		//CalibrateBusinesses calBus = new CalibrateBusinesses();
+		CalibrateBusinesses calBus = ctx.getBean(CalibrateBusinesses.class);
 		calBus.createBusinessAgents();
 		System.out.println("Finished Business agent calibration: " + new Date(System.currentTimeMillis()));
 		

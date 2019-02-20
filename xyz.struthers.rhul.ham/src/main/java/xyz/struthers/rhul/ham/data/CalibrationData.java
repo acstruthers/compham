@@ -38,7 +38,7 @@ import xyz.struthers.rhul.ham.config.Properties;
  * @author Adam Struthers
  * @since 2018-11-20
  */
-@Component("calibrationData")
+@Component
 @Scope(value = "singleton")
 public class CalibrationData {
 
