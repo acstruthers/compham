@@ -15,7 +15,6 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -57,8 +56,9 @@ public class CalibrateBusinesses {
 	private CalibrationData data;
 	private AreaMapping area;
 	private AustralianEconomy economy;
-	private List<Business> businessAgents;
 
+	// field variables
+	private List<Business> businessAgents;
 	protected int[] businessTypeCount; // number of businesses of each type that were instantiated
 
 	// data sets
@@ -277,7 +277,7 @@ public class CalibrateBusinesses {
 		 * model and its stated aims and degree of accuracy.
 		 */
 		System.out.println("Step 1: " + new Date(System.currentTimeMillis()));
-		
+
 		Set<String> fineIndustryKeySet = new HashSet<String>(this.atoCompanyTable4a.get("Total Income3 no.").keySet());
 		int numFineIndustryKeys = fineIndustryKeySet.size();
 		Map<String, Integer> fineIndustryKeyIndex = new HashMap<String, Integer>(numFineIndustryKeys);
@@ -286,11 +286,13 @@ public class CalibrateBusinesses {
 		// company wages multiplier
 		Map<String, String> industryDivisionMap4A = new HashMap<String, String>(198); // maps ANZSIC Group Code to
 																						// Division Code
+		Set<String> industryDivisionsList4A = new HashSet<String>();
 		for (String industryGroupCode : industryGroupCodes) {
-			industryDivisionMap4A.put(industryGroupCode,
-					this.abs1292_0_55_002ANZSIC.get("Group Code to Division Code").get(industryGroupCode));
+			String div = this.abs1292_0_55_002ANZSIC.get("Group Code to Division Code").get(industryGroupCode);
+			industryDivisionMap4A.put(industryGroupCode, div);
+			industryDivisionsList4A.add(div);
 		}
-		String[] industryDivisions4A = industryDivisionMap4A.keySet().stream().toArray(String[]::new);
+		String[] industryDivisions4A = industryDivisionsList4A.stream().toArray(String[]::new);
 		Map<String, Double> wagesPerIndustryDivision = new HashMap<String, Double>(industryDivisions4A.length);
 		Map<String, Integer> numberOfGroupsInDivision = new HashMap<String, Integer>(industryDivisions4A.length);
 		for (String division : industryDivisions4A) {
@@ -491,7 +493,7 @@ public class CalibrateBusinesses {
 		 * to break the ABS data for 18 industries down into 574 industry codes.
 		 */
 		System.out.println("Step 2: " + new Date(System.currentTimeMillis()));
-		
+
 		Set<String> industryCodeKeySet = new HashSet<String>(
 				this.atoCompanyTable4b.get("Number of companies").keySet());
 		int numIndustryCodeKeys = industryCodeKeySet.size();
@@ -537,8 +539,16 @@ public class CalibrateBusinesses {
 			numberOfCompanies[i] = Integer.valueOf(tmp.substring(0, 1).equals("<") ? "5" : tmp);
 
 			// TOTAL INCOME
-			count = Integer.valueOf(this.atoCompanyTable4b.get("Total income no.").get(key).replace(",", ""));
-			amount = Double.valueOf(this.atoCompanyTable4b.get("Total income $").get(key).replace(",", ""));
+			try {
+				count = Integer.valueOf(this.atoCompanyTable4b.get("Total income no.").get(key).replace(",", ""));
+			} catch (NumberFormatException e) {
+				count = 0;
+			}
+			try {
+				amount = Double.valueOf(this.atoCompanyTable4b.get("Total income $").get(key).replace(",", ""));
+			} catch (NumberFormatException e) {
+				amount = 0d;
+			}
 			totalIncome[i] = count == 0 ? 0d : amount / count;
 
 			// Calculate income line items
@@ -549,8 +559,16 @@ public class CalibrateBusinesses {
 			foreignIncome[i] = foreignIncomeRatio[fineIndustryIndex] * totalIncome[i];
 
 			// TOTAL EXPENSES
-			count = Integer.valueOf(this.atoCompanyTable4b.get("Total expenses no.").get(key).replace(",", ""));
-			amount = Double.valueOf(this.atoCompanyTable4b.get("Total expenses $").get(key).replace(",", ""));
+			try {
+				count = Integer.valueOf(this.atoCompanyTable4b.get("Total expenses no.").get(key).replace(",", ""));
+			} catch (NumberFormatException e) {
+				count = 0;
+			}
+			try {
+				amount = Double.valueOf(this.atoCompanyTable4b.get("Total expenses $").get(key).replace(",", ""));
+			} catch (NumberFormatException e) {
+				amount = 0d;
+			}
 			totalExpense[i] = count == 0 ? 0d : amount / count;
 
 			// Calculate expense line items
@@ -586,7 +604,11 @@ public class CalibrateBusinesses {
 		 */
 		System.out.println("Step 3: " + new Date(System.currentTimeMillis()));
 
-		String[] states = { "NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT", "Other" };
+		// String[] states = { "NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT",
+		// "Other" };
+		// exclude "Other" states because the data is inconsistent and it causes null
+		// pointer errors
+		String[] states = { "NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT" };
 		Set<String> industriesSet8155 = this.abs8155_0Table6.get(ABS8155_YEAR).get(ABS8155_TITLE_EMPLOYMENT)
 				.get(states[0]).keySet();
 		industriesSet8155.remove("Other services");
@@ -640,7 +662,7 @@ public class CalibrateBusinesses {
 		 * Keys: year, column title, size, industry
 		 */
 		System.out.println("Step 4: " + new Date(System.currentTimeMillis()));
-		
+
 		String[] sizes = { "S", "M", "L" };
 		double[] totalSizeEmploymentByIndustry = new double[industries8155.length];
 		double[] totalSizeWagesByIndustry = new double[industries8155.length];
@@ -719,7 +741,7 @@ public class CalibrateBusinesses {
 		 * employees per business.
 		 */
 		System.out.println("Step 5: " + new Date(System.currentTimeMillis()));
-		
+
 		double businessCountAU = 0d;
 		double employmentCountAU = 0d;
 		double wagesAU = 0d;
@@ -740,6 +762,31 @@ public class CalibrateBusinesses {
 				double mediumCount = 0d;
 				double largeCount = 0d;
 				for (String lgaCode : lgaCodes8165) {
+					///////////////////////////////////////////////////////////////////////////////////////
+					// FIXME: null pointer exception
+					System.out.println("lgaCode: " + lgaCode);
+					System.out.println("smallCount: " + smallCount);
+					System.out.println("this.abs8165_0LgaEmployment: " + this.abs8165_0LgaEmployment);
+					System.out.println("idxState: " + idxState);
+					System.out.println("states[idxState]: " + states[idxState]);
+					System.out.println("idxIndustry: " + idxIndustry);
+					System.out.println("industries8155[idxIndustry]: " + industries8155[idxIndustry]);
+					System.out.println("this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1): "
+							+ this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1));
+					System.out.println(
+							"this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[idxState]): "
+									+ this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
+											.get(states[idxState]));
+					System.out.println(
+							"this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[idxState]).get(lgaCode): "
+									+ this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[idxState])
+											.get(lgaCode));
+					System.out.println(
+							"this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]): "
+									+ this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[idxState])
+											.get(lgaCode).get(industries8155[idxIndustry]));
+					///////////////////////////////////////////////////////////////////////////////////////
+
 					smallCount += Double.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
 							.get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]).replace(",", ""));
 					smallCount += Double.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_2)
@@ -757,6 +804,16 @@ public class CalibrateBusinesses {
 				// calculate mean amounts per business
 				employmentCountPerBusiness[idxState][idxIndustry][0] = smallCount == 0 ? 0
 						: employmentCountByStateIndustrySize[idxState][idxIndustry][0] / smallCount;
+				// FIXME: null pointer exception
+				System.out.println("employmentCountPerBusiness: " + employmentCountPerBusiness);
+				System.out.println("idxState: " + idxState);
+				System.out.println("idxIndustry: " + idxIndustry);
+				System.out.println("mediumCount: " + mediumCount);
+				System.out.println("employmentCountByStateIndustrySize: " + employmentCountByStateIndustrySize);
+				System.out.println("employmentCountPerBusiness[idxState][idxIndustry][1]: "
+						+ employmentCountPerBusiness[idxState][idxIndustry][1]);
+				System.out.println("employmentCountByStateIndustrySize[idxState][idxIndustry][1]: "
+						+ employmentCountByStateIndustrySize[idxState][idxIndustry][1]);
 				employmentCountPerBusiness[idxState][idxIndustry][1] = mediumCount == 0 ? 0
 						: employmentCountByStateIndustrySize[idxState][idxIndustry][1] / mediumCount;
 				employmentCountPerBusiness[idxState][idxIndustry][2] = largeCount == 0 ? 0
@@ -812,7 +869,7 @@ public class CalibrateBusinesses {
 		 * produce a multiplier for each category combination.
 		 */
 		System.out.println("Step 6: " + new Date(System.currentTimeMillis()));
-		
+
 		double[][][] employmentCountMultiplier = new double[states.length][industries8155.length][sizes.length];
 		double[][][] wagesMultiplier = new double[states.length][industries8155.length][sizes.length];
 		double[][][] salesMultiplier = new double[states.length][industries8155.length][sizes.length];
@@ -859,7 +916,7 @@ public class CalibrateBusinesses {
 		 * representative of businesses per state / industry / size.
 		 */
 		System.out.println("Step 8: " + new Date(System.currentTimeMillis()));
-		
+
 		// make a map so we can look up division indices cheaply
 		Map<String, Integer> divisionCodeKeyIndex = new HashMap<String, Integer>(industries8155.length);
 		for (int i = 0; i < industries8155.length; i++) {
@@ -981,7 +1038,7 @@ public class CalibrateBusinesses {
 		 * businesses in each industry code within each industry division.
 		 */
 		System.out.println("Step 9: " + new Date(System.currentTimeMillis()));
-		
+
 		// LGA emp Keys: emp range, state, LGA code, industry division code
 		Set<String> divisionsKeySet8165 = abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[0])
 				.get("10050").keySet();
@@ -1078,7 +1135,7 @@ public class CalibrateBusinesses {
 		 * topology.
 		 */
 		System.out.println("Step 10: " + new Date(System.currentTimeMillis()));
-		
+
 		// calculate ratio of no. businesses in each Industry Code by Industry Class
 		Map<String, Double> industryCodeClassRatio4B = new HashMap<String, Double>(industryCodes.length);
 		Map<String, Integer> industryClassCompanyCount4B = new HashMap<String, Integer>(industryCodes.length);
@@ -1224,7 +1281,6 @@ public class CalibrateBusinesses {
 	 * @param data the calibration data to set
 	 */
 	@Autowired
-	@Qualifier("calibrationData")
 	public void setCalibrationData(CalibrationData data) {
 		this.data = data;
 	}

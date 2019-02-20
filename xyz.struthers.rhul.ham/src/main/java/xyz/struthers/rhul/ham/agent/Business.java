@@ -5,8 +5,6 @@ package xyz.struthers.rhul.ham.agent;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import xyz.struthers.rhul.ham.process.Tax;
 
 /**
@@ -20,9 +18,6 @@ import xyz.struthers.rhul.ham.process.Tax;
 public class Business extends Agent {
 
 	private static final long serialVersionUID = 1L;
-
-	// beans
-	protected Tax tax;
 
 	/**
 	 * Identifies agents that were calibrated using the same industry / size / state
@@ -236,7 +231,7 @@ public class Business extends Agent {
 	 */
 	public double getTax() {
 		return this.getGrossProfit()
-				* this.tax.calculateCompanyTax(this.totalIncome, this.totalIncome - this.totalExpenses);
+				* Tax.calculateCompanyTax(this.totalIncome, this.totalIncome - this.totalExpenses);
 	}
 
 	public double getNetProfit() {
@@ -787,14 +782,6 @@ public class Business extends Agent {
 	 */
 	public void setInterestRateDeposits(double interestRateDeposits) {
 		this.interestRateDeposits = interestRateDeposits;
-	}
-
-	/**
-	 * @param tax the tax to set
-	 */
-	@Autowired
-	public void setTax(Tax tax) {
-		this.tax = tax;
 	}
 
 }

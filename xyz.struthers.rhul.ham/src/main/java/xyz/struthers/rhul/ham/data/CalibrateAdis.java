@@ -29,10 +29,13 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
 @Scope(value = "singleton")
 public class CalibrateAdis {
 
+	// beans
 	private CalibrationData data;
+	private AustralianEconomy economy;
+
+	// field variables
 	private Map<String, Map<String, String>> allAdiData;
 	private List<AuthorisedDepositTakingInstitution> adiAgents;
-	private AustralianEconomy economy;
 
 	/**
 	 * 
@@ -164,8 +167,7 @@ public class CalibrateAdis {
 	}
 
 	/**
-	 * @param data
-	 *            the calibration data to set
+	 * @param data the calibration data to set
 	 */
 	@Autowired
 	public void setData(CalibrationData data) {
@@ -173,8 +175,7 @@ public class CalibrateAdis {
 	}
 
 	/**
-	 * @param economy
-	 *            the economy to set
+	 * @param economy the economy to set
 	 */
 	@Autowired
 	public void setEconomy(AustralianEconomy economy) {

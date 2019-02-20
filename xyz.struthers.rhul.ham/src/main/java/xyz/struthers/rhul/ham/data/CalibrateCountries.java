@@ -19,7 +19,8 @@ import xyz.struthers.rhul.ham.agent.ForeignCountry;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
 
 /**
- * Populate the import/export volumes later when the exporter agents have been calibrated
+ * Populate the import/export volumes later when the exporter agents have been
+ * calibrated
  * 
  * @author Adam Struthers
  * @since 27-Jan-2019
@@ -28,12 +29,15 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
 @Scope(value = "singleton")
 public class CalibrateCountries {
 
+	// beans
 	private CalibrationData data;
 	private Currencies currencies;
+	private AustralianEconomy economy;
+
+	// field variables
 	private Map<String, Map<String, String>> allCountryData;
 	private List<ForeignCountry> countryAgents;
-	private AustralianEconomy economy;
-	
+
 	/**
 	 * 
 	 */
@@ -53,12 +57,13 @@ public class CalibrateCountries {
 			Currency currency = this.currencies.getCurrency(ccyCode);
 			ForeignCountry countryAgent = new ForeignCountry(country, currency);
 			this.countryAgents.add(countryAgent);
-			// Note: Populate the import/export volumes later when the exporter agents have been calibrated
+			// Note: Populate the import/export volumes later when the exporter agents have
+			// been calibrated
 		}
-		
+
 		this.addAgentsToEconomy();
 	}
-	
+
 	private void addAgentsToEconomy() {
 		this.economy.setCountries(this.countryAgents);
 	}
@@ -70,8 +75,7 @@ public class CalibrateCountries {
 	}
 
 	/**
-	 * @param data
-	 *            the calibration data to set
+	 * @param data the calibration data to set
 	 */
 	@Autowired
 	public void setData(CalibrationData data) {
