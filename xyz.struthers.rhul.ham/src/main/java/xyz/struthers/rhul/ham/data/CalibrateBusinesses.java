@@ -3,12 +3,16 @@
  */
 package xyz.struthers.rhul.ham.data;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,7 +35,10 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
 public class CalibrateBusinesses {
 
 	// constants
-	public static final String RBA_E1_DATE = "Jun-2018";
+	public static final String RBA_E1_DATE_STRING = "Jun-2018";
+	public static final String RBA_E1_BUSINESS_BANK_DEPOSITS = "BSPNSPNFAD";
+	public static final String RBA_E1_BUSINESS_FOREIGN_EQUITIES = "BSPNSPNFAF";
+	public static final String RBA_E1_BUSINESS_TOTAL_FINANCIAL_ASSETS = "BSPNSPNFAT";
 
 	public static final String ABS8155_YEAR = "2016-17";
 	public static final String ABS8155_TITLE_EMPLOYMENT = "Employment at end of June";
@@ -40,7 +47,7 @@ public class CalibrateBusinesses {
 	public static final String ABS8155_TITLE_INCOME = "Total income";
 	public static final String ABS8155_TITLE_EXPENSES = "Total expenses";
 
-	public static final String ABS8165_TITLE_EMPLOYMENT_1 = "Non employing";
+	public static final String ABS8165_TITLE_EMPLOYMENT_1 = "Non Employing";
 	public static final String ABS8165_TITLE_EMPLOYMENT_2 = "1-19 Employees";
 	public static final String ABS8165_TITLE_EMPLOYMENT_3 = "20-199 Employees";
 	public static final String ABS8165_TITLE_EMPLOYMENT_4 = "200+ Employees";
@@ -613,6 +620,7 @@ public class CalibrateBusinesses {
 				.get(states[0]).keySet();
 		industriesSet8155.remove("Other services");
 		industriesSet8155.remove("Total selected industries");
+		industriesSet8155.remove(null); // the first element in the array is null if I don't do this step
 		String[] industries8155 = industriesSet8155.stream().toArray(String[]::new);
 		double[] totalStateEmploymentByIndustry = new double[industries8155.length];
 		double[] totalStateWagesByIndustry = new double[industries8155.length];
@@ -755,6 +763,7 @@ public class CalibrateBusinesses {
 		double[][][] totalIncomePerBusiness = new double[states.length][industries8155.length][sizes.length];
 		double[][][] totalExpensesPerBusiness = new double[states.length][industries8155.length][sizes.length];
 		Set<String> lgaCodes8165 = this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[0]).keySet();
+		lgaCodes8165.remove("Total"); // need to do this to avoid errors in the loop below
 		for (int idxIndustry = 0; idxIndustry < industries8155.length; idxIndustry++) {
 			for (int idxState = 0; idxState < states.length; idxState++) {
 				// count number of businesses in each category
@@ -762,39 +771,18 @@ public class CalibrateBusinesses {
 				double mediumCount = 0d;
 				double largeCount = 0d;
 				for (String lgaCode : lgaCodes8165) {
-					///////////////////////////////////////////////////////////////////////////////////////
-					// FIXME: null pointer exception
-					System.out.println("lgaCode: " + lgaCode);
-					System.out.println("smallCount: " + smallCount);
-					System.out.println("this.abs8165_0LgaEmployment: " + this.abs8165_0LgaEmployment);
-					System.out.println("idxState: " + idxState);
-					System.out.println("states[idxState]: " + states[idxState]);
-					System.out.println("idxIndustry: " + idxIndustry);
-					System.out.println("industries8155[idxIndustry]: " + industries8155[idxIndustry]);
-					System.out.println("this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1): "
-							+ this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1));
-					System.out.println(
-							"this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[idxState]): "
-									+ this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
-											.get(states[idxState]));
-					System.out.println(
-							"this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[idxState]).get(lgaCode): "
-									+ this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[idxState])
-											.get(lgaCode));
-					System.out.println(
-							"this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]): "
-									+ this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[idxState])
-											.get(lgaCode).get(industries8155[idxIndustry]));
-					///////////////////////////////////////////////////////////////////////////////////////
-
-					smallCount += Double.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
-							.get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]).replace(",", ""));
-					smallCount += Double.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_2)
-							.get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]).replace(",", ""));
-					mediumCount += Double.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_3)
-							.get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]).replace(",", ""));
-					largeCount += Double.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_4)
-							.get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]).replace(",", ""));
+					// It loops over all LGA codes, but they don't all exist in every state. Adding
+					// this if statement is inefficient but the fastest way to fix the bug for now.
+					if (lgaCode.equals(states[idxState])) {
+						smallCount += Double.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
+								.get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]).replace(",", ""));
+						smallCount += Double.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_2)
+								.get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]).replace(",", ""));
+						mediumCount += Double.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_3)
+								.get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]).replace(",", ""));
+						largeCount += Double.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_4)
+								.get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]).replace(",", ""));
+					}
 				}
 				businessCountAU += smallCount + mediumCount + largeCount;
 				businessCountByStateIndustrySize[idxState][idxIndustry][0] = smallCount;
@@ -804,16 +792,6 @@ public class CalibrateBusinesses {
 				// calculate mean amounts per business
 				employmentCountPerBusiness[idxState][idxIndustry][0] = smallCount == 0 ? 0
 						: employmentCountByStateIndustrySize[idxState][idxIndustry][0] / smallCount;
-				// FIXME: null pointer exception
-				System.out.println("employmentCountPerBusiness: " + employmentCountPerBusiness);
-				System.out.println("idxState: " + idxState);
-				System.out.println("idxIndustry: " + idxIndustry);
-				System.out.println("mediumCount: " + mediumCount);
-				System.out.println("employmentCountByStateIndustrySize: " + employmentCountByStateIndustrySize);
-				System.out.println("employmentCountPerBusiness[idxState][idxIndustry][1]: "
-						+ employmentCountPerBusiness[idxState][idxIndustry][1]);
-				System.out.println("employmentCountByStateIndustrySize[idxState][idxIndustry][1]: "
-						+ employmentCountByStateIndustrySize[idxState][idxIndustry][1]);
 				employmentCountPerBusiness[idxState][idxIndustry][1] = mediumCount == 0 ? 0
 						: employmentCountByStateIndustrySize[idxState][idxIndustry][1] / mediumCount;
 				employmentCountPerBusiness[idxState][idxIndustry][2] = largeCount == 0 ? 0
@@ -903,10 +881,19 @@ public class CalibrateBusinesses {
 		 */
 		System.out.println("Step 7: " + new Date(System.currentTimeMillis()));
 
-		double bankDepositsE1 = Double.valueOf(this.rbaE1.get("Business bank deposits").get(RBA_E1_DATE));
-		double foreignEquitiesE1 = Double.valueOf(this.rbaE1.get("Business foreign equities").get(RBA_E1_DATE));
+		DateFormat df = new SimpleDateFormat("MMM-yyyy", Locale.ENGLISH);
+		Date rbaE1Date = null;
+		try {
+			// convert String to Date
+			rbaE1Date = df.parse(RBA_E1_DATE_STRING);
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		double bankDepositsE1 = Double.valueOf(this.rbaE1.get(RBA_E1_BUSINESS_BANK_DEPOSITS).get(rbaE1Date));
+		double foreignEquitiesE1 = Double.valueOf(this.rbaE1.get(RBA_E1_BUSINESS_FOREIGN_EQUITIES).get(rbaE1Date));
 		double totalFinancialAssetsE1 = Double
-				.valueOf(this.rbaE1.get("Business total financial assets").get(RBA_E1_DATE));
+				.valueOf(this.rbaE1.get(RBA_E1_BUSINESS_TOTAL_FINANCIAL_ASSETS).get(rbaE1Date));
 		double bankDepositRatioE1 = totalFinancialAssetsE1 > 0d ? bankDepositsE1 / totalFinancialAssetsE1 : 0d;
 		double foreignEquitiesRatioE1 = totalFinancialAssetsE1 > 0d ? foreignEquitiesE1 / totalFinancialAssetsE1 : 0d;
 
@@ -974,6 +961,7 @@ public class CalibrateBusinesses {
 
 						// create representative agent
 						Business agent = new Business();
+						agent.setName("Type " + businessTypeId + " business");
 						agent.setBusinessTypeId(businessTypeId++);
 						agent.setIndustryCode(industryCodes[idxIndustryCode]);
 						agent.setIndustryDivisionCode(divisionCode.charAt(0));
@@ -1076,18 +1064,20 @@ public class CalibrateBusinesses {
 			// set the division totals
 			for (String industryClassCode8165 : industryClassCodeSet8165) {
 				String div = this.abs1292_0_55_002ANZSIC.get("Class Code to Division Code").get(industryClassCode8165);
-				int idxDiv = divisionIndexMap8165.get(div);
-				double smallValue = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
-						.get(states[idxState]).get(industryClassCode8165).replace(",", ""));
-				smallValue += Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_2)
-						.get(states[idxState]).get(industryClassCode8165).replace(",", ""));
-				double mediumValue = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_3)
-						.get(states[idxState]).get(industryClassCode8165).replace(",", ""));
-				double largeValue = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_4)
-						.get(states[idxState]).get(industryClassCode8165).replace(",", ""));
-				industryDivisionTotals[idxState][0][idxDiv] += smallValue;
-				industryDivisionTotals[idxState][1][idxDiv] += mediumValue;
-				industryDivisionTotals[idxState][2][idxDiv] += largeValue;
+				if (div != null) {
+					int idxDiv = divisionIndexMap8165.get(div);
+					double smallValue = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
+							.get(states[idxState]).get(industryClassCode8165).replace(",", ""));
+					smallValue += Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_2)
+							.get(states[idxState]).get(industryClassCode8165).replace(",", ""));
+					double mediumValue = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_3)
+							.get(states[idxState]).get(industryClassCode8165).replace(",", ""));
+					double largeValue = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_4)
+							.get(states[idxState]).get(industryClassCode8165).replace(",", ""));
+					industryDivisionTotals[idxState][0][idxDiv] += smallValue;
+					industryDivisionTotals[idxState][1][idxDiv] += mediumValue;
+					industryDivisionTotals[idxState][2][idxDiv] += largeValue;
+				}
 			}
 
 			// calculate the ratios
@@ -1095,22 +1085,26 @@ public class CalibrateBusinesses {
 				industryClassCodes8165Index.put(industryClassCodes8165[idxClass], idxClass);
 				String div = this.abs1292_0_55_002ANZSIC.get("Class Code to Division Code")
 						.get(industryClassCodes8165[idxClass]);
-				int idxDiv = divisionIndexMap8165.get(div);
-				double smallTotal = industryDivisionTotals[idxState][0][idxDiv];
-				double mediumTotal = industryDivisionTotals[idxState][1][idxDiv];
-				double largeTotal = industryDivisionTotals[idxState][2][idxDiv];
-				double smallValue = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
-						.get(states[idxState]).get(industryClassCodes8165[idxClass]).replace(",", ""));
-				smallValue += Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_2)
-						.get(states[idxState]).get(industryClassCodes8165[idxClass]).replace(",", ""));
-				double mediumValue = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_3)
-						.get(states[idxState]).get(industryClassCodes8165[idxClass]).replace(",", ""));
-				double largeValue = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_4)
-						.get(states[idxState]).get(industryClassCodes8165[idxClass]).replace(",", ""));
-				industryDivisionRatios[idxState][0][idxDiv][idxClass] = smallTotal > 0d ? smallValue / smallTotal : 0d;
-				industryDivisionRatios[idxState][1][idxDiv][idxClass] = mediumTotal > 0d ? mediumValue / mediumTotal
-						: 0d;
-				industryDivisionRatios[idxState][2][idxDiv][idxClass] = largeTotal > 0d ? largeValue / largeTotal : 0d;
+				if (div != null) {
+					int idxDiv = divisionIndexMap8165.get(div);
+					double smallTotal = industryDivisionTotals[idxState][0][idxDiv];
+					double mediumTotal = industryDivisionTotals[idxState][1][idxDiv];
+					double largeTotal = industryDivisionTotals[idxState][2][idxDiv];
+					double smallValue = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
+							.get(states[idxState]).get(industryClassCodes8165[idxClass]).replace(",", ""));
+					smallValue += Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_2)
+							.get(states[idxState]).get(industryClassCodes8165[idxClass]).replace(",", ""));
+					double mediumValue = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_3)
+							.get(states[idxState]).get(industryClassCodes8165[idxClass]).replace(",", ""));
+					double largeValue = Double.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_4)
+							.get(states[idxState]).get(industryClassCodes8165[idxClass]).replace(",", ""));
+					industryDivisionRatios[idxState][0][idxDiv][idxClass] = smallTotal > 0d ? smallValue / smallTotal
+							: 0d;
+					industryDivisionRatios[idxState][1][idxDiv][idxClass] = mediumTotal > 0d ? mediumValue / mediumTotal
+							: 0d;
+					industryDivisionRatios[idxState][2][idxDiv][idxClass] = largeTotal > 0d ? largeValue / largeTotal
+							: 0d;
+				}
 			}
 		}
 
@@ -1145,16 +1139,34 @@ public class CalibrateBusinesses {
 			if (!industryClassCompanyCount4B.containsKey(classCode)) {
 				industryClassCompanyCount4B.put(classCode, 0);
 			}
-			int industryCodeCount = Integer
-					.valueOf(this.atoCompanyTable4b.get("Number of companies no.").get(industryCode).replace(",", ""));
+			int industryCodeCount = 0;
+			try {
+				industryCodeCount = Integer
+						.valueOf(this.atoCompanyTable4b.get("Number of companies").get(industryCode).replace(",", ""));
+			} catch (NumberFormatException e) {
+				if (this.atoCompanyTable4b.get("Number of companies").get(industryCode).equals("<10")) {
+					industryCodeCount = 5;
+				} else {
+					industryCodeCount = 0;
+				}
+			}
 			industryClassCompanyCount4B.put(classCode, industryClassCompanyCount4B.get(classCode) + industryCodeCount);
 		}
 		// calculate ratios per Industry Code
 		for (String industryCode : industryCodes) {
 			String classCode = this.abs1292_0_55_002ANZSIC.get("Industry Code to Class Code").get(industryCode);
 			double total = industryClassCompanyCount4B.get(classCode);
-			double value = Double
-					.valueOf(this.atoCompanyTable4b.get("Number of companies no.").get(industryCode).replace(",", ""));
+			double value = 0d;
+			try {
+				value = Double
+						.valueOf(this.atoCompanyTable4b.get("Number of companies").get(industryCode).replace(",", ""));
+			} catch (NumberFormatException e) {
+				if (this.atoCompanyTable4b.get("Number of companies").get(industryCode).equals("<10")) {
+					value = 5d;
+				} else {
+					value = 0d;
+				}
+			}
 			industryCodeClassRatio4B.put(industryCode, total > 0d ? value / total : 0d);
 		}
 
@@ -1164,6 +1176,7 @@ public class CalibrateBusinesses {
 		for (int idxState = 0; idxState < states.length; idxState++) {
 			Set<String> lgaCodeSet = this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[idxState])
 					.keySet();
+			lgaCodeSet.remove("Total"); // fixes a null pointer exception below
 			for (String lgaCode : lgaCodeSet) {
 				lgaCodes.add(lgaCode);
 				for (int idxIndustryCode = 0; idxIndustryCode < industryCodes.length; idxIndustryCode++) {
@@ -1223,22 +1236,34 @@ public class CalibrateBusinesses {
 
 						// Create agents and add to list
 						for (int i = 0; i < numSmallBusinesses; i++) {
-							Business businessAgent = new Business(agentMatrix[idxState][idxIndustryCode][0]);
-							this.businessAgents.add(businessAgent);
-							int typeId = businessAgent.getBusinessTypeId();
-							this.businessTypeCount[typeId]++;
+							if (agentMatrix[idxState][idxIndustryCode][0] != null) {
+								/*
+								 * Sometimes the count data has cells populated that the amount data doesn't.
+								 * This leads to a null pointer error, so we exclude businesses where there is a
+								 * positive count but no corresponding financial information to calibrate the
+								 * business with.
+								 */
+								Business businessAgent = new Business(agentMatrix[idxState][idxIndustryCode][0]);
+								this.businessAgents.add(businessAgent);
+								int typeId = businessAgent.getBusinessTypeId();
+								this.businessTypeCount[typeId]++;
+							}
 						}
 						for (int i = 0; i < numMediumBusinesses; i++) {
-							Business businessAgent = new Business(agentMatrix[idxState][idxIndustryCode][1]);
-							this.businessAgents.add(businessAgent);
-							int typeId = businessAgent.getBusinessTypeId();
-							this.businessTypeCount[typeId]++;
+							if (agentMatrix[idxState][idxIndustryCode][1] != null) {
+								Business businessAgent = new Business(agentMatrix[idxState][idxIndustryCode][1]);
+								this.businessAgents.add(businessAgent);
+								int typeId = businessAgent.getBusinessTypeId();
+								this.businessTypeCount[typeId]++;
+							}
 						}
 						for (int i = 0; i < numLargeBusinesses; i++) {
-							Business businessAgent = new Business(agentMatrix[idxState][idxIndustryCode][2]);
-							this.businessAgents.add(businessAgent);
-							int typeId = businessAgent.getBusinessTypeId();
-							this.businessTypeCount[typeId]++;
+							if (agentMatrix[idxState][idxIndustryCode][2] != null) {
+								Business businessAgent = new Business(agentMatrix[idxState][idxIndustryCode][2]);
+								this.businessAgents.add(businessAgent);
+								int typeId = businessAgent.getBusinessTypeId();
+								this.businessTypeCount[typeId]++;
+							}
 						}
 					}
 				}

@@ -62,7 +62,7 @@ public class App {
 		calBus.createBusinessAgents();
 		System.out.println("Finished Business agent calibration: " + new Date(System.currentTimeMillis()));
 		
-		//while (true) {}
+		//while (true) {} // 17 seconds on lappy, consumes 2GB RAM
 		ctx.close();
 	}
 

@@ -36,7 +36,7 @@ public abstract class Agent implements Serializable, Clearable {
 	public Agent(Agent agent) {
 		super();
 		this.init();
-		
+
 		this.name = agent.name;
 	}
 	
