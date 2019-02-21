@@ -30,12 +30,17 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
 @Scope(value = "singleton")
 public class CalibrateIndividuals {
 
+	// CONSTANTS
+	private static final double MILLION = 1000000d;
+	private static final double THOUSAND = 1000d;
+	private static final double EPSILON = 0.1d; // to round business counts so the integer sums match
+
 	// beans
 	private CalibrationData data;
 	private AreaMapping area;
 	private AustralianEconomy economy;
-	
-	// individuals should have an LGA
+
+	// field variables
 	private int peoplePerAgent;
 	private List<Individual> individualAgents;
 
@@ -47,6 +52,8 @@ public class CalibrateIndividuals {
 
 	private double bsAULoans;
 	private double bsAUOtherLiabilities;
+
+	// data sets
 
 	/**
 	 * 
@@ -72,11 +79,10 @@ public class CalibrateIndividuals {
 
 	/**
 	 * 
-	 * @param date
-	 *            - the date for which data should be used to calibrate the
-	 *            individuals
-	 * @param numberOfPeoplePerAgent
-	 *            - the number of people represented by each agent in the model
+	 * @param date                   - the date for which data should be used to
+	 *                               calibrate the individuals
+	 * @param numberOfPeoplePerAgent - the number of people represented by each
+	 *                               agent in the model
 	 */
 	public void calibrateIndividualFinancials(Date date, int numberOfPeoplePerAgent) {
 		// TODO: implement me
@@ -271,8 +277,7 @@ public class CalibrateIndividuals {
 	}
 
 	/**
-	 * @param data
-	 *            the data to set
+	 * @param data the data to set
 	 */
 	@Autowired
 	public void setData(CalibrationData data) {
@@ -280,8 +285,7 @@ public class CalibrateIndividuals {
 	}
 
 	/**
-	 * @param area
-	 *            the area to set
+	 * @param area the area to set
 	 */
 	@Autowired
 	public void setArea(AreaMapping area) {
@@ -289,8 +293,7 @@ public class CalibrateIndividuals {
 	}
 
 	/**
-	 * @param economy
-	 *            the economy to set
+	 * @param economy the economy to set
 	 */
 	@Autowired
 	public void setEconomy(AustralianEconomy economy) {
