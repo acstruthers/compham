@@ -1,15 +1,17 @@
-﻿Resident Tax Rates 2018-19,,,,
-SOURCE: https://www.ato.gov.au/rates/individual-income-tax-rates/,,,,
-SOURCE: https://www.ato.gov.au/Individuals/Medicare-levy/,,,,
-SOURCE: https://www.ato.gov.au/individuals/medicare-levy/medicare-levy-reduction-for-low-income-earners/,,,,
-Accessed: 13-Feb-2019,,,,
-,,,,
-Income From,Income To,Base Amount,Marginal Rate,Medicare Levy
-$,$,$,%,%
-0,18200,0,0,0
-18201,21980,0,19,0
-21981,27475,0,19,1
-27476,37000,0,19,2
-37001,90000,3572,32.5,2
-90001,180000,20797,37,2
-180001,999999999,54097,45,2
+﻿Resident Tax Rates 2018-19,,,,,,
+SOURCE: https://www.ato.gov.au/rates/individual-income-tax-rates/,,,,,,
+SOURCE: https://www.ato.gov.au/Individuals/Medicare-levy/,,,,,,
+SOURCE: https://www.ato.gov.au/individuals/medicare-levy/medicare-levy-reduction-for-low-income-earners/,,,,,,
+SOURCE: https://www.ato.gov.au/individuals/income-and-deductions/offsets-and-rebates/low-income-earners/,,,,,,
+Accessed: 13-Feb-2019,,,,,,
+,,,,,,
+Income From,Income To,Base Amount,Marginal Rate,Medicare Levy,Low Income Tax Offset,Low Income Tax Offset Reduction
+$,$,$,%,%,$,%
+0,18200,0,0,0,445,0
+18201,21980,0,19,0,445,0
+21981,27475,0,19,1,445,0
+27476,37000,0,19,2,445,0
+37001,66667,3572,32.5,2,445,1.5
+66668,90000,13213.775,32.5,2,0,0
+90001,180000,20797,37,2,0,0
+180001,999999999,54097,45,2,0,0

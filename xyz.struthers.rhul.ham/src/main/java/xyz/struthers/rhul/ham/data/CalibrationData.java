@@ -2068,6 +2068,7 @@ public class CalibrationData {
 			boolean prevRowIsBlank = true; // there's a blank row before leaf names
 			boolean prevRowIsLeafName = false;
 			String leafName = null;
+			int leafNumber = 0;
 			String[] seriesId = new String[columnsToImport.length];
 
 			String[] line = null;
@@ -2082,8 +2083,9 @@ public class CalibrationData {
 					} else {
 						if (prevRowIsBlank && !line[0].isBlank()) {
 							// set leaf name
-							leafName = line[0];
+							leafName = line[0].trim();
 							prevRowIsLeafName = true;
+							leafNumber++;
 						} else {
 							if (prevRowIsLeafName) {
 								// set series ID
@@ -2103,14 +2105,16 @@ public class CalibrationData {
 								prevRowIsLeafName = false;
 							} else if (!line[1].isBlank()) {
 								// parse the body of the data
+								// TODO: modify this so it can use POA, state, etc. not just LGA
 								String lgaCode = this.area.getLgaCodeFromName(line[0]);
 								if (lgaCode != null) {
 									// null check excludes invalid LGAs
-									data.get(seriesId[i]).put(lgaCode,  new hash map)
 									for (int i = 0; i < columnsToImport.length; i++) {
-										
+										if (leafNumber == 1) {
+											data.get(seriesId[i]).put(lgaCode,
+													new HashMap<String, String>(columnsToImport.length));
+										}
 										data.get(seriesId[i]).get(lgaCode).put(leafName, line[columnsToImport[i]]);
-										// TODO: modify this so it can use POA, state, etc. not just LGA
 									}
 								}
 							} else if (line[0].isBlank()) {
@@ -3112,9 +3116,9 @@ public class CalibrationData {
 	}
 
 	/**
-	 * @return the censusLgaByINCP (title, LGA code, value)
+	 * @return the censusLGA_INCP_INDP (title, LGA code, income range, value)
 	 */
-	public Map<String, Map<String, String>> getCensusLgaByINCP() {
+	public Map<String, Map<String, Map<String, String>>> getCensusLGA_INCP_INDP() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -3122,9 +3126,9 @@ public class CalibrationData {
 	}
 
 	/**
-	 * @return the censusLgaByMRERD (title, LGA code, value)
+	 * @return the censusLGA_MRERD (title, LGA code, value)
 	 */
-	public Map<String, Map<String, String>> getCensusLgaByMRERD() {
+	public Map<String, Map<String, String>> getCensusLGA_MRERD() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -3132,13 +3136,34 @@ public class CalibrationData {
 	}
 
 	/**
-	 * @return the censusLgaByRNTRD (title, LGA code, value)
+	 * @return the censusLGA_RNTRD (title, LGA code, value)
 	 */
-	public Map<String, Map<String, String>> getCensusLgaByRNTRD() {
+	public Map<String, Map<String, String>> getCensusLGA_RNTRD() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
 		return censusLGA_RNTRD;
+	}
+
+	/**
+	 * @return the censusLGA_TEND
+	 */
+	public Map<String, Map<String, String>> getCensusLGA_TEND() {
+		return censusLGA_TEND;
+	}
+
+	/**
+	 * @return the censusLGA_CDCF
+	 */
+	public Map<String, Map<String, String>> getCensusLGA_CDCF() {
+		return censusLGA_CDCF;
+	}
+
+	/**
+	 * @return the censusPOA_AGE10P
+	 */
+	public Map<String, Map<String, String>> getCensusPOA_AGE10P() {
+		return censusPOA_AGE10P;
 	}
 
 	/**
