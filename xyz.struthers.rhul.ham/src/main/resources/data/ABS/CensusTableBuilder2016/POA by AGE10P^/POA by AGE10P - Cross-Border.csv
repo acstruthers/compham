@@ -1,0 +1,35 @@
+Australian Bureau of Statistics
+
+"2016 Census - Employment, Income and Education"
+"POA (UR) by AGE10P - Age in Ten Year Groups"
+"Counting: Persons Place of Usual Residence"
+
+Filters:
+"Default Summation","Persons Place of Usual Residence"
+
+"AGE10P - Age in Ten Year Groups","0-9 years","10-19 years","20-29 years","30-39 years","40-49 years","50-59 years","60-69 years","70-79 years","80-89 years","90-99 years","100 years and over","Total",
+"POA (UR)",
+"0872 crosses NT/SA/WA",2488,2367,3243,2517,2031,1528,860,297,121,16,0,15468,
+"2406 crosses NSW/QLD",155,91,78,129,94,112,87,46,25,4,0,824,
+"2540 crosses NSW/OT",4682,5091,4334,4229,5243,6415,7266,5225,2238,387,6,45117,
+"2611 crosses ACT/NSW",4023,3110,3103,4326,4072,3120,2857,2194,983,218,3,28019,
+"2618 crosses ACT/NSW",157,235,126,115,252,199,205,122,28,6,0,1447,
+"2620 crosses NSW/ACT",4939,4525,5667,5697,5768,5554,4052,2020,869,193,4,39287,
+"3644 crosses VIC/NSW",1077,1107,910,931,1068,1171,1370,1012,504,75,4,9229,
+"3691 crosses VIC/NSW",1376,1397,1148,1178,1305,1350,1123,534,213,82,0,9704,
+"3707 crosses VIC/NSW",187,194,166,151,194,282,263,245,130,34,0,1836,
+"4375 crosses QLD/NSW",21,20,17,16,26,28,42,30,3,0,0,213,
+"4377 crosses QLD/NSW",62,51,41,50,74,96,100,55,16,0,0,538,
+"4380 crosses QLD/NSW",916,877,679,761,908,1074,1277,900,424,89,0,7907,
+"4383 crosses QLD/NSW",73,74,47,44,67,112,126,55,27,0,0,622,
+"4385 crosses QLD/NSW",136,111,99,113,133,172,206,153,85,7,0,1217,
+"4825 crosses QLD/NT",3277,2539,3371,3117,2584,2343,1234,569,198,19,0,19249,
+"Total",23575,21791,23028,23377,23810,23558,21055,13466,5866,1126,25,180674,
+
+"Data Source: Census of Population and Housing, 2016, TableBuilder"
+
+"INFO","Cells in this table have been randomly adjusted to avoid the release of confidential data. No reliance should be placed on small cells."
+
+
+"Copyright Commonwealth of Australia, 2018, see abs.gov.au/copyright"
+"ABS data licensed under Creative Commons, see abs.gov.au/ccby"

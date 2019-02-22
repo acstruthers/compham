@@ -54,6 +54,11 @@ public class CalibrateIndividuals {
 	private double bsAUOtherLiabilities;
 
 	// data sets
+	/**
+	 * ABS 3222.0 population projections<br>
+	 * Keys: Gender and age, Date.
+	 */
+	private Map<String, Map<Date, String>> abs3222_0;
 
 	/**
 	 * 
@@ -66,9 +71,69 @@ public class CalibrateIndividuals {
 	/**
 	 * Calibrates individual financials, and works out how many of each to create,
 	 * then adds them to the economy.
+	 * 
+	 * =============<br>
+	 * = ALGORITHM =<br>
+	 * =============<br>
+	 * 
+	 * I think I want to loop through the LGAs one at a time, creating all their
+	 * agents and Households before moving onto the next LGA. I need to work out how
+	 * to handle "orphan" individuals when aggregating into families. a possible
+	 * solution would be to randomly assign them to households. This is not
+	 * incongruous with the broader approach because it creates heterogeneity and
+	 * recognises that all the agents are built on a series of assumptions anyway.
+	 * 
+	 * It might be easier to calibrate the Household agents in here at the same time
+	 * that the Individual agents are created.
+	 * 
+	 * For the sake of this model, dwellings, households and families are considered
+	 * to be interchangeable.
+	 * 
+	 * ------------------------------------------------------------------------<br>
+	 * PART A: DETERMINING THE NUMBER AND TYPE OF INDIVIDUALS IN EACH LGA
+	 * ------------------------------------------------------------------------<br>
+	 * 
+	 * 1. ABS 3222.0: Get the sum of the 2018 population projections. This will be
+	 * the baseline we adjust the rest of the data against.
+	 * 
+	 * 2. ABS 2074.0: Sum the total number of dwellings and individuals for
+	 * Australia. Divide the total by the population projections from ABS 3222.0 to
+	 * get a multiplier that adjusts all LGA population and dwelling counts forward
+	 * from 2016 to 2018. Determine the number of dwellings and individuals per LGA,
+	 * and apply the population multiplier to each LGA to get the adjusted number of
+	 * persons and dwellings.
+	 * 
+	 * Use this as the list of LGAs to iterate over.
+	 * 
+	 * 
+	 * ------------------------------------------------------------------------<br>
+	 * PART B: DETERMINING THE NUMBER AND TYPE OF HOUSEHOLDS IN EACH LGA
+	 * ------------------------------------------------------------------------<br>
+	 * 
+	 * 
 	 */
 	public void createIndividualAgents() {
-		// TODO: implement me
+
+		// FIXME: implement me
+		/*
+		 * ------------------------------------------------------------------------<br>
+		 * PART A: DETERMINING THE NUMBER AND TYPE OF INDIVIDUALS IN EACH LGA
+		 * ------------------------------------------------------------------------<br>
+		 * 
+		 * 1. ABS 3222.0: Get the sum of the 2018 population projections. This will be
+		 * the baseline we adjust the rest of the data against.
+		 */
+		
+		//double totalPopAU = 
+
+		/*
+		 * 2. ABS 2074.0: Sum the total number of dwellings and individuals for
+		 * Australia. Divide the total by the population projections from ABS 3222.0 to
+		 * get a multiplier that adjusts all LGA population and dwelling counts forward
+		 * from 2016 to 2018. Determine the number of dwellings and individuals per LGA,
+		 * and apply the population multiplier to each LGA to get the adjusted number of
+		 * persons and dwellings.
+		 */
 
 		this.addAgentsToEconomy();
 	}

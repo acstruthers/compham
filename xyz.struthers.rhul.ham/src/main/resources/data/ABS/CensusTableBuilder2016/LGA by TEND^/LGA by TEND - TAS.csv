@@ -1,0 +1,50 @@
+Australian Bureau of Statistics
+
+"2016 Census - Selected Dwelling Characteristics"
+"LGA by TEND Tenure Type"
+"Counting: Dwellings Location on Census Night"
+
+Filters:
+"Default Summation","Dwellings Location on Census Night"
+
+"TEND Tenure Type","Owned outright","Owned with a mortgage","Being purchased under a shared equity scheme","Rented","Being occupied rent-free","Being occupied under a life tenure scheme","Other tenure type","Not stated","Not applicable","Total",
+"LGA",
+"Break O'Day (M)",1346,620,0,544,63,6,25,224,1714,4527,
+"Brighton (M)",1368,2383,11,1905,31,11,13,460,366,6553,
+"Burnie (C)",2426,2478,6,2380,55,15,19,572,948,8904,
+"Central Coast (M)",3426,2811,13,1912,55,32,26,583,1016,9869,
+"Central Highlands (M)",456,228,0,155,55,0,3,92,1585,2581,
+"Circular Head (M)",1028,991,0,692,142,10,21,267,693,3840,
+"Clarence (C)",7746,7935,28,4690,143,142,68,1160,1978,23893,
+"Derwent Valley (M)",1330,1446,4,898,45,13,9,310,397,4453,
+"Devonport (C)",3420,2881,16,3227,53,39,40,731,1153,11566,
+"Dorset (M)",1189,731,3,544,97,22,17,226,943,3776,
+"Flinders (M)",177,74,0,130,32,0,0,34,199,648,
+"George Town (M)",998,748,4,778,29,10,16,263,741,3587,
+"Glamorgan/Spring Bay (M)",926,431,0,391,60,7,15,186,2026,4045,
+"Glenorchy (C)",5472,6154,32,6226,109,69,58,1455,1500,21058,
+"Hobart (C)",6688,5666,16,6965,165,165,84,1480,2573,23810,
+"Huon Valley (M)",2631,2326,4,1037,107,19,34,495,1386,8031,
+"Kentish (M)",1027,822,0,317,31,9,6,187,320,2730,
+"King Island (M)",268,151,0,182,29,0,4,47,168,861,
+"Kingborough (M)",5140,5097,6,2737,100,80,50,712,1967,15884,
+"Latrobe (M)",1672,1336,5,944,47,35,19,303,769,5123,
+"Launceston (C)",7929,7976,31,8645,165,199,87,2141,2842,30012,
+"Meander Valley (M)",2990,2599,5,1510,114,15,38,534,863,8670,
+"Northern Midlands (M)",1976,1636,0,1068,130,18,26,423,669,5947,
+"Sorell (M)",1867,2389,3,1062,67,16,29,417,1274,7120,
+"Southern Midlands (M)",877,930,0,314,54,11,19,182,326,2712,
+"Tasman (M)",517,257,0,152,24,0,11,118,1177,2252,
+"Waratah/Wynyard (M)",2144,1733,9,1327,64,14,25,376,922,6611,
+"West Coast (M)",765,429,3,527,69,4,14,183,962,2945,
+"West Tamar (M)",3630,3154,3,1595,71,26,29,578,1406,10499,
+"Migratory - Offshore - Shipping (Tas.)",0,0,0,0,0,0,0,0,14,14,
+"Total",71412,66401,216,52853,2212,973,819,14722,32899,242514,
+
+"Data Source: Census of Population and Housing, 2016, TableBuilder"
+
+"INFO","Cells in this table have been randomly adjusted to avoid the release of confidential data. No reliance should be placed on small cells."
+
+
+"Copyright Commonwealth of Australia, 2018, see abs.gov.au/copyright"
+"ABS data licensed under Creative Commons, see abs.gov.au/ccby"

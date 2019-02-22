@@ -1,0 +1,22 @@
+Australian Bureau of Statistics
+
+"2016 Census - Selected Dwelling Characteristics"
+"LGA by TEND Tenure Type"
+"Counting: Dwellings Location on Census Night"
+
+Filters:
+"Default Summation","Dwellings Location on Census Night"
+
+"TEND Tenure Type","Owned outright","Owned with a mortgage","Being purchased under a shared equity scheme","Rented","Being occupied rent-free","Being occupied under a life tenure scheme","Other tenure type","Not stated","Not applicable","Total",
+"LGA",
+"Unincorp. Other Territories",417,306,0,515,97,23,31,165,454,2010,
+"Migratory - Offshore - Shipping (OT)",0,0,0,0,0,0,0,0,0,0,
+"Total",417,306,0,515,97,23,31,165,454,2006,
+
+"Data Source: Census of Population and Housing, 2016, TableBuilder"
+
+"INFO","Cells in this table have been randomly adjusted to avoid the release of confidential data. No reliance should be placed on small cells."
+
+
+"Copyright Commonwealth of Australia, 2018, see abs.gov.au/copyright"
+"ABS data licensed under Creative Commons, see abs.gov.au/ccby"

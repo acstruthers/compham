@@ -1,0 +1,39 @@
+Australian Bureau of Statistics
+
+"2016 Census - Selected Dwelling Characteristics"
+"LGA by TEND Tenure Type"
+"Counting: Dwellings Location on Census Night"
+
+Filters:
+"Default Summation","Dwellings Location on Census Night"
+
+"TEND Tenure Type","Owned outright","Owned with a mortgage","Being purchased under a shared equity scheme","Rented","Being occupied rent-free","Being occupied under a life tenure scheme","Other tenure type","Not stated","Not applicable","Total",
+"LGA",
+"Alice Springs (T)",1731,2858,36,3394,304,5,72,1423,1390,11224,
+"Barkly (R)",392,162,3,939,235,0,101,318,767,2914,
+"Belyuen (S)",0,0,0,34,0,0,5,3,6,41,
+"Central Desert (R)",61,14,0,528,125,0,21,105,306,1162,
+"Coomalie (S)",235,119,3,147,30,0,9,203,154,891,
+"Darwin (C)",5022,7735,72,12526,365,64,125,3963,3717,33592,
+"East Arnhem (R)",32,5,0,1056,194,0,24,145,353,1805,
+"Katherine (T)",704,725,0,1370,116,4,37,833,284,4072,
+"Litchfield (M)",2135,3103,6,1201,144,7,57,1167,614,8440,
+"MacDonnell (R)",170,17,0,761,137,0,55,459,414,2007,
+"Palmerston (C)",883,4268,57,5195,145,5,26,1255,1287,13119,
+"Roper Gulf (R)",537,59,0,810,120,3,64,435,264,2291,
+"Tiwi Islands (R)",9,0,0,489,55,3,7,59,111,733,
+"Victoria Daly (R)",207,29,0,376,117,5,24,191,285,1234,
+"Wagait (S)",63,86,0,32,3,0,0,11,86,289,
+"West Arnhem (R)",168,14,0,954,175,4,60,289,397,2050,
+"West Daly (R)",19,7,0,367,63,0,9,89,90,636,
+"Unincorporated NT",525,201,8,1476,400,7,74,591,927,4206,
+"Migratory - Offshore - Shipping (NT)",0,0,0,0,0,0,0,0,42,42,
+"Total",12886,19394,192,31652,2722,115,753,11533,11495,90735,
+
+"Data Source: Census of Population and Housing, 2016, TableBuilder"
+
+"INFO","Cells in this table have been randomly adjusted to avoid the release of confidential data. No reliance should be placed on small cells."
+
+
+"Copyright Commonwealth of Australia, 2018, see abs.gov.au/copyright"
+"ABS data licensed under Creative Commons, see abs.gov.au/ccby"
