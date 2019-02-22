@@ -40,22 +40,25 @@ public abstract class Tax {
 	public static final Double INCOME_TAX_THRESHOLD_3 = 21981d;
 	public static final Double INCOME_TAX_THRESHOLD_4 = 27476d;
 	public static final Double INCOME_TAX_THRESHOLD_5 = 37001d;
-	public static final Double INCOME_TAX_THRESHOLD_6 = 90001d;
-	public static final Double INCOME_TAX_THRESHOLD_7 = 180001d;
+	public static final Double INCOME_TAX_THRESHOLD_6 = 66668d;
+	public static final Double INCOME_TAX_THRESHOLD_7 = 90001d;
+	public static final Double INCOME_TAX_THRESHOLD_8 = 180001d;
 	public static final Double INCOME_TAX_BASE_AMT_1 = 0d;
 	public static final Double INCOME_TAX_BASE_AMT_2 = 0d;
 	public static final Double INCOME_TAX_BASE_AMT_3 = 0d;
 	public static final Double INCOME_TAX_BASE_AMT_4 = 0d;
 	public static final Double INCOME_TAX_BASE_AMT_5 = 3572d;
-	public static final Double INCOME_TAX_BASE_AMT_6 = 20797d;
-	public static final Double INCOME_TAX_BASE_AMT_7 = 54097d;
+	public static final Double INCOME_TAX_BASE_AMT_6 = 13213.78d;
+	public static final Double INCOME_TAX_BASE_AMT_7 = 20797d;
+	public static final Double INCOME_TAX_BASE_AMT_8 = 54097d;
 	public static final Double INCOME_TAX_RATE_1 = 0d;
 	public static final Double INCOME_TAX_RATE_2 = 0.19d;
 	public static final Double INCOME_TAX_RATE_3 = 0.19d;
 	public static final Double INCOME_TAX_RATE_4 = 0.19d;
 	public static final Double INCOME_TAX_RATE_5 = 0.325d;
 	public static final Double INCOME_TAX_RATE_6 = 0.325d;
-	public static final Double INCOME_TAX_RATE_7 = 0.45d;
+	public static final Double INCOME_TAX_RATE_7 = 0.37d;
+	public static final Double INCOME_TAX_RATE_8 = 0.45d;
 	public static final Double MEDICARE_LEVY_RATE_1 = 0d;
 	public static final Double MEDICARE_LEVY_RATE_2 = 0d;
 	public static final Double MEDICARE_LEVY_RATE_3 = 0.01d;
@@ -63,6 +66,7 @@ public abstract class Tax {
 	public static final Double MEDICARE_LEVY_RATE_5 = 0.02d;
 	public static final Double MEDICARE_LEVY_RATE_6 = 0.02d;
 	public static final Double MEDICARE_LEVY_RATE_7 = 0.02d;
+	public static final Double MEDICARE_LEVY_RATE_8 = 0.02d;
 	public static final Double MEDICARE_LEVY_BASE_AMT_1 = 0d;
 	public static final Double MEDICARE_LEVY_BASE_AMT_2 = MEDICARE_LEVY_BASE_AMT_1
 			+ INCOME_TAX_THRESHOLD_1 * MEDICARE_LEVY_RATE_1;
@@ -76,6 +80,24 @@ public abstract class Tax {
 			+ (INCOME_TAX_THRESHOLD_5 - INCOME_TAX_THRESHOLD_4) * MEDICARE_LEVY_RATE_5;
 	public static final Double MEDICARE_LEVY_BASE_AMT_7 = MEDICARE_LEVY_BASE_AMT_6
 			+ (INCOME_TAX_THRESHOLD_6 - INCOME_TAX_THRESHOLD_5) * MEDICARE_LEVY_RATE_6;
+	public static final Double MEDICARE_LEVY_BASE_AMT_8 = MEDICARE_LEVY_BASE_AMT_7
+			+ (INCOME_TAX_THRESHOLD_7 - INCOME_TAX_THRESHOLD_6) * MEDICARE_LEVY_RATE_7;
+	public static final Double LOW_INCOME_TAX_OFFSET_AMT_1 = 445d;
+	public static final Double LOW_INCOME_TAX_OFFSET_AMT_2 = 445d;
+	public static final Double LOW_INCOME_TAX_OFFSET_AMT_3 = 445d;
+	public static final Double LOW_INCOME_TAX_OFFSET_AMT_4 = 445d;
+	public static final Double LOW_INCOME_TAX_OFFSET_AMT_5 = 445d;
+	public static final Double LOW_INCOME_TAX_OFFSET_AMT_6 = 0d;
+	public static final Double LOW_INCOME_TAX_OFFSET_AMT_7 = 0d;
+	public static final Double LOW_INCOME_TAX_OFFSET_AMT_8 = 0d;
+	public static final Double LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_1 = 0d;
+	public static final Double LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_2 = 0d;
+	public static final Double LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_3 = 0d;
+	public static final Double LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_4 = 0d;
+	public static final Double LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_5 = 0.015d;
+	public static final Double LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_6 = 0d;
+	public static final Double LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_7 = 0d;
+	public static final Double LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_8 = 0d;
 
 	/**
 	 * 
@@ -178,6 +200,12 @@ public abstract class Tax {
 	/**
 	 * Calculates and Individual's tax expense for a single month.
 	 * 
+	 * SOURCES:<br>
+	 * https://www.ato.gov.au/rates/individual-income-tax-rates/<br>
+	 * https://www.ato.gov.au/Individuals/Medicare-levy/<br>
+	 * https://www.ato.gov.au/individuals/medicare-levy/medicare-levy-reduction-for-low-income-earners/<br>
+	 * https://www.ato.gov.au/individuals/income-and-deductions/offsets-and-rebates/low-income-earners/<br>
+	 * 
 	 * @param taxableIncomePerMonth - the individual's taxable income, measured on a
 	 *                              monthly basis
 	 * @return the amount of tax due to the ATO (i.e. AustralianGovernment)
@@ -188,27 +216,45 @@ public abstract class Tax {
 
 		// calculate tax using marginal tax rates
 		double incomeTax = 0d;
-		if (taxableIncome > INCOME_TAX_THRESHOLD_7) {
+		if (taxableIncome > INCOME_TAX_THRESHOLD_8) {
+			incomeTax = INCOME_TAX_BASE_AMT_8 + MEDICARE_LEVY_BASE_AMT_8
+					+ (taxableIncome - INCOME_TAX_BASE_AMT_8) * (INCOME_TAX_RATE_8 + MEDICARE_LEVY_RATE_8)
+					- LOW_INCOME_TAX_OFFSET_AMT_8
+					+ (taxableIncome - LOW_INCOME_TAX_OFFSET_AMT_7) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_8;
+		} else if (taxableIncome > INCOME_TAX_THRESHOLD_7) {
 			incomeTax = INCOME_TAX_BASE_AMT_7 + MEDICARE_LEVY_BASE_AMT_7
-					+ (taxableIncome - INCOME_TAX_BASE_AMT_7) * (INCOME_TAX_RATE_7 + MEDICARE_LEVY_RATE_7);
+					+ (taxableIncome - INCOME_TAX_BASE_AMT_7) * (INCOME_TAX_RATE_7 + MEDICARE_LEVY_RATE_7)
+					- LOW_INCOME_TAX_OFFSET_AMT_7
+					+ (taxableIncome - LOW_INCOME_TAX_OFFSET_AMT_6) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_7;
 		} else if (taxableIncome > INCOME_TAX_THRESHOLD_6) {
 			incomeTax = INCOME_TAX_BASE_AMT_6 + MEDICARE_LEVY_BASE_AMT_6
-					+ (taxableIncome - INCOME_TAX_BASE_AMT_6) * (INCOME_TAX_RATE_6 + MEDICARE_LEVY_RATE_6);
+					+ (taxableIncome - INCOME_TAX_BASE_AMT_6) * (INCOME_TAX_RATE_6 + MEDICARE_LEVY_RATE_6)
+					- LOW_INCOME_TAX_OFFSET_AMT_6
+					+ (taxableIncome - LOW_INCOME_TAX_OFFSET_AMT_5) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_6;
 		} else if (taxableIncome > INCOME_TAX_THRESHOLD_5) {
 			incomeTax = INCOME_TAX_BASE_AMT_5 + MEDICARE_LEVY_BASE_AMT_5
-					+ (taxableIncome - INCOME_TAX_BASE_AMT_5) * (INCOME_TAX_RATE_5 + MEDICARE_LEVY_RATE_5);
+					+ (taxableIncome - INCOME_TAX_BASE_AMT_5) * (INCOME_TAX_RATE_5 + MEDICARE_LEVY_RATE_5)
+					- LOW_INCOME_TAX_OFFSET_AMT_5
+					+ (taxableIncome - LOW_INCOME_TAX_OFFSET_AMT_4) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_5;
 		} else if (taxableIncome > INCOME_TAX_THRESHOLD_4) {
 			incomeTax = INCOME_TAX_BASE_AMT_4 + MEDICARE_LEVY_BASE_AMT_4
-					+ (taxableIncome - INCOME_TAX_BASE_AMT_4) * (INCOME_TAX_RATE_4 + MEDICARE_LEVY_RATE_4);
+					+ (taxableIncome - INCOME_TAX_BASE_AMT_4) * (INCOME_TAX_RATE_4 + MEDICARE_LEVY_RATE_4)
+					- LOW_INCOME_TAX_OFFSET_AMT_4
+					+ (taxableIncome - LOW_INCOME_TAX_OFFSET_AMT_3) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_4;
 		} else if (taxableIncome > INCOME_TAX_THRESHOLD_3) {
 			incomeTax = INCOME_TAX_BASE_AMT_3 + MEDICARE_LEVY_BASE_AMT_3
-					+ (taxableIncome - INCOME_TAX_BASE_AMT_3) * (INCOME_TAX_RATE_3 + MEDICARE_LEVY_RATE_3);
+					+ (taxableIncome - INCOME_TAX_BASE_AMT_3) * (INCOME_TAX_RATE_3 + MEDICARE_LEVY_RATE_3)
+					- LOW_INCOME_TAX_OFFSET_AMT_3
+					+ (taxableIncome - LOW_INCOME_TAX_OFFSET_AMT_2) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_3;
 		} else if (taxableIncome > INCOME_TAX_THRESHOLD_2) {
 			incomeTax = INCOME_TAX_BASE_AMT_2 + MEDICARE_LEVY_BASE_AMT_2
-					+ (taxableIncome - INCOME_TAX_BASE_AMT_2) * (INCOME_TAX_RATE_2 + MEDICARE_LEVY_RATE_2);
+					+ (taxableIncome - INCOME_TAX_BASE_AMT_2) * (INCOME_TAX_RATE_2 + MEDICARE_LEVY_RATE_2)
+					- LOW_INCOME_TAX_OFFSET_AMT_2
+					+ (taxableIncome - LOW_INCOME_TAX_OFFSET_AMT_1) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_2;
 		} else if (taxableIncome > INCOME_TAX_THRESHOLD_1) {
 			incomeTax = INCOME_TAX_BASE_AMT_1 + MEDICARE_LEVY_BASE_AMT_1
-					+ (taxableIncome - INCOME_TAX_BASE_AMT_1) * (INCOME_TAX_RATE_1 + MEDICARE_LEVY_RATE_1);
+					+ (taxableIncome - INCOME_TAX_BASE_AMT_1) * (INCOME_TAX_RATE_1 + MEDICARE_LEVY_RATE_1)
+					- LOW_INCOME_TAX_OFFSET_AMT_1 + taxableIncome * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_1;
 		} else {
 			incomeTax = 0d;
 		}
