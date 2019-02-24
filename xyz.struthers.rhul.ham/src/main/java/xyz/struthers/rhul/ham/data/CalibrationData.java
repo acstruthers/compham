@@ -43,18 +43,37 @@ import xyz.struthers.rhul.ham.config.Properties;
 public class CalibrationData {
 
 	// multipliers
-	public static final Double BILLION = 1000000000d;
-	public static final Double MILLION = 1000000d;
-	public static final Double THOUSAND = 1000d;
-	public static final Double PERCENT = 0.01d;
+	public static final double BILLION = 1000000000d;
+	public static final double MILLION = 1000000d;
+	public static final double THOUSAND = 1000d;
+	public static final double PERCENT = 0.01d;
+
+	// map implementation optimisation
+	public static final double MAP_LOAD_FACTOR = 0.75d;
+	
+	public static final int MAP_INIT_SIZE_LGA = (int) Math.ceil(573 / MAP_LOAD_FACTOR); // 572 (UR) including state
+																						// totals (563 Enum)
+	public static final int MAP_INIT_SIZE_AGE5P = (int) Math.ceil(22 / MAP_LOAD_FACTOR); // 21 plus totals
+	public static final int MAP_INIT_SIZE_CDCF = (int) Math.ceil(15 / MAP_LOAD_FACTOR); // 15 (no totals in data)
+	public static final int MAP_INIT_SIZE_FINF = (int) Math.ceil(25 / MAP_LOAD_FACTOR); // 25 plus totals
+	public static final int MAP_INIT_SIZE_HCFMD = (int) Math.ceil(18 / MAP_LOAD_FACTOR); // 17 plus totals
+	public static final int MAP_INIT_SIZE_HIND = (int) Math.ceil(26 / MAP_LOAD_FACTOR); // 25 plus totals
+	public static final int MAP_INIT_SIZE_INCP = (int) Math.ceil(18 / MAP_LOAD_FACTOR); // 17 plus totals
+	public static final int MAP_INIT_SIZE_INDP = (int) Math.ceil(23 / MAP_LOAD_FACTOR); // 22 plus totals
+	public static final int MAP_INIT_SIZE_MRERD = (int) Math.ceil(22 / MAP_LOAD_FACTOR); // 21 plus totals
+	public static final int MAP_INIT_SIZE_RNTRD = (int) Math.ceil(26 / MAP_LOAD_FACTOR); // 25 plus totals
+	public static final int MAP_INIT_SIZE_TEND = (int) Math.ceil(10 / MAP_LOAD_FACTOR); // 9 plus totals
+	public static final int MAP_INIT_SIZE_SEXP = (int) Math.ceil(2 / MAP_LOAD_FACTOR); // 2 (no totals in data)
 
 	// series names
 	public static final String RBA_E1 = "RBA_E1"; // household & business Balance Sheet
 	public static final String RBA_E2 = "RBA_E2"; // household Balance Sheet ratios
+
 	public static final String ABS1292_0_55_002_ANZSIC = "ABS_1292.0.55.002_ANZSIC";
 	public static final String ABS1410_0_ECONOMY = "ABS_1410.0_Economy";
 	public static final String ABS1410_0_FAMILY = "ABS_1410.0_Family";
 	public static final String ABS1410_0_INCOME = "ABS_1410.0_Income";
+	public static final String ABS_2074_0 = "ABS_2074.0"; // people & dwelling count by meshblock
 	public static final String ABS_3222_0 = "ABS_3222.0"; // population projections
 	public static final String ABS_5368_0_T14A = "ABS_5368.0_Table14a"; // exports by country
 	public static final String ABS_5368_0_T14B = "ABS_5368.0_Table14b"; // imports by country
@@ -95,11 +114,18 @@ public class CalibrationData {
 	public static final String ABS8165_0_T17 = "ABS_8165.0_Table17";
 	public static final String ABS8167_0_T3 = "ABS_8167.0_Table3";
 	public static final String ABS8167_0_T6 = "ABS_8167.0_Table3";
+
 	public static final String ATO_COMPANY_T4A = "ATO_CompanyTable4A";
 	public static final String ATO_COMPANY_T4B = "ATO_CompanyTable4B";
-	public static final String LGA_BY_INCP = "Census_LGA_INCP";
-	public static final String LGA_BY_MRERD = "Census_LGA_MRERD";
-	public static final String LGA_BY_RNTRD = "Census_LGA_RNTRD";
+	public static final String ATO_INDIVIDUAL_T6B = "ATO_IndividualTable6B";
+	public static final String ATO_INDIVIDUAL_T6C = "ATO_IndividualTable6C";
+	public static final String ATO_INDIVIDUAL_T9 = "ATO_IndividualTable9";
+
+	public static final String CENSUS_SEXP_LGA_AGE5P_INDP_INCP = "Census SEXP by LGA (UR) by AGE5P, INDP and INCP";
+	public static final String CENSUS_HCFMD_TEND_LGA_HIND_RNTRD = "Census HCFMD and TEND by LGA by HIND and RNTRD";
+	public static final String CENSUS_HCFMD_TEND_LGA_HIND_MRERD = "Census HCFMD and TEND by LGA by HIND and MRERD";
+	public static final String CENSUS_CDCF_LGA_FINF = "Census CDCF by LGA by FINF";
+
 	public static final String ADI_DATA = "ADI_Data";
 	public static final String CCY_DATA = "Currency_Data";
 	public static final String COUNTRY_DATA = "Country_Data";
@@ -125,6 +151,7 @@ public class CalibrationData {
 	private Map<String, Map<String, Map<String, String>>> abs1410_0Family; // Data by LGA: Family (keys: year, LGA,
 																			// series)
 	private Map<String, Map<String, Map<String, String>>> abs1410_0Income; // Data by LGA: Income
+	private Map<String, Map<String, String>> abs2074_0; // People and Dwellings count by Meshblock
 	private Map<String, Map<Date, String>> abs3222_0; // AU by gender and age
 	private Map<String, Map<Date, String>> abs5368_0Table14a; // exports by country
 	private Map<String, Map<Date, String>> abs5368_0Table14b; // imports by country
@@ -199,6 +226,9 @@ public class CalibrationData {
 	private Map<String, Map<String, String>> abs8167_0Table6; // main supplier
 	private Map<String, Map<String, String>> atoCompanyTable4a; // ATO Fine Industry Detailed P&L and Bal Sht
 	private Map<String, Map<String, String>> atoCompanyTable4b; // Industry Code Total P&L
+	private Map<String, Map<String, String>> atoIndividualTable6b; // P&L and people count by post code
+	private Map<String, Map<String, String>> atoIndividualTable6c; // Income ranges people count by post code
+	private Map<String, Map<String, String>> atoIndividualTable9; // P&L by industry code
 	/**
 	 * ABS Census Table Builder data:<br>
 	 * SEXP by LGA (UR) by AGE5P, INDP and INCP<br>
@@ -236,7 +266,7 @@ public class CalibrationData {
 	 * Keys: Family Income, LGA, Family Composition<br>
 	 * Values: Number of families
 	 */
-	private Map<String, Map<String, String>> censusCDCF_LGA_FINF;
+	private Map<String, Map<String, Map<String, String>>> censusCDCF_LGA_FINF;
 
 	private boolean initialisedCensusSEXP_LGA_AGE5P_INDP_INCP;
 	private boolean initialisedCensusHCFMD_TEND_LGA_HIND_RNTRD;
@@ -695,104 +725,219 @@ public class CalibrationData {
 		this.loadAbsDataRowsColumnsCsv("/data/ABS/8167.0_BusMktAndComp/Table6.csv", ABS8167_0_T6,
 				abs8167_0Table6Columns, abs8167_0Table6Rows, abs8167_0titleRow, this.title, this.abs8167_0Table6);
 
-		// ABS Census: LGA by INCP by INDP
-		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS Census LGA by INCP data");
-		this.censusLGA_INCP_INDP = new HashMap<String, Map<String, Map<String, String>>>();
-		int[] censusLgaByINCPColumns = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-				22 };
-		this.loadAbsCensusTableCsv3D("/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - ACT.csv",
-				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLGA_INCP_INDP, this.title,
-				this.censusLGA_INCP_INDP);
-		this.loadAbsCensusTableCsv3D("/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - NSW.csv",
-				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLGA_INCP_INDP, this.title,
-				this.censusLGA_INCP_INDP);
-		this.loadAbsCensusTableCsv3D("/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - NT.csv",
-				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLGA_INCP_INDP, this.title,
-				this.censusLGA_INCP_INDP);
-		this.loadAbsCensusTableCsv3D("/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - OT.csv",
-				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLGA_INCP_INDP, this.title,
-				this.censusLGA_INCP_INDP);
-		this.loadAbsCensusTableCsv3D("/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - QLD.csv",
-				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLGA_INCP_INDP, this.title,
-				this.censusLGA_INCP_INDP);
-		this.loadAbsCensusTableCsv3D("/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - SA.csv",
-				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLGA_INCP_INDP, this.title,
-				this.censusLGA_INCP_INDP);
-		this.loadAbsCensusTableCsv3D("/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - TAS.csv",
-				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLGA_INCP_INDP, this.title,
-				this.censusLGA_INCP_INDP);
-		this.loadAbsCensusTableCsv3D("/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - VIC.csv",
-				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLGA_INCP_INDP, this.title,
-				this.censusLGA_INCP_INDP);
-		this.loadAbsCensusTableCsv3D("/data/ABS/CensusTableBuilder2016/LGA by INCP/LGA (UR) by INCP - WA.csv",
-				CalibrationData.LGA_BY_INCP, censusLgaByINCPColumns, this.initialisedCensusLGA_INCP_INDP, this.title,
-				this.censusLGA_INCP_INDP);
+		// ABS Census SEXP by LGA (UR) by AGE5P, INDP and INCP
+		System.out.print(new Date(System.currentTimeMillis())
+				+ ": Loading ABS Census SEXP by LGA (UR) by AGE5P, INDP and INCP data");
+		this.censusSEXP_LGA_AGE5P_INDP_INCP = new HashMap<String, Map<String, Map<String, Map<String, Map<String, String>>>>>(
+				MAP_INIT_SIZE_AGE5P);
+		int fromColumnSEXP_LGA_AGE5P_INDP_INCP = 1;
+		int toColumnSEXP_LGA_AGE5P_INDP_INCP = 8229;
+		System.out.print(": NSW");
+		this.loadAbsCensusTableCsv3Columns1Wafer(
+				"/data/ABS/CensusTableBuilder2016/SEXP by LGA (UR) by AGE5P, INDP and INCP/SEXP by LGA (UR) by AGE5P, INDP and INCP - NSW.csv",
+				this.initialisedCensusSEXP_LGA_AGE5P_INDP_INCP, fromColumnSEXP_LGA_AGE5P_INDP_INCP,
+				toColumnSEXP_LGA_AGE5P_INDP_INCP, this.censusSEXP_LGA_AGE5P_INDP_INCP);
+		this.initialisedCensusSEXP_LGA_AGE5P_INDP_INCP = true;
+		System.out.print(", VIC");
+		this.loadAbsCensusTableCsv3Columns1Wafer(
+				"/data/ABS/CensusTableBuilder2016/SEXP by LGA (UR) by AGE5P, INDP and INCP/SEXP by LGA (UR) by AGE5P, INDP and INCP - VIC.csv",
+				this.initialisedCensusSEXP_LGA_AGE5P_INDP_INCP, fromColumnSEXP_LGA_AGE5P_INDP_INCP,
+				toColumnSEXP_LGA_AGE5P_INDP_INCP, this.censusSEXP_LGA_AGE5P_INDP_INCP);
+		System.out.print(", QLD");
+		this.loadAbsCensusTableCsv3Columns1Wafer(
+				"/data/ABS/CensusTableBuilder2016/SEXP by LGA (UR) by AGE5P, INDP and INCP/SEXP by LGA (UR) by AGE5P, INDP and INCP - QLD.csv",
+				this.initialisedCensusSEXP_LGA_AGE5P_INDP_INCP, fromColumnSEXP_LGA_AGE5P_INDP_INCP,
+				toColumnSEXP_LGA_AGE5P_INDP_INCP, this.censusSEXP_LGA_AGE5P_INDP_INCP);
+		System.out.print(", SA");
+		this.loadAbsCensusTableCsv3Columns1Wafer(
+				"/data/ABS/CensusTableBuilder2016/SEXP by LGA (UR) by AGE5P, INDP and INCP/SEXP by LGA (UR) by AGE5P, INDP and INCP - SA.csv",
+				this.initialisedCensusSEXP_LGA_AGE5P_INDP_INCP, fromColumnSEXP_LGA_AGE5P_INDP_INCP,
+				toColumnSEXP_LGA_AGE5P_INDP_INCP, this.censusSEXP_LGA_AGE5P_INDP_INCP);
+		System.out.print(", WA");
+		this.loadAbsCensusTableCsv3Columns1Wafer(
+				"/data/ABS/CensusTableBuilder2016/SEXP by LGA (UR) by AGE5P, INDP and INCP/SEXP by LGA (UR) by AGE5P, INDP and INCP - WA.csv",
+				this.initialisedCensusSEXP_LGA_AGE5P_INDP_INCP, fromColumnSEXP_LGA_AGE5P_INDP_INCP,
+				toColumnSEXP_LGA_AGE5P_INDP_INCP, this.censusSEXP_LGA_AGE5P_INDP_INCP);
+		System.out.print(", TAS");
+		this.loadAbsCensusTableCsv3Columns1Wafer(
+				"/data/ABS/CensusTableBuilder2016/SEXP by LGA (UR) by AGE5P, INDP and INCP/SEXP by LGA (UR) by AGE5P, INDP and INCP - TAS.csv",
+				this.initialisedCensusSEXP_LGA_AGE5P_INDP_INCP, fromColumnSEXP_LGA_AGE5P_INDP_INCP,
+				toColumnSEXP_LGA_AGE5P_INDP_INCP, this.censusSEXP_LGA_AGE5P_INDP_INCP);
+		System.out.print(", NT");
+		this.loadAbsCensusTableCsv3Columns1Wafer(
+				"/data/ABS/CensusTableBuilder2016/SEXP by LGA (UR) by AGE5P, INDP and INCP/SEXP by LGA (UR) by AGE5P, INDP and INCP - NT.csv",
+				this.initialisedCensusSEXP_LGA_AGE5P_INDP_INCP, fromColumnSEXP_LGA_AGE5P_INDP_INCP,
+				toColumnSEXP_LGA_AGE5P_INDP_INCP, this.censusSEXP_LGA_AGE5P_INDP_INCP);
+		System.out.print(", ACT");
+		this.loadAbsCensusTableCsv3Columns1Wafer(
+				"/data/ABS/CensusTableBuilder2016/SEXP by LGA (UR) by AGE5P, INDP and INCP/SEXP by LGA (UR) by AGE5P, INDP and INCP - ACT.csv",
+				this.initialisedCensusSEXP_LGA_AGE5P_INDP_INCP, fromColumnSEXP_LGA_AGE5P_INDP_INCP,
+				toColumnSEXP_LGA_AGE5P_INDP_INCP, this.censusSEXP_LGA_AGE5P_INDP_INCP);
+		System.out.println(", OT.");
+		this.loadAbsCensusTableCsv3Columns1Wafer(
+				"/data/ABS/CensusTableBuilder2016/SEXP by LGA (UR) by AGE5P, INDP and INCP/SEXP by LGA (UR) by AGE5P, INDP and INCP - OT.csv",
+				this.initialisedCensusSEXP_LGA_AGE5P_INDP_INCP, fromColumnSEXP_LGA_AGE5P_INDP_INCP,
+				toColumnSEXP_LGA_AGE5P_INDP_INCP, this.censusSEXP_LGA_AGE5P_INDP_INCP);
 
-		// ABS Census: LGA by MRERD
-		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS Census LGA by MRERD data");
-		this.censusLGA_MRERD = new HashMap<String, Map<String, String>>();
-		int[] censusLgaByMRERDColumns = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-				22 };
-		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - ACT.csv",
-				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLGA_MRERD, this.title,
-				this.censusLGA_MRERD);
-		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - NSW.csv",
-				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLGA_MRERD, this.title,
-				this.censusLGA_MRERD);
-		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - NT.csv",
-				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLGA_MRERD, this.title,
-				this.censusLGA_MRERD);
-		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - OT.csv",
-				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLGA_MRERD, this.title,
-				this.censusLGA_MRERD);
-		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - QLD.csv",
-				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLGA_MRERD, this.title,
-				this.censusLGA_MRERD);
-		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - SA.csv",
-				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLGA_MRERD, this.title,
-				this.censusLGA_MRERD);
-		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - TAS.csv",
-				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLGA_MRERD, this.title,
-				this.censusLGA_MRERD);
-		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - VIC.csv",
-				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLGA_MRERD, this.title,
-				this.censusLGA_MRERD);
-		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by MRERD/LGA by MRERD - WA.csv",
-				CalibrationData.LGA_BY_MRERD, censusLgaByMRERDColumns, this.initialisedCensusLGA_MRERD, this.title,
-				this.censusLGA_MRERD);
+		// ABS Census HCFMD and TEND by LGA by HIND and RNTRD
+		System.out.print(new Date(System.currentTimeMillis())
+				+ ": Loading ABS Census HCFMD and TEND by LGA by HIND and RNTRD data");
+		this.censusHCFMD_TEND_LGA_HIND_RNTRD = new HashMap<String, Map<String, Map<String, Map<String, Map<String, String>>>>>(
+				MAP_INIT_SIZE_HIND);
+		int fromColumnHCFMD_TEND_LGA_HIND_RNTRD = 1;
+		int toColumnHCFMD_TEND_LGA_HIND_RNTRD = 651;
+		System.out.print(": NSW");
+		this.loadAbsCensusTableCsv2Columns2Wafers(
+				"/data/ABS/CensusTableBuilder2016/HCFMD and TEND by LGA by HIND and RNTRD/HCFMD and TEND by LGA by HIND and RNTRD - NSW.csv",
+				this.initialisedCensusHCFMD_TEND_LGA_HIND_RNTRD, fromColumnHCFMD_TEND_LGA_HIND_RNTRD,
+				toColumnHCFMD_TEND_LGA_HIND_RNTRD, this.censusHCFMD_TEND_LGA_HIND_RNTRD);
+		this.initialisedCensusHCFMD_TEND_LGA_HIND_RNTRD = true;
+		System.out.print(", VIC");
+		this.loadAbsCensusTableCsv2Columns2Wafers(
+				"/data/ABS/CensusTableBuilder2016/HCFMD and TEND by LGA by HIND and RNTRD/HCFMD and TEND by LGA by HIND and RNTRD - VIC.csv",
+				this.initialisedCensusHCFMD_TEND_LGA_HIND_RNTRD, fromColumnHCFMD_TEND_LGA_HIND_RNTRD,
+				toColumnHCFMD_TEND_LGA_HIND_RNTRD, this.censusHCFMD_TEND_LGA_HIND_RNTRD);
+		System.out.print(", QLD");
+		this.loadAbsCensusTableCsv2Columns2Wafers(
+				"/data/ABS/CensusTableBuilder2016/HCFMD and TEND by LGA by HIND and RNTRD/HCFMD and TEND by LGA by HIND and RNTRD - QLD.csv",
+				this.initialisedCensusHCFMD_TEND_LGA_HIND_RNTRD, fromColumnHCFMD_TEND_LGA_HIND_RNTRD,
+				toColumnHCFMD_TEND_LGA_HIND_RNTRD, this.censusHCFMD_TEND_LGA_HIND_RNTRD);
+		System.out.print(", SA");
+		this.loadAbsCensusTableCsv2Columns2Wafers(
+				"/data/ABS/CensusTableBuilder2016/HCFMD and TEND by LGA by HIND and RNTRD/HCFMD and TEND by LGA by HIND and RNTRD - SA.csv",
+				this.initialisedCensusHCFMD_TEND_LGA_HIND_RNTRD, fromColumnHCFMD_TEND_LGA_HIND_RNTRD,
+				toColumnHCFMD_TEND_LGA_HIND_RNTRD, this.censusHCFMD_TEND_LGA_HIND_RNTRD);
+		System.out.print(", WA");
+		this.loadAbsCensusTableCsv2Columns2Wafers(
+				"/data/ABS/CensusTableBuilder2016/HCFMD and TEND by LGA by HIND and RNTRD/HCFMD and TEND by LGA by HIND and RNTRD - WA.csv",
+				this.initialisedCensusHCFMD_TEND_LGA_HIND_RNTRD, fromColumnHCFMD_TEND_LGA_HIND_RNTRD,
+				toColumnHCFMD_TEND_LGA_HIND_RNTRD, this.censusHCFMD_TEND_LGA_HIND_RNTRD);
+		System.out.print(", TAS");
+		this.loadAbsCensusTableCsv2Columns2Wafers(
+				"/data/ABS/CensusTableBuilder2016/HCFMD and TEND by LGA by HIND and RNTRD/HCFMD and TEND by LGA by HIND and RNTRD - TAS.csv",
+				this.initialisedCensusHCFMD_TEND_LGA_HIND_RNTRD, fromColumnHCFMD_TEND_LGA_HIND_RNTRD,
+				toColumnHCFMD_TEND_LGA_HIND_RNTRD, this.censusHCFMD_TEND_LGA_HIND_RNTRD);
+		System.out.print(", NT");
+		this.loadAbsCensusTableCsv2Columns2Wafers(
+				"/data/ABS/CensusTableBuilder2016/HCFMD and TEND by LGA by HIND and RNTRD/HCFMD and TEND by LGA by HIND and RNTRD - NT.csv",
+				this.initialisedCensusHCFMD_TEND_LGA_HIND_RNTRD, fromColumnHCFMD_TEND_LGA_HIND_RNTRD,
+				toColumnHCFMD_TEND_LGA_HIND_RNTRD, this.censusHCFMD_TEND_LGA_HIND_RNTRD);
+		System.out.print(", ACT");
+		this.loadAbsCensusTableCsv2Columns2Wafers(
+				"/data/ABS/CensusTableBuilder2016/HCFMD and TEND by LGA by HIND and RNTRD/HCFMD and TEND by LGA by HIND and RNTRD - ACT.csv",
+				this.initialisedCensusHCFMD_TEND_LGA_HIND_RNTRD, fromColumnHCFMD_TEND_LGA_HIND_RNTRD,
+				toColumnHCFMD_TEND_LGA_HIND_RNTRD, this.censusHCFMD_TEND_LGA_HIND_RNTRD);
+		System.out.println(", OT.");
+		this.loadAbsCensusTableCsv2Columns2Wafers(
+				"/data/ABS/CensusTableBuilder2016/HCFMD and TEND by LGA by HIND and RNTRD/HCFMD and TEND by LGA by HIND and RNTRD - OT.csv",
+				this.initialisedCensusHCFMD_TEND_LGA_HIND_RNTRD, fromColumnHCFMD_TEND_LGA_HIND_RNTRD,
+				toColumnHCFMD_TEND_LGA_HIND_RNTRD, this.censusHCFMD_TEND_LGA_HIND_RNTRD);
 
-		// ABS Census: LGA by RNTRD
-		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS Census LGA by RNTRD data");
-		this.censusLGA_RNTRD = new HashMap<String, Map<String, String>>();
-		int[] censusLgaByRNTRDColumns = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-				23, 24, 25, 26 };
-		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - ACT.csv",
-				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLGA_RNTRD, this.title,
-				this.censusLGA_RNTRD);
-		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - NSW.csv",
-				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLGA_RNTRD, this.title,
-				this.censusLGA_RNTRD);
-		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - NT.csv",
-				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLGA_RNTRD, this.title,
-				this.censusLGA_RNTRD);
-		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - OT.csv",
-				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLGA_RNTRD, this.title,
-				this.censusLGA_RNTRD);
-		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - QLD.csv",
-				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLGA_RNTRD, this.title,
-				this.censusLGA_RNTRD);
-		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - SA.csv",
-				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLGA_RNTRD, this.title,
-				this.censusLGA_RNTRD);
-		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - TAS.csv",
-				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLGA_RNTRD, this.title,
-				this.censusLGA_RNTRD);
-		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - VIC.csv",
-				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLGA_RNTRD, this.title,
-				this.censusLGA_RNTRD);
-		this.loadAbsCensusTableCsv2D("/data/ABS/CensusTableBuilder2016/LGA by RNTRD/LGA by RNTRD - WA.csv",
-				CalibrationData.LGA_BY_RNTRD, censusLgaByRNTRDColumns, this.initialisedCensusLGA_RNTRD, this.title,
-				this.censusLGA_RNTRD);
+		// ABS Census HCFMD and TEND by LGA by HIND and MRERD
+		System.out.print(new Date(System.currentTimeMillis())
+				+ ": Loading ABS Census HCFMD and TEND by LGA by HIND and MRERD data");
+		this.censusHCFMD_TEND_LGA_HIND_MRERD = new HashMap<String, Map<String, Map<String, Map<String, Map<String, String>>>>>(
+				MAP_INIT_SIZE_HIND);
+		int fromColumnHCFMD_TEND_LGA_HIND_MRERD = 1;
+		int toColumnHCFMD_TEND_LGA_HIND_MRERD = 547;
+		System.out.print(": NSW");
+		this.loadAbsCensusTableCsv2Columns2Wafers(
+				"/data/ABS/CensusTableBuilder2016/HCFMD and TEND by LGA by HIND and MRERD/HCFMD and TEND by LGA by HIND and MRERD - NSW.csv",
+				this.initialisedCensusHCFMD_TEND_LGA_HIND_MRERD, fromColumnHCFMD_TEND_LGA_HIND_MRERD,
+				toColumnHCFMD_TEND_LGA_HIND_MRERD, this.censusHCFMD_TEND_LGA_HIND_MRERD);
+		this.initialisedCensusHCFMD_TEND_LGA_HIND_MRERD = true;
+		System.out.print(", VIC");
+		this.loadAbsCensusTableCsv2Columns2Wafers(
+				"/data/ABS/CensusTableBuilder2016/HCFMD and TEND by LGA by HIND and MRERD/HCFMD and TEND by LGA by HIND and MRERD - VIC.csv",
+				this.initialisedCensusHCFMD_TEND_LGA_HIND_MRERD, fromColumnHCFMD_TEND_LGA_HIND_MRERD,
+				toColumnHCFMD_TEND_LGA_HIND_MRERD, this.censusHCFMD_TEND_LGA_HIND_MRERD);
+		System.out.print(", QLD");
+		this.loadAbsCensusTableCsv2Columns2Wafers(
+				"/data/ABS/CensusTableBuilder2016/HCFMD and TEND by LGA by HIND and MRERD/HCFMD and TEND by LGA by HIND and MRERD - QLD.csv",
+				this.initialisedCensusHCFMD_TEND_LGA_HIND_MRERD, fromColumnHCFMD_TEND_LGA_HIND_MRERD,
+				toColumnHCFMD_TEND_LGA_HIND_MRERD, this.censusHCFMD_TEND_LGA_HIND_MRERD);
+		System.out.print(", SA");
+		this.loadAbsCensusTableCsv2Columns2Wafers(
+				"/data/ABS/CensusTableBuilder2016/HCFMD and TEND by LGA by HIND and MRERD/HCFMD and TEND by LGA by HIND and MRERD - SA.csv",
+				this.initialisedCensusHCFMD_TEND_LGA_HIND_MRERD, fromColumnHCFMD_TEND_LGA_HIND_MRERD,
+				toColumnHCFMD_TEND_LGA_HIND_MRERD, this.censusHCFMD_TEND_LGA_HIND_MRERD);
+		System.out.print(", WA");
+		this.loadAbsCensusTableCsv2Columns2Wafers(
+				"/data/ABS/CensusTableBuilder2016/HCFMD and TEND by LGA by HIND and MRERD/HCFMD and TEND by LGA by HIND and MRERD - WA.csv",
+				this.initialisedCensusHCFMD_TEND_LGA_HIND_MRERD, fromColumnHCFMD_TEND_LGA_HIND_MRERD,
+				toColumnHCFMD_TEND_LGA_HIND_MRERD, this.censusHCFMD_TEND_LGA_HIND_MRERD);
+		System.out.print(", TAS");
+		this.loadAbsCensusTableCsv2Columns2Wafers(
+				"/data/ABS/CensusTableBuilder2016/HCFMD and TEND by LGA by HIND and MRERD/HCFMD and TEND by LGA by HIND and MRERD - TAS.csv",
+				this.initialisedCensusHCFMD_TEND_LGA_HIND_MRERD, fromColumnHCFMD_TEND_LGA_HIND_MRERD,
+				toColumnHCFMD_TEND_LGA_HIND_MRERD, this.censusHCFMD_TEND_LGA_HIND_MRERD);
+		System.out.print(", NT");
+		this.loadAbsCensusTableCsv2Columns2Wafers(
+				"/data/ABS/CensusTableBuilder2016/HCFMD and TEND by LGA by HIND and MRERD/HCFMD and TEND by LGA by HIND and MRERD - NT.csv",
+				this.initialisedCensusHCFMD_TEND_LGA_HIND_MRERD, fromColumnHCFMD_TEND_LGA_HIND_MRERD,
+				toColumnHCFMD_TEND_LGA_HIND_MRERD, this.censusHCFMD_TEND_LGA_HIND_MRERD);
+		System.out.print(", ACT");
+		this.loadAbsCensusTableCsv2Columns2Wafers(
+				"/data/ABS/CensusTableBuilder2016/HCFMD and TEND by LGA by HIND and MRERD/HCFMD and TEND by LGA by HIND and MRERD - ACT.csv",
+				this.initialisedCensusHCFMD_TEND_LGA_HIND_MRERD, fromColumnHCFMD_TEND_LGA_HIND_MRERD,
+				toColumnHCFMD_TEND_LGA_HIND_MRERD, this.censusHCFMD_TEND_LGA_HIND_MRERD);
+		System.out.println(", OT.");
+		this.loadAbsCensusTableCsv2Columns2Wafers(
+				"/data/ABS/CensusTableBuilder2016/HCFMD and TEND by LGA by HIND and MRERD/HCFMD and TEND by LGA by HIND and MRERD - OT.csv",
+				this.initialisedCensusHCFMD_TEND_LGA_HIND_MRERD, fromColumnHCFMD_TEND_LGA_HIND_MRERD,
+				toColumnHCFMD_TEND_LGA_HIND_MRERD, this.censusHCFMD_TEND_LGA_HIND_MRERD);
+
+		// ABS Census CDCF by LGA by FINF
+		System.out.print(new Date(System.currentTimeMillis()) + ": Loading ABS Census CDCF by LGA by FINF data");
+		this.censusCDCF_LGA_FINF = new HashMap<String, Map<String, Map<String, String>>>(MAP_INIT_SIZE_FINF);
+		int fromColumnCDCF_LGA_FINF = 1;
+		int toColumnCDCF_LGA_FINF = 27;
+		System.out.print(": NSW");
+		this.loadAbsCensusTableCsv1Column1Wafer(
+				"/data/ABS/CensusTableBuilder2016/CDCF by LGA by FINF/CDCF by LGA by FINF - NSW.csv",
+				this.initialisedCensusCDCF_LGA_FINF, fromColumnCDCF_LGA_FINF, toColumnCDCF_LGA_FINF,
+				this.censusCDCF_LGA_FINF);
+		this.initialisedCensusCDCF_LGA_FINF = true;
+		System.out.print(", VIC");
+		this.loadAbsCensusTableCsv1Column1Wafer(
+				"/data/ABS/CensusTableBuilder2016/CDCF by LGA by FINF/CDCF by LGA by FINF - VIC.csv",
+				this.initialisedCensusCDCF_LGA_FINF, fromColumnCDCF_LGA_FINF, toColumnCDCF_LGA_FINF,
+				this.censusCDCF_LGA_FINF);
+		System.out.print(", QLD");
+		this.loadAbsCensusTableCsv1Column1Wafer(
+				"/data/ABS/CensusTableBuilder2016/CDCF by LGA by FINF/CDCF by LGA by FINF - QLD.csv",
+				this.initialisedCensusCDCF_LGA_FINF, fromColumnCDCF_LGA_FINF, toColumnCDCF_LGA_FINF,
+				this.censusCDCF_LGA_FINF);
+		System.out.print(", SA");
+		this.loadAbsCensusTableCsv1Column1Wafer(
+				"/data/ABS/CensusTableBuilder2016/CDCF by LGA by FINF/CDCF by LGA by FINF - SA.csv",
+				this.initialisedCensusCDCF_LGA_FINF, fromColumnCDCF_LGA_FINF, toColumnCDCF_LGA_FINF,
+				this.censusCDCF_LGA_FINF);
+		System.out.print(", WA");
+		this.loadAbsCensusTableCsv1Column1Wafer(
+				"/data/ABS/CensusTableBuilder2016/CDCF by LGA by FINF/CDCF by LGA by FINF - WA.csv",
+				this.initialisedCensusCDCF_LGA_FINF, fromColumnCDCF_LGA_FINF, toColumnCDCF_LGA_FINF,
+				this.censusCDCF_LGA_FINF);
+		System.out.print(", TAS");
+		this.loadAbsCensusTableCsv1Column1Wafer(
+				"/data/ABS/CensusTableBuilder2016/CDCF by LGA by FINF/CDCF by LGA by FINF - TAS.csv",
+				this.initialisedCensusCDCF_LGA_FINF, fromColumnCDCF_LGA_FINF, toColumnCDCF_LGA_FINF,
+				this.censusCDCF_LGA_FINF);
+		System.out.print(", NT");
+		this.loadAbsCensusTableCsv1Column1Wafer(
+				"/data/ABS/CensusTableBuilder2016/CDCF by LGA by FINF/CDCF by LGA by FINF - NT.csv",
+				this.initialisedCensusCDCF_LGA_FINF, fromColumnCDCF_LGA_FINF, toColumnCDCF_LGA_FINF,
+				this.censusCDCF_LGA_FINF);
+		System.out.print(", ACT");
+		this.loadAbsCensusTableCsv1Column1Wafer(
+				"/data/ABS/CensusTableBuilder2016/CDCF by LGA by FINF/CDCF by LGA by FINF - ACT.csv",
+				this.initialisedCensusCDCF_LGA_FINF, fromColumnCDCF_LGA_FINF, toColumnCDCF_LGA_FINF,
+				this.censusCDCF_LGA_FINF);
+		System.out.println(", OT.");
+		this.loadAbsCensusTableCsv1Column1Wafer(
+				"/data/ABS/CensusTableBuilder2016/CDCF by LGA by FINF/CDCF by LGA by FINF - OT.csv",
+				this.initialisedCensusCDCF_LGA_FINF, fromColumnCDCF_LGA_FINF, toColumnCDCF_LGA_FINF,
+				this.censusCDCF_LGA_FINF);
 
 		// load ATO Company Table 4
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Company Table 4A data");
@@ -854,18 +999,15 @@ public class CalibrationData {
 		int[] govtBalShtRows = { 8, 10, 12, 13, 15, 16, 22, 23, 25, 29 };
 		int govtBalShtColumn = 10;
 		double govtMultiplier = 1000000d;
-		this.loadFinancialStatementCsv(
-
-				"/data/ABS/5512.0_GovtFinStats/55120DO057_201617 - Table 3 - Bal Sht.csv", CalibrationData.GOVT_PL,
-				govtBalShtColumn, govtBalShtRows, this.title, this.govtBalSht, govtMultiplier);
+		this.loadFinancialStatementCsv("/data/ABS/5512.0_GovtFinStats/55120DO057_201617 - Table 3 - Bal Sht.csv",
+				CalibrationData.GOVT_PL, govtBalShtColumn, govtBalShtRows, this.title, this.govtBalSht, govtMultiplier);
 
 		this.govtProfitLoss = new HashMap<String, Double>();
 		int[] govtProfitLossRows = { 7, 9, 10, 12, 17, 18, 22, 23, 37, 48 };
 		int govtProfitLossColumn = 10;
-		this.loadFinancialStatementCsv(
-
-				"/data/ABS/5512.0_GovtFinStats/55120DO057_201617 - Table 1 - P&L.csv", CalibrationData.GOVT_PL,
-				govtProfitLossColumn, govtProfitLossRows, this.title, this.govtProfitLoss, govtMultiplier);
+		this.loadFinancialStatementCsv("/data/ABS/5512.0_GovtFinStats/55120DO057_201617 - Table 1 - P&L.csv",
+				CalibrationData.GOVT_PL, govtProfitLossColumn, govtProfitLossRows, this.title, this.govtProfitLoss,
+				govtMultiplier);
 
 		// set flag so we only load the data once
 		System.out.println(new Date(System.currentTimeMillis()) + ": Data loaded");
@@ -2033,14 +2175,14 @@ public class CalibrationData {
 						header = false;
 					}
 				} else if (!footer) {
-					if (line[0].equals("Total")) {
+					if (line.length > 0 && line[0].equals("Total")) {
 						footer = true;
 					} else {
 						for (int i = 0; i < columnsToImport.length; i++) {
 							// parse the body of the data
 							String lgaCode = this.area.getLgaCodeFromName(line[0]);
 							data.get(seriesId[i]).put(lgaCode, line[columnsToImport[i]]);
-							// TODO: modify this so it can use POA, state, etc. not just LGA
+							// WISHLIST: modify this so it can use POA, state, etc. not just LGA
 						}
 					}
 				}
@@ -2061,12 +2203,12 @@ public class CalibrationData {
 	 * wafer).
 	 * 
 	 * File pre-conditions:<br>
-	 * 1. Row 10 contains the first leaf title.<br>
-	 * 2. The row after each leaf title is the column titles.<br>
+	 * 1. Row 10 contains the first wafer title.<br>
+	 * 2. The row after each wafer title is the column titles.<br>
 	 * 3. Row 4 column 1 contains the series title.<br>
 	 * 4. Data starts on row 12.<br>
-	 * 5. The first column contains the LGA names (not codes). 6. 1the first row in
-	 * the footer begins with "Data Source".
+	 * 5. The first column contains the LGA names (not codes).<br>
+	 * 6. The first row in the footer begins with "Data Source".
 	 * 
 	 * @param fileResourceLocation - the URI of the file to import
 	 * @param columnsToImport      - a zero-based array of integers specifying which
@@ -2078,9 +2220,8 @@ public class CalibrationData {
 	 * @param data                 - the data map that the values are returned in.
 	 *                             Keys are: column, row, wafer. (div, LGA, income)
 	 */
-	private void loadAbsCensusTableCsv3D(String fileResourceLocation, String tableName, int[] columnsToImport,
-			boolean isInitialised, Map<String, List<String>> titles,
-			Map<String, Map<String, Map<String, String>>> data) {
+	private void loadAbsCensusTableCsv1Column1Wafer(String fileResourceLocation, boolean isInitialised,
+			int fromColumnIndex, int toColumnIndex, Map<String, Map<String, Map<String, String>>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -2094,7 +2235,7 @@ public class CalibrationData {
 			boolean prevRowIsWaferName = false;
 			String waferName = null;
 			int waferNumber = 0;
-			String[] seriesId = new String[columnsToImport.length];
+			String[] seriesId = new String[toColumnIndex - fromColumnIndex];
 
 			String[] line = null;
 			while ((line = reader.readNext()) != null) {
@@ -2103,7 +2244,7 @@ public class CalibrationData {
 						header = false;
 					}
 				} else if (!footer) {
-					if (line[0].substring(0, 11).equals("Data Source")) {
+					if (line[0].length() > 11 && line[0].substring(0, 11).equals("Data Source")) {
 						footer = true;
 					} else {
 						if (prevRowIsBlank && !line[0].isBlank()) {
@@ -2111,35 +2252,35 @@ public class CalibrationData {
 							waferName = line[0].trim();
 							prevRowIsWaferName = true;
 							waferNumber++;
+							prevRowIsBlank = false;
 						} else {
 							if (prevRowIsWaferName) {
-								// set series ID
-								for (int i = 0; i < columnsToImport.length; i++) {
-									seriesId[i] = line[columnsToImport[i]];
-								}
-								if (!isInitialised) {
-									titles.put(tableName, new ArrayList<String>(columnsToImport.length));
-									for (int i = 0; i < columnsToImport.length; i++) {
-										// store title
-										titles.get(tableName).add(line[columnsToImport[i]]);
-
-										// store series ID as key with blank collections to populate with data below
-										data.put(line[columnsToImport[i]], new HashMap<String, Map<String, String>>());
+								if (waferNumber == 1) {
+									// set series ID
+									for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
+										seriesId[i] = line[i + fromColumnIndex];
+									}
+									if (!isInitialised) {
+										for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
+											// store series ID as key with blank collections to populate with data below
+											data.put(line[i + fromColumnIndex],
+													new HashMap<String, Map<String, String>>(MAP_INIT_SIZE_LGA));
+										}
 									}
 								}
 								prevRowIsWaferName = false;
-							} else if (!line[1].isBlank()) {
+							} else if (line.length > 1 && !line[1].isBlank()) {
 								// parse the body of the data
-								// TODO: modify this so it can use POA, state, etc. not just LGA
+								// WISHLIST: modify this so it can use POA, state, etc. not just LGA
 								String lgaCode = this.area.getLgaCodeFromName(line[0]);
 								if (lgaCode != null) {
 									// null check excludes invalid LGAs
-									for (int i = 0; i < columnsToImport.length; i++) {
+									for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
 										if (waferNumber == 1) {
 											data.get(seriesId[i]).put(lgaCode,
-													new HashMap<String, String>(columnsToImport.length));
+													new HashMap<String, String>(MAP_INIT_SIZE_CDCF));
 										}
-										data.get(seriesId[i]).get(lgaCode).put(waferName, line[columnsToImport[i]]);
+										data.get(seriesId[i]).get(lgaCode).put(waferName, line[i + fromColumnIndex]);
 									}
 								}
 							} else if (line[0].isBlank()) {
@@ -2161,31 +2302,28 @@ public class CalibrationData {
 	}
 
 	/**
-	 * FIXME: implement me
-	 * 
-	 * Loads ABS Census Table Builder tables with three dimensions (row, column &
-	 * wafer).
+	 * Loads ABS Census Table Builder tables with one row series, three column
+	 * series, and one wafer series.
 	 * 
 	 * File pre-conditions:<br>
-	 * 1. Row 10 contains the first leaf title.<br>
-	 * 2. The row after each leaf title is the column titles.<br>
+	 * 1. Row 10 contains the first wafer title.<br>
+	 * 2. The rows after each wafer title are the column titles.<br>
 	 * 3. Row 4 column 1 contains the series title.<br>
-	 * 4. Data starts on row 12.<br>
-	 * 5. The first column contains the LGA names (not codes). 6. 1the first row in
-	 * the footer begins with "Data Source".
+	 * 4. Data starts on row 15.<br>
+	 * 5. The first column contains the LGA names (not codes).<br>
+	 * 6. The first row in the footer begins with "Data Source".
 	 * 
-	 * @param fileResourceLocation - the URI of the file to import
-	 * @param columnsToImport      - a zero-based array of integers specifying which
-	 *                             columns to import (i.e. the first column is
-	 *                             column 0). The first column is assumed to be the
-	 *                             date and is imported only as the key for the
-	 *                             other columns' data.
-	 * @param titles               - column titles in CSV file
+	 * @param fileResourceLocation - the URI of the file to import.
+	 * @param isInitialised        - true if any file has already been imported for
+	 *                             this data series, false otherwise.
+	 * @param fromColumnIndex      - import data from this column index (inclusive).
+	 * @param toColumnIndex        - import data to this column index (exclusive).
 	 * @param data                 - the data map that the values are returned in.
-	 *                             Keys are: column, row, wafer. (div, LGA, income)
+	 *                             Keys are: 3 columns, row, wafer. (AGE5P, INDP,
+	 *                             INCP, LGA, SEXP)
 	 */
-	private void loadAbsCensusTableCsv3Columns1Wafer(String fileResourceLocation, String tableName,
-			int[] columnsToImport, Map<String, List<String>> titles,
+	private void loadAbsCensusTableCsv3Columns1Wafer(String fileResourceLocation, boolean isInitialised,
+			int fromColumnIndex, int toColumnIndex,
 			Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> data) {
 
 		CSVReader reader = null;
@@ -2197,10 +2335,11 @@ public class CalibrationData {
 			int currentRow = 1;
 			int lastHeaderRow = 9; // the row before the first wafer's title row
 			boolean prevRowIsBlank = true; // there's a blank row before wafer names
-			boolean prevRowIsWaferName = false;
 			String waferName = null;
 			int waferNumber = 0;
-			String[] seriesId = new String[columnsToImport.length];
+			int columnSeriesNumber = Integer.MAX_VALUE;
+			final int columnSeriesMax = 3; // because the dataset contains 3 column series
+			String[][] columnTitles = new String[columnSeriesMax][toColumnIndex - fromColumnIndex];
 
 			String[] line = null;
 			while ((line = reader.readNext()) != null) {
@@ -2209,41 +2348,190 @@ public class CalibrationData {
 						header = false;
 					}
 				} else if (!footer) {
-					if (line[0].substring(0, 11).equals("Data Source")) {
+					if (line[0].length() > 11 && line[0].substring(0, 11).equals("Data Source")) {
 						footer = true;
 					} else {
 						if (prevRowIsBlank && !line[0].isBlank()) {
 							// set wafer name
 							waferName = line[0].trim();
-							prevRowIsWaferName = true;
+							columnSeriesNumber = 0;
 							waferNumber++;
+							prevRowIsBlank = false;
 						} else {
-							if (prevRowIsWaferName) {
+							if (columnSeriesNumber < columnSeriesMax) {
 								// set series ID
-								for (int i = 0; i < columnsToImport.length; i++) {
-									seriesId[i] = line[columnsToImport[i]];
+								String thisTitle = null;
+								for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
+									thisTitle = line[i + fromColumnIndex].isEmpty() ? thisTitle
+											: line[i + fromColumnIndex];
+									columnTitles[columnSeriesNumber][i] = thisTitle;
 								}
-								titles.put(tableName, new ArrayList<String>(columnsToImport.length));
-								for (int i = 0; i < columnsToImport.length; i++) {
-									// store title
-									titles.get(tableName).add(line[columnsToImport[i]]);
-
-									// store series ID as key with blank collections to populate with data below
-									data.put(line[columnsToImport[i]], new HashMap<String, Map<String, String>>());
+								columnSeriesNumber++;
+							} else if (columnSeriesNumber == columnSeriesMax && !isInitialised) {
+								// add blank maps to data, so they can be populated below
+								if (waferNumber == 1) {
+									for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
+										if (!data.containsKey(columnTitles[0][i])) {
+											// add column series 1 key
+											data.put(columnTitles[0][i],
+													new HashMap<String, Map<String, Map<String, Map<String, String>>>>(
+															MAP_INIT_SIZE_INDP));
+										}
+										if (!data.get(columnTitles[0][i]).containsKey(columnTitles[1][i])) {
+											// add column series 2 key
+											data.get(columnTitles[0][i]).put(columnTitles[1][i],
+													new HashMap<String, Map<String, Map<String, String>>>(
+															MAP_INIT_SIZE_INCP));
+										}
+										if (!data.get(columnTitles[0][i]).get(columnTitles[1][i])
+												.containsKey(columnTitles[2][i])) {
+											// add column series 3 key
+											data.get(columnTitles[0][i]).get(columnTitles[1][i]).put(columnTitles[2][i],
+													new HashMap<String, Map<String, String>>(MAP_INIT_SIZE_LGA));
+										}
+									}
 								}
-								prevRowIsWaferName = false;
-							} else if (!line[1].isBlank()) {
+								columnSeriesNumber++; // make sure this is only executed once
+							} else if (line.length > 1 && !line[1].isBlank()) {
 								// parse the body of the data
-								// TODO: modify this so it can use POA, state, etc. not just LGA
+								// WISHLIST: modify this so it can use POA, state, etc. not just LGA
 								String lgaCode = this.area.getLgaCodeFromName(line[0]);
 								if (lgaCode != null) {
 									// null check excludes invalid LGAs
-									for (int i = 0; i < columnsToImport.length; i++) {
+									for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
 										if (waferNumber == 1) {
-											data.get(seriesId[i]).put(lgaCode,
-													new HashMap<String, String>(columnsToImport.length));
+											data.get(columnTitles[0][i]).get(columnTitles[1][i]).get(columnTitles[2][i])
+													.put(lgaCode, new HashMap<String, String>(MAP_INIT_SIZE_SEXP));
 										}
-										data.get(seriesId[i]).get(lgaCode).put(waferName, line[columnsToImport[i]]);
+										data.get(columnTitles[0][i]).get(columnTitles[1][i]).get(columnTitles[2][i])
+												.get(lgaCode).put(waferName, line[i + fromColumnIndex]);
+									}
+								}
+							} else if (line[0].isBlank()) {
+								prevRowIsBlank = true;
+							}
+						}
+					}
+				}
+			}
+			reader.close();
+			reader = null;
+		} catch (FileNotFoundException e) {
+			// open file
+			e.printStackTrace();
+		} catch (IOException e) {
+			// read next
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Loads ABS Census Table Builder tables with one row series, two column series,
+	 * and two wafer series.
+	 * 
+	 * File pre-conditions:<br>
+	 * 1. Row 10 contains the first wafer title.<br>
+	 * 2. The rows after each wafer title are the column titles.<br>
+	 * 3. Row 4 column 1 contains the series title.<br>
+	 * 4. Data starts on row 15.<br>
+	 * 5. The first column contains the LGA names (not codes).<br>
+	 * 6. The first row in the footer begins with "Data Source".
+	 * 
+	 * @param fileResourceLocation - the URI of the file to import.
+	 * @param isInitialised        - true if any file has already been imported for
+	 *                             this data series, false otherwise.
+	 * @param fromColumnIndex      - import data from this column index (inclusive).
+	 * @param toColumnIndex        - import data to this column index (exclusive).
+	 * @param data                 - the data map that the values are returned in.
+	 *                             Keys are: 2 columns, row, 2 wafers. (HIND,
+	 *                             RNTRD/MRERD, LGA, HCFMD, TEND)
+	 */
+	private void loadAbsCensusTableCsv2Columns2Wafers(String fileResourceLocation, boolean isInitialised,
+			int fromColumnIndex, int toColumnIndex,
+			Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> data) {
+
+		CSVReader reader = null;
+		try {
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
+			boolean header = true;
+			boolean footer = false;
+			int currentRow = 1;
+			int lastHeaderRow = 9; // the row before the first wafer's title row
+			boolean prevRowIsBlank = true; // there's a blank row before wafer names
+			final int numWafers = 2;
+			String[] waferName = new String[numWafers];
+			int waferNumber = 0;
+			int columnSeriesNumber = Integer.MAX_VALUE;
+			final int columnSeriesMax = 2; // because the dataset contains 2 column series
+			String[][] columnTitles = new String[columnSeriesMax][toColumnIndex - fromColumnIndex];
+
+			String[] line = null;
+			while ((line = reader.readNext()) != null) {
+				if (header) {
+					if (currentRow++ == lastHeaderRow) {
+						header = false;
+					}
+				} else if (!footer) {
+					if (line[0].length() > 11 && line[0].substring(0, 11).equals("Data Source")) {
+						footer = true;
+					} else {
+						if (prevRowIsBlank && !line[0].isBlank()) {
+							// set wafer name
+							String[] tmp = line[0].split(","); // wafer names are separated by commas
+							for (int i = 0; i < numWafers; i++) {
+								waferName[i] = tmp[i].trim();
+							}
+							columnSeriesNumber = 0;
+							waferNumber++;
+							prevRowIsBlank = false;
+						} else {
+							if (columnSeriesNumber < columnSeriesMax) {
+								// set series ID
+								String thisTitle = null;
+								for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
+									thisTitle = line[i + fromColumnIndex].isEmpty() ? thisTitle
+											: line[i + fromColumnIndex];
+									columnTitles[columnSeriesNumber][i] = thisTitle;
+								}
+								columnSeriesNumber++;
+							} else if (columnSeriesNumber == columnSeriesMax && !isInitialised) {
+								// add blank maps to data, so they can be populated below
+								if (waferNumber == 1) {
+									for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
+										if (!data.containsKey(columnTitles[0][i])) {
+											// add column series 1 key
+											data.put(columnTitles[0][i],
+													new HashMap<String, Map<String, Map<String, Map<String, String>>>>(
+															Math.max(MAP_INIT_SIZE_RNTRD, MAP_INIT_SIZE_MRERD)));
+										}
+										if (!data.get(columnTitles[0][i]).containsKey(columnTitles[1][i])) {
+											// add column series 2 key
+											data.get(columnTitles[0][i]).put(columnTitles[1][i],
+													new HashMap<String, Map<String, Map<String, String>>>(
+															MAP_INIT_SIZE_LGA));
+										}
+									}
+								}
+							} else if (line.length > 1 && !line[1].isBlank()) {
+								// parse the body of the data
+								// WISHLIST: modify this so it can use POA, state, etc. not just LGA
+								String lgaCode = this.area.getLgaCodeFromName(line[0]);
+								if (lgaCode != null) {
+									// null check excludes invalid LGAs
+									for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
+										if (waferNumber == 1) {
+											data.get(columnTitles[0][i]).get(columnTitles[1][i]).put(lgaCode,
+													new HashMap<String, Map<String, String>>(MAP_INIT_SIZE_HCFMD));
+										}
+										if (!data.get(columnTitles[0][i]).get(columnTitles[1][i]).get(lgaCode)
+												.containsKey(waferName[0])) {
+											// add map if this is the first time the wafer 1 has been read
+											data.get(columnTitles[0][i]).get(columnTitles[1][i]).get(lgaCode)
+													.put(waferName[0], new HashMap<String, String>(MAP_INIT_SIZE_TEND));
+										}
+										data.get(columnTitles[0][i]).get(columnTitles[1][i]).get(lgaCode)
+												.get(waferName[0]).put(waferName[1], line[i + fromColumnIndex]);
 									}
 								}
 							} else if (line[0].isBlank()) {
@@ -2698,6 +2986,7 @@ public class CalibrationData {
 		this.abs1410_0Economy = null;
 		this.abs1410_0Family = null;
 		this.abs1410_0Income = null;
+		this.abs2074_0 = null;
 		this.abs3222_0 = null;
 		this.abs5368_0Table14a = null;
 		this.abs5368_0Table14b = null;
@@ -2741,6 +3030,9 @@ public class CalibrationData {
 
 		this.atoCompanyTable4a = null;
 		this.atoCompanyTable4b = null;
+		this.atoIndividualTable6b = null;
+		this.atoIndividualTable6c = null;
+		this.atoIndividualTable9 = null;
 
 		this.censusCDCF_LGA_FINF = null;
 		this.censusHCFMD_TEND_LGA_HIND_MRERD = null;
@@ -2838,6 +3130,16 @@ public class CalibrationData {
 			this.loadData();
 		}
 		return abs1410_0Income;
+	}
+
+	/**
+	 * @return the abs2074_0
+	 */
+	public Map<String, Map<String, String>> getAbs2074_0() {
+		if (!this.dataLoaded) {
+			this.loadData();
+		}
+		return abs2074_0;
 	}
 
 	/**
@@ -3261,6 +3563,36 @@ public class CalibrationData {
 	}
 
 	/**
+	 * @return the atoIndividualTable6b
+	 */
+	public Map<String, Map<String, String>> getAtoIndividualTable6b() {
+		if (!this.dataLoaded) {
+			this.loadData();
+		}
+		return atoIndividualTable6b;
+	}
+
+	/**
+	 * @return the atoIndividualTable6c
+	 */
+	public Map<String, Map<String, String>> getAtoIndividualTable6c() {
+		if (!this.dataLoaded) {
+			this.loadData();
+		}
+		return atoIndividualTable6c;
+	}
+
+	/**
+	 * @return the atoIndividualTable9
+	 */
+	public Map<String, Map<String, String>> getAtoIndividualTable9() {
+		if (!this.dataLoaded) {
+			this.loadData();
+		}
+		return atoIndividualTable9;
+	}
+
+	/**
 	 * @return the censusSEXP_LGA_AGE5P_INDP_INCP
 	 */
 	public Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> getCensusSEXP_LGA_AGE5P_INDP_INCP() {
@@ -3293,7 +3625,7 @@ public class CalibrationData {
 	/**
 	 * @return the censusCDCF_LGA_FINF
 	 */
-	public Map<String, Map<String, String>> getCensusCDCF_LGA_FINF() {
+	public Map<String, Map<String, Map<String, String>>> getCensusCDCF_LGA_FINF() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}

@@ -178,7 +178,7 @@ public class CalibrateIndividuals {
 		Map<String, Integer> peopleByLga = this.area.getCensusPeopleByLga();
 		Set<String> lgaCodeSet = peopleByLga.keySet();
 		for (String lgaCode : lgaCodeSet) {
-			Map<String, List<Double>> lgaByIncp = this.segmentLgaByIncp(lgaCode, "2015-16", date); // from, to,
+			//Map<String, List<Double>> lgaByIncp = this.segmentLgaByIncp(lgaCode, "2015-16", date); // from, to,
 																									// meanIncome,
 																									// adjustedPeople
 
@@ -189,7 +189,7 @@ public class CalibrateIndividuals {
 
 	}
 
-	private Map<String, List<Double>> segmentLgaByIncp(String lgaCode, String financialYear, Date date) {
+	/*private Map<String, List<Double>> segmentLgaByIncp(String lgaCode, String financialYear, Date date) {
 		// local constants
 		final int numBins = 14;
 
@@ -317,7 +317,7 @@ public class CalibrateIndividuals {
 		result.put("adjustedDwellings", Arrays.asList(dwellingsAdjusted));
 
 		return result;
-	}
+	}*/
 
 	private void calibrateNationalBalSht() {
 		// TODO: implement me

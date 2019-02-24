@@ -6,6 +6,8 @@ package xyz.struthers.rhul.ham;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -41,11 +43,13 @@ public class App {
 
 		System.out.println("Started Calibration Data Load: " + new Date(System.currentTimeMillis()));
 		CalibrationData data = ctx.getBean(CalibrationData.class);
+		
 		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 		Date date = null;
 		try {
 			date = df.parse("01/06/2018");
 			System.out.println("Date is: " + date);
+
 			int totalPop = data.getTotalPopulation(date);
 			System.out.println("Total Population is: " + totalPop);
 			int lgaPop = data.getAdjustedPeopleByLga("10050", date);
@@ -54,16 +58,18 @@ public class App {
 			// date parsing failed
 			e.printStackTrace();
 		}
+
 		System.out.println("Finished Calibration Data Load: " + new Date(System.currentTimeMillis()));
-		
+
 		System.out.println("Starting Business agent calibration: " + new Date(System.currentTimeMillis()));
-		//CalibrateBusinesses calBus = new CalibrateBusinesses();
+		// CalibrateBusinesses calBus = new CalibrateBusinesses();
 		CalibrateBusinesses calBus = ctx.getBean(CalibrateBusinesses.class);
 		calBus.createBusinessAgents();
 		System.out.println("Finished Business agent calibration: " + new Date(System.currentTimeMillis()));
-		
-		//while (true) {} // 17 seconds on lappy, consumes 2GB RAM
-		ctx.close();
+
+		while (true) {
+		} // 17 seconds on lappy, consumes 2GB RAM
+		// ctx.close();
 	}
 
 	public void areaMappingTestHarness() {
