@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -61,6 +62,7 @@ public class CalibrateBusinesses {
 	// beans
 	private Properties properties;
 	private CalibrationData data;
+	private CalibrationDataBusiness businessData;
 	private AreaMapping area;
 	private AustralianEconomy economy;
 
@@ -106,11 +108,6 @@ public class CalibrateBusinesses {
 	 */
 	private Map<String, Map<String, String>> abs1292_0_55_002ANZSIC;
 	/**
-	 * formatted export data<br>
-	 * Keys: industry, state, country, value range
-	 */
-	private Map<String, Map<String, Map<String, Map<String, String>>>> abs5368_0Exporters;
-	/**
 	 * Business size by division<br>
 	 * Keys: year, column title, size, industry
 	 */
@@ -147,6 +144,30 @@ public class CalibrateBusinesses {
 	public CalibrateBusinesses() {
 		super();
 		this.init();
+	}
+
+	@PostConstruct
+	private void init() {
+		this.businessAgents = null;
+		this.businessTypeCount = null;
+
+		this.rbaE1 = null;
+		this.abs1292_0_55_002ANZSIC = null;
+		this.abs8155_0Table5 = null;
+		this.abs8155_0Table6 = null;
+		this.abs8165_0StateEmployment = null;
+		this.abs8165_0LgaEmployment = null;
+	}
+
+	/**
+	 * Deletes all the field variables, freeing up memory.
+	 * 
+	 * Does not do a deep delete because most objects are passed to other classes by
+	 * reference, and the other classes will probably still need to refer to them.
+	 */
+	@PreDestroy
+	public void close() {
+		this.init(); // set all the pointers to null
 	}
 
 	/**
@@ -257,13 +278,12 @@ public class CalibrateBusinesses {
 		System.out.println("this.data: " + this.data);
 		this.rbaE1 = this.data.getRbaE1();
 		this.abs1292_0_55_002ANZSIC = this.data.getAbs1292_0_55_002ANZSIC();
-		this.abs5368_0Exporters = this.data.getAbs5368_0Exporters();
-		this.abs8155_0Table5 = this.data.getAbs8155_0Table5();
-		this.abs8155_0Table6 = this.data.getAbs8155_0Table6();
-		this.abs8165_0StateEmployment = this.data.getAbs8165_0StateEmployment();
-		this.abs8165_0LgaEmployment = this.data.getAbs8165_0LgaEmployment();
-		this.atoCompanyTable4a = this.data.getAtoCompanyTable4a();
-		this.atoCompanyTable4b = this.data.getAtoCompanyTable4b();
+		this.abs8155_0Table5 = this.businessData.getAbs8155_0Table5();
+		this.abs8155_0Table6 = this.businessData.getAbs8155_0Table6();
+		this.abs8165_0StateEmployment = this.businessData.getAbs8165_0StateEmployment();
+		this.abs8165_0LgaEmployment = this.businessData.getAbs8165_0LgaEmployment();
+		this.atoCompanyTable4a = this.businessData.getAtoCompanyTable4a();
+		this.atoCompanyTable4b = this.businessData.getAtoCompanyTable4b();
 
 		// create businesses
 		this.businessAgents = new ArrayList<Business>();
@@ -1278,20 +1298,14 @@ public class CalibrateBusinesses {
 	private void addAgentsToEconomy() {
 		this.economy.setBusinesses(this.businessAgents);
 		this.economy.setBusinessTypeCount(this.businessTypeCount);
-	}
 
-	@PostConstruct
-	private void init() {
-		this.businessAgents = null;
-		this.businessTypeCount = null;
-
-		this.rbaE1 = null;
-		this.abs1292_0_55_002ANZSIC = null;
-		this.abs5368_0Exporters = null;
-		this.abs8155_0Table5 = null;
-		this.abs8155_0Table6 = null;
-		this.abs8165_0StateEmployment = null;
-		this.abs8165_0LgaEmployment = null;
+		/*
+		 * Release memory by deleting the data maps used to create these agents. Doesn't
+		 * guarantee the garbage collector will run, but should make the memory
+		 * available to collect when it does run.
+		 */
+		this.businessData.close();
+		this.businessData = null;
 	}
 
 	/**
@@ -1308,6 +1322,14 @@ public class CalibrateBusinesses {
 	@Autowired
 	public void setCalibrationData(CalibrationData data) {
 		this.data = data;
+	}
+
+	/**
+	 * @param businessData the businessData to set
+	 */
+	@Autowired
+	public void setBusinessData(CalibrationDataBusiness businessData) {
+		this.businessData = businessData;
 	}
 
 	/**
