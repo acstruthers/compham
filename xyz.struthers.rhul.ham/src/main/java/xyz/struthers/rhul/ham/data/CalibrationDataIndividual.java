@@ -1027,6 +1027,29 @@ public class CalibrationDataIndividual {
 	}
 
 	//FIXME: load ATO Individual Tables 6b, 6c and 9.
+	/**
+	 * Column[1] is post code
+	 * 
+	 * @param fileResourceLocation
+	 * @param columnsToImport
+	 * @param data
+	 */
+	private void loadAtoIndividualsTable6(String fileResourceLocation, int[] columnsToImport,
+			Map<String, Map<String, String>> data) {
+		
+	}
+	
+	/**
+	 * left(column[1], 5) is industry code (5 digits)
+	 * 
+	 * @param fileResourceLocation
+	 * @param columnsToImport
+	 * @param data
+	 */
+	private void loadAtoIndividualsTable9(String fileResourceLocation, int[] columnsToImport,
+			Map<String, Map<String, String>> data) {
+		
+	}
 	
 	@PostConstruct
 	private void init() {

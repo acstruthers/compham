@@ -7,10 +7,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,6 +27,7 @@ import org.springframework.stereotype.Component;
 import com.opencsv.CSVReader;
 
 import xyz.struthers.rhul.ham.MemoryUsageBenchmark;
+import xyz.struthers.rhul.ham.config.Properties;
 
 /**
  * Loads ASGS boundary data from the ABS, downloaded in CSV format. Uses
@@ -36,6 +42,9 @@ import xyz.struthers.rhul.ham.MemoryUsageBenchmark;
 @Scope(value = "singleton")
 public class AreaMapping {
 
+	// series names
+	public static final String ABS_3222_0 = "ABS_3222.0"; // population projections
+
 	// zero-based column numbers
 	private static final int LGA_NAME_COL = 2;
 	private static final int LGA_STATE_COL = 4;
@@ -48,14 +57,20 @@ public class AreaMapping {
 	private static final int INDEX_COUNT_DWELLING = 1;
 
 	// data variables
-	private boolean dataMapped;
+	private boolean dataLoaded;
+	private Map<String, List<String>> title;
+	private Map<String, List<String>> unitType;
+
 	private Map<String, Map<String, String>> absData;
 	private Map<String, Map<String, String>> lgaData;
 	private Map<String, Map<String, String>> poaData;
 
-	private Map<String, Integer> dataIndicesAbs2074_0;
-	private ArrayList<ArrayList<Integer>> dataMatrixAbs2074_0;
-	private ArrayList<ArrayList<String>> keysAbs2074_0;
+	private Map<Date, Integer> totalPopulation;
+	private Map<Date, Map<String, Integer>> adjustedPeopleByLga;
+	private Map<String, Integer> abs2074_0indexMap;
+	private ArrayList<ArrayList<Integer>> abs2074_0dataMatrix;
+	private ArrayList<ArrayList<String>> abs2074_0seriesTitles;
+	private Map<String, Map<Date, String>> abs3222_0; // AU by gender and age (population projections)
 
 	// private Map<String, Double> postCodeLatitude;
 	// private Map<String, Double> postCodeLongitude;
@@ -80,11 +95,66 @@ public class AreaMapping {
 	}
 
 	/**
+	 * Gets the total Australian population as at a given date
+	 * 
+	 * @param date - Dates in the data file are MMM-yyyy, so date argument should be
+	 *             the first day of each Month.
+	 * @return total Australian population
+	 */
+	public int getTotalPopulation(Date date) {
+		if (!this.dataLoaded) {
+			this.mapMeshblocks();
+		}
+		if (this.totalPopulation == null) {
+			this.totalPopulation = new HashMap<Date, Integer>(5);
+		}
+		Integer totalPop = this.totalPopulation.get(date);
+		if (totalPop == null) {
+			totalPop = 0;
+			Set<String> seriesIds = this.abs3222_0.keySet();
+			for (String series : seriesIds) {
+				totalPop += Integer.valueOf(this.abs3222_0.get(series).get(date));
+			}
+			this.totalPopulation.put(date, totalPop);
+		}
+		Properties.setTotalPopulationAU(totalPop);
+		return totalPop.intValue();
+	}
+
+	public Map<String, Integer> getAdjustedPeopleByLga(Date date) {
+		if (!this.dataLoaded) {
+			this.mapMeshblocks();
+		}
+		if (this.adjustedPeopleByLga == null) {
+			this.adjustedPeopleByLga = new HashMap<Date, Map<String, Integer>>(5);
+		}
+		Map<String, Integer> result = this.adjustedPeopleByLga.get(date);
+		if (result == null) {
+			Map<String, Integer> censusPeopleByLga = this.getCensusPeopleByLga();
+			Set<String> lgaSet = censusPeopleByLga.keySet();
+			int totalCensusPopulation = 0;
+			for (String lga : lgaSet) {
+				totalCensusPopulation += censusPeopleByLga.get(lga);
+			}
+			result = new HashMap<String, Integer>(lgaSet.size());
+			double factor = Double.valueOf(this.getTotalPopulation(date)) / Double.valueOf(totalCensusPopulation);
+			for (String lga : lgaSet) {
+				result.put(lga, (int) Math.round(Double.valueOf(censusPeopleByLga.get(lga)) * factor));
+			}
+		}
+		return result;
+	}
+
+	public int getAdjustedPeopleByLga(String lgaCode, Date date) {
+		return this.getAdjustedPeopleByLga(date).get(lgaCode);
+	}
+
+	/**
 	 * 
 	 * @return a map of the unadjusted number of people in each LGA, per the census.
 	 */
 	public Map<String, Integer> getCensusPeopleByLga() {
-		if (!this.dataMapped) {
+		if (!this.dataLoaded) {
 			this.mapMeshblocks();
 		}
 
@@ -94,7 +164,7 @@ public class AreaMapping {
 			int lgaPeople = 0;
 			Set<String> lgaMb = this.lgaMeshblocks.get(lga);
 			for (String mb : lgaMb) {
-				lgaPeople += this.dataMatrixAbs2074_0.get(INDEX_COUNT_PERSON).get(this.dataIndicesAbs2074_0.get(mb));
+				lgaPeople += this.abs2074_0dataMatrix.get(INDEX_COUNT_PERSON).get(this.abs2074_0indexMap.get(mb));
 			}
 			result.put(lga, lgaPeople);
 		}
@@ -108,14 +178,14 @@ public class AreaMapping {
 	 * @return the number of people in the LGA
 	 */
 	public Integer getCensusPeopleByLga(String lgaCode) {
-		if (!this.dataMapped) {
+		if (!this.dataLoaded) {
 			this.mapMeshblocks();
 		}
 
 		int lgaPeople = 0;
 		Set<String> lgaMb = this.lgaMeshblocks.get(lgaCode);
 		for (String mb : lgaMb) {
-			lgaPeople += this.dataMatrixAbs2074_0.get(INDEX_COUNT_PERSON).get(this.dataIndicesAbs2074_0.get(mb));
+			lgaPeople += this.abs2074_0dataMatrix.get(INDEX_COUNT_PERSON).get(this.abs2074_0indexMap.get(mb));
 		}
 		return lgaPeople;
 	}
@@ -126,7 +196,7 @@ public class AreaMapping {
 	 *         census.
 	 */
 	public Map<String, Integer> getCensusDwellingsByLga() {
-		if (!this.dataMapped) {
+		if (!this.dataLoaded) {
 			this.mapMeshblocks();
 		}
 
@@ -136,8 +206,7 @@ public class AreaMapping {
 			int lgaDwellings = 0;
 			Set<String> lgaMb = this.lgaMeshblocks.get(lga);
 			for (String mb : lgaMb) {
-				lgaDwellings += this.dataMatrixAbs2074_0.get(INDEX_COUNT_DWELLING)
-						.get(this.dataIndicesAbs2074_0.get(mb));
+				lgaDwellings += this.abs2074_0dataMatrix.get(INDEX_COUNT_DWELLING).get(this.abs2074_0indexMap.get(mb));
 			}
 			result.put(lga, lgaDwellings);
 		}
@@ -151,14 +220,14 @@ public class AreaMapping {
 	 * @return the number of dwellings in the LGA
 	 */
 	public Integer getCensusDwellingsByLga(String lgaCode) {
-		if (!this.dataMapped) {
+		if (!this.dataLoaded) {
 			this.mapMeshblocks();
 		}
 
 		int lgaDwellings = 0;
 		Set<String> lgaMb = this.lgaMeshblocks.get(lgaCode);
 		for (String mb : lgaMb) {
-			lgaDwellings += this.dataMatrixAbs2074_0.get(INDEX_COUNT_DWELLING).get(this.dataIndicesAbs2074_0.get(mb));
+			lgaDwellings += this.abs2074_0dataMatrix.get(INDEX_COUNT_DWELLING).get(this.abs2074_0indexMap.get(mb));
 		}
 		return lgaDwellings;
 	}
@@ -169,7 +238,7 @@ public class AreaMapping {
 	 * @return Local Government Area (LGA) code
 	 */
 	public String getLgaCodeFromMeshblock(String meshblockCode) {
-		if (!this.dataMapped) {
+		if (!this.dataLoaded) {
 			this.mapMeshblocks();
 		}
 		return this.absData.get(LGA_LGA_CODE).get(meshblockCode);
@@ -181,7 +250,7 @@ public class AreaMapping {
 	 * @return Local Government Area (LGA) code
 	 */
 	public String getLgaCodeFromPoa(String poaCode) {
-		if (!this.dataMapped) {
+		if (!this.dataLoaded) {
 			this.mapMeshblocks();
 		}
 		return this.mapPoaToLga.get(poaCode);
@@ -193,7 +262,7 @@ public class AreaMapping {
 	 * @return Postal Area (POA) code
 	 */
 	public String getPoaCodeFromLga(String lgaCode) {
-		if (!this.dataMapped) {
+		if (!this.dataLoaded) {
 			this.mapMeshblocks();
 		}
 		return this.mapLgaToPoa.get(lgaCode);
@@ -205,28 +274,28 @@ public class AreaMapping {
 	 * @return Greater Capital City Statistical Area (GCCSA) code
 	 */
 	public String getGccsaCodeFromLga(String lgaCode) {
-		if (!this.dataMapped) {
+		if (!this.dataLoaded) {
 			this.mapMeshblocks();
 		}
 		return this.mapLgaToGccsa.get(lgaCode);
 	}
 
 	public String getLgaNameFromCode(String lgaCode) {
-		if (!this.dataMapped) {
+		if (!this.dataLoaded) {
 			this.mapMeshblocks();
 		}
 		return this.mapLgaCodeToName.get(lgaCode);
 	}
 
 	public String getLgaCodeFromName(String lgaName) {
-		if (!this.dataMapped) {
+		if (!this.dataLoaded) {
 			this.mapMeshblocks();
 		}
 		return this.mapLgaNameToCode.get(lgaName);
 	}
 
 	public String getLgaStateFromCode(String lgaCode) {
-		if (!this.dataMapped) {
+		if (!this.dataLoaded) {
 			this.mapMeshblocks();
 		}
 		return this.mapLgaCodeToState.get(lgaCode);
@@ -254,7 +323,7 @@ public class AreaMapping {
 		this.mapSmallToBigArea(this.poaData, AreaMapping.POA_POA_CODE, this.lgaData, AreaMapping.LGA_LGA_CODE,
 				this.mapPoaToLga);
 
-		this.dataMapped = true;
+		this.dataLoaded = true;
 	}
 
 	/**
@@ -292,7 +361,7 @@ public class AreaMapping {
 			for (String mb : fromMeshblocks) {
 				String toCode = toData.get(toTitle).get(mb);
 				int toCodeCount = toPeopleCount.containsKey(toCode) ? toPeopleCount.get(toCode) : 0;
-				int newCount = this.dataMatrixAbs2074_0.get(INDEX_COUNT_PERSON).get(this.dataIndicesAbs2074_0.get(mb));
+				int newCount = this.abs2074_0dataMatrix.get(INDEX_COUNT_PERSON).get(this.abs2074_0indexMap.get(mb));
 				toPeopleCount.put(toCode, toCodeCount + newCount); // update count in map
 			}
 
@@ -316,6 +385,8 @@ public class AreaMapping {
 	 * Loads all Meshblock CSV files into memory.
 	 */
 	private void loadMeshblocks() {
+		this.title = new HashMap<String, List<String>>();
+		this.unitType = new HashMap<String, List<String>>();
 		this.lgaMeshblocks = new HashMap<String, Set<String>>();
 		this.poaMeshblocks = new HashMap<String, Set<String>>();
 
@@ -367,12 +438,24 @@ public class AreaMapping {
 
 		// load mesh block counts
 		final int[] abs2074_0_Columns = { 3, 4 };
-		this.dataIndicesAbs2074_0 = new HashMap<String, Integer>();
-		this.dataMatrixAbs2074_0 = new ArrayList<ArrayList<Integer>>(abs2074_0_Columns.length);
-		this.keysAbs2074_0 = new ArrayList<ArrayList<String>>(abs2074_0_Columns.length);
-		this.loadAbsDataCsv_2074_0_UsingDoubleArrays(
-				"/data/ABS/2074.0_MeshblockCounts/2016 Census Mesh Block Counts.csv", abs2074_0_Columns,
-				this.dataIndicesAbs2074_0, this.dataMatrixAbs2074_0, this.keysAbs2074_0);
+		this.abs2074_0indexMap = new HashMap<String, Integer>();
+		this.abs2074_0dataMatrix = new ArrayList<ArrayList<Integer>>(abs2074_0_Columns.length);
+		this.abs2074_0seriesTitles = new ArrayList<ArrayList<String>>(abs2074_0_Columns.length);
+		this.loadAbsDataCsv_2074_0("/data/ABS/2074.0_MeshblockCounts/2016 Census Mesh Block Counts.csv",
+				abs2074_0_Columns, this.abs2074_0indexMap, this.abs2074_0dataMatrix, this.abs2074_0seriesTitles);
+
+		// load ABS 3222.0 data
+		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 3222.0 Income data");
+		this.abs3222_0 = new HashMap<String, Map<Date, String>>();
+		int[] abs3220_0Columns = { 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219,
+				220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240,
+				241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261,
+				262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282,
+				283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302,
+				303 }; // loads count of Persons 0 - 100
+		this.loadAbsDataCsv_Catalogue(
+				"/data/ABS/3222.0_PopnProjections/Table B9. Population projections - Series B.csv", ABS_3222_0,
+				abs3220_0Columns, this.title, this.unitType, this.abs3222_0);
 
 		// load postcode latitude and longitude
 		/*
@@ -516,9 +599,9 @@ public class AreaMapping {
 	 * (IOException e) { // read next e.printStackTrace(); } }
 	 */
 
-	private void loadAbsDataCsv_2074_0_UsingDoubleArrays(String fileResourceLocation, int[] columnsToImport,
-			Map<String, Integer> dataIndices, ArrayList<ArrayList<Integer>> dataMatrix,
-			ArrayList<ArrayList<String>> keys) {
+	private void loadAbsDataCsv_2074_0(String fileResourceLocation, int[] columnsToImport,
+			Map<String, Integer> indexMap, ArrayList<ArrayList<Integer>> dataMatrix,
+			ArrayList<ArrayList<String>> seriesTitles) {
 
 		CSVReader reader = null;
 		try {
@@ -535,7 +618,6 @@ public class AreaMapping {
 					// store series ID
 					for (int i = 0; i < columnsToImport.length; i++) {
 						seriesId[i] = line[columnsToImport[i]];
-						dataIndices.put(line[columnsToImport[i]], i);
 					}
 					header = false;
 				} else {
@@ -558,13 +640,13 @@ public class AreaMapping {
 			while ((line = reader.readNext()) != null && !footer) {
 				if (header) {
 					// do nothing because the header was processed on the first reading
-					keys.add(new ArrayList<String>(columnsToImport.length));
+					seriesTitles.add(new ArrayList<String>(columnsToImport.length));
 					for (int i = 0; i < columnsToImport.length; i++) {
 						dataMatrix.add(new ArrayList<Integer>(dataRowCount));
-						keys.get(0).add(line[columnsToImport[i]]);
+						seriesTitles.get(0).add(line[columnsToImport[i]]);
 					}
 					dataMatrix.trimToSize();
-					keys.get(0).trimToSize();
+					seriesTitles.get(0).trimToSize();
 					header = false;
 					dataRowCount = 0; // reset so I can use this as an index number
 				} else {
@@ -579,7 +661,7 @@ public class AreaMapping {
 							}
 							dataMatrix.get(i).add(val);
 						}
-						dataRowCount++;
+						indexMap.put(line[0], dataRowCount++); // Key: meshblock, Value: index
 					} else {
 						footer = true;
 					}
@@ -600,18 +682,101 @@ public class AreaMapping {
 	}
 
 	/**
+	 * Loads ABS pre-prepared catalogue data.
+	 * 
+	 * File pre-conditions:<br>
+	 * 1. The first row contains the column titles.<br>
+	 * 2. The unit type row has "Unit" in the first column.<br>
+	 * 3. The last header row has "Series ID" in the first column.<br>
+	 * 4. The first column contains the dates in the format MMM-yyyy.
+	 * 
+	 * Catalogues this works for include: ABS3222.0
+	 * 
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param catalogueName        - the name used to store this series' data in the
+	 *                             maps
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0). The first column is assumed to be the
+	 *                             date and is imported only as the key for the
+	 *                             other columns' data.
+	 * @param titles               - column titles in CSV file
+	 * @param units                - unit type (e.g. $Billions, Number, '000)
+	 * @param data                 - the data map that the values are returned in
+	 */
+	private void loadAbsDataCsv_Catalogue(String fileResourceLocation, String catalogueName, int[] columnsToImport,
+			Map<String, List<String>> titles, Map<String, List<String>> units, Map<String, Map<Date, String>> data) {
+
+		CSVReader reader = null;
+		try {
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
+			boolean header = true;
+			boolean titleRow = true;
+			String[] seriesId = new String[columnsToImport.length];
+			String[] line = null;
+			DateFormat dateFormat = new SimpleDateFormat("MMM-yyyy", Locale.ENGLISH);
+			while ((line = reader.readNext()) != null) {
+				if (header) {
+					if (titleRow) {
+						// store title
+						titles.put(catalogueName, new ArrayList<String>(columnsToImport.length));
+						for (int i = 0; i < columnsToImport.length; i++) {
+							titles.get(catalogueName).add(line[columnsToImport[i]]);
+						}
+						titleRow = false;
+					} else if (line[0].equals("Unit")) {
+						// store unit types
+						units.put(catalogueName, new ArrayList<String>(columnsToImport.length));
+						for (int i = 0; i < columnsToImport.length; i++) {
+							units.get(catalogueName).add(line[columnsToImport[i]]);
+						}
+					} else if (line[0].equals("Series ID")) {
+						// store series ID as key with blank collections to populate with data below
+						for (int i = 0; i < columnsToImport.length; i++) {
+							seriesId[i] = line[columnsToImport[i]];
+							data.put(line[columnsToImport[i]], new HashMap<Date, String>());
+						}
+						header = false;
+					}
+				} else {
+					for (int i = 0; i < columnsToImport.length; i++) {
+						// parse the body of the data
+						data.get(seriesId[i]).put(dateFormat.parse(line[0]), line[columnsToImport[i]]);
+					}
+				}
+			}
+			reader.close();
+			reader = null;
+		} catch (FileNotFoundException e) {
+			// open file
+			e.printStackTrace();
+		} catch (IOException e) {
+			// read next
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// parsing date from string
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * Initialises class variables.
 	 */
 	@PostConstruct
 	private void init() {
-		this.dataMapped = false;
+		this.dataLoaded = false;
+		this.totalPopulation = null;
+		this.adjustedPeopleByLga = null;
+
 		this.absData = null;
 		this.lgaData = null;
 		this.poaData = null;
 
-		this.dataIndicesAbs2074_0 = null;
-		this.dataMatrixAbs2074_0 = null;
-		this.keysAbs2074_0 = null;
+		this.abs2074_0indexMap = null;
+		this.abs2074_0dataMatrix = null;
+		this.abs2074_0seriesTitles = null;
+		this.abs3222_0 = null;
 
 		this.mapLgaToGccsa = null;
 		this.mapPoaToLga = null;
@@ -621,5 +786,15 @@ public class AreaMapping {
 		this.mapLgaCodeToState = null;
 		this.lgaMeshblocks = null;
 		this.poaMeshblocks = null;
+	}
+
+	/**
+	 * @return the abs3222_0
+	 */
+	public Map<String, Map<Date, String>> getAbs3222_0() {
+		if (!this.dataLoaded) {
+			this.mapMeshblocks();
+		}
+		return abs3222_0;
 	}
 }

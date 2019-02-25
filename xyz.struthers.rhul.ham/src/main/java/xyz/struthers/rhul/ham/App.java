@@ -50,8 +50,8 @@ public class App {
 		System.out.println("GCCSA is: " + gccsa + " (should be 1GSYD)");
 		System.out.println("Finished MeshblockMapping: " + new Date(System.currentTimeMillis()));
 
-		System.out.println("Started Calibration Data Load: " + new Date(System.currentTimeMillis()));
-		CalibrationData data = ctx.getBean(CalibrationData.class);
+		//System.out.println("Started Calibration Data Load: " + new Date(System.currentTimeMillis()));
+		//CalibrationData data = ctx.getBean(CalibrationData.class);
 
 		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 		Date date = null;
@@ -59,16 +59,16 @@ public class App {
 			date = df.parse("01/06/2018");
 			System.out.println("Date is: " + date);
 
-			int totalPop = data.getTotalPopulation(date);
+			int totalPop = mb.getTotalPopulation(date);
 			System.out.println("Total Population is: " + totalPop);
-			int lgaPop = data.getAdjustedPeopleByLga("10050", date);
+			int lgaPop = mb.getAdjustedPeopleByLga("10050", date);
 			System.out.println("LGA 10050 Population is: " + lgaPop);
 		} catch (ParseException e) {
 			// date parsing failed
 			e.printStackTrace();
 		}
 
-		System.out.println("Finished Calibration Data Load: " + new Date(System.currentTimeMillis()));
+		//System.out.println("Finished Calibration Data Load: " + new Date(System.currentTimeMillis()));
 
 		System.out.println("Starting Business agent calibration: " + new Date(System.currentTimeMillis()));
 		// CalibrateBusinesses calBus = new CalibrateBusinesses();
@@ -83,7 +83,7 @@ public class App {
 		System.out.println("MEMORY CONSUMED: " + formatter.format(megabytesAfter - megabytesBefore) + "MB");
 
 		while (true) {
-		} // 17 seconds on lappy, consumes 2GB RAM
+		}
 			// ctx.close();
 	}
 

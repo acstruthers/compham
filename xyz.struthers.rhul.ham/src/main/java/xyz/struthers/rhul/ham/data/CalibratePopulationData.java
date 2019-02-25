@@ -72,8 +72,7 @@ public class CalibratePopulationData {
 		Map<String, Double> lgaPercent = this.populationPercentByLga();
 
 		// get total population
-		this.data = new CalibrationData();
-		double totalPop = Double.valueOf(this.data.getTotalPopulation(date));
+		double totalPop = Double.valueOf(this.mapping.getTotalPopulation(date));
 
 		// multiply total by percentage to get current number of people in each LGA
 		Set<String> lgaSet = lgaPercent.keySet();
@@ -92,8 +91,10 @@ public class CalibratePopulationData {
 	 * 
 	 * @param date
 	 * @return the number of representative agents per LGA
+	 * 
+	 * deprecated
 	 */
-	public Map<String, Integer> householdAgentsByLga(Date date) {
+	/*public Map<String, Integer> householdAgentsByLga(Date date) {
 		int peoplePerAgent = Properties.getPeoplePerAgent();
 		Map<String, Integer> popByLga = this.populationByLga(date);
 		Set<String> lgaSet = popByLga.keySet();
@@ -102,7 +103,7 @@ public class CalibratePopulationData {
 			householdAgents.put(lga, (int) Math.round(popByLga.get(lga) / Double.valueOf(peoplePerAgent)));
 		}
 		return householdAgents;
-	}
+	}*/
 
 	@PostConstruct
 	private void init() {

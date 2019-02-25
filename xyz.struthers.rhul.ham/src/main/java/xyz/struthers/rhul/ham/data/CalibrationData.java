@@ -50,8 +50,6 @@ public class CalibrationData {
 	public static final String RBA_E1 = "RBA_E1"; // household & business Balance Sheet
 
 	public static final String ABS1292_0_55_002_ANZSIC = "ABS_1292.0.55.002_ANZSIC";
-	public static final String ABS_2074_0 = "ABS_2074.0"; // people & dwelling count by meshblock
-	public static final String ABS_3222_0 = "ABS_3222.0"; // population projections
 	public static final String ABS_5368_0_T14A = "ABS_5368.0_Table14a"; // exports by country
 	public static final String ABS_5368_0_T14B = "ABS_5368.0_Table14b"; // imports by country
 	public static final String ABS_5368_0_T36A = "ABS_5368.0_Table36a"; // exports NSW
@@ -87,14 +85,12 @@ public class CalibrationData {
 
 	// data
 	private boolean dataLoaded;
-	private Map<Date, Integer> totalPopulation;
-	private Map<Date, Map<String, Integer>> adjustedPeopleByLga;
+	
 	private Map<String, List<String>> title;
 	private Map<String, List<String>> unitType;
 	private Map<String, Map<Date, String>> rbaE1; // AU Bal Sht totals
 	private Map<String, Map<String, String>> abs1292_0_55_002ANZSIC; // ANZSIC industry code mapping
-	private Map<String, Map<String, String>> abs2074_0; // People and Dwellings count by Meshblock
-	private Map<String, Map<Date, String>> abs3222_0; // AU by gender and age
+	//private Map<String, Map<Date, String>> abs3222_0; // AU by gender and age (population projections)
 	private Map<String, Map<Date, String>> abs5368_0Table14a; // exports by country
 	private Map<String, Map<Date, String>> abs5368_0Table14b; // imports by country
 	private Map<String, Map<Date, String>> abs5368_0Table36a; // exports NSW
@@ -144,60 +140,7 @@ public class CalibrationData {
 		this.area = areaMapping;
 	}
 
-	/**
-	 * Gets the total Australian population as at a given date
-	 * 
-	 * @param date - Dates in the data file are MMM-yyyy, so date argument should be
-	 *             the first day of each Month.
-	 * @return total Australian population
-	 */
-	public int getTotalPopulation(Date date) {
-		if (!this.dataLoaded) {
-			this.loadData();
-		}
-		if (this.totalPopulation == null) {
-			this.totalPopulation = new HashMap<Date, Integer>(5);
-		}
-		Integer totalPop = this.totalPopulation.get(date);
-		if (totalPop == null) {
-			totalPop = 0;
-			Set<String> seriesIds = this.abs3222_0.keySet();
-			for (String series : seriesIds) {
-				totalPop += Integer.valueOf(this.abs3222_0.get(series).get(date));
-			}
-			this.totalPopulation.put(date, totalPop);
-		}
-		Properties.setTotalPopulationAU(totalPop);
-		return totalPop.intValue();
-	}
-
-	public Map<String, Integer> getAdjustedPeopleByLga(Date date) {
-		if (!this.dataLoaded) {
-			this.loadData();
-		}
-		if (this.adjustedPeopleByLga == null) {
-			this.adjustedPeopleByLga = new HashMap<Date, Map<String, Integer>>(5);
-		}
-		Map<String, Integer> result = this.adjustedPeopleByLga.get(date);
-		if (result == null) {
-			Map<String, Integer> censusPeopleByLga = area.getCensusPeopleByLga();
-			Set<String> lgaSet = censusPeopleByLga.keySet();
-			int totalCensusPopulation = 0;
-			for (String lga : lgaSet) {
-				totalCensusPopulation += censusPeopleByLga.get(lga);
-			}
-			result = new HashMap<String, Integer>(lgaSet.size());
-			double factor = Double.valueOf(this.getTotalPopulation(date)) / Double.valueOf(totalCensusPopulation);
-			for (String lga : lgaSet) {
-				result.put(lga, (int) Math.round(Double.valueOf(censusPeopleByLga.get(lga)) * factor));
-			}
-		}
-		return result;
-	}
-
-	public int getAdjustedPeopleByLga(String lgaCode, Date date) {
-		return this.getAdjustedPeopleByLga(date).get(lgaCode);
-	}
+	
 
 	/**
 	 * Deletes all the field variables, freeing up memory.
@@ -226,14 +169,6 @@ public class CalibrationData {
 		this.loadAbsDataCsv_1292_0_55_002("/data/ABS/1292.0.55.002_ANZSIC/1292.0.55.002_ANZSIC codes formatted.csv",
 				ABS1292_0_55_002_ANZSIC, this.title, this.abs1292_0_55_002ANZSIC);
 
-		// load ABS 2074.0 Census meshblock counts
-		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 2074.0 census meshblock count data");
-		this.abs2074_0 = new HashMap<String, Map<String, String>>();
-		int[] abs2074_0_Columns = { 3, 4 };
-		this.loadAbsDataCsv_2074_0("/data/ABS/2074.0_MeshblockCounts/2016 Census Mesh Block Counts.csv",
-				abs2074_0_Columns, this.abs2074_0);
-		// FIXME: up to here for 2074.0
-
 		// load RBA data
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading RBA E1 data");
 		this.rbaE1 = new HashMap<String, Map<Date, String>>();
@@ -241,18 +176,7 @@ public class CalibrationData {
 		this.loadRbaDataCsv("/data/RBA/E_HouseholdBusiness/e1-data.csv", RBA_E1, rbaE1Columns, this.title,
 				this.unitType, this.rbaE1);
 
-		// load ABS 3222.0 data
-		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 3222.0 Income data");
-		this.abs3222_0 = new HashMap<String, Map<Date, String>>();
-		int[] abs3220_0Columns = { 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219,
-				220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240,
-				241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261,
-				262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282,
-				283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302,
-				303 }; // loads count of Persons 0 - 100
-		this.loadAbsDataCsv_Catalogue(
-				"/data/ABS/3222.0_PopnProjections/Table B9. Population projections - Series B.csv", ABS_3222_0,
-				abs3220_0Columns, this.title, this.unitType, this.abs3222_0);
+		
 
 		// load ABS 5368.0 International Trade data
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 5368.0 International Trade data");
@@ -947,57 +871,6 @@ public class CalibrationData {
 		}
 	}
 
-	// FIXME: load ABS 2074.0 population by mesh block, and convert to LGA
-	/**
-	 * 
-	 * @param fileResourceLocation - the classpath resource location of the file to
-	 *                             import
-	 * @param columnsToImport      - a zero-based array of integers specifying which
-	 *                             columns to import (i.e. the first column is
-	 *                             column 0).
-	 * @param data                 - a map containing the number of people and
-	 *                             dwellings for each meshblock code.<br>
-	 *                             Keys: title (Dwelling / Person), meshblock
-	 */
-	private void loadAbsDataCsv_2074_0(String fileResourceLocation, int[] columnsToImport,
-			Map<String, Map<String, String>> data) {
-
-		CSVReader reader = null;
-		try {
-			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
-			reader = new CSVReader(new InputStreamReader(is));
-			boolean header = true;
-			String[] seriesId = new String[columnsToImport.length];
-			String[] line = null;
-			while ((line = reader.readNext()) != null) {
-				if (header) {
-					// store series ID
-					for (int i = 0; i < columnsToImport.length; i++) {
-						seriesId[i] = line[columnsToImport[i]];
-						data.put(line[i], new HashMap<String, String>());
-					}
-					header = false;
-				} else {
-					if (!line[0].isBlank()) { // data exists, so import this row
-						data.put(line[0], new HashMap<String, String>());
-						for (int i = 0; i < columnsToImport.length; i++) {
-							// parse the body of the data
-							data.get(seriesId[i]).put(line[0], line[columnsToImport[i]]);
-						}
-					}
-				}
-			}
-			reader.close();
-			reader = null;
-		} catch (FileNotFoundException e) {
-			// open file
-			e.printStackTrace();
-		} catch (IOException e) {
-			// read next
-			e.printStackTrace();
-		}
-	}
-
 	/**
 	 * 
 	 * @param fileResourceLocation - the URI of the file to import
@@ -1178,8 +1051,7 @@ public class CalibrationData {
 	@PostConstruct
 	private void init() {
 		this.dataLoaded = false;
-		this.totalPopulation = null;
-		this.adjustedPeopleByLga = null;
+		
 
 		this.title = null;
 		this.unitType = null;
@@ -1187,8 +1059,6 @@ public class CalibrationData {
 		this.rbaE1 = null;
 
 		this.abs1292_0_55_002ANZSIC = null;
-		this.abs2074_0 = null;
-		this.abs3222_0 = null;
 		this.abs5368_0Table14a = null;
 		this.abs5368_0Table14b = null;
 		this.abs5368_0Table36a = null;
@@ -1260,25 +1130,7 @@ public class CalibrationData {
 		return abs1292_0_55_002ANZSIC;
 	}
 
-	/**
-	 * @return the abs2074_0
-	 */
-	public Map<String, Map<String, String>> getAbs2074_0() {
-		if (!this.dataLoaded) {
-			this.loadData();
-		}
-		return abs2074_0;
-	}
-
-	/**
-	 * @return the abs3222_0
-	 */
-	public Map<String, Map<Date, String>> getAbs3222_0() {
-		if (!this.dataLoaded) {
-			this.loadData();
-		}
-		return abs3222_0;
-	}
+	
 
 	/**
 	 * @return the abs5368_0Exporters
