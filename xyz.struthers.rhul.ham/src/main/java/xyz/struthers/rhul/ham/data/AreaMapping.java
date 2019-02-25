@@ -21,6 +21,8 @@ import org.springframework.stereotype.Component;
 
 import com.opencsv.CSVReader;
 
+import xyz.struthers.rhul.ham.MemoryUsageBenchmark;
+
 /**
  * Loads ASGS boundary data from the ABS, downloaded in CSV format. Uses
  * meshblocks as the common field to map between Postal Area (POA), Local
@@ -42,15 +44,19 @@ public class AreaMapping {
 	private static final String ABS_GCCSA_CODE = "GCCSA_CODE_2016";
 	private static final String LGA_LGA_CODE = "LGA_CODE_2018";
 	private static final String POA_POA_CODE = "POA_CODE_2016";
-	private static final String COUNT_PERSON = "Person";
-	private static final String COUNT_DWELLING = "Dwelling";
+	private static final int INDEX_COUNT_PERSON = 0;
+	private static final int INDEX_COUNT_DWELLING = 1;
 
 	// data variables
 	private boolean dataMapped;
 	private Map<String, Map<String, String>> absData;
 	private Map<String, Map<String, String>> lgaData;
 	private Map<String, Map<String, String>> poaData;
-	private Map<String, Map<String, String>> countData;
+
+	private Map<String, Integer> dataIndicesAbs2074_0;
+	private ArrayList<ArrayList<Integer>> dataMatrixAbs2074_0;
+	private ArrayList<ArrayList<String>> keysAbs2074_0;
+
 	// private Map<String, Double> postCodeLatitude;
 	// private Map<String, Double> postCodeLongitude;
 	// private Map<String, Double> lgaLatitude;
@@ -88,7 +94,7 @@ public class AreaMapping {
 			int lgaPeople = 0;
 			Set<String> lgaMb = this.lgaMeshblocks.get(lga);
 			for (String mb : lgaMb) {
-				lgaPeople += Integer.valueOf(this.countData.get(AreaMapping.COUNT_PERSON).get(mb));
+				lgaPeople += this.dataMatrixAbs2074_0.get(INDEX_COUNT_PERSON).get(this.dataIndicesAbs2074_0.get(mb));
 			}
 			result.put(lga, lgaPeople);
 		}
@@ -109,7 +115,7 @@ public class AreaMapping {
 		int lgaPeople = 0;
 		Set<String> lgaMb = this.lgaMeshblocks.get(lgaCode);
 		for (String mb : lgaMb) {
-			lgaPeople += Integer.valueOf(this.countData.get(AreaMapping.COUNT_PERSON).get(mb));
+			lgaPeople += this.dataMatrixAbs2074_0.get(INDEX_COUNT_PERSON).get(this.dataIndicesAbs2074_0.get(mb));
 		}
 		return lgaPeople;
 	}
@@ -130,7 +136,8 @@ public class AreaMapping {
 			int lgaDwellings = 0;
 			Set<String> lgaMb = this.lgaMeshblocks.get(lga);
 			for (String mb : lgaMb) {
-				lgaDwellings += Integer.valueOf(this.countData.get(AreaMapping.COUNT_DWELLING).get(mb));
+				lgaDwellings += this.dataMatrixAbs2074_0.get(INDEX_COUNT_DWELLING)
+						.get(this.dataIndicesAbs2074_0.get(mb));
 			}
 			result.put(lga, lgaDwellings);
 		}
@@ -151,9 +158,21 @@ public class AreaMapping {
 		int lgaDwellings = 0;
 		Set<String> lgaMb = this.lgaMeshblocks.get(lgaCode);
 		for (String mb : lgaMb) {
-			lgaDwellings += Integer.valueOf(this.countData.get(AreaMapping.COUNT_DWELLING).get(mb));
+			lgaDwellings += this.dataMatrixAbs2074_0.get(INDEX_COUNT_DWELLING).get(this.dataIndicesAbs2074_0.get(mb));
 		}
 		return lgaDwellings;
+	}
+
+	/**
+	 * 
+	 * @param meshblockCode - Meshblock code
+	 * @return Local Government Area (LGA) code
+	 */
+	public String getLgaCodeFromMeshblock(String meshblockCode) {
+		if (!this.dataMapped) {
+			this.mapMeshblocks();
+		}
+		return this.absData.get(LGA_LGA_CODE).get(meshblockCode);
 	}
 
 	/**
@@ -273,7 +292,7 @@ public class AreaMapping {
 			for (String mb : fromMeshblocks) {
 				String toCode = toData.get(toTitle).get(mb);
 				int toCodeCount = toPeopleCount.containsKey(toCode) ? toPeopleCount.get(toCode) : 0;
-				int newCount = Integer.valueOf(this.countData.get(AreaMapping.COUNT_PERSON).get(mb));
+				int newCount = this.dataMatrixAbs2074_0.get(INDEX_COUNT_PERSON).get(this.dataIndicesAbs2074_0.get(mb));
 				toPeopleCount.put(toCode, toCodeCount + newCount); // update count in map
 			}
 
@@ -339,7 +358,7 @@ public class AreaMapping {
 				lgaLoadColumn);
 		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_OT.csv", this.lgaData,
 				lgaLoadColumn);
-		
+
 		// load POA data
 		final boolean[] poaLoadColumn = { false, true, false, false };
 		this.poaData = new HashMap<String, Map<String, String>>();
@@ -347,10 +366,13 @@ public class AreaMapping {
 				poaLoadColumn);
 
 		// load mesh block counts
-		final boolean[] countLoadColumn = { false, false, false, true, true, false };
-		this.countData = new HashMap<String, Map<String, String>>();
-		this.readMeshblockCsvData("/data/ABS/2074.0_MeshblockCounts/2016 Census Mesh Block Counts.csv", this.countData,
-				countLoadColumn);
+		final int[] abs2074_0_Columns = { 3, 4 };
+		this.dataIndicesAbs2074_0 = new HashMap<String, Integer>();
+		this.dataMatrixAbs2074_0 = new ArrayList<ArrayList<Integer>>(abs2074_0_Columns.length);
+		this.keysAbs2074_0 = new ArrayList<ArrayList<String>>(abs2074_0_Columns.length);
+		this.loadAbsDataCsv_2074_0_UsingDoubleArrays(
+				"/data/ABS/2074.0_MeshblockCounts/2016 Census Mesh Block Counts.csv", abs2074_0_Columns,
+				this.dataIndicesAbs2074_0, this.dataMatrixAbs2074_0, this.keysAbs2074_0);
 
 		// load postcode latitude and longitude
 		/*
@@ -494,6 +516,89 @@ public class AreaMapping {
 	 * (IOException e) { // read next e.printStackTrace(); } }
 	 */
 
+	private void loadAbsDataCsv_2074_0_UsingDoubleArrays(String fileResourceLocation, int[] columnsToImport,
+			Map<String, Integer> dataIndices, ArrayList<ArrayList<Integer>> dataMatrix,
+			ArrayList<ArrayList<String>> keys) {
+
+		CSVReader reader = null;
+		try {
+			// determine the array sizes in the first pass
+			InputStream is = MemoryUsageBenchmark.class.getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
+			boolean header = true;
+			boolean footer = false;
+			String[] seriesId = new String[columnsToImport.length];
+			int dataRowCount = 0;
+			String[] line = null;
+			while ((line = reader.readNext()) != null && !footer) {
+				if (header) {
+					// store series ID
+					for (int i = 0; i < columnsToImport.length; i++) {
+						seriesId[i] = line[columnsToImport[i]];
+						dataIndices.put(line[columnsToImport[i]], i);
+					}
+					header = false;
+				} else {
+					if (!line[0].isBlank()) { // data exists, so count this row
+						dataRowCount++;
+					} else {
+						footer = true;
+					}
+				}
+			}
+			reader.close();
+			reader = null;
+
+			// read the data into the arrays on the second pass
+			is = MemoryUsageBenchmark.class.getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
+			header = true;
+			footer = false;
+			line = null;
+			while ((line = reader.readNext()) != null && !footer) {
+				if (header) {
+					// do nothing because the header was processed on the first reading
+					keys.add(new ArrayList<String>(columnsToImport.length));
+					for (int i = 0; i < columnsToImport.length; i++) {
+						dataMatrix.add(new ArrayList<Integer>(dataRowCount));
+						keys.get(0).add(line[columnsToImport[i]]);
+					}
+					dataMatrix.trimToSize();
+					keys.get(0).trimToSize();
+					header = false;
+					dataRowCount = 0; // reset so I can use this as an index number
+				} else {
+					if (!line[0].isBlank()) { // data exists, so import this row
+						for (int i = 0; i < columnsToImport.length; i++) {
+							// parse the body of the data
+							int val = 0;
+							try {
+								val = Integer.valueOf(line[columnsToImport[i]]);
+							} catch (NumberFormatException e) {
+								val = 0;
+							}
+							dataMatrix.get(i).add(val);
+						}
+						dataRowCount++;
+					} else {
+						footer = true;
+					}
+				}
+			}
+			for (int i = 0; i < columnsToImport.length; i++) {
+				dataMatrix.get(i).trimToSize();
+			}
+			reader.close();
+			reader = null;
+		} catch (FileNotFoundException e) {
+			// open file
+			e.printStackTrace();
+		} catch (IOException e) {
+			// read next
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Initialises class variables.
 	 */
@@ -503,7 +608,11 @@ public class AreaMapping {
 		this.absData = null;
 		this.lgaData = null;
 		this.poaData = null;
-		this.countData = null;
+
+		this.dataIndicesAbs2074_0 = null;
+		this.dataMatrixAbs2074_0 = null;
+		this.keysAbs2074_0 = null;
+
 		this.mapLgaToGccsa = null;
 		this.mapPoaToLga = null;
 		this.mapLgaToPoa = null;

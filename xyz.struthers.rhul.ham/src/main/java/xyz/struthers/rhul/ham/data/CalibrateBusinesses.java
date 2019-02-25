@@ -1306,6 +1306,7 @@ public class CalibrateBusinesses {
 		 */
 		this.businessData.close();
 		this.businessData = null;
+		System.gc();
 	}
 
 	/**

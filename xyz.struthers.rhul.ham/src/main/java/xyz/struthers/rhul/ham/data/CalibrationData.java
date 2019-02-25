@@ -226,6 +226,14 @@ public class CalibrationData {
 		this.loadAbsDataCsv_1292_0_55_002("/data/ABS/1292.0.55.002_ANZSIC/1292.0.55.002_ANZSIC codes formatted.csv",
 				ABS1292_0_55_002_ANZSIC, this.title, this.abs1292_0_55_002ANZSIC);
 
+		// load ABS 2074.0 Census meshblock counts
+		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 2074.0 census meshblock count data");
+		this.abs2074_0 = new HashMap<String, Map<String, String>>();
+		int[] abs2074_0_Columns = { 3, 4 };
+		this.loadAbsDataCsv_2074_0("/data/ABS/2074.0_MeshblockCounts/2016 Census Mesh Block Counts.csv",
+				abs2074_0_Columns, this.abs2074_0);
+		// FIXME: up to here for 2074.0
+
 		// load RBA data
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading RBA E1 data");
 		this.rbaE1 = new HashMap<String, Map<Date, String>>();
@@ -940,6 +948,55 @@ public class CalibrationData {
 	}
 
 	// FIXME: load ABS 2074.0 population by mesh block, and convert to LGA
+	/**
+	 * 
+	 * @param fileResourceLocation - the classpath resource location of the file to
+	 *                             import
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0).
+	 * @param data                 - a map containing the number of people and
+	 *                             dwellings for each meshblock code.<br>
+	 *                             Keys: title (Dwelling / Person), meshblock
+	 */
+	private void loadAbsDataCsv_2074_0(String fileResourceLocation, int[] columnsToImport,
+			Map<String, Map<String, String>> data) {
+
+		CSVReader reader = null;
+		try {
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
+			boolean header = true;
+			String[] seriesId = new String[columnsToImport.length];
+			String[] line = null;
+			while ((line = reader.readNext()) != null) {
+				if (header) {
+					// store series ID
+					for (int i = 0; i < columnsToImport.length; i++) {
+						seriesId[i] = line[columnsToImport[i]];
+						data.put(line[i], new HashMap<String, String>());
+					}
+					header = false;
+				} else {
+					if (!line[0].isBlank()) { // data exists, so import this row
+						data.put(line[0], new HashMap<String, String>());
+						for (int i = 0; i < columnsToImport.length; i++) {
+							// parse the body of the data
+							data.get(seriesId[i]).put(line[0], line[columnsToImport[i]]);
+						}
+					}
+				}
+			}
+			reader.close();
+			reader = null;
+		} catch (FileNotFoundException e) {
+			// open file
+			e.printStackTrace();
+		} catch (IOException e) {
+			// read next
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * 

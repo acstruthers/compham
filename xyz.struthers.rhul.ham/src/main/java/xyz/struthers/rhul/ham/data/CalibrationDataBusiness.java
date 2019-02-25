@@ -3,8 +3,6 @@
  */
 package xyz.struthers.rhul.ham.data;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;

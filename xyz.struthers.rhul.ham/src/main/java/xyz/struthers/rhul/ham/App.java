@@ -3,6 +3,7 @@
  */
 package xyz.struthers.rhul.ham;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -27,11 +28,19 @@ public class App {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		DecimalFormat formatter = new DecimalFormat("#,##0.00");
+		long memoryBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+		double megabytesBefore = memoryBefore / 1024d / 1024d;
+		System.out.println("MEMORY USAGE BEFORE: " + formatter.format(megabytesBefore) + "MB");
+
 		// load Spring context
 		// https://www.tutorialspoint.com/spring/spring_java_based_configuration.htm
 		// ApplicationContext ctx = new
 		// ClassPathXmlApplicationContext("spring/applicationContext.xml");
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfiguration.class);
+
+		System.out.println(
+				"MEMORY USAGE BEFORE: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
 
 		System.out.println("Started MeshblockMapping: " + new Date(System.currentTimeMillis()));
 		AreaMapping mb = ctx.getBean(AreaMapping.class);
@@ -43,7 +52,7 @@ public class App {
 
 		System.out.println("Started Calibration Data Load: " + new Date(System.currentTimeMillis()));
 		CalibrationData data = ctx.getBean(CalibrationData.class);
-		
+
 		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 		Date date = null;
 		try {
@@ -67,9 +76,15 @@ public class App {
 		calBus.createBusinessAgents();
 		System.out.println("Finished Business agent calibration: " + new Date(System.currentTimeMillis()));
 
+		System.gc();
+		long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+		double megabytesAfter = memoryAfter / 1024d / 1024d;
+		System.out.println("MEMORY USAGE AFTER: " + formatter.format(megabytesAfter) + "MB");
+		System.out.println("MEMORY CONSUMED: " + formatter.format(megabytesAfter - megabytesBefore) + "MB");
+
 		while (true) {
 		} // 17 seconds on lappy, consumes 2GB RAM
-		// ctx.close();
+			// ctx.close();
 	}
 
 	public void areaMappingTestHarness() {
