@@ -20,6 +20,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -410,6 +411,26 @@ public class CalibrationDataIndividual {
 				"/data/ABS/CensusTableBuilder2016/CDCF by LGA by FINF/CDCF by LGA by FINF - OT.csv",
 				this.initialisedCensusCDCF_LGA_FINF, fromColumnCDCF_LGA_FINF, toColumnCDCF_LGA_FINF,
 				this.censusCDCF_LGA_FINF);
+
+		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Individuals Table 6B data");
+		this.atoIndividualTable6b = new HashMap<String, Map<String, String>>();
+		int[] atoIndividualTable6bColumns = { 2, 3, 4, 16, 17, 18, 19, 22, 23, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37,
+				38, 39, 40, 41, 44, 45, 60, 61, 100, 101, 102, 103 };
+		this.loadAtoIndividualsTable6("/data/ATO/Individual/IndividualsTable6B.csv", ATO_INDIVIDUAL_T6B,
+				atoIndividualTable6bColumns, this.title, this.atoIndividualTable6b);
+
+		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Individuals Table 6C data");
+		this.atoIndividualTable6c = new HashMap<String, Map<String, String>>();
+		int[] atoIndividualTable6cColumns = { 10, 11, 12, 13, 14, 32, 33, 34, 35, 36 };
+		this.loadAtoIndividualsTable6("/data/ATO/Individual/IndividualsTable6C.csv", ATO_INDIVIDUAL_T6C,
+				atoIndividualTable6cColumns, this.title, this.atoIndividualTable6c);
+
+		// FIXME: call table 9 loader
+		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Individuals Table 9 data");
+		this.atoIndividualTable9 = new HashMap<String, Map<String, String>>();
+		int[] atoIndividualTable9Columns = { };
+		this.loadAtoIndividualsTable9("/data/ATO/Individual/IndividualsTable9.csv", ATO_INDIVIDUAL_T9,
+				atoIndividualTable9Columns, this.title, this.atoIndividualTable9);
 
 		// set flag so we only load the data once
 		System.out.println(new Date(System.currentTimeMillis()) + ": Individual data loaded");
@@ -1026,31 +1047,144 @@ public class CalibrationDataIndividual {
 		}
 	}
 
-	//FIXME: load ATO Individual Tables 6b, 6c and 9.
+	// FIXME: load ATO Individual Tables 6b, 6c and 9.
 	/**
-	 * Column[1] is post code
+	 * Load data from ATO Individuals Table 6B, 6C
 	 * 
-	 * @param fileResourceLocation
-	 * @param columnsToImport
-	 * @param data
+	 * Column[1] is post code FIXME: implement me
+	 * 
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param dataSourceName       - the name used to identify this data source (in
+	 *                             the shared maps)
+	 * @param tableName            - the name used to store this series' data in the
+	 *                             maps
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0).
+	 * @param titles               - column titles in CSV file
+	 * @param data                 - the data map that the values are returned in
 	 */
-	private void loadAtoIndividualsTable6(String fileResourceLocation, int[] columnsToImport,
-			Map<String, Map<String, String>> data) {
-		
+	private void loadAtoIndividualsTable6(String fileResourceLocation, String tableName, int[] columnsToImport,
+			Map<String, List<String>> titles, Map<String, Map<String, String>> data) {
+
+		CSVReader reader = null;
+		try {
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
+			boolean header = true;
+			boolean footer = false;
+			String[] seriesId = new String[columnsToImport.length];
+
+			String[] line = null;
+			while ((line = reader.readNext()) != null && !footer) {
+				if (header) {
+					if (line[0].equals("State/ Territory1")) {
+						// title row
+						List<String> thesecolumnNames = new ArrayList<String>(columnsToImport.length);
+						for (int i = 0; i < columnsToImport.length; i++) {
+							// store title
+							seriesId[i] = line[columnsToImport[i]];
+							thesecolumnNames.add(line[columnsToImport[i]]);
+
+							// store series ID as key with blank collections to populate with data below
+							data.put(line[columnsToImport[i]], new HashMap<String, String>());
+						}
+						titles.put(tableName, thesecolumnNames);
+						header = false;
+					}
+				} else {
+					if (!line[0].isBlank()) {
+						// Check if line[1] is numeric, and skip this row if it's not because we
+						// can't map a "state other" category to an LGA
+						if (NumberUtils.isCreatable(line[1])) {
+							for (int i = 0; i < columnsToImport.length; i++) {
+								// parse the body of the data
+								data.get(seriesId[i]).put(line[1], line[columnsToImport[i]]);
+							}
+						}
+					} else {
+						footer = true;
+					}
+				}
+			}
+			reader.close();
+			reader = null;
+		} catch (FileNotFoundException e) {
+			// open file
+			e.printStackTrace();
+		} catch (IOException e) {
+			// read next
+			e.printStackTrace();
+		}
 	}
-	
+
 	/**
-	 * left(column[1], 5) is industry code (5 digits)
+	 * Load data from ATO Individuals Table 9
 	 * 
-	 * @param fileResourceLocation
-	 * @param columnsToImport
-	 * @param data
+	 * left(column[1], 5) is industry code (5 digits) FIXME: implement me
+	 * 
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param dataSourceName       - the name used to identify this data source (in
+	 *                             the shared maps)
+	 * @param tableName            - the name used to store this series' data in the
+	 *                             maps
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0).
+	 * @param titles               - column titles in CSV file
+	 * @param data                 - the data map that the values are returned in
 	 */
-	private void loadAtoIndividualsTable9(String fileResourceLocation, int[] columnsToImport,
-			Map<String, Map<String, String>> data) {
-		
+	private void loadAtoIndividualsTable9(String fileResourceLocation, String tableName, int[] columnsToImport,
+			Map<String, List<String>> titles, Map<String, Map<String, String>> data) {
+
+		CSVReader reader = null;
+		try {
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
+			boolean header = true;
+			boolean footer = false;
+			String[] seriesId = new String[columnsToImport.length];
+
+			String[] line = null;
+			while ((line = reader.readNext()) != null && !footer) {
+				if (header) {
+					if (line[0].equals("Broad Industry1")) {
+						// title row
+						List<String> thesecolumnNames = new ArrayList<String>(columnsToImport.length);
+						for (int i = 0; i < columnsToImport.length; i++) {
+							// store title
+							seriesId[i] = line[columnsToImport[i]];
+							thesecolumnNames.add(line[columnsToImport[i]]);
+
+							// store series ID as key with blank collections to populate with data below
+							data.put(line[columnsToImport[i]], new HashMap<String, String>());
+						}
+						titles.put(tableName, thesecolumnNames);
+						header = false;
+					}
+				} else {
+					if (!line[1].equals("Other individuals")) {
+						for (int i = 0; i < columnsToImport.length; i++) {
+							// parse the body of the data
+							String fineIndustryCode = line[1].substring(0, 5);
+							data.get(seriesId[i]).put(fineIndustryCode, line[columnsToImport[i]]);
+						}
+					} else {
+						footer = true;
+					}
+				}
+			}
+			reader.close();
+			reader = null;
+		} catch (FileNotFoundException e) {
+			// open file
+			e.printStackTrace();
+		} catch (IOException e) {
+			// read next
+			e.printStackTrace();
+		}
 	}
-	
+
 	@PostConstruct
 	private void init() {
 		this.dataLoaded = false;
