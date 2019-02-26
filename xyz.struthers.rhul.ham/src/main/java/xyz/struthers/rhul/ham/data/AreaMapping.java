@@ -67,6 +67,7 @@ public class AreaMapping {
 
 	private Map<Date, Integer> totalPopulation;
 	private Map<Date, Map<String, Integer>> adjustedPeopleByLga;
+	private Map<Date, Map<String, Integer>> adjustedDwellingsByLga;
 	private Map<String, Integer> abs2074_0indexMap;
 	private ArrayList<ArrayList<Integer>> abs2074_0dataMatrix;
 	private ArrayList<ArrayList<String>> abs2074_0seriesTitles;
@@ -148,7 +149,38 @@ public class AreaMapping {
 	public int getAdjustedPeopleByLga(String lgaCode, Date date) {
 		return this.getAdjustedPeopleByLga(date).get(lgaCode);
 	}
+	
+	public Map<String, Integer> getAdjustedDwellingsByLga(Date date) {
+		if (!this.dataLoaded) {
+			this.mapMeshblocks();
+		}
+		if (this.adjustedDwellingsByLga == null) {
+			this.adjustedDwellingsByLga = new HashMap<Date, Map<String, Integer>>(2);
+		}
+		Map<String, Integer> result = this.adjustedDwellingsByLga.get(date);
+		if (result == null) {
+			Map<String, Integer> censusDwellingsByLga = this.getCensusDwellingsByLga();
+			Map<String, Integer> censusPeopleByLga = this.getCensusPeopleByLga();
+			Set<String> lgaSet = censusPeopleByLga.keySet();
+			int totalCensusPopulation = 0;
+			for (String lga : lgaSet) {
+				totalCensusPopulation += censusPeopleByLga.get(lga);
+			}
+			int resultMapCapacity = (int) Math.ceil(lgaSet.size() / 0.75d);
+			result = new HashMap<String, Integer>(resultMapCapacity);
+			double factor = Double.valueOf(this.getTotalPopulation(date)) / Double.valueOf(totalCensusPopulation);
+			for (String lga : lgaSet) {
+				result.put(lga, (int) Math.round(Double.valueOf(censusDwellingsByLga.get(lga)) * factor));
+			}
+			this.adjustedDwellingsByLga.put(date, result);
+		}
+		return result;
+	}
 
+	public int getAdjustedDwellingsByLga(String lgaCode, Date date) {
+		return this.getAdjustedDwellingsByLga(date).get(lgaCode);
+	}
+	
 	/**
 	 * 
 	 * @return a map of the unadjusted number of people in each LGA, per the census.
@@ -768,6 +800,7 @@ public class AreaMapping {
 		this.dataLoaded = false;
 		this.totalPopulation = null;
 		this.adjustedPeopleByLga = null;
+		this.adjustedDwellingsByLga = null;
 
 		this.absData = null;
 		this.lgaData = null;

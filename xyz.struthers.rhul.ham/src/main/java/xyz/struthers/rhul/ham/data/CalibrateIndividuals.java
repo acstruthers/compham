@@ -3,10 +3,12 @@
  */
 package xyz.struthers.rhul.ham.data;
 
-import java.util.Arrays;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,6 +45,10 @@ public class CalibrateIndividuals {
 	// field variables
 	private int peoplePerAgent;
 	private List<Individual> individualAgents;
+	private Date calibrationDate;
+	private int totalPopulationAU;
+	private Map<String, Integer> lgaPeopleCount;
+	private Map<String, Integer> lgaDwellingsCount;
 
 	// A single Bal Sht using national-level data
 	private double bsAUBankDeposits;
@@ -70,8 +76,11 @@ public class CalibrateIndividuals {
 
 	private void init() {
 		this.peoplePerAgent = 0;
-		this.area = null;
-		this.data = null;
+		this.individualAgents = null;
+		this.calibrationDate = null;
+		this.totalPopulationAU = 0;
+		this.lgaPeopleCount = null;
+		this.lgaDwellingsCount = null;
 
 		this.bsAUBankDeposits = 0d;
 		this.bsAUOtherFinancialAssets = 0d;
@@ -80,6 +89,9 @@ public class CalibrateIndividuals {
 
 		this.bsAULoans = 0d;
 		this.bsAUOtherLiabilities = 0d;
+
+		// data sources
+		this.abs3222_0 = null;
 	}
 
 	/**
@@ -127,8 +139,14 @@ public class CalibrateIndividuals {
 	 * 
 	 */
 	public void createIndividualAgents() {
+		DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+		try {
+			this.calibrationDate = sdf.parse("01/06/2018");
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		this.abs3222_0 = this.area.getAbs3222_0();
 
-		// FIXME: implement me
 		/*
 		 * ------------------------------------------------------------------------<br>
 		 * PART A: DETERMINING THE NUMBER AND TYPE OF INDIVIDUALS IN EACH LGA
@@ -138,7 +156,9 @@ public class CalibrateIndividuals {
 		 * the baseline we adjust the rest of the data against.
 		 */
 
-		// double totalPopAU =
+		this.lgaPeopleCount = this.area.getAdjustedPeopleByLga(this.calibrationDate);
+		this.lgaDwellingsCount = this.area.getAdjustedDwellingsByLga(this.calibrationDate);
+		this.totalPopulationAU = this.area.getTotalPopulation(this.calibrationDate);
 
 		/*
 		 * 2. ABS 2074.0: Sum the total number of dwellings and individuals for
@@ -148,6 +168,7 @@ public class CalibrateIndividuals {
 		 * and apply the population multiplier to each LGA to get the adjusted number of
 		 * persons and dwellings.
 		 */
+		// FIXME: implement me
 
 		this.addAgentsToEconomy();
 	}
@@ -177,8 +198,7 @@ public class CalibrateIndividuals {
 
 		// calibrate Bal Sht using national-level data, then pro-rata for each
 		// individual using the ratios
-		this.calibrateNationalBalSht();
-		this.assignProRataBalShtToAllIndividuals();
+
 	}
 
 	/**
@@ -197,9 +217,6 @@ public class CalibrateIndividuals {
 			// meanIncome,
 			// adjustedPeople
 
-			// TODO do other things here
-
-			// TODO: shouldn't I be breaking this down into agents of size P here?
 		}
 
 	}
@@ -328,14 +345,6 @@ public class CalibrateIndividuals {
 	 * 
 	 * return result; }
 	 */
-
-	private void calibrateNationalBalSht() {
-		// TODO: implement me
-	}
-
-	private void assignProRataBalShtToAllIndividuals() {
-		// TODO: implement me
-	}
 
 	/**
 	 * @param data the data to set

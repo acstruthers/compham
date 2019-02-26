@@ -422,13 +422,13 @@ public class CalibrationDataIndividual {
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Individuals Table 6C data");
 		this.atoIndividualTable6c = new HashMap<String, Map<String, String>>();
 		int[] atoIndividualTable6cColumns = { 10, 11, 12, 13, 14, 32, 33, 34, 35, 36 };
-		this.loadAtoIndividualsTable6("/data/ATO/Individual/IndividualsTable6C.csv", ATO_INDIVIDUAL_T6C,
+		this.loadAtoIndividualsTable6("/data/ATO/Individual/IndividualsTable6C_transformed.csv", ATO_INDIVIDUAL_T6C,
 				atoIndividualTable6cColumns, this.title, this.atoIndividualTable6c);
 
-		// FIXME: call table 9 loader
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Individuals Table 9 data");
 		this.atoIndividualTable9 = new HashMap<String, Map<String, String>>();
-		int[] atoIndividualTable9Columns = { };
+		int[] atoIndividualTable9Columns = { 2, 3, 4, 15, 16, 17, 18, 21, 22, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
+				37, 38, 39, 40, 43, 44, 93, 94, 95, 96, 99, 100, 101, 102 };
 		this.loadAtoIndividualsTable9("/data/ATO/Individual/IndividualsTable9.csv", ATO_INDIVIDUAL_T9,
 				atoIndividualTable9Columns, this.title, this.atoIndividualTable9);
 
@@ -1047,11 +1047,8 @@ public class CalibrationDataIndividual {
 		}
 	}
 
-	// FIXME: load ATO Individual Tables 6b, 6c and 9.
 	/**
 	 * Load data from ATO Individuals Table 6B, 6C
-	 * 
-	 * Column[1] is post code FIXME: implement me
 	 * 
 	 * @param fileResourceLocation - the URI of the file to import
 	 * @param dataSourceName       - the name used to identify this data source (in
@@ -1120,8 +1117,6 @@ public class CalibrationDataIndividual {
 
 	/**
 	 * Load data from ATO Individuals Table 9
-	 * 
-	 * left(column[1], 5) is industry code (5 digits) FIXME: implement me
 	 * 
 	 * @param fileResourceLocation - the URI of the file to import
 	 * @param dataSourceName       - the name used to identify this data source (in
