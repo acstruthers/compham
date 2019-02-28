@@ -85,12 +85,13 @@ public class CalibrationData {
 
 	// data
 	private boolean dataLoaded;
-	
+
 	private Map<String, List<String>> title;
 	private Map<String, List<String>> unitType;
 	private Map<String, Map<Date, String>> rbaE1; // AU Bal Sht totals
 	private Map<String, Map<String, String>> abs1292_0_55_002ANZSIC; // ANZSIC industry code mapping
-	//private Map<String, Map<Date, String>> abs3222_0; // AU by gender and age (population projections)
+	// private Map<String, Map<Date, String>> abs3222_0; // AU by gender and age
+	// (population projections)
 	private Map<String, Map<Date, String>> abs5368_0Table14a; // exports by country
 	private Map<String, Map<Date, String>> abs5368_0Table14b; // imports by country
 	private Map<String, Map<Date, String>> abs5368_0Table36a; // exports NSW
@@ -140,8 +141,6 @@ public class CalibrationData {
 		this.area = areaMapping;
 	}
 
-	
-
 	/**
 	 * Deletes all the field variables, freeing up memory.
 	 * 
@@ -175,8 +174,6 @@ public class CalibrationData {
 		int[] rbaE1Columns = { 1, 3, 4, 8, 9, 10, 11, 14, 15, 16, 17, 18, 20, 23 };
 		this.loadRbaDataCsv("/data/RBA/E_HouseholdBusiness/e1-data.csv", RBA_E1, rbaE1Columns, this.title,
 				this.unitType, this.rbaE1);
-
-		
 
 		// load ABS 5368.0 International Trade data
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 5368.0 International Trade data");
@@ -1051,7 +1048,6 @@ public class CalibrationData {
 	@PostConstruct
 	private void init() {
 		this.dataLoaded = false;
-		
 
 		this.title = null;
 		this.unitType = null;
@@ -1129,8 +1125,6 @@ public class CalibrationData {
 		}
 		return abs1292_0_55_002ANZSIC;
 	}
-
-	
 
 	/**
 	 * @return the abs5368_0Exporters

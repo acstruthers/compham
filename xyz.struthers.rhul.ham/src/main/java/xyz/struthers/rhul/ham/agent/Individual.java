@@ -10,6 +10,11 @@ import java.util.Map;
  * approximately 25 million instances of this class in the model, so they will
  * consume approximately 4.6 GB of RAM.
  * 
+ * TODO: Need to work out if I'm going to store totals or calculate them (e.g.
+ * total assets). That will largely be informed by the data, but will also
+ * depend on the performance when I start running simulations - does it run out
+ * of RAM, or is it slow?
+ * 
  * @author Adam Struthers
  * @since 25-Jan-2019
  */
@@ -32,11 +37,13 @@ public final class Individual extends Agent {
 	private double pnlWagesSalaries;
 	private double pnlUnemploymentBenefits;
 	private double pnlOtherSocialSecurityIncome;
-	private double pnlInvestmentIncome; // other income
+	private double pnlInvestmentIncome; // other income (including superannuation & dividends)
+	private double pnlInterestIncome;
+	private double pnlRentIncome; // income from investment properties
 	private double pnlIncomeTaxExpense;
 
 	private double pnlLivingExpenses;
-	private double pnlRent;
+	private double pnlRentExpense;
 	private double pnlMortgageRepayments;
 	private double pnlOtherDiscretionaryExpenses;
 
@@ -45,13 +52,19 @@ public final class Individual extends Agent {
 	private double bsOtherFinancialAssets;
 	private double bsResidentialLandAndDwellings;
 	private double bsOtherNonFinancialAssets;
+	private double bsTotalAssets;
 
 	private double bsLoans;
+	private double bsStudentLoans; // HELP debt
 	private double bsOtherLiabilities;
+	private double bsTotalLiabilities;
+
+	private double bsNetWorth;
 
 	// Interest rates (16 bytes)
-	protected double interestRateLoans;
 	protected double interestRateDeposits;
+	protected double interestRateLoans;
+	protected double interestRateStudentLoans; // in Australia this should always be CPI
 
 	/**
 	 * Default constructor
@@ -60,14 +73,14 @@ public final class Individual extends Agent {
 		super();
 		this.init();
 	}
-	
+
 	/**
 	 * Copy constructor
 	 */
 	public Individual(Individual individual) {
 		super();
 		this.init();
-		
+
 		// TODO: implement copy constructor for Individual
 	}
 
@@ -81,7 +94,8 @@ public final class Individual extends Agent {
 	}
 
 	public double getTotalExpenses() {
-		return this.pnlLivingExpenses + this.pnlRent + this.pnlMortgageRepayments + this.pnlOtherDiscretionaryExpenses;
+		return this.pnlLivingExpenses + this.pnlRentExpense + this.pnlMortgageRepayments
+				+ this.pnlOtherDiscretionaryExpenses;
 	}
 
 	public double getNetProfit() {
@@ -120,7 +134,7 @@ public final class Individual extends Agent {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	protected void init() {
 		// Demographic
 		this.age = 0;
@@ -130,10 +144,12 @@ public final class Individual extends Agent {
 		this.pnlUnemploymentBenefits = 0d;
 		this.pnlOtherSocialSecurityIncome = 0d;
 		this.pnlInvestmentIncome = 0d;
+		this.pnlInterestIncome = 0d;
+		this.pnlRentIncome = 0d;
 		this.pnlIncomeTaxExpense = 0d;
 
 		this.pnlLivingExpenses = 0d;
-		this.pnlRent = 0d;
+		this.pnlRentExpense = 0d;
 		this.pnlMortgageRepayments = 0d;
 		this.pnlOtherDiscretionaryExpenses = 0d;
 
@@ -142,9 +158,20 @@ public final class Individual extends Agent {
 		this.bsOtherFinancialAssets = 0d;
 		this.bsResidentialLandAndDwellings = 0d;
 		this.bsOtherNonFinancialAssets = 0d;
+		this.bsTotalAssets = 0d;
 
 		this.bsLoans = 0d;
+		this.bsStudentLoans = 0d;
 		this.bsOtherLiabilities = 0d;
+		this.bsTotalLiabilities = 0d;
+
+		this.bsNetWorth = 0d;
+
+		// Interest rates
+		this.interestRateDeposits = 0d;
+		this.interestRateLoans = 0d;
+		this.interestRateStudentLoans = 0d;
+
 	}
 
 	/**
@@ -155,8 +182,7 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param household
-	 *            the household to set
+	 * @param household the household to set
 	 */
 	public void setHousehold(Household household) {
 		this.household = household;
@@ -170,8 +196,7 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param employer
-	 *            the employer to set
+	 * @param employer the employer to set
 	 */
 	public void setEmployer(Business employer) {
 		this.employer = employer;
@@ -185,8 +210,7 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param depositAdi
-	 *            the depositAdi to set
+	 * @param depositAdi the depositAdi to set
 	 */
 	public void setDepositAdi(AuthorisedDepositTakingInstitution depositAdi) {
 		this.depositAdi = depositAdi;
@@ -200,8 +224,7 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param loanAdi
-	 *            the loanAdi to set
+	 * @param loanAdi the loanAdi to set
 	 */
 	public void setLoanAdi(AuthorisedDepositTakingInstitution loanAdi) {
 		this.loanAdi = loanAdi;
@@ -215,8 +238,7 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param age
-	 *            the age to set
+	 * @param age the age to set
 	 */
 	public void setAge(int age) {
 		this.age = age;
@@ -230,8 +252,7 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param employmentIndustry
-	 *            the employmentIndustry to set
+	 * @param employmentIndustry the employmentIndustry to set
 	 */
 	public void setEmploymentIndustry(String employmentIndustry) {
 		this.employmentIndustry = employmentIndustry;
@@ -245,8 +266,7 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param localGovernmentAreaCode
-	 *            the localGovernmentAreaCode to set
+	 * @param localGovernmentAreaCode the localGovernmentAreaCode to set
 	 */
 	public void setLocalGovernmentAreaCode(String localGovernmentAreaCode) {
 		this.localGovernmentAreaCode = localGovernmentAreaCode;
@@ -260,8 +280,7 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param pnlWagesSalaries
-	 *            the pnlWagesSalaries to set
+	 * @param pnlWagesSalaries the pnlWagesSalaries to set
 	 */
 	public void setPnlWagesSalaries(double pnlWagesSalaries) {
 		this.pnlWagesSalaries = pnlWagesSalaries;
@@ -275,8 +294,7 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param pnlUnemploymentBenefits
-	 *            the pnlUnemploymentBenefits to set
+	 * @param pnlUnemploymentBenefits the pnlUnemploymentBenefits to set
 	 */
 	public void setPnlUnemploymentBenefits(double pnlUnemploymentBenefits) {
 		this.pnlUnemploymentBenefits = pnlUnemploymentBenefits;
@@ -290,8 +308,7 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param pnlOtherSocialSecurityIncome
-	 *            the pnlOtherSocialSecurityIncome to set
+	 * @param pnlOtherSocialSecurityIncome the pnlOtherSocialSecurityIncome to set
 	 */
 	public void setPnlOtherSocialSecurityIncome(double pnlOtherSocialSecurityIncome) {
 		this.pnlOtherSocialSecurityIncome = pnlOtherSocialSecurityIncome;
@@ -305,11 +322,38 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param pnlInvestmentIncome
-	 *            the pnlInvestmentIncome to set
+	 * @param pnlInvestmentIncome the pnlInvestmentIncome to set
 	 */
 	public void setPnlInvestmentIncome(double pnlInvestmentIncome) {
 		this.pnlInvestmentIncome = pnlInvestmentIncome;
+	}
+
+	/**
+	 * @return the pnlInterestIncome
+	 */
+	public double getPnlInterestIncome() {
+		return pnlInterestIncome;
+	}
+
+	/**
+	 * @param pnlInterestIncome the pnlInterestIncome to set
+	 */
+	public void setPnlInterestIncome(double pnlInterestIncome) {
+		this.pnlInterestIncome = pnlInterestIncome;
+	}
+
+	/**
+	 * @return the pnlRentIncome
+	 */
+	public double getPnlRentIncome() {
+		return pnlRentIncome;
+	}
+
+	/**
+	 * @param pnlRentIncome the pnlRentIncome to set
+	 */
+	public void setPnlRentIncome(double pnlRentIncome) {
+		this.pnlRentIncome = pnlRentIncome;
 	}
 
 	/**
@@ -320,8 +364,7 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param pnlIncomeTaxExpense
-	 *            the pnlIncomeTaxExpense to set
+	 * @param pnlIncomeTaxExpense the pnlIncomeTaxExpense to set
 	 */
 	public void setPnlIncomeTaxExpense(double pnlIncomeTaxExpense) {
 		this.pnlIncomeTaxExpense = pnlIncomeTaxExpense;
@@ -335,26 +378,24 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param pnlLivingExpenses
-	 *            the pnlLivingExpenses to set
+	 * @param pnlLivingExpenses the pnlLivingExpenses to set
 	 */
 	public void setPnlLivingExpenses(double pnlLivingExpenses) {
 		this.pnlLivingExpenses = pnlLivingExpenses;
 	}
 
 	/**
-	 * @return the pnlRent
+	 * @return the pnlRentExpense
 	 */
-	public double getPnlRent() {
-		return pnlRent;
+	public double getPnlRentExpense() {
+		return pnlRentExpense;
 	}
 
 	/**
-	 * @param pnlRent
-	 *            the pnlRent to set
+	 * @param pnlRentExpense the pnlRentExpense to set
 	 */
-	public void setPnlRent(double pnlRent) {
-		this.pnlRent = pnlRent;
+	public void setPnlRentExpense(double pnlRentExpense) {
+		this.pnlRentExpense = pnlRentExpense;
 	}
 
 	/**
@@ -365,8 +406,7 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param pnlMortgageRepayments
-	 *            the pnlMortgageRepayments to set
+	 * @param pnlMortgageRepayments the pnlMortgageRepayments to set
 	 */
 	public void setPnlMortgageRepayments(double pnlMortgageRepayments) {
 		this.pnlMortgageRepayments = pnlMortgageRepayments;
@@ -380,8 +420,7 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param pnlOtherDiscretionaryExpenses
-	 *            the pnlOtherDiscretionaryExpenses to set
+	 * @param pnlOtherDiscretionaryExpenses the pnlOtherDiscretionaryExpenses to set
 	 */
 	public void setPnlOtherDiscretionaryExpenses(double pnlOtherDiscretionaryExpenses) {
 		this.pnlOtherDiscretionaryExpenses = pnlOtherDiscretionaryExpenses;
@@ -395,8 +434,7 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param bsBankDeposits
-	 *            the bsBankDeposits to set
+	 * @param bsBankDeposits the bsBankDeposits to set
 	 */
 	public void setBsBankDeposits(double bsBankDeposits) {
 		this.bsBankDeposits = bsBankDeposits;
@@ -410,8 +448,7 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param bsOtherFinancialAssets
-	 *            the bsOtherFinancialAssets to set
+	 * @param bsOtherFinancialAssets the bsOtherFinancialAssets to set
 	 */
 	public void setBsOtherFinancialAssets(double bsOtherFinancialAssets) {
 		this.bsOtherFinancialAssets = bsOtherFinancialAssets;
@@ -425,8 +462,7 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param bsResidentialLandAndDwellings
-	 *            the bsResidentialLandAndDwellings to set
+	 * @param bsResidentialLandAndDwellings the bsResidentialLandAndDwellings to set
 	 */
 	public void setBsResidentialLandAndDwellings(double bsResidentialLandAndDwellings) {
 		this.bsResidentialLandAndDwellings = bsResidentialLandAndDwellings;
@@ -440,11 +476,24 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param bsOtherNonFinancialAssets
-	 *            the bsOtherNonFinancialAssets to set
+	 * @param bsOtherNonFinancialAssets the bsOtherNonFinancialAssets to set
 	 */
 	public void setBsOtherNonFinancialAssets(double bsOtherNonFinancialAssets) {
 		this.bsOtherNonFinancialAssets = bsOtherNonFinancialAssets;
+	}
+
+	/**
+	 * @return the bsTotalAssets
+	 */
+	public double getBsTotalAssets() {
+		return bsTotalAssets;
+	}
+
+	/**
+	 * @param bsTotalAssets the bsTotalAssets to set
+	 */
+	public void setBsTotalAssets(double bsTotalAssets) {
+		this.bsTotalAssets = bsTotalAssets;
 	}
 
 	/**
@@ -455,11 +504,24 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param bsLoans
-	 *            the bsLoans to set
+	 * @param bsLoans the bsLoans to set
 	 */
 	public void setBsLoans(double bsLoans) {
 		this.bsLoans = bsLoans;
+	}
+
+	/**
+	 * @return the bsStudentLoans
+	 */
+	public double getBsStudentLoans() {
+		return bsStudentLoans;
+	}
+
+	/**
+	 * @param bsStudentLoans the bsStudentLoans to set
+	 */
+	public void setBsStudentLoans(double bsStudentLoans) {
+		this.bsStudentLoans = bsStudentLoans;
 	}
 
 	/**
@@ -470,26 +532,31 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param bsOtherLiabilities
-	 *            the bsOtherLiabilities to set
+	 * @param bsOtherLiabilities the bsOtherLiabilities to set
 	 */
 	public void setBsOtherLiabilities(double bsOtherLiabilities) {
 		this.bsOtherLiabilities = bsOtherLiabilities;
 	}
 
 	/**
-	 * @return the interestRateLoans
+	 * @param bsTotalLiabilities the bsTotalLiabilities to set
 	 */
-	public double getInterestRateLoans() {
-		return interestRateLoans;
+	public void setBsTotalLiabilities(double bsTotalLiabilities) {
+		this.bsTotalLiabilities = bsTotalLiabilities;
 	}
 
 	/**
-	 * @param interestRateLoans
-	 *            the interestRateLoans to set
+	 * @return the bsNetWorth
 	 */
-	public void setInterestRateLoans(double interestRateLoans) {
-		this.interestRateLoans = interestRateLoans;
+	public double getBsNetWorth() {
+		return bsNetWorth;
+	}
+
+	/**
+	 * @param bsNetWorth the bsNetWorth to set
+	 */
+	public void setBsNetWorth(double bsNetWorth) {
+		this.bsNetWorth = bsNetWorth;
 	}
 
 	/**
@@ -500,11 +567,38 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @param interestRateDeposits
-	 *            the interestRateDeposits to set
+	 * @param interestRateDeposits the interestRateDeposits to set
 	 */
 	public void setInterestRateDeposits(double interestRateDeposits) {
 		this.interestRateDeposits = interestRateDeposits;
+	}
+
+	/**
+	 * @return the interestRateLoans
+	 */
+	public double getInterestRateLoans() {
+		return interestRateLoans;
+	}
+
+	/**
+	 * @param interestRateLoans the interestRateLoans to set
+	 */
+	public void setInterestRateLoans(double interestRateLoans) {
+		this.interestRateLoans = interestRateLoans;
+	}
+
+	/**
+	 * @return the interestRateStudentLoans
+	 */
+	public double getInterestRateStudentLoans() {
+		return interestRateStudentLoans;
+	}
+
+	/**
+	 * @param interestRateStudentLoans the interestRateStudentLoans to set
+	 */
+	public void setInterestRateStudentLoans(double interestRateStudentLoans) {
+		this.interestRateStudentLoans = interestRateStudentLoans;
 	}
 
 }

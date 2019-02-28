@@ -38,12 +38,12 @@ public class CalibrateIndividuals {
 	private static final double EPSILON = 0.1d; // to round business counts so the integer sums match
 
 	// beans
-	private CalibrationData data;
 	private AreaMapping area;
+	private CalibrationData commonData;
+	private CalibrationDataIndividual individualData;
 	private AustralianEconomy economy;
 
 	// field variables
-	private int peoplePerAgent;
 	private List<Individual> individualAgents;
 	private Date calibrationDate;
 	private int totalPopulationAU;
@@ -51,6 +51,7 @@ public class CalibrateIndividuals {
 	private Map<String, Integer> lgaDwellingsCount;
 
 	// A single Bal Sht using national-level data
+	// DEPRECATED ???
 	private double bsAUBankDeposits;
 	private double bsAUOtherFinancialAssets;
 	private double bsAUResidentialLandAndDwellings;
@@ -61,10 +62,85 @@ public class CalibrateIndividuals {
 
 	// data sets
 	/**
-	 * ABS 3222.0 population projections<br>
-	 * Keys: Gender and age, Date.
+	 * Data by LGA: Economy<br>
+	 * Contains property prices and counts per LGA<br>
+	 * Keys: Year, LGA, data series
 	 */
-	private Map<String, Map<Date, String>> abs3222_0;
+	private Map<String, Map<String, Map<String, String>>> abs1410_0Economy;
+	/**
+	 * ATO Individuals Table 2A<br>
+	 * Contains P&L and people count by sex and 5-year age range.<br>
+	 * Keys: Series Title, Age Range, Sex
+	 */
+	private Map<String, Map<String, String>> atoIndividualTable2a;
+	/**
+	 * ATO Individuals Table 6B<br>
+	 * Contains P&L and people count by post code.<br>
+	 * Keys: Series Title, Post Code
+	 */
+	private Map<String, Map<String, String>> atoIndividualTable6b;
+	/**
+	 * ATO Individuals Table 6C<br>
+	 * Contains income ranges people count by post code.<br>
+	 * Keys: Series Title, Post Code
+	 */
+	private Map<String, Map<String, String>> atoIndividualTable6c;
+	/**
+	 * ATO Individuals Table 9<br>
+	 * Contains P&L by industry code.<br>
+	 * Keys: Series Title, Industry Code
+	 */
+	private Map<String, Map<String, String>> atoIndividualTable9;
+	/**
+	 * RBA E1 Household and Business Balance Sheets<br>
+	 * Contains high-level balance sheet amounts at a national level.<br>
+	 * Keys: Series Name, Date
+	 */
+	private Map<String, Map<Date, String>> rbaE1;
+	/**
+	 * RBA E2 Selected Ratios<br>
+	 * Contains ratios that link P&L and Bal Sht.<br>
+	 * Keys: Series Name, Date
+	 */
+	private Map<String, Map<Date, String>> rbaE2;
+	/**
+	 * ABS Census Table Builder data:<br>
+	 * SEXP by LGA (UR) by AGE5P, INDP and INCP<br>
+	 * Individual income by industry and demographic.
+	 * 
+	 * Keys: Age5, Industry Division, Personal Income, LGA, Sex<br>
+	 * Values: Number of persons
+	 */
+	private Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> censusSEXP_LGA_AGE5P_INDP_INCP;
+	/**
+	 * ABS Census Table Builder data:<br>
+	 * HCFMD and TEND by LGA by HIND and RNTRD<br>
+	 * Rent by tenure, household income and composition.
+	 * 
+	 * Keys: Household Income, Rent Range, LGA, Household Composition Dwelling,
+	 * Tenure<br>
+	 * Values: Number of dwellings
+	 */
+	private Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> censusHCFMD_TEND_LGA_HIND_RNTRD;
+	/**
+	 * ABS Census Table Builder data:<br>
+	 * HCFMD and TEND by LGA by HIND and MRERD<br>
+	 * Mortgage payments by tenure, household income and composition.
+	 * 
+	 * Keys: Household Income, Rent Range, LGA, Household Composition Dwelling,
+	 * Tenure<br>
+	 * Values: Number of dwellings
+	 */
+	private Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> censusHCFMD_TEND_LGA_HIND_MRERD;
+	/**
+	 * ABS Census Table Builder data:<br>
+	 * CDCF by LGA by FINF<br>
+	 * Family income by family composition.
+	 * 
+	 * Keys: Family Income, LGA, Family Composition<br>
+	 * Values: Number of families
+	 */
+	private Map<String, Map<String, Map<String, String>>> censusCDCF_LGA_FINF;
 
 	/**
 	 * 
@@ -75,7 +151,6 @@ public class CalibrateIndividuals {
 	}
 
 	private void init() {
-		this.peoplePerAgent = 0;
 		this.individualAgents = null;
 		this.calibrationDate = null;
 		this.totalPopulationAU = 0;
@@ -91,7 +166,14 @@ public class CalibrateIndividuals {
 		this.bsAUOtherLiabilities = 0d;
 
 		// data sources
-		this.abs3222_0 = null;
+		this.abs1410_0Economy = null;
+	}
+
+	/**
+	 * A destructor to free up the resources used by this class.
+	 */
+	public void close() {
+		this.init();
 	}
 
 	/**
@@ -132,10 +214,68 @@ public class CalibrateIndividuals {
 	 * Use this as the list of LGAs to iterate over.
 	 * 
 	 * 
+	 * 
 	 * ------------------------------------------------------------------------<br>
 	 * PART B: DETERMINING THE NUMBER AND TYPE OF HOUSEHOLDS IN EACH LGA
 	 * ------------------------------------------------------------------------<br>
 	 * 
+	 * - ATO 6C: income range ratios and multipliers (by POA, within each LGA)<br>
+	 * N.B. I can probably omit ATO 6C and use ATO 2A instead.
+	 * 
+	 * TODO: Consider getting census data by POA, then just assigning to LGA later.
+	 * This will make it easier to match with POA data from ATO. Probably don't need
+	 * the TEND dimension - they're either renting, buying, or own outright.
+	 * 
+	 * START WITH COUNT, THEN ASSIGN AS WE GO BASED ON RATIOS. FOR EXAMPLE, WE
+	 * SHOULD ASSIGN THE RIGHT NUMBER OF HELP DEBT - NOT JUST AN AVERAGE TO
+	 * EVERYONE.<br>
+	 * MAYBE PICK ONE CELL FROM THE CENSUS INDIVIDUAL DATA TABLE AND MOCK IT UP IN
+	 * EXCEL TO HELP FIGURE OUT THE ALGORITHM?
+	 * 
+	 * ROUGH ALGORITHM FOR INDIVIDUAL COUNTS:<br>
+	 * 1. Census age, industry, income & sex per LGA: Calculate ratios<br>
+	 * 1.(a) For each age, sex & state, work out the ratio of people in each income
+	 * range. We will use this to cross-multiply ATO 2A with ATO 3A.<br>
+	 * - Multiply ratios by total people per LGA to give an adjusted count.<br>
+	 * - Use ratios within categories to attribute the amounts from ATO data to make
+	 * a more realistic matrix.
+	 * 
+	 * ROUGH ALGORITHM FOR AMOUNTS:<br>
+	 * - ATO 9: P&L (by industry code). Only 1.2m of 13.5m taxpayers specified an
+	 * industry, so just use the industry data to derive ratios of taxable income to
+	 * multiply the the other data by. Make it a multiple of the industry-declaring
+	 * national average so we can just multiply the other cells by this multiple
+	 * rather than trying to split them. Don't use the total amounts or the ratios
+	 * between line items as it's too small a sample. So, the algorithm becomes:
+	 * Calculate mean taxable income per industry code. Calculate mean taxable
+	 * income across all industry codes. Divide each industry code's mean by the
+	 * overall mean to produce an industry multiplier.<br>
+	 * 
+	 * - ATO 2A: age/sex count, P&L, Help Debt (by State)???<br>
+	 * - ATO 3A: age/sex count, P&L, Help Debt (by income range)???<br>
+	 * - ATO 6B: POA count, P&L (by POA, within each LGA)???<br>
+	 * 
+	 * - RBA E2: ratios between P&L and Bal Sht. Use these to calculate total assets
+	 * and total debt.<br>
+	 * - RBA E1: ratios between Bal Sht items. Use these, compared to assets and
+	 * debt, to estimate the other balance sheet items.<br>
+	 * 
+	 * N.B. Need to think about HELP debt and work out how to assign it by age &
+	 * gender, not diminish it by including it in ratios too early.
+	 * 
+	 * This gives P&L and Bal Sht by age, gender, industry, POA
+	 * 
+	 * ROUGH ALGORITHM FOR HOUSEHOLD COUNTS:<br>
+	 * - Load Census FINF by CDCF by LGA/POA<br>
+	 * - Load MRERD by LGA/POA<br>
+	 * - Load RNTRD by LGA/POA<br>
+	 * - For each FINF and CDCF, get the corresponding HIND and HCFMD to get income,
+	 * rent & mortgage for each family. Assume rent is paid by families with no mtg,
+	 * and mortgage paid by families with no rent.<br>
+	 * - Calculate the ratios between all these per LGA.<br>
+	 * - Multiply by the number of dwellings in each LGA to give an adjusted count.
+	 * 
+	 * ROUGH ALGORITHM TO ASSIGN PEOPLE TO HOUSEHOLDS:
 	 * 
 	 */
 	public void createIndividualAgents() {
@@ -145,7 +285,16 @@ public class CalibrateIndividuals {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		this.abs3222_0 = this.area.getAbs3222_0();
+		this.abs1410_0Economy = this.individualData.getAbs1410_0Economy();
+		this.atoIndividualTable6b = this.individualData.getAtoIndividualTable6b();
+		this.atoIndividualTable6c = this.individualData.getAtoIndividualTable6c();
+		this.atoIndividualTable9 = this.individualData.getAtoIndividualTable9();
+		this.rbaE1 = this.commonData.getRbaE1();
+		this.rbaE2 = this.individualData.getRbaE2();
+		this.censusSEXP_LGA_AGE5P_INDP_INCP = this.individualData.getCensusSEXP_LGA_AGE5P_INDP_INCP();
+		this.censusHCFMD_TEND_LGA_HIND_RNTRD = this.individualData.getCensusHCFMD_TEND_LGA_HIND_RNTRD();
+		this.censusHCFMD_TEND_LGA_HIND_MRERD = this.individualData.getCensusHCFMD_TEND_LGA_HIND_MRERD();
+		this.censusCDCF_LGA_FINF = this.individualData.getCensusCDCF_LGA_FINF();
 
 		/*
 		 * ------------------------------------------------------------------------<br>
@@ -154,21 +303,24 @@ public class CalibrateIndividuals {
 		 * 
 		 * 1. ABS 3222.0: Get the sum of the 2018 population projections. This will be
 		 * the baseline we adjust the rest of the data against.
-		 */
-
-		this.lgaPeopleCount = this.area.getAdjustedPeopleByLga(this.calibrationDate);
-		this.lgaDwellingsCount = this.area.getAdjustedDwellingsByLga(this.calibrationDate);
-		this.totalPopulationAU = this.area.getTotalPopulation(this.calibrationDate);
-
-		/*
+		 * 
 		 * 2. ABS 2074.0: Sum the total number of dwellings and individuals for
 		 * Australia. Divide the total by the population projections from ABS 3222.0 to
 		 * get a multiplier that adjusts all LGA population and dwelling counts forward
 		 * from 2016 to 2018. Determine the number of dwellings and individuals per LGA,
 		 * and apply the population multiplier to each LGA to get the adjusted number of
-		 * persons and dwellings.
+		 * persons and dwellings. N.B. This is already done in the AreaMapping class.
 		 */
+
+		this.lgaPeopleCount = this.area.getAdjustedPeopleByLga(this.calibrationDate);
+		this.lgaDwellingsCount = this.area.getAdjustedDwellingsByLga(this.calibrationDate);
+		this.totalPopulationAU = this.area.getTotalPopulation(this.calibrationDate);
+		Set<String> lgaCodes = this.lgaPeopleCount.keySet();
+
 		// FIXME: implement me
+		for (String lgaCode : lgaCodes) {
+
+		}
 
 		this.addAgentsToEconomy();
 	}
@@ -184,9 +336,8 @@ public class CalibrateIndividuals {
 	 * @param numberOfPeoplePerAgent - the number of people represented by each
 	 *                               agent in the model
 	 */
-	public void calibrateIndividualFinancials(Date date, int numberOfPeoplePerAgent) {
+	public void calibrateIndividualFinancials(Date date) {
 		// TODO: implement me
-		this.peoplePerAgent = numberOfPeoplePerAgent;
 
 		// calibrate individual P&Ls
 		// 1. For each LGA
@@ -350,8 +501,16 @@ public class CalibrateIndividuals {
 	 * @param data the data to set
 	 */
 	@Autowired
-	public void setData(CalibrationData data) {
-		this.data = data;
+	public void setCommonData(CalibrationData commonData) {
+		this.commonData = commonData;
+	}
+
+	/**
+	 * @param individualData the individualData to set
+	 */
+	@Autowired
+	public void setIndividualData(CalibrationDataIndividual individualData) {
+		this.individualData = individualData;
 	}
 
 	/**

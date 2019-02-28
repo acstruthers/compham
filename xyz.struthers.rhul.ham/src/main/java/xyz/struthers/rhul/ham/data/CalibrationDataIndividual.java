@@ -63,6 +63,7 @@ public class CalibrationDataIndividual {
 	public static final String ABS1410_0_FAMILY = "ABS_1410.0_Family";
 	public static final String ABS1410_0_INCOME = "ABS_1410.0_Income";
 
+	public static final String ATO_INDIVIDUAL_T2A = "ATO_IndividualTable2A";
 	public static final String ATO_INDIVIDUAL_T6B = "ATO_IndividualTable6B";
 	public static final String ATO_INDIVIDUAL_T6C = "ATO_IndividualTable6C";
 	public static final String ATO_INDIVIDUAL_T9 = "ATO_IndividualTable9";
@@ -89,9 +90,37 @@ public class CalibrationDataIndividual {
 	private Map<String, Map<String, Map<String, String>>> abs1410_0Family; // Data by LGA: Family (keys: year, LGA,
 																			// series)
 	private Map<String, Map<String, Map<String, String>>> abs1410_0Income; // Data by LGA: Income
-	private Map<String, Map<String, String>> atoIndividualTable6b; // P&L and people count by post code
-	private Map<String, Map<String, String>> atoIndividualTable6c; // Income ranges people count by post code
-	private Map<String, Map<String, String>> atoIndividualTable9; // P&L by industry code
+	/**
+	 * ATO Individuals Table 2A<br>
+	 * Contains P&L and people count by sex and 5-year age range.<br>
+	 * Keys: Series Title, State, Age, Gender, Taxable Status, Lodgment Method
+	 */
+	private Map<String, Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>>> atoIndividualTable2a;
+	/**
+	 * ATO Individuals Table 3A<br>
+	 * Contains P&L and people count by sex and 5-year age range.<br>
+	 * Keys: Series Title, State, Age, Gender, Taxable Status, Lodgment Method
+	 */
+	private Map<String, Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>>> atoIndividualTable2a;
+
+	/**
+	 * ATO Individuals Table 6B<br>
+	 * Contains P&L and people count by post code.<br>
+	 * Keys: Series Title, Post Code
+	 */
+	private Map<String, Map<String, String>> atoIndividualTable6b;
+	/**
+	 * ATO Individuals Table 6C<br>
+	 * Contains income ranges people count by post code.<br>
+	 * Keys: Series Title, Post Code
+	 */
+	private Map<String, Map<String, String>> atoIndividualTable6c;
+	/**
+	 * ATO Individuals Table 9<br>
+	 * Contains P&L by industry code.<br>
+	 * Keys: Series Title, Industry Code
+	 */
+	private Map<String, Map<String, String>> atoIndividualTable9;
 	/**
 	 * ABS Census Table Builder data:<br>
 	 * SEXP by LGA (UR) by AGE5P, INDP and INCP<br>
@@ -131,10 +160,52 @@ public class CalibrationDataIndividual {
 	 */
 	private Map<String, Map<String, Map<String, String>>> censusCDCF_LGA_FINF;
 
+	/**
+	 * ABS Census Table Builder data:<br>
+	 * SEXP by POA (UR) by AGE5P, INDP and INCP<br>
+	 * Individual income by industry and demographic.
+	 * 
+	 * Keys: Age5, Industry Division, Personal Income, POA, Sex<br>
+	 * Values: Number of persons
+	 */
+	private Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> censusSEXP_POA_AGE5P_INDP_INCP;
+	/**
+	 * ABS Census Table Builder data:<br>
+	 * HCFMD by POA by HIND and RNTRD<br>
+	 * Rent by tenure, household income and composition.
+	 * 
+	 * Keys: Household Income, Rent Range, LGA, Household Composition Dwelling<br>
+	 * Values: Number of dwellings
+	 */
+	private Map<String, Map<String, Map<String, Map<String, String>>>> censusHCFMD_POA_HIND_RNTRD;
+	/**
+	 * ABS Census Table Builder data:<br>
+	 * HCFMD by POA by HIND and MRERD<br>
+	 * Mortgage payments by tenure, household income and composition.
+	 * 
+	 * Keys: Household Income, Rent Range, LGA, Household Composition Dwelling<br>
+	 * Values: Number of dwellings
+	 */
+	private Map<String, Map<String, Map<String, Map<String, String>>>> censusHCFMD_POA_HIND_MRERD;
+	/**
+	 * ABS Census Table Builder data:<br>
+	 * CDCF by POA by FINF<br>
+	 * Family income by family composition.
+	 * 
+	 * Keys: Family Income, POA, Family Composition<br>
+	 * Values: Number of families
+	 */
+	private Map<String, Map<String, Map<String, String>>> censusCDCF_POA_FINF;
+
+	
 	private boolean initialisedCensusSEXP_LGA_AGE5P_INDP_INCP;
 	private boolean initialisedCensusHCFMD_TEND_LGA_HIND_RNTRD;
 	private boolean initialisedCensusHCFMD_TEND_LGA_HIND_MRERD;
 	private boolean initialisedCensusCDCF_LGA_FINF;
+	private boolean initialisedCensusSEXP_POA_AGE5P_INDP_INCP;
+	private boolean initialisedCensusHCFMD_POA_HIND_RNTRD;
+	private boolean initialisedCensusHCFMD_POA_HIND_MRERD;
+	private boolean initialisedCensusCDCF_POA_FINF;
 
 	/**
 	 * 
@@ -412,10 +483,18 @@ public class CalibrationDataIndividual {
 				this.initialisedCensusCDCF_LGA_FINF, fromColumnCDCF_LGA_FINF, toColumnCDCF_LGA_FINF,
 				this.censusCDCF_LGA_FINF);
 
+		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Individuals Table 2A data");
+		this.atoIndividualTable2a = new HashMap<String, Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>>>();
+		int[] atoIndividualTable2aColumns = { 5, 6, 7, 18, 19, 20, 21, 24, 25, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+				40, 41, 42, 43, 46, 47, 62, 63, 66, 67, 96, 97, 98, 99, 102, 103, 104, 105, 140, 141, 142, 143, 144,
+				145 };
+		this.loadAtoIndividualsTable2a("/data/ATO/Individual/IndividualsTable2A.csv", ATO_INDIVIDUAL_T2A,
+				atoIndividualTable2aColumns, this.title, this.atoIndividualTable2a);
+
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Individuals Table 6B data");
 		this.atoIndividualTable6b = new HashMap<String, Map<String, String>>();
-		int[] atoIndividualTable6bColumns = { 2, 3, 4, 16, 17, 18, 19, 22, 23, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37,
-				38, 39, 40, 41, 44, 45, 60, 61, 100, 101, 102, 103 };
+		int[] atoIndividualTable6bColumns = { 2, 3, 4, 15, 16, 17, 18, 21, 22, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37,
+				38, 39, 40, 41, 44, 45, 59, 60, 63, 64, 93, 94, 95, 96, 99, 100, 101, 102 };
 		this.loadAtoIndividualsTable6("/data/ATO/Individual/IndividualsTable6B.csv", ATO_INDIVIDUAL_T6B,
 				atoIndividualTable6bColumns, this.title, this.atoIndividualTable6b);
 
@@ -1048,6 +1127,102 @@ public class CalibrationDataIndividual {
 	}
 
 	/**
+	 * Load data from ATO Individuals Table 2A
+	 * 
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param dataSourceName       - the name used to identify this data source (in
+	 *                             the shared maps)
+	 * @param tableName            - the name used to store this series' data in the
+	 *                             maps
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0).
+	 * @param titles               - column titles in CSV file
+	 * @param data                 - the data map that the values are returned
+	 *                             in.<br>
+	 *                             Keys: Series Title, State, Age, Gender, Taxable
+	 *                             Status, Lodgment Method
+	 */
+	private void loadAtoIndividualsTable2a(String fileResourceLocation, String tableName, int[] columnsToImport,
+			Map<String, List<String>> titles,
+			Map<String, Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>>> data) {
+
+		CSVReader reader = null;
+		try {
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
+			boolean header = true;
+			boolean footer = false;
+			String[] seriesId = new String[columnsToImport.length];
+
+			String[] line = null;
+			while ((line = reader.readNext()) != null && !footer) {
+				if (header) {
+					if (line[0].equals("State/ Territory1")) {
+						// title row
+						List<String> thesecolumnNames = new ArrayList<String>(columnsToImport.length);
+						for (int i = 0; i < columnsToImport.length; i++) {
+							// store title
+							seriesId[i] = line[columnsToImport[i]];
+							thesecolumnNames.add(line[columnsToImport[i]]);
+
+							// store series ID as key with blank collections to populate with data below
+							data.put(line[columnsToImport[i]],
+									new HashMap<String, Map<String, Map<String, Map<String, Map<String, String>>>>>());
+						}
+						titles.put(tableName, thesecolumnNames);
+						header = false;
+					}
+				} else {
+					if (!line[0].isBlank()) {
+						// Keys: Series Title, State, Age, Gender, Taxable Status, Lodgment Method
+						String thisState = line[3].trim().length() > 3 ? "Other" : line[3].trim();
+						String thisAge = line[4];
+						String thisSex = line[1].substring(0, 1);
+						String thisTaxableStatus = line[2].substring(0, 1).equals("N") ? "N" : "Y";
+						String thisLodgmentMethod = line[0].substring(0, 1);
+
+						for (int i = 0; i < columnsToImport.length; i++) {
+							// create nested maps for new data categories
+							if (!data.get(seriesId[i]).containsKey(thisState)) {
+								data.get(seriesId[i]).put(thisState,
+										new HashMap<String, Map<String, Map<String, Map<String, String>>>>());
+							}
+							if (!data.get(seriesId[i]).get(thisState).containsKey(thisAge)) {
+								data.get(seriesId[i]).get(thisState).put(thisAge,
+										new HashMap<String, Map<String, Map<String, String>>>());
+							}
+							if (!data.get(seriesId[i]).get(thisState).get(thisAge).containsKey(thisSex)) {
+								data.get(seriesId[i]).get(thisState).get(thisAge).put(thisSex,
+										new HashMap<String, Map<String, String>>());
+							}
+							if (!data.get(seriesId[i]).get(thisState).get(thisAge).get(thisSex)
+									.containsKey(thisTaxableStatus)) {
+								data.get(seriesId[i]).get(thisState).get(thisAge).get(thisSex).put(thisTaxableStatus,
+										new HashMap<String, String>());
+							}
+
+							// parse the body of the data
+							data.get(seriesId[i]).get(thisState).get(thisAge).get(thisSex).get(thisTaxableStatus)
+									.put(thisLodgmentMethod, line[columnsToImport[i]]);
+						}
+					} else {
+						footer = true;
+					}
+				}
+			}
+			reader.close();
+			reader = null;
+		} catch (FileNotFoundException e) {
+			// open file
+			e.printStackTrace();
+		} catch (IOException e) {
+			// read next
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * Load data from ATO Individuals Table 6B, 6C
 	 * 
 	 * @param fileResourceLocation - the URI of the file to import
@@ -1195,6 +1370,7 @@ public class CalibrationDataIndividual {
 		this.abs1410_0Family = null;
 		this.abs1410_0Income = null;
 
+		this.atoIndividualTable2a = null;
 		this.atoIndividualTable6b = null;
 		this.atoIndividualTable6c = null;
 		this.atoIndividualTable9 = null;
@@ -1247,6 +1423,13 @@ public class CalibrationDataIndividual {
 			this.loadData();
 		}
 		return abs1410_0Income;
+	}
+
+	/**
+	 * @return the atoIndividualTable2a
+	 */
+	public Map<String, Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>>> getAtoIndividualTable2a() {
+		return atoIndividualTable2a;
 	}
 
 	/**
