@@ -50,16 +50,6 @@ public class CalibrateIndividuals {
 	private Map<String, Integer> lgaPeopleCount;
 	private Map<String, Integer> lgaDwellingsCount;
 
-	// A single Bal Sht using national-level data
-	// DEPRECATED ???
-	private double bsAUBankDeposits;
-	private double bsAUOtherFinancialAssets;
-	private double bsAUResidentialLandAndDwellings;
-	private double bsAUOtherNonFinancialAssets;
-
-	private double bsAULoans;
-	private double bsAUOtherLiabilities;
-
 	// data sets
 	/**
 	 * Data by LGA: Economy<br>
@@ -70,21 +60,21 @@ public class CalibrateIndividuals {
 	/**
 	 * ATO Individuals Table 2A<br>
 	 * Contains P&L and people count by sex and 5-year age range.<br>
-	 * Keys: Series Title, Age Range, Sex
+	 * Keys: Series Title, State, Age, Gender, Taxable Status, Lodgment Method
 	 */
-	private Map<String, Map<String, String>> atoIndividualTable2a;
+	Map<String, Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>>> atoIndividualTable2a;
+	/**
+	 * ATO Individuals Table 3A<br>
+	 * Contains P&L and people count by sex and 5-year age range.<br>
+	 * Keys: Series Title, State, Age, Gender, Taxable Status, Lodgment Method
+	 */
+	private Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> atoIndividualTable3a;
 	/**
 	 * ATO Individuals Table 6B<br>
 	 * Contains P&L and people count by post code.<br>
 	 * Keys: Series Title, Post Code
 	 */
 	private Map<String, Map<String, String>> atoIndividualTable6b;
-	/**
-	 * ATO Individuals Table 6C<br>
-	 * Contains income ranges people count by post code.<br>
-	 * Keys: Series Title, Post Code
-	 */
-	private Map<String, Map<String, String>> atoIndividualTable6c;
 	/**
 	 * ATO Individuals Table 9<br>
 	 * Contains P&L by industry code.<br>
@@ -105,33 +95,33 @@ public class CalibrateIndividuals {
 	private Map<String, Map<Date, String>> rbaE2;
 	/**
 	 * ABS Census Table Builder data:<br>
-	 * SEXP by LGA (UR) by AGE5P, INDP and INCP<br>
+	 * SEXP by POA (UR) by AGE5P, INDP and INCP<br>
 	 * Individual income by industry and demographic.
 	 * 
-	 * Keys: Age5, Industry Division, Personal Income, LGA, Sex<br>
+	 * Keys: Age5, Industry Division, Personal Income, POA, Sex<br>
 	 * Values: Number of persons
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> censusSEXP_LGA_AGE5P_INDP_INCP;
+	private Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> censusSEXP_POA_AGE5P_INDP_INCP;
 	/**
 	 * ABS Census Table Builder data:<br>
 	 * HCFMD and TEND by LGA by HIND and RNTRD<br>
-	 * Rent by tenure, household income and composition.
+	 * Rent by household income and composition.
 	 * 
 	 * Keys: Household Income, Rent Range, LGA, Household Composition Dwelling,
 	 * Tenure<br>
 	 * Values: Number of dwellings
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> censusHCFMD_TEND_LGA_HIND_RNTRD;
+	private Map<String, Map<String, Map<String, Map<String, String>>>> censusHCFMD_LGA_HIND_RNTRD;
 	/**
 	 * ABS Census Table Builder data:<br>
-	 * HCFMD and TEND by LGA by HIND and MRERD<br>
-	 * Mortgage payments by tenure, household income and composition.
+	 * HCFMD by LGA by HIND and MRERD<br>
+	 * Mortgage payments by household income and composition.
 	 * 
 	 * Keys: Household Income, Rent Range, LGA, Household Composition Dwelling,
 	 * Tenure<br>
 	 * Values: Number of dwellings
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> censusHCFMD_TEND_LGA_HIND_MRERD;
+	private Map<String, Map<String, Map<String, Map<String, String>>>> censusHCFMD_LGA_HIND_MRERD;
 	/**
 	 * ABS Census Table Builder data:<br>
 	 * CDCF by LGA by FINF<br>
@@ -157,23 +147,28 @@ public class CalibrateIndividuals {
 		this.lgaPeopleCount = null;
 		this.lgaDwellingsCount = null;
 
-		this.bsAUBankDeposits = 0d;
-		this.bsAUOtherFinancialAssets = 0d;
-		this.bsAUResidentialLandAndDwellings = 0d;
-		this.bsAUOtherNonFinancialAssets = 0d;
-
-		this.bsAULoans = 0d;
-		this.bsAUOtherLiabilities = 0d;
-
 		// data sources
 		this.abs1410_0Economy = null;
+		this.atoIndividualTable2a = null;
+		this.atoIndividualTable3a = null;
+		this.atoIndividualTable6b = null;
+		this.atoIndividualTable9 = null;
+		this.rbaE1 = null;
+		this.rbaE2 = null;
+		this.censusSEXP_POA_AGE5P_INDP_INCP = null;
+		this.censusHCFMD_LGA_HIND_RNTRD = null;
+		this.censusHCFMD_LGA_HIND_MRERD = null;
+		this.censusCDCF_LGA_FINF = null;
 	}
 
 	/**
 	 * A destructor to free up the resources used by this class.
 	 */
 	public void close() {
-		this.init();
+		// TODO: do a deep delete of the variables that won't be used in the Individual
+		// agents.
+
+		this.init(); // to reset all variables to null
 	}
 
 	/**
@@ -198,72 +193,62 @@ public class CalibrateIndividuals {
 	 * to be interchangeable.
 	 * 
 	 * ------------------------------------------------------------------------<br>
-	 * PART A: DETERMINING THE NUMBER AND TYPE OF INDIVIDUALS IN EACH LGA
+	 * PART A: ESTIMATING INDIVIDUAL PROFIT & LOSS STATEMENTS
 	 * ------------------------------------------------------------------------<br>
 	 * 
-	 * 1. ABS 3222.0: Get the sum of the 2018 population projections. This will be
-	 * the baseline we adjust the rest of the data against.
+	 * N.B. P&L composition will vary more with income, so use ATO 3A as the amounts
+	 * and the ratios between line items.<br>
 	 * 
-	 * 2. ABS 2074.0: Sum the total number of dwellings and individuals for
-	 * Australia. Divide the total by the population projections from ABS 3222.0 to
-	 * get a multiplier that adjusts all LGA population and dwelling counts forward
-	 * from 2016 to 2018. Determine the number of dwellings and individuals per LGA,
-	 * and apply the population multiplier to each LGA to get the adjusted number of
-	 * persons and dwellings.
+	 * 1. ATO Individual Table 9: P&L (by industry code). Only 1.2M of 13.5M
+	 * taxpayers specified an industry, so just use the industry data to derive
+	 * ratios of taxable income to multiply the the other data by. Do it at an
+	 * industry division level to minimise the impact of the small sample. Make it a
+	 * multiple of the industry-declaring national average so we can just multiply
+	 * the other cells by this multiple rather than trying to split them. Don't use
+	 * the total amounts or the ratios between line items as it's too small a
+	 * sample. So, the algorithm becomes: Calculate mean taxable income per industry
+	 * code. Calculate mean taxable income across all industry codes. Divide each
+	 * industry code's mean by the overall mean to produce an industry
+	 * multiplier.<br>
 	 * 
-	 * Use this as the list of LGAs to iterate over.
+	 * 2. ATO Individual Table 2A: age/sex count, P&L, Help Debt (by State).
+	 * Calculate state multiplier for every age/sex combination.<br>
 	 * 
+	 * 3. ATO Individual Table 6B: people count, taxable income (per POA). Calculate
+	 * POA multiplier for each POA, by state.<br>
 	 * 
+	 * 4. ATO Individual Table 3A: age/sex count, P&L, Help Debt (by income range).
+	 * Financial position will vary more by income than any other metric, so use
+	 * table 3A as the base amounts and counts to adjust. Use these amounts, looping
+	 * through the extra dimensions and multiplying by the multipliers above. The
+	 * number of people is given in table 3A, and only needs to be multiplied by the
+	 * population forecast multiplier to adjust them forward to 2018 figures. This
+	 * ensures, for example, that the right number of people are assigned a HELP
+	 * debt, etc.<br>
 	 * 
 	 * ------------------------------------------------------------------------<br>
-	 * PART B: DETERMINING THE NUMBER AND TYPE OF HOUSEHOLDS IN EACH LGA
+	 * PART B: ADDING INDIVIDUAL BALANCE SHEETS
 	 * ------------------------------------------------------------------------<br>
 	 * 
-	 * - ATO 6C: income range ratios and multipliers (by POA, within each LGA)<br>
-	 * N.B. I can probably omit ATO 6C and use ATO 2A instead.
-	 * 
-	 * TODO: Consider getting census data by POA, then just assigning to LGA later.
-	 * This will make it easier to match with POA data from ATO. Probably don't need
-	 * the TEND dimension - they're either renting, buying, or own outright.
-	 * 
-	 * START WITH COUNT, THEN ASSIGN AS WE GO BASED ON RATIOS. FOR EXAMPLE, WE
-	 * SHOULD ASSIGN THE RIGHT NUMBER OF HELP DEBT - NOT JUST AN AVERAGE TO
-	 * EVERYONE.<br>
-	 * MAYBE PICK ONE CELL FROM THE CENSUS INDIVIDUAL DATA TABLE AND MOCK IT UP IN
-	 * EXCEL TO HELP FIGURE OUT THE ALGORITHM?
-	 * 
-	 * ROUGH ALGORITHM FOR INDIVIDUAL COUNTS:<br>
-	 * 1. Census age, industry, income & sex per LGA: Calculate ratios<br>
-	 * 1.(a) For each age, sex & state, work out the ratio of people in each income
-	 * range. We will use this to cross-multiply ATO 2A with ATO 3A.<br>
-	 * - Multiply ratios by total people per LGA to give an adjusted count.<br>
-	 * - Use ratios within categories to attribute the amounts from ATO data to make
-	 * a more realistic matrix.
-	 * 
-	 * ROUGH ALGORITHM FOR AMOUNTS:<br>
-	 * - ATO 9: P&L (by industry code). Only 1.2m of 13.5m taxpayers specified an
-	 * industry, so just use the industry data to derive ratios of taxable income to
-	 * multiply the the other data by. Make it a multiple of the industry-declaring
-	 * national average so we can just multiply the other cells by this multiple
-	 * rather than trying to split them. Don't use the total amounts or the ratios
-	 * between line items as it's too small a sample. So, the algorithm becomes:
-	 * Calculate mean taxable income per industry code. Calculate mean taxable
-	 * income across all industry codes. Divide each industry code's mean by the
-	 * overall mean to produce an industry multiplier.<br>
-	 * 
-	 * - ATO 2A: age/sex count, P&L, Help Debt (by State)???<br>
-	 * - ATO 3A: age/sex count, P&L, Help Debt (by income range)???<br>
-	 * - ATO 6B: POA count, P&L (by POA, within each LGA)???<br>
-	 * 
-	 * - RBA E2: ratios between P&L and Bal Sht. Use these to calculate total assets
-	 * and total debt.<br>
-	 * - RBA E1: ratios between Bal Sht items. Use these, compared to assets and
-	 * debt, to estimate the other balance sheet items.<br>
+	 * 5. RBA E2: Use the debt-to-income and assets-to-income ratios to calculate
+	 * total assets and total debt.<br>
+	 * 6. RBA E1: Calculate the ratios between Bal Sht items. Use these, compared to
+	 * assets and debt, to estimate the other balance sheet items.<br>
 	 * 
 	 * N.B. Need to think about HELP debt and work out how to assign it by age &
 	 * gender, not diminish it by including it in ratios too early.
 	 * 
-	 * This gives P&L and Bal Sht by age, gender, industry, POA
+	 * This gives P&L and Bal Sht by sex, age, industry division, income, POA
+	 * 
+	 * ------------------------------------------------------------------------<br>
+	 * PART C: INDIVIDUAL COUNTS
+	 * ------------------------------------------------------------------------<br>
+	 * 
+	 * 7. Census age, industry, income & sex per POA<br>
+	 * 
+	 * ------------------------------------------------------------------------<br>
+	 * PART D: HOUSEHOLD COUNTS
+	 * ------------------------------------------------------------------------<br>
 	 * 
 	 * ROUGH ALGORITHM FOR HOUSEHOLD COUNTS:<br>
 	 * - Load Census FINF by CDCF by LGA/POA<br>
@@ -275,7 +260,20 @@ public class CalibrateIndividuals {
 	 * - Calculate the ratios between all these per LGA.<br>
 	 * - Multiply by the number of dwellings in each LGA to give an adjusted count.
 	 * 
+	 * Question: Is the HCFMD detailed enough to be able to just exclude the CDCF
+	 * table altogether?
+	 * 
 	 * ROUGH ALGORITHM TO ASSIGN PEOPLE TO HOUSEHOLDS:
+	 * 
+	 * ------------------------------------------------------------------------<br>
+	 * PART E: ADJUSTING FINANCIALS FOR HOUSEHOLDS
+	 * ------------------------------------------------------------------------<br>
+	 * 
+	 * ROUGH ALGORITHM FOR HOUSEHOLD ADJUSTMENTS:<br>
+	 * - Henderson poverty line based on family composition to be a proxy for
+	 * inelastic expenses. - Generally just one mortgage or rent payment per
+	 * household. This should probably factor into the algorithm that assigns
+	 * individuals to households.
 	 * 
 	 */
 	public void createIndividualAgents() {
@@ -286,14 +284,15 @@ public class CalibrateIndividuals {
 			e.printStackTrace();
 		}
 		this.abs1410_0Economy = this.individualData.getAbs1410_0Economy();
+		this.atoIndividualTable2a = this.individualData.getAtoIndividualTable2a();
+		this.atoIndividualTable3a = this.individualData.getAtoIndividualTable3a();
 		this.atoIndividualTable6b = this.individualData.getAtoIndividualTable6b();
-		this.atoIndividualTable6c = this.individualData.getAtoIndividualTable6c();
 		this.atoIndividualTable9 = this.individualData.getAtoIndividualTable9();
 		this.rbaE1 = this.commonData.getRbaE1();
 		this.rbaE2 = this.individualData.getRbaE2();
-		this.censusSEXP_LGA_AGE5P_INDP_INCP = this.individualData.getCensusSEXP_LGA_AGE5P_INDP_INCP();
-		this.censusHCFMD_TEND_LGA_HIND_RNTRD = this.individualData.getCensusHCFMD_TEND_LGA_HIND_RNTRD();
-		this.censusHCFMD_TEND_LGA_HIND_MRERD = this.individualData.getCensusHCFMD_TEND_LGA_HIND_MRERD();
+		this.censusSEXP_POA_AGE5P_INDP_INCP = this.individualData.getCensusSEXP_POA_AGE5P_INDP_INCP();
+		this.censusHCFMD_LGA_HIND_RNTRD = this.individualData.getCensusHCFMD_LGA_HIND_RNTRD();
+		this.censusHCFMD_LGA_HIND_MRERD = this.individualData.getCensusHCFMD_LGA_HIND_MRERD();
 		this.censusCDCF_LGA_FINF = this.individualData.getCensusCDCF_LGA_FINF();
 
 		/*
