@@ -52,6 +52,7 @@ public class AreaMapping {
 	// column headings in CSV files
 	private static final String ABS_GCCSA_CODE = "GCCSA_CODE_2016";
 	private static final String LGA_LGA_CODE = "LGA_CODE_2018";
+	private static final String LGA_STATE_NAME = "STATE_NAME_2016";
 	private static final String POA_POA_CODE = "POA_CODE_2016";
 	private static final int INDEX_COUNT_PERSON = 0;
 	private static final int INDEX_COUNT_DWELLING = 1;
@@ -66,6 +67,7 @@ public class AreaMapping {
 	private Map<String, Map<String, String>> poaData;
 
 	private Map<Date, Integer> totalPopulation;
+	private Map<Date, Double> totalPopulationMultiplier; // multiply old data by this to get to 2018
 	private Map<Date, Map<String, Integer>> adjustedPeopleByLga;
 	private Map<Date, Map<String, Integer>> adjustedDwellingsByLga;
 	private Map<String, Integer> abs2074_0indexMap;
@@ -122,12 +124,21 @@ public class AreaMapping {
 		return totalPop.intValue();
 	}
 
+	public double getPopulationMultiplier(Date date) {
+		if (this.totalPopulationMultiplier == null || this.totalPopulationMultiplier.get(date) == null) {
+			this.getAdjustedPeopleByLga(date);
+		}
+		return this.totalPopulationMultiplier.get(date);
+	}
+
 	public Map<String, Integer> getAdjustedPeopleByLga(Date date) {
 		if (!this.dataLoaded) {
 			this.mapMeshblocks();
 		}
 		if (this.adjustedPeopleByLga == null) {
+			// these are always initialised and populated together (by this method)
 			this.adjustedPeopleByLga = new HashMap<Date, Map<String, Integer>>(5);
+			this.totalPopulationMultiplier = new HashMap<Date, Double>(5);
 		}
 		Map<String, Integer> result = this.adjustedPeopleByLga.get(date);
 		if (result == null) {
@@ -142,6 +153,8 @@ public class AreaMapping {
 			for (String lga : lgaSet) {
 				result.put(lga, (int) Math.round(Double.valueOf(censusPeopleByLga.get(lga)) * factor));
 			}
+			this.adjustedPeopleByLga.put(date, result);
+			this.totalPopulationMultiplier.put(date, factor);
 		}
 		return result;
 	}
@@ -149,7 +162,7 @@ public class AreaMapping {
 	public int getAdjustedPeopleByLga(String lgaCode, Date date) {
 		return this.getAdjustedPeopleByLga(date).get(lgaCode);
 	}
-	
+
 	public Map<String, Integer> getAdjustedDwellingsByLga(Date date) {
 		if (!this.dataLoaded) {
 			this.mapMeshblocks();
@@ -180,7 +193,7 @@ public class AreaMapping {
 	public int getAdjustedDwellingsByLga(String lgaCode, Date date) {
 		return this.getAdjustedDwellingsByLga(date).get(lgaCode);
 	}
-	
+
 	/**
 	 * 
 	 * @return a map of the unadjusted number of people in each LGA, per the census.
@@ -290,6 +303,19 @@ public class AreaMapping {
 
 	/**
 	 * 
+	 * @param poaCode - Postal Area (POA) code
+	 * @return Local Government Area (LGA) code
+	 */
+	public String getStateFromPoa(String poaCode) {
+		if (!this.dataLoaded) {
+			this.mapMeshblocks();
+		}
+		String lgaCode = this.mapPoaToLga.get(poaCode);
+		return this.getStateFromLgaCode(lgaCode);
+	}
+
+	/**
+	 * 
 	 * @param lgaCode - Local Government Area (LGA) code
 	 * @return Postal Area (POA) code
 	 */
@@ -326,7 +352,7 @@ public class AreaMapping {
 		return this.mapLgaNameToCode.get(lgaName);
 	}
 
-	public String getLgaStateFromCode(String lgaCode) {
+	public String getStateFromLgaCode(String lgaCode) {
 		if (!this.dataLoaded) {
 			this.mapMeshblocks();
 		}
@@ -441,7 +467,7 @@ public class AreaMapping {
 		this.mapLgaCodeToName = new HashMap<String, String>();
 		this.mapLgaCodeToState = new HashMap<String, String>();
 
-		final boolean[] lgaLoadColumn = { false, true, true, false, false, false };
+		final boolean[] lgaLoadColumn = { false, true, true, false, true, false };
 		this.lgaData = new HashMap<String, Map<String, String>>();
 		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_NSW.csv", this.lgaData,
 				lgaLoadColumn);
@@ -799,6 +825,7 @@ public class AreaMapping {
 	private void init() {
 		this.dataLoaded = false;
 		this.totalPopulation = null;
+		this.totalPopulationMultiplier = null;
 		this.adjustedPeopleByLga = null;
 		this.adjustedDwellingsByLga = null;
 

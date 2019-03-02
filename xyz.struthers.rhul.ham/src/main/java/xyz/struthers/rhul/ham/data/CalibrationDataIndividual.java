@@ -98,14 +98,14 @@ public class CalibrationDataIndividual {
 	Map<String, Map<String, Map<String, String>>> abs1410_0Income; // Data by LGA: Income
 	/**
 	 * ATO Individuals Table 2A<br>
-	 * Contains P&L and people count by sex and 5-year age range.<br>
+	 * Contains P&L and people count by sex, 5-year age range, and state.<br>
 	 * Keys: Series Title, State, Age, Gender, Taxable Status, Lodgment Method
 	 */
 	private Map<String, Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>>> atoIndividualTable2a;
 	/**
 	 * ATO Individuals Table 3A<br>
-	 * Contains P&L and people count by sex and 5-year age range.<br>
-	 * Keys: Series Title, State, Age, Gender, Taxable Status, Lodgment Method
+	 * Contains P&L and people count by sex, 5-year age range, and income range.<br>
+	 * Keys: Series Title, Income Range, Age, Gender, Taxable Status
 	 */
 	private Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> atoIndividualTable3a;
 
@@ -127,6 +127,12 @@ public class CalibrationDataIndividual {
 	 * Keys: Series Title, Industry Code
 	 */
 	private Map<String, Map<String, String>> atoIndividualTable9;
+	/**
+	 * ATO Individuals Table 9 (Industry Division summary)<br>
+	 * Contains count and taxable income, summarised by industry division.<br>
+	 * Keys: Series Title, Industry Division Code
+	 */
+	private Map<String, Map<String, Double>> atoIndividualTable9DivisionSummary;
 	/**
 	 * ABS Census Table Builder data:<br>
 	 * SEXP by POA (UR) by AGE5P, INDP and INCP<br>
@@ -233,8 +239,9 @@ public class CalibrationDataIndividual {
 
 		// load RBA data
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading RBA E2 data");
-		this.rbaE2 = new HashMap<String, Map<Date, String>>();
 		int[] rbaE2Columns = { 3, 6, 8, 9, 10 };
+		int rbaE2MapCapacity = (int) Math.ceil(rbaE2Columns.length / MAP_LOAD_FACTOR);
+		this.rbaE2 = new HashMap<String, Map<Date, String>>(rbaE2MapCapacity);
 		this.loadRbaDataCsv("/data/RBA/E_HouseholdBusiness/e2-data.csv", RBA_E2, rbaE2Columns, this.title,
 				this.unitType, this.rbaE2);
 
@@ -647,18 +654,37 @@ public class CalibrationDataIndividual {
 				this.initialisedCensusCDCF_LGA_FINF, fromColumnCDCF_LGA_FINF, toColumnCDCF_LGA_FINF,
 				this.censusCDCF_LGA_FINF);
 
+		// Load ATO Individuals Table data
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Individuals Table 2A data");
-		this.atoIndividualTable2a = new HashMap<String, Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>>>();
-		int[] atoIndividualTable2aColumns = { 5, 6, 7, 18, 19, 20, 21, 24, 25, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
-				40, 41, 42, 43, 46, 47, 62, 63, 66, 67, 96, 97, 98, 99, 102, 103, 104, 105, 140, 141, 142, 143, 144,
-				145 };
+		// int[] atoIndividualTable2aColumns = { 5, 6, 7, 18, 19, 20, 21, 24, 25, 30,
+		// 31, 32, 33, 34, 35, 36, 37, 38, 39,
+		// 40, 41, 42, 43, 46, 47, 62, 63, 66, 67, 96, 97, 98, 99, 102, 103, 104, 105,
+		// 140, 141, 142, 143, 144,
+		// 145 };
+		int[] atoIndividualTable2aColumns = { 5, 6, 7 };
+		int ato2aMapCapacity = (int) Math.ceil(atoIndividualTable2aColumns.length / MAP_LOAD_FACTOR);
+		this.atoIndividualTable2a = new HashMap<String, Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>>>(
+				ato2aMapCapacity);
 		this.loadAtoIndividualsTable2a("/data/ATO/Individual/IndividualsTable2A.csv", ATO_INDIVIDUAL_T2A,
 				atoIndividualTable2aColumns, this.title, this.atoIndividualTable2a);
 
+		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Individuals Table 3A data");
+
+		int[] atoIndividualTable3aColumns = { 5, 6, 7, 20, 21, 24, 25, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
+				42, 43, 62, 63, 66, 67, 96, 97, 98, 99, 102, 103, 104, 105, 140, 141, 142, 143, 144, 145 };
+		int ato3aMapCapacity = (int) Math.ceil(atoIndividualTable3aColumns.length / MAP_LOAD_FACTOR);
+		this.atoIndividualTable3a = new HashMap<String, Map<String, Map<String, Map<String, Map<String, String>>>>>(
+				ato3aMapCapacity);
+		this.loadAtoIndividualsTable3a("/data/ATO/Individual/IndividualsTable3A.csv", ATO_INDIVIDUAL_T3A,
+				atoIndividualTable3aColumns, this.title, this.atoIndividualTable3a);
+
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Individuals Table 6B data");
-		this.atoIndividualTable6b = new HashMap<String, Map<String, String>>();
-		int[] atoIndividualTable6bColumns = { 2, 3, 4, 15, 16, 17, 18, 21, 22, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37,
-				38, 39, 40, 41, 44, 45, 59, 60, 63, 64, 93, 94, 95, 96, 99, 100, 101, 102 };
+		// int[] atoIndividualTable6bColumns = { 2, 3, 4, 15, 16, 17, 18, 21, 22, 28,
+		// 29, 30, 31, 32, 33, 34, 35, 36, 37,
+		// 38, 39, 40, 41, 44, 45, 59, 60, 63, 64, 93, 94, 95, 96, 99, 100, 101, 102 };
+		int[] atoIndividualTable6bColumns = { 2, 3, 4 };
+		int ato6bMapCapacity = (int) Math.ceil(atoIndividualTable6bColumns.length / MAP_LOAD_FACTOR);
+		this.atoIndividualTable6b = new HashMap<String, Map<String, String>>(ato6bMapCapacity);
 		this.loadAtoIndividualsTable6("/data/ATO/Individual/IndividualsTable6B.csv", ATO_INDIVIDUAL_T6B,
 				atoIndividualTable6bColumns, this.title, this.atoIndividualTable6b);
 
@@ -673,11 +699,19 @@ public class CalibrationDataIndividual {
 		 */
 
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Individuals Table 9 data");
-		this.atoIndividualTable9 = new HashMap<String, Map<String, String>>();
-		int[] atoIndividualTable9Columns = { 2, 3, 4, 15, 16, 17, 18, 21, 22, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
-				37, 38, 39, 40, 43, 44, 93, 94, 95, 96, 99, 100, 101, 102 };
-		this.loadAtoIndividualsTable9("/data/ATO/Individual/IndividualsTable9.csv", ATO_INDIVIDUAL_T9,
-				atoIndividualTable9Columns, this.title, this.atoIndividualTable9);
+		// int[] atoIndividualTable9Columns = { 2, 3, 4, 15, 16, 17, 18, 21, 22, 27, 28,
+		// 29, 30, 31, 32, 33, 34, 35, 36,
+		// 37, 38, 39, 40, 43, 44, 93, 94, 95, 96, 99, 100, 101, 102 };
+		int[] atoIndividualTable9Columns = { 2, 3, 4 };
+		int ato9MapCapacity = (int) Math.ceil(atoIndividualTable9Columns.length / MAP_LOAD_FACTOR);
+		this.atoIndividualTable9DivisionSummary = new HashMap<String, Map<String, Double>>(ato9MapCapacity);
+		this.loadAtoIndividualsTable9DivisionSummary("/data/ATO/Individual/IndividualsTable9.csv", ATO_INDIVIDUAL_T9,
+				atoIndividualTable9Columns, this.title, this.atoIndividualTable9DivisionSummary);
+		// this.atoIndividualTable9 = new HashMap<String, Map<String,
+		// String>>(ato9MapCapacity);
+		// this.loadAtoIndividualsTable9("/data/ATO/Individual/IndividualsTable9.csv",
+		// ATO_INDIVIDUAL_T9,
+		// atoIndividualTable9Columns, this.title, this.atoIndividualTable9);
 
 		// set flag so we only load the data once
 		System.out.println(new Date(System.currentTimeMillis()) + ": Individual data loaded");
@@ -1447,7 +1481,7 @@ public class CalibrationDataIndividual {
 			String[] line = null;
 			while ((line = reader.readNext()) != null && !footer) {
 				if (header) {
-					if (line[0].equals("State/ Territory1")) {
+					if (line[0].equals("Lodgment method")) {
 						// title row
 						List<String> thesecolumnNames = new ArrayList<String>(columnsToImport.length);
 						for (int i = 0; i < columnsToImport.length; i++) {
@@ -1467,7 +1501,7 @@ public class CalibrationDataIndividual {
 						// Keys: Series Title, State, Age, Gender, Taxable Status, Lodgment Method
 						String thisState = line[3].trim().length() > 3 ? "Other" : line[3].trim();
 						String thisAge = line[4];
-						String thisSex = line[1].substring(0, 1);
+						String thisSex = line[1].substring(0, 1).toUpperCase();
 						String thisTaxableStatus = line[2].substring(0, 1).equals("N") ? "N" : "Y";
 						String thisLodgmentMethod = line[0].substring(0, 1);
 
@@ -1494,6 +1528,96 @@ public class CalibrationDataIndividual {
 							// parse the body of the data
 							data.get(seriesId[i]).get(thisState).get(thisAge).get(thisSex).get(thisTaxableStatus)
 									.put(thisLodgmentMethod, line[columnsToImport[i]]);
+						}
+					} else {
+						footer = true;
+					}
+				}
+			}
+			reader.close();
+			reader = null;
+		} catch (FileNotFoundException e) {
+			// open file
+			e.printStackTrace();
+		} catch (IOException e) {
+			// read next
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Load data from ATO Individuals Table 3A
+	 * 
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param dataSourceName       - the name used to identify this data source (in
+	 *                             the shared maps)
+	 * @param tableName            - the name used to store this series' data in the
+	 *                             maps
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0).
+	 * @param titles               - column titles in CSV file
+	 * @param data                 - the data map that the values are returned
+	 *                             in.<br>
+	 *                             Keys: Series Title, Income Range, Age, Gender,
+	 *                             Taxable Status
+	 */
+	private void loadAtoIndividualsTable3a(String fileResourceLocation, String tableName, int[] columnsToImport,
+			Map<String, List<String>> titles,
+			Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> data) {
+
+		CSVReader reader = null;
+		try {
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
+			boolean header = true;
+			boolean footer = false;
+			String[] seriesId = new String[columnsToImport.length];
+
+			String[] line = null;
+			while ((line = reader.readNext()) != null && !footer) {
+				if (header) {
+					if (line[0].equals("Gender")) {
+						// title row
+						List<String> theseColumnNames = new ArrayList<String>(columnsToImport.length);
+						for (int i = 0; i < columnsToImport.length; i++) {
+							// store title
+							seriesId[i] = line[columnsToImport[i]];
+							theseColumnNames.add(line[columnsToImport[i]]);
+
+							// store series ID as key with blank collections to populate with data below
+							data.put(line[columnsToImport[i]],
+									new HashMap<String, Map<String, Map<String, Map<String, String>>>>());
+						}
+						titles.put(tableName, theseColumnNames);
+						header = false;
+					}
+				} else {
+					if (!line[0].isBlank()) {
+						// Keys: Series Title, Income Range, Age, Gender, Taxable Status
+						String thisIncomeRange = line[3].trim().length() > 3 ? "Other" : line[3].trim();
+						String thisAge = line[2];
+						String thisSex = line[0].substring(0, 1).toUpperCase();
+						String thisTaxableStatus = line[1].substring(0, 1).equals("N") ? "N" : "Y";
+
+						for (int i = 0; i < columnsToImport.length; i++) {
+							// create nested maps for new data categories
+							if (!data.get(seriesId[i]).containsKey(thisIncomeRange)) {
+								data.get(seriesId[i]).put(thisIncomeRange,
+										new HashMap<String, Map<String, Map<String, String>>>());
+							}
+							if (!data.get(seriesId[i]).get(thisIncomeRange).containsKey(thisAge)) {
+								data.get(seriesId[i]).get(thisIncomeRange).put(thisAge,
+										new HashMap<String, Map<String, String>>());
+							}
+							if (!data.get(seriesId[i]).get(thisIncomeRange).get(thisAge).containsKey(thisSex)) {
+								data.get(seriesId[i]).get(thisIncomeRange).get(thisAge).put(thisSex,
+										new HashMap<String, String>());
+							}
+
+							// parse the body of the data
+							data.get(seriesId[i]).get(thisIncomeRange).get(thisAge).get(thisSex).put(thisTaxableStatus,
+									line[columnsToImport[i]]);
 						}
 					} else {
 						footer = true;
@@ -1623,10 +1747,81 @@ public class CalibrationDataIndividual {
 					}
 				} else {
 					if (!line[1].equals("Other individuals")) {
+						String fineIndustryCode = line[1].substring(0, 5);
 						for (int i = 0; i < columnsToImport.length; i++) {
 							// parse the body of the data
-							String fineIndustryCode = line[1].substring(0, 5);
 							data.get(seriesId[i]).put(fineIndustryCode, line[columnsToImport[i]]);
+						}
+					} else {
+						footer = true;
+					}
+				}
+			}
+			reader.close();
+			reader = null;
+		} catch (FileNotFoundException e) {
+			// open file
+			e.printStackTrace();
+		} catch (IOException e) {
+			// read next
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Load data from ATO Individuals Table 9
+	 * 
+	 * @param fileResourceLocation - the URI of the file to import
+	 * @param dataSourceName       - the name used to identify this data source (in
+	 *                             the shared maps)
+	 * @param tableName            - the name used to store this series' data in the
+	 *                             maps
+	 * @param columnsToImport      - a zero-based array of integers specifying which
+	 *                             columns to import (i.e. the first column is
+	 *                             column 0).
+	 * @param titles               - column titles in CSV file
+	 * @param data                 - the data map that the values are returned in
+	 */
+	private void loadAtoIndividualsTable9DivisionSummary(String fileResourceLocation, String tableName,
+			int[] columnsToImport, Map<String, List<String>> titles, Map<String, Map<String, Double>> data) {
+
+		CSVReader reader = null;
+		try {
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
+			boolean header = true;
+			boolean footer = false;
+			String[] seriesId = new String[columnsToImport.length];
+
+			String[] line = null;
+			while ((line = reader.readNext()) != null && !footer) {
+				if (header) {
+					if (line[0].equals("Broad Industry1")) {
+						// title row
+						List<String> thesecolumnNames = new ArrayList<String>(columnsToImport.length);
+						int divisionMapCapacity = (int) Math.ceil(19 / MAP_LOAD_FACTOR + 1); // 19 divisions imported
+						for (int i = 0; i < columnsToImport.length; i++) {
+							// store title
+							seriesId[i] = line[columnsToImport[i]];
+							thesecolumnNames.add(line[columnsToImport[i]]);
+
+							// store series ID as key with blank collections to populate with data below
+							data.put(line[columnsToImport[i]], new HashMap<String, Double>(divisionMapCapacity));
+						}
+						titles.put(tableName, thesecolumnNames);
+						header = false;
+					}
+				} else {
+					if (!line[1].equals("Other individuals")) {
+						String divisionCode = line[0].substring(0, 1).toUpperCase();
+						for (int i = 0; i < columnsToImport.length; i++) {
+							// parse the body of the data
+							double oldVal = 0d;
+							if (data.get(seriesId[i]).get(divisionCode) != null) {
+								oldVal = data.get(seriesId[i]).get(divisionCode);
+							}
+							data.get(seriesId[i]).put(divisionCode,
+									oldVal + Double.valueOf(line[columnsToImport[i]].replace(",", "")));
 						}
 					} else {
 						footer = true;
@@ -1664,6 +1859,7 @@ public class CalibrationDataIndividual {
 		this.atoIndividualTable6b = null;
 		this.atoIndividualTable6c = null;
 		this.atoIndividualTable9 = null;
+		this.atoIndividualTable9DivisionSummary = null;
 
 		this.censusCDCF_LGA_FINF = null;
 		this.censusHCFMD_TEND_LGA_HIND_MRERD = null;
@@ -1763,6 +1959,16 @@ public class CalibrationDataIndividual {
 			this.loadData();
 		}
 		return atoIndividualTable9;
+	}
+
+	/**
+	 * @return the atoIndividualTable9DivisionSummary
+	 */
+	public Map<String, Map<String, Double>> getAtoIndividualTable9DivisionSummary() {
+		if (!this.dataLoaded) {
+			this.loadData();
+		}
+		return atoIndividualTable9DivisionSummary;
 	}
 
 	/**

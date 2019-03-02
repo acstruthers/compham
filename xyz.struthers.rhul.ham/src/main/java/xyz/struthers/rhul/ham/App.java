@@ -3,19 +3,18 @@
  */
 package xyz.struthers.rhul.ham;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Locale;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import xyz.struthers.rhul.ham.config.SpringConfiguration;
 import xyz.struthers.rhul.ham.data.AreaMapping;
 import xyz.struthers.rhul.ham.data.CalibrateBusinesses;
-import xyz.struthers.rhul.ham.data.CalibrationData;
 
 /**
  * @author Adam
@@ -53,7 +52,7 @@ public class App {
 		//System.out.println("Started Calibration Data Load: " + new Date(System.currentTimeMillis()));
 		//CalibrationData data = ctx.getBean(CalibrationData.class);
 
-		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+		DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
 		Date date = null;
 		try {
 			date = df.parse("01/06/2018");

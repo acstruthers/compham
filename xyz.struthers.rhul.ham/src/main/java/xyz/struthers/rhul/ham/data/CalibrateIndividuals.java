@@ -7,6 +7,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -35,7 +36,44 @@ public class CalibrateIndividuals {
 	// CONSTANTS
 	private static final double MILLION = 1000000d;
 	private static final double THOUSAND = 1000d;
+	private static final double PERCENT = 0.01d;
 	private static final double EPSILON = 0.1d; // to round business counts so the integer sums match
+
+	private static final double NUM_MONTHS = 12d;
+	private static final double NUM_WEEKS = 365d / 7d;
+	private static final int NUM_DIVISIONS = 19;
+
+	public static final String CALIBRATION_DATE_ATO = "01/06/2018";
+	public static final String CALIBRATION_DATE_RBA = "30/06/2018";
+
+	public static final double MAP_LOAD_FACTOR = 0.75d;
+	private static final String[] STATES_ARRAY = { "NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT", "OT" };
+	private static final int[] MAP_STATE_POA_CAPACITY = { (int) Math.ceil(612 / MAP_LOAD_FACTOR) + 1,
+			(int) Math.ceil(382 / MAP_LOAD_FACTOR) + 1, (int) Math.ceil(429 / MAP_LOAD_FACTOR) + 1,
+			(int) Math.ceil(326 / MAP_LOAD_FACTOR) + 1, (int) Math.ceil(338 / MAP_LOAD_FACTOR) + 1,
+			(int) Math.ceil(111 / MAP_LOAD_FACTOR) + 1, (int) Math.ceil(43 / MAP_LOAD_FACTOR) + 1,
+			(int) Math.ceil(25 / MAP_LOAD_FACTOR) + 1, (int) Math.ceil(1 / MAP_LOAD_FACTOR) + 1 };
+
+	private static final String ATO_2A_TITLE_COUNT = "Number of individuals no.";
+	private static final String ATO_2A_TITLE_TAXABLE_COUNT = "Taxable income or loss3 no.";
+	private static final String ATO_2A_TITLE_TAXABLE_AMOUNT = "Taxable income or loss3 $";
+	private static final String ATO_9_TITLE_COUNT = "Number of individuals";
+	private static final String ATO_9_TITLE_TAXABLE_COUNT = "Taxable income or loss4 no.";
+	private static final String ATO_9_TITLE_TAXABLE_AMOUNT = "Taxable income or loss4 $";
+	private static final String ATO_6B_TITLE_COUNT = "Number of individuals no.";
+	private static final String ATO_6B_TITLE_TAXABLE_COUNT = "Taxable income or loss3 no.";
+	private static final String ATO_6B_TITLE_TAXABLE_AMOUNT = "Taxable income or loss3 $";
+
+	private static final String RBA_E1_SERIESID_CASH = "BSPNSHUFAD"; // Household deposits
+	private static final String RBA_E1_SERIESID_SUPER = "BSPNSHUFAR"; // Household superannuation
+	private static final String RBA_E1_SERIESID_EQUITIES = "BSPNSHUFAS"; // Household equities
+	private static final String RBA_E1_SERIESID_OTHER_FIN_ASSETS = "BSPNSHUFAO"; // Household other financial assets
+	private static final String RBA_E1_SERIESID_DWELLINGS = "BSPNSHNFD"; // Household dwellings
+	private static final String RBA_E1_SERIESID_NONFIN_ASSETS = "BSPNSHNFT"; // Household total non-financial assets
+	private static final String RBA_E1_SERIESID_TOTAL_LIABILITIES = "BSPNSHUL"; // Household total liabilities
+
+	private static final String RBA_E2_SERIESID_DEBT_TO_INCOME = "BHFDDIT";
+	private static final String RBA_E2_SERIESID_ASSETS_TO_INCOME = "BHFADIT";
 
 	// beans
 	private AreaMapping area;
@@ -45,12 +83,45 @@ public class CalibrateIndividuals {
 
 	// field variables
 	private List<Individual> individualAgents;
-	private Date calibrationDate;
+	private Date calibrationDateAto;
+	private Date calibrationDateRba;
 	private int totalPopulationAU;
+	private double populationMultiplier;
 	private Map<String, Integer> lgaPeopleCount;
 	private Map<String, Integer> lgaDwellingsCount;
 
 	// data sets
+	/**
+	 * ANZSIC industry code mapping<br>
+	 * Key 1 is mapping per the titles (e.g. "Class Code to Division")<br>
+	 * Key 2 is the code or description (e.g. "Division Code")
+	 * 
+	 * Stores description-to-code mapping in UPPER CASE, so use toUpperCase() when
+	 * getting the mapping from descriptions to codes.
+	 * 
+	 * Mappings are:<br>
+	 * "Division Code to Division"<br>
+	 * "Subdivision Code to Subdivision"<br>
+	 * "Group Code to Group"<br>
+	 * "Class Code to Class"<br>
+	 * "Industry Code to Industry"<br>
+	 * "Division to Division Code"<br>
+	 * "Subdivision to Subdivision Code"<br>
+	 * "Group to Group Code"<br>
+	 * "Class to Class Code"<br>
+	 * "Industry to Industry Code"<br>
+	 * "Industry Code to Class Code"<br>
+	 * "Industry Code to Group Code"<br>
+	 * "Industry Code to Subdivision Code"<br>
+	 * "Industry Code to Division Code"<br>
+	 * "Class Code to Group Code"<br>
+	 * "Class Code to Subdivision Code"<br>
+	 * "Class Code to Division Code"<br>
+	 * "Group Code to Subdivision Code"<br>
+	 * "Group Code to Division Code"<br>
+	 * "Subdivision Code to Division Code"<br>
+	 */
+	private Map<String, Map<String, String>> abs1292_0_55_002ANZSIC;
 	/**
 	 * Data by LGA: Economy<br>
 	 * Contains property prices and counts per LGA<br>
@@ -62,7 +133,7 @@ public class CalibrateIndividuals {
 	 * Contains P&L and people count by sex and 5-year age range.<br>
 	 * Keys: Series Title, State, Age, Gender, Taxable Status, Lodgment Method
 	 */
-	Map<String, Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>>> atoIndividualTable2a;
+	private Map<String, Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>>> atoIndividualTable2a;
 	/**
 	 * ATO Individuals Table 3A<br>
 	 * Contains P&L and people count by sex and 5-year age range.<br>
@@ -76,21 +147,21 @@ public class CalibrateIndividuals {
 	 */
 	private Map<String, Map<String, String>> atoIndividualTable6b;
 	/**
-	 * ATO Individuals Table 9<br>
-	 * Contains P&L by industry code.<br>
-	 * Keys: Series Title, Industry Code
+	 * ATO Individuals Table 9 (Industry Division summary)<br>
+	 * Contains count and taxable income, summarised by industry division.<br>
+	 * Keys: Series Title, Industry Division Code
 	 */
-	private Map<String, Map<String, String>> atoIndividualTable9;
+	private Map<String, Map<String, Double>> atoIndividualTable9DivisionSummary;
 	/**
 	 * RBA E1 Household and Business Balance Sheets<br>
 	 * Contains high-level balance sheet amounts at a national level.<br>
-	 * Keys: Series Name, Date
+	 * Keys: Series ID, Date
 	 */
 	private Map<String, Map<Date, String>> rbaE1;
 	/**
 	 * RBA E2 Selected Ratios<br>
 	 * Contains ratios that link P&L and Bal Sht.<br>
-	 * Keys: Series Name, Date
+	 * Keys: Series ID, Date
 	 */
 	private Map<String, Map<Date, String>> rbaE2;
 	/**
@@ -142,8 +213,10 @@ public class CalibrateIndividuals {
 
 	private void init() {
 		this.individualAgents = null;
-		this.calibrationDate = null;
+		this.calibrationDateAto = null;
+		this.calibrationDateRba = null;
 		this.totalPopulationAU = 0;
+		this.populationMultiplier = 0d;
 		this.lgaPeopleCount = null;
 		this.lgaDwellingsCount = null;
 
@@ -152,7 +225,7 @@ public class CalibrateIndividuals {
 		this.atoIndividualTable2a = null;
 		this.atoIndividualTable3a = null;
 		this.atoIndividualTable6b = null;
-		this.atoIndividualTable9 = null;
+		this.atoIndividualTable9DivisionSummary = null;
 		this.rbaE1 = null;
 		this.rbaE2 = null;
 		this.censusSEXP_POA_AGE5P_INDP_INCP = null;
@@ -193,7 +266,7 @@ public class CalibrateIndividuals {
 	 * to be interchangeable.
 	 * 
 	 * ------------------------------------------------------------------------<br>
-	 * PART A: ESTIMATING INDIVIDUAL PROFIT & LOSS STATEMENTS
+	 * PART A: ESTIMATING INDIVIDUAL PROFIT & LOSS STATEMENTS AND BALANCE SHEETS
 	 * ------------------------------------------------------------------------<br>
 	 * 
 	 * N.B. P&L composition will vary more with income, so use ATO 3A as the amounts
@@ -226,28 +299,23 @@ public class CalibrateIndividuals {
 	 * ensures, for example, that the right number of people are assigned a HELP
 	 * debt, etc.<br>
 	 * 
-	 * ------------------------------------------------------------------------<br>
-	 * PART B: ADDING INDIVIDUAL BALANCE SHEETS
-	 * ------------------------------------------------------------------------<br>
-	 * 
-	 * 5. RBA E2: Use the debt-to-income and assets-to-income ratios to calculate
-	 * total assets and total debt.<br>
-	 * 6. RBA E1: Calculate the ratios between Bal Sht items. Use these, compared to
-	 * assets and debt, to estimate the other balance sheet items.<br>
-	 * 
 	 * N.B. Need to think about HELP debt and work out how to assign it by age &
 	 * gender, not diminish it by including it in ratios too early.
 	 * 
 	 * This gives P&L and Bal Sht by sex, age, industry division, income, POA
 	 * 
 	 * ------------------------------------------------------------------------<br>
-	 * PART C: INDIVIDUAL COUNTS
+	 * PART B: INDIVIDUAL COUNTS
 	 * ------------------------------------------------------------------------<br>
 	 * 
-	 * 7. Census age, industry, income & sex per POA<br>
+	 * 5. Census age, industry, income & sex per POA: Get total population
+	 * multiplier, and adjust each count so it's now a 2018 equivalent.<br>
+	 * 
+	 * ROUGH ALGORITHM: Calculate tax-payers per ATO/RBA data as above, then create
+	 * everyone else so they can be added into households too.
 	 * 
 	 * ------------------------------------------------------------------------<br>
-	 * PART D: HOUSEHOLD COUNTS
+	 * PART C: HOUSEHOLD COUNTS
 	 * ------------------------------------------------------------------------<br>
 	 * 
 	 * ROUGH ALGORITHM FOR HOUSEHOLD COUNTS:<br>
@@ -266,8 +334,14 @@ public class CalibrateIndividuals {
 	 * ROUGH ALGORITHM TO ASSIGN PEOPLE TO HOUSEHOLDS:
 	 * 
 	 * ------------------------------------------------------------------------<br>
-	 * PART E: ADJUSTING FINANCIALS FOR HOUSEHOLDS
+	 * PART D: ADJUSTING FINANCIALS FOR HOUSEHOLDS
 	 * ------------------------------------------------------------------------<br>
+	 * 
+	 * 4. RBA E2: Use the household debt-to-income and assets-to-income ratios to
+	 * calculate total assets and total debt.<br>
+	 * 
+	 * 5. RBA E1: Calculate the ratios between household Bal Sht items. Use these,
+	 * compared to assets and debt, to estimate the other balance sheet items.<br>
 	 * 
 	 * ROUGH ALGORITHM FOR HOUSEHOLD ADJUSTMENTS:<br>
 	 * - Henderson poverty line based on family composition to be a proxy for
@@ -277,17 +351,22 @@ public class CalibrateIndividuals {
 	 * 
 	 */
 	public void createIndividualAgents() {
+		// set the calibration date
 		DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
 		try {
-			this.calibrationDate = sdf.parse("01/06/2018");
+			this.calibrationDateAto = sdf.parse(CALIBRATION_DATE_ATO);
+			this.calibrationDateRba = sdf.parse(CALIBRATION_DATE_RBA);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
+
+		// get raw calibration data
+		this.abs1292_0_55_002ANZSIC = this.commonData.getAbs1292_0_55_002ANZSIC();
 		this.abs1410_0Economy = this.individualData.getAbs1410_0Economy();
 		this.atoIndividualTable2a = this.individualData.getAtoIndividualTable2a();
 		this.atoIndividualTable3a = this.individualData.getAtoIndividualTable3a();
 		this.atoIndividualTable6b = this.individualData.getAtoIndividualTable6b();
-		this.atoIndividualTable9 = this.individualData.getAtoIndividualTable9();
+		this.atoIndividualTable9DivisionSummary = this.individualData.getAtoIndividualTable9DivisionSummary();
 		this.rbaE1 = this.commonData.getRbaE1();
 		this.rbaE2 = this.individualData.getRbaE2();
 		this.censusSEXP_POA_AGE5P_INDP_INCP = this.individualData.getCensusSEXP_POA_AGE5P_INDP_INCP();
@@ -295,80 +374,273 @@ public class CalibrateIndividuals {
 		this.censusHCFMD_LGA_HIND_MRERD = this.individualData.getCensusHCFMD_LGA_HIND_MRERD();
 		this.censusCDCF_LGA_FINF = this.individualData.getCensusCDCF_LGA_FINF();
 
-		/*
-		 * ------------------------------------------------------------------------<br>
-		 * PART A: DETERMINING THE NUMBER AND TYPE OF INDIVIDUALS IN EACH LGA
-		 * ------------------------------------------------------------------------<br>
-		 * 
-		 * 1. ABS 3222.0: Get the sum of the 2018 population projections. This will be
-		 * the baseline we adjust the rest of the data against.
-		 * 
-		 * 2. ABS 2074.0: Sum the total number of dwellings and individuals for
-		 * Australia. Divide the total by the population projections from ABS 3222.0 to
-		 * get a multiplier that adjusts all LGA population and dwelling counts forward
-		 * from 2016 to 2018. Determine the number of dwellings and individuals per LGA,
-		 * and apply the population multiplier to each LGA to get the adjusted number of
-		 * persons and dwellings. N.B. This is already done in the AreaMapping class.
-		 */
-
-		this.lgaPeopleCount = this.area.getAdjustedPeopleByLga(this.calibrationDate);
-		this.lgaDwellingsCount = this.area.getAdjustedDwellingsByLga(this.calibrationDate);
-		this.totalPopulationAU = this.area.getTotalPopulation(this.calibrationDate);
+		// get key metrics that will be used across all the data
+		this.lgaPeopleCount = this.area.getAdjustedPeopleByLga(this.calibrationDateAto);
+		this.lgaDwellingsCount = this.area.getAdjustedDwellingsByLga(this.calibrationDateAto);
+		this.totalPopulationAU = this.area.getTotalPopulation(this.calibrationDateAto);
+		this.populationMultiplier = this.area.getPopulationMultiplier(this.calibrationDateAto);
 		Set<String> lgaCodes = this.lgaPeopleCount.keySet();
 
-		// FIXME: implement me
-		for (String lgaCode : lgaCodes) {
-
+		/*
+		 * ------------------------------------------------------------------------<br>
+		 * PART A: ESTIMATING INDIVIDUAL PROFIT & LOSS STATEMENTS
+		 * ------------------------------------------------------------------------<br>
+		 * 
+		 * N.B. P&L composition will vary more with income, so use ATO 3A as the amounts
+		 * and the ratios between line items.<br>
+		 * 
+		 * 1. ATO Individual Table 9: P&L (by industry code). Only 1.2M of 13.5M
+		 * taxpayers specified an industry, so just use the industry data to derive
+		 * ratios of taxable income to multiply the the other data by. Do it at an
+		 * industry division level to minimise the impact of the small sample. Make it a
+		 * multiple of the industry-declaring national average so we can just multiply
+		 * the other cells by this multiple rather than trying to split them. Don't use
+		 * the total amounts or the ratios between line items as it's too small a
+		 * sample. So, the algorithm becomes: Calculate mean taxable income per industry
+		 * code. Calculate mean taxable income across all industry codes. Divide each
+		 * industry code's mean by the overall mean to produce an industry
+		 * multiplier.<br>
+		 */
+		Map<String, Double> divisionMultiplier = new HashMap<String, Double>(NUM_DIVISIONS);
+		Set<String> divisionCodeSet = this.atoIndividualTable9DivisionSummary.get(ATO_9_TITLE_TAXABLE_COUNT).keySet();
+		double divTotalCount9A = 0d;
+		double divTotalAmount9A = 0d;
+		for (String divCode : divisionCodeSet) {
+			// calculate average income per division, and total of all divisions
+			double divTaxableCount = this.atoIndividualTable9DivisionSummary.get(ATO_9_TITLE_TAXABLE_COUNT)
+					.get(divCode);
+			double divTaxableAmount = this.atoIndividualTable9DivisionSummary.get(ATO_9_TITLE_TAXABLE_AMOUNT)
+					.get(divCode);
+			double divTaxablePerPerson = divTaxableAmount / divTaxableCount;
+			// Just an efficient place to hold this. Will be overwritten in the loop below.
+			divisionMultiplier.put(divCode, divTaxablePerPerson);
+			divTotalCount9A += divTaxableCount;
+			divTotalAmount9A += divTaxableAmount;
 		}
+		double divTotalTaxablePerPerson = divTotalCount9A > 0d ? divTotalAmount9A / divTotalCount9A : 0d;
+		for (String divCode : divisionCodeSet) {
+			double divMultiplier = divisionMultiplier.get(divCode) / divTotalTaxablePerPerson;
+			divisionMultiplier.put(divCode, divMultiplier);
+		}
+
+		/*
+		 * 2. ATO Individual Table 2A: age/sex count, P&L, Help Debt (by State).
+		 * Calculate state multiplier for every age/sex combination.<br>
+		 */
+		// Keys: Series Title, State, Age, Gender, Taxable Status, Lodgment Method
+
+		// initialise state multiplier map
+		// Keys for stateMultiplier: Sex (2), Age (13), State (9)
+		String[] sexArray = { "M", "F" };
+		String[] ageArray = { "a. Under 18", "b. 18 - 24", "c. 25 - 29", "d. 30 - 34", "e. 35 - 39", "f. 40 - 44",
+				"g. 45 - 49", "h. 50 - 54", "i. 55 - 59", "j. 60 - 64", "k. 65 - 69", "l. 70 - 74", "m. 75 and over" };
+		int sexMapCapacity = (int) Math.ceil(sexArray.length / MAP_LOAD_FACTOR);
+		int ageMapCapacity = (int) Math.ceil(ageArray.length / MAP_LOAD_FACTOR);
+		int stateMapCapacity = (int) Math.ceil(STATES_ARRAY.length / MAP_LOAD_FACTOR);
+		Map<String, Map<String, Map<String, Double>>> stateTaxableCount = new HashMap<String, Map<String, Map<String, Double>>>(
+				sexMapCapacity);
+		Map<String, Map<String, Map<String, Double>>> stateTaxableAmount = new HashMap<String, Map<String, Map<String, Double>>>(
+				sexMapCapacity);
+		Map<String, Map<String, Map<String, Double>>> stateMultiplier = new HashMap<String, Map<String, Map<String, Double>>>(
+				sexMapCapacity);
+		Map<String, Map<String, Double>> stateSexAgeNationalTotalCount = new HashMap<String, Map<String, Double>>(
+				sexMapCapacity);
+		Map<String, Map<String, Double>> stateSexAgeNationalTotalAmount = new HashMap<String, Map<String, Double>>(
+				sexMapCapacity);
+		for (String sex : sexArray) {
+			stateTaxableCount.put(sex, new HashMap<String, Map<String, Double>>(ageMapCapacity));
+			stateTaxableAmount.put(sex, new HashMap<String, Map<String, Double>>(ageMapCapacity));
+			stateMultiplier.put(sex, new HashMap<String, Map<String, Double>>(ageMapCapacity));
+			stateSexAgeNationalTotalCount.put(sex, new HashMap<String, Double>(ageMapCapacity));
+			stateSexAgeNationalTotalAmount.put(sex, new HashMap<String, Double>(ageMapCapacity));
+			for (String age : ageArray) {
+				stateTaxableCount.get(sex).put(age, new HashMap<String, Double>(stateMapCapacity));
+				stateTaxableAmount.get(sex).put(age, new HashMap<String, Double>(stateMapCapacity));
+				stateMultiplier.get(sex).put(age, new HashMap<String, Double>(stateMapCapacity));
+				stateSexAgeNationalTotalCount.get(sex).put(age, 0d);
+				stateSexAgeNationalTotalAmount.get(sex).put(age, 0d);
+				for (String state : STATES_ARRAY) {
+					stateTaxableCount.get(sex).get(age).put(state, 0d);
+					stateTaxableAmount.get(sex).get(age).put(state, 0d);
+					stateMultiplier.get(sex).get(age).put(state, 0d);
+				}
+			}
+		}
+
+		// read data and calculate totals by state
+		// N.B. Not every series has every key, so get key sets inside loops
+		Set<String> ato2aKeySetState = this.atoIndividualTable2a.get(ATO_2A_TITLE_TAXABLE_COUNT).keySet();
+		for (String state : ato2aKeySetState) {
+			String stateCode = this.getStateCode(state);
+			Set<String> ato2aKeySetAge = this.atoIndividualTable2a.get(ATO_2A_TITLE_TAXABLE_COUNT).get(state).keySet();
+			for (String age : ato2aKeySetAge) {
+				Set<String> ato2aKeySetSex = this.atoIndividualTable2a.get(ATO_2A_TITLE_TAXABLE_COUNT).get(state)
+						.get(age).keySet();
+				for (String sex : ato2aKeySetSex) {
+					Set<String> ato2aKeySetTaxableStatus = this.atoIndividualTable2a.get(ATO_2A_TITLE_TAXABLE_COUNT)
+							.get(state).get(age).get(sex).keySet();
+					for (String taxableStatus : ato2aKeySetTaxableStatus) {
+						Set<String> ato2aKeySetLodgmentStatus = this.atoIndividualTable2a
+								.get(ATO_2A_TITLE_TAXABLE_COUNT).get(state).get(age).get(sex).get(taxableStatus)
+								.keySet();
+						for (String lodgmentStatus : ato2aKeySetLodgmentStatus) {
+							double oldCountVal = stateTaxableCount.get(sex).get(age).get(stateCode);
+							double newCountVal = Double
+									.valueOf(this.atoIndividualTable2a.get(ATO_2A_TITLE_TAXABLE_COUNT).get(state)
+											.get(age).get(sex).get(taxableStatus).get(lodgmentStatus).replace(",", ""));
+							stateTaxableCount.get(sex).get(age).put(stateCode, oldCountVal + newCountVal);
+							double oldTotalCount = stateSexAgeNationalTotalCount.get(sex).get(age);
+							stateSexAgeNationalTotalCount.get(sex).put(age, oldTotalCount + newCountVal);
+
+							double oldAmountVal = stateTaxableAmount.get(sex).get(age).get(stateCode);
+							double newAmountVal = Double
+									.valueOf(this.atoIndividualTable2a.get(ATO_2A_TITLE_TAXABLE_AMOUNT).get(state)
+											.get(age).get(sex).get(taxableStatus).get(lodgmentStatus).replace(",", ""));
+							stateTaxableAmount.get(sex).get(age).put(stateCode, oldAmountVal + newAmountVal);
+							double oldTotalAmount = stateSexAgeNationalTotalAmount.get(sex).get(age);
+							stateSexAgeNationalTotalAmount.get(sex).put(age, oldTotalAmount + newAmountVal);
+						}
+					}
+				}
+			}
+		}
+
+		// calculate average income per state, and national average
+		for (String sex : sexArray) {
+			for (String age : ageArray) {
+				double sexAgeCount = stateSexAgeNationalTotalCount.get(sex).get(age);
+				double sexAgeAmount = stateSexAgeNationalTotalAmount.get(sex).get(age);
+				double sexAgeTaxablePerPerson = sexAgeCount > 0d ? sexAgeAmount / sexAgeCount : 0d;
+				for (String state : STATES_ARRAY) {
+					double stateCount = stateTaxableCount.get(sex).get(age).get(state);
+					double stateAmount = stateTaxableAmount.get(sex).get(age).get(state);
+					double stateTaxablePerPerson = stateAmount / stateCount;
+					double thisStateMultiplier = sexAgeTaxablePerPerson > 0d
+							? stateTaxablePerPerson / sexAgeTaxablePerPerson
+							: 0d;
+					stateMultiplier.get(sex).get(age).put(state, thisStateMultiplier);
+				}
+			}
+		}
+
+		/*
+		 * 3. ATO Individual Table 6B: people count, taxable income (per POA). Calculate
+		 * POA multiplier for each POA, by state.<br>
+		 */
+
+		// ATO 6B Keys: Series Title, Post Code
+		// postcodeMultiplier Keys: State Code, Post Code
+		Map<String, Map<String, Double>> postcodeStateMultiplier = new HashMap<String, Map<String, Double>>(
+				stateMapCapacity);
+		Map<String, Double> postcodeStateTotalCount = new HashMap<String, Double>(stateMapCapacity);
+		Map<String, Double> postcodeStateTotalAmount = new HashMap<String, Double>(stateMapCapacity);
+		Map<String, Double> postcodeStateTaxablePerPerson = new HashMap<String, Double>(stateMapCapacity);
+
+		// initialise state multiplier map
+		for (int i = 0; i < STATES_ARRAY.length; i++) {
+			String state = STATES_ARRAY[i];
+			postcodeStateMultiplier.put(state, new HashMap<String, Double>(MAP_STATE_POA_CAPACITY[i]));
+			postcodeStateTotalCount.put(state, 0d);
+			postcodeStateTotalAmount.put(state, 0d);
+		}
+
+		Set<String> postcodeSet = this.atoIndividualTable6b.get(ATO_6B_TITLE_TAXABLE_COUNT).keySet();
+		for (String postcode : postcodeSet) {
+			String state = this.area.getStateFromPoa(postcode);
+
+			// calculate average income per postcode, and state totals for all postcodes
+			double postcodeTaxableCount = Double
+					.valueOf(this.atoIndividualTable6b.get(ATO_6B_TITLE_TAXABLE_COUNT).get(postcode).replace(",", ""));
+			double postcodeTaxableAmount = Double
+					.valueOf(this.atoIndividualTable6b.get(ATO_6B_TITLE_TAXABLE_AMOUNT).get(postcode).replace(",", ""));
+			double postcodeTaxablePerPerson = postcodeTaxableAmount / postcodeTaxableCount;
+
+			// Just an efficient place to hold this. Will be overwritten in the loop below.
+			postcodeStateMultiplier.get(state).put(postcode, postcodeTaxablePerPerson);
+			double oldStateTotalCount = postcodeStateTotalCount.get(state);
+			postcodeStateTotalCount.put(state, oldStateTotalCount + postcodeTaxableCount);
+			double oldStateTotalAmount = postcodeStateTotalAmount.get(state);
+			postcodeStateTotalAmount.put(state, oldStateTotalAmount + postcodeTaxableAmount);
+		}
+
+		// calculate state averages
+		for (String state : STATES_ARRAY) {
+			double stateCount = postcodeStateTotalCount.containsKey(state) ? postcodeStateTotalCount.get(state) : 0d;
+			double stateAmount = postcodeStateTotalAmount.containsKey(state) ? postcodeStateTotalAmount.get(state) : 0d;
+			postcodeStateTaxablePerPerson.put(state, stateCount > 0d ? stateAmount / stateCount : 0d);
+		}
+
+		// calculate state multipliers
+		for (String postcode : postcodeSet) {
+			String state = this.area.getStateFromPoa(postcode);
+			double stateTaxablePerPerson = postcodeStateTaxablePerPerson.get(state);
+			double postcodeMultiplier = postcodeStateMultiplier.get(state).get(postcode) / stateTaxablePerPerson;
+			postcodeStateMultiplier.get(state).put(postcode, postcodeMultiplier);
+		}
+
+		/*
+		 * 4. ATO Individual Table 3A: age/sex count, P&L, Help Debt (by income range).
+		 * Financial position will vary more by income than any other metric, so use
+		 * table 3A as the base amounts and counts to adjust. Use these amounts, looping
+		 * through the extra dimensions and multiplying by the multipliers above. The
+		 * number of people is given in table 3A, and only needs to be multiplied by the
+		 * population forecast multiplier to adjust them forward to 2018 figures. This
+		 * ensures, for example, that the right number of people are assigned a HELP
+		 * debt, etc.<br>
+		 */
+
+		// FIXME: implement me
+
+		/*
+		 * ------------------------------------------------------------------------<br>
+		 * PART D: ADJUSTING FINANCIALS FOR HOUSEHOLDS
+		 * ------------------------------------------------------------------------<br>
+		 * 
+		 * D1. RBA E2: Use the debt-to-income and assets-to-income ratios to calculate
+		 * total assets and total debt.<br>
+		 */
+		// RBA E2 Keys: Series Name, Date
+		double debtToIncomeRatioRbaE2 = Double
+				.valueOf(this.rbaE2.get(RBA_E2_SERIESID_DEBT_TO_INCOME).get(this.calibrationDateRba)) * PERCENT;
+		double assetsToIncomeRatioRbaE2 = Double
+				.valueOf(this.rbaE2.get(RBA_E2_SERIESID_ASSETS_TO_INCOME).get(this.calibrationDateRba)) * PERCENT;
+
+		/*
+		 * D2. RBA E1: Calculate the ratios between Bal Sht items. Use these, compared
+		 * to assets and debt, to estimate the other balance sheet items.<br>
+		 */
+		// RBA E1 Keys: Series Name, Date
+		// get RBA E1 amounts ($ billions)
+		double cashRbaE1 = Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_CASH).get(this.calibrationDateRba));
+		double superRbaE1 = Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_SUPER).get(this.calibrationDateRba));
+		double equitiesRbaE1 = Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_EQUITIES).get(this.calibrationDateRba));
+		double otherFinAssetsRbaE1 = Double
+				.valueOf(this.rbaE1.get(RBA_E1_SERIESID_OTHER_FIN_ASSETS).get(this.calibrationDateRba));
+		double totalFinancialAssetsRbaE1 = cashRbaE1 + superRbaE1 + equitiesRbaE1 + otherFinAssetsRbaE1;
+		double dwellingsRbaE1 = Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_DWELLINGS).get(this.calibrationDateRba));
+		double totalNonFinancialAssetsRbaE1 = Double
+				.valueOf(this.rbaE1.get(RBA_E1_SERIESID_NONFIN_ASSETS).get(this.calibrationDateRba));
+		double otherNonFinancialAssetsRbaE1 = totalNonFinancialAssetsRbaE1 - dwellingsRbaE1;
+		double totalAssetsRbaE1 = totalFinancialAssetsRbaE1 + totalNonFinancialAssetsRbaE1;
+		double totalLiabilitiesRbaE1 = Double
+				.valueOf(this.rbaE1.get(RBA_E1_SERIESID_TOTAL_LIABILITIES).get(this.calibrationDateRba));
+
+		// calculate ratios within balance sheet
+		double cashToAssetsRbaE1 = cashRbaE1 / totalAssetsRbaE1;
+		double superToAssetsRbaE1 = superRbaE1 / totalAssetsRbaE1;
+		double equitiesToAssetsRbaE1 = equitiesRbaE1 / totalAssetsRbaE1;
+		double otherFinAssetsToAssetsRbaE1 = otherFinAssetsRbaE1 / totalAssetsRbaE1;
+		double dwellingsToAssetsRbaE1 = dwellingsRbaE1 / totalAssetsRbaE1;
+		double otherNonFinAssetsToAssetsRbaE1 = otherNonFinancialAssetsRbaE1 / totalAssetsRbaE1;
+		double totalLiabilitiesToAssetsRbaE1 = totalLiabilitiesRbaE1 / totalAssetsRbaE1;
+		// use debt-to-income ratio to determine total debt, then subtract from total
+		// liabilities to get other liabilities
 
 		this.addAgentsToEconomy();
 	}
 
 	private void addAgentsToEconomy() {
 		this.economy.setIndividuals(this.individualAgents);
-	}
-
-	/**
-	 * 
-	 * @param date                   - the date for which data should be used to
-	 *                               calibrate the individuals
-	 * @param numberOfPeoplePerAgent - the number of people represented by each
-	 *                               agent in the model
-	 */
-	public void calibrateIndividualFinancials(Date date) {
-		// TODO: implement me
-
-		// calibrate individual P&Ls
-		// 1. For each LGA
-		// 2. Calculate number of people in each "economic segment", interpolating into
-		// groups of size P
-		// 3. For each segment, calibrate the P&L of a representative individual.
-		// Calculate tax paid by the individual, then later aggregate it to households.
-		this.calibrateAllIndividualsProfitAndLoss(date);
-
-		// calibrate Bal Sht using national-level data, then pro-rata for each
-		// individual using the ratios
-
-	}
-
-	/**
-	 * 1. For each LGA<br>
-	 * 2. Calculate number of people in each "economic segment", interpolating into
-	 * groups of size P<br>
-	 * 3. For each segment, calibrate the P&L of a representative individual.
-	 * Calculate tax paid by the individual, then later aggregate it to households.
-	 */
-	private void calibrateAllIndividualsProfitAndLoss(Date date) {
-		Map<String, Integer> peopleByLga = this.area.getCensusPeopleByLga();
-		Set<String> lgaCodeSet = peopleByLga.keySet();
-		for (String lgaCode : lgaCodeSet) {
-			// Map<String, List<Double>> lgaByIncp = this.segmentLgaByIncp(lgaCode,
-			// "2015-16", date); // from, to,
-			// meanIncome,
-			// adjustedPeople
-
-		}
-
 	}
 
 	/*
@@ -502,6 +774,48 @@ public class CalibrateIndividuals {
 	@Autowired
 	public void setCommonData(CalibrationData commonData) {
 		this.commonData = commonData;
+	}
+
+	private String getStateCode(String stateName) {
+		String stateCode = "NA";
+		switch (stateName.toUpperCase()) {
+		case "NSW":
+		case "NEW SOUTH WALES":
+			stateCode = "NSW";
+			break;
+		case "VIC":
+		case "VICTORIA":
+			stateCode = "VIC";
+			break;
+		case "QLD":
+		case "QUEENSLAND":
+			stateCode = "QLD";
+			break;
+		case "SA":
+		case "SOUTH AUTSTRALIA":
+			stateCode = "SA";
+			break;
+		case "WA":
+		case "WESTERN AUSTRALIA":
+			stateCode = "WA";
+			break;
+		case "TAS":
+		case "TASMANIA":
+			stateCode = "TAS";
+			break;
+		case "NT":
+		case "NORTHERN TERRITORY":
+			stateCode = "NT";
+			break;
+		case "ACT":
+		case "AUSTRALIAN CAPITAL TERRITORY":
+			stateCode = "ACT";
+			break;
+		default:
+			stateCode = "OT";
+			break;
+		}
+		return stateCode;
 	}
 
 	/**

@@ -91,7 +91,7 @@ public class Household extends Agent {
 
 			this.pnlIncomeTaxExpense += i.getPnlIncomeTaxExpense();
 			this.pnlLivingExpenses += i.getPnlLivingExpenses();
-			this.pnlRent += i.getPnlRent();
+			this.pnlRent += i.getPnlRentExpense();
 			this.pnlMortgageRepayments += i.getPnlMortgageRepayments();
 			this.pnlOtherDiscretionaryExpenses += i.getPnlOtherDiscretionaryExpenses();
 
