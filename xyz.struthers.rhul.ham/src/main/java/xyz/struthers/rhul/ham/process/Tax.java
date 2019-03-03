@@ -69,19 +69,19 @@ public abstract class Tax {
 	public static final Double MEDICARE_LEVY_RATE_8 = 0.02d;
 	public static final Double MEDICARE_LEVY_BASE_AMT_1 = 0d;
 	public static final Double MEDICARE_LEVY_BASE_AMT_2 = MEDICARE_LEVY_BASE_AMT_1
-			+ INCOME_TAX_THRESHOLD_1 * MEDICARE_LEVY_RATE_1;
+			+ (INCOME_TAX_THRESHOLD_2 - INCOME_TAX_THRESHOLD_1) * MEDICARE_LEVY_RATE_1;
 	public static final Double MEDICARE_LEVY_BASE_AMT_3 = MEDICARE_LEVY_BASE_AMT_2
-			+ (INCOME_TAX_THRESHOLD_2 - INCOME_TAX_THRESHOLD_1) * MEDICARE_LEVY_RATE_2;
+			+ (INCOME_TAX_THRESHOLD_3 - INCOME_TAX_THRESHOLD_2) * MEDICARE_LEVY_RATE_2;
 	public static final Double MEDICARE_LEVY_BASE_AMT_4 = MEDICARE_LEVY_BASE_AMT_3
-			+ (INCOME_TAX_THRESHOLD_3 - INCOME_TAX_THRESHOLD_2) * MEDICARE_LEVY_RATE_3;
+			+ (INCOME_TAX_THRESHOLD_4 - INCOME_TAX_THRESHOLD_3) * MEDICARE_LEVY_RATE_3;
 	public static final Double MEDICARE_LEVY_BASE_AMT_5 = MEDICARE_LEVY_BASE_AMT_4
-			+ (INCOME_TAX_THRESHOLD_4 - INCOME_TAX_THRESHOLD_3) * MEDICARE_LEVY_RATE_4;
+			+ (INCOME_TAX_THRESHOLD_5 - INCOME_TAX_THRESHOLD_4) * MEDICARE_LEVY_RATE_4;
 	public static final Double MEDICARE_LEVY_BASE_AMT_6 = MEDICARE_LEVY_BASE_AMT_5
-			+ (INCOME_TAX_THRESHOLD_5 - INCOME_TAX_THRESHOLD_4) * MEDICARE_LEVY_RATE_5;
+			+ (INCOME_TAX_THRESHOLD_6 - INCOME_TAX_THRESHOLD_5) * MEDICARE_LEVY_RATE_5;
 	public static final Double MEDICARE_LEVY_BASE_AMT_7 = MEDICARE_LEVY_BASE_AMT_6
-			+ (INCOME_TAX_THRESHOLD_6 - INCOME_TAX_THRESHOLD_5) * MEDICARE_LEVY_RATE_6;
+			+ (INCOME_TAX_THRESHOLD_7 - INCOME_TAX_THRESHOLD_6) * MEDICARE_LEVY_RATE_6;
 	public static final Double MEDICARE_LEVY_BASE_AMT_8 = MEDICARE_LEVY_BASE_AMT_7
-			+ (INCOME_TAX_THRESHOLD_7 - INCOME_TAX_THRESHOLD_6) * MEDICARE_LEVY_RATE_7;
+			+ (INCOME_TAX_THRESHOLD_8 - INCOME_TAX_THRESHOLD_7) * MEDICARE_LEVY_RATE_7;
 	public static final Double LOW_INCOME_TAX_OFFSET_AMT_1 = 445d;
 	public static final Double LOW_INCOME_TAX_OFFSET_AMT_2 = 445d;
 	public static final Double LOW_INCOME_TAX_OFFSET_AMT_3 = 445d;
@@ -98,6 +98,44 @@ public abstract class Tax {
 	public static final Double LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_6 = 0d;
 	public static final Double LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_7 = 0d;
 	public static final Double LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_8 = 0d;
+
+	// SOURCE:
+	// https://www.ato.gov.au/rates/help,-tsl-and-sfss-repayment-thresholds-and-rates/?page=1
+	public static final Double HELP_THRESHOLD_1 = 0d;
+	public static final Double HELP_THRESHOLD_2 = 51957d;
+	public static final Double HELP_THRESHOLD_3 = 57730d;
+	public static final Double HELP_THRESHOLD_4 = 64307d;
+	public static final Double HELP_THRESHOLD_5 = 70882d;
+	public static final Double HELP_THRESHOLD_6 = 74608d;
+	public static final Double HELP_THRESHOLD_7 = 80198d;
+	public static final Double HELP_THRESHOLD_8 = 86856d;
+	public static final Double HELP_THRESHOLD_9 = 91426d;
+	public static final Double HELP_THRESHOLD_10 = 100614d;
+	public static final Double HELP_THRESHOLD_11 = 107214d;
+	public static final Double HELP_RATE_1 = 0d;
+	public static final Double HELP_RATE_2 = 0.02d;
+	public static final Double HELP_RATE_3 = 0.04d;
+	public static final Double HELP_RATE_4 = 0.045d;
+	public static final Double HELP_RATE_5 = 0.05d;
+	public static final Double HELP_RATE_6 = 0.055d;
+	public static final Double HELP_RATE_7 = 0.06d;
+	public static final Double HELP_RATE_8 = 0.065d;
+	public static final Double HELP_RATE_9 = 0.07d;
+	public static final Double HELP_RATE_10 = 0.075d;
+	public static final Double HELP_RATE_11 = 0.08d;
+	public static final Double HELP_BASE_AMT_1 = 0d;
+	public static final Double HELP_BASE_AMT_2 = HELP_BASE_AMT_1 + (HELP_THRESHOLD_2 - HELP_THRESHOLD_1) * HELP_RATE_1;
+	public static final Double HELP_BASE_AMT_3 = HELP_BASE_AMT_2 + (HELP_THRESHOLD_3 - HELP_THRESHOLD_2) * HELP_RATE_2;
+	public static final Double HELP_BASE_AMT_4 = HELP_BASE_AMT_3 + (HELP_THRESHOLD_4 - HELP_THRESHOLD_3) * HELP_RATE_3;
+	public static final Double HELP_BASE_AMT_5 = HELP_BASE_AMT_4 + (HELP_THRESHOLD_5 - HELP_THRESHOLD_4) * HELP_RATE_4;
+	public static final Double HELP_BASE_AMT_6 = HELP_BASE_AMT_5 + (HELP_THRESHOLD_6 - HELP_THRESHOLD_5) * HELP_RATE_5;
+	public static final Double HELP_BASE_AMT_7 = HELP_BASE_AMT_6 + (HELP_THRESHOLD_7 - HELP_THRESHOLD_6) * HELP_RATE_6;
+	public static final Double HELP_BASE_AMT_8 = HELP_BASE_AMT_7 + (HELP_THRESHOLD_8 - HELP_THRESHOLD_7) * HELP_RATE_7;
+	public static final Double HELP_BASE_AMT_9 = HELP_BASE_AMT_8 + (HELP_THRESHOLD_9 - HELP_THRESHOLD_8) * HELP_RATE_8;
+	public static final Double HELP_BASE_AMT_10 = HELP_BASE_AMT_9
+			+ (HELP_THRESHOLD_10 - HELP_THRESHOLD_9) * HELP_RATE_9;
+	public static final Double HELP_BASE_AMT_11 = HELP_BASE_AMT_10
+			+ (HELP_THRESHOLD_11 - HELP_THRESHOLD_10) * HELP_RATE_10;
 
 	/**
 	 * 
@@ -218,48 +256,97 @@ public abstract class Tax {
 		double incomeTax = 0d;
 		if (taxableIncome > INCOME_TAX_THRESHOLD_8) {
 			incomeTax = INCOME_TAX_BASE_AMT_8 + MEDICARE_LEVY_BASE_AMT_8
-					+ (taxableIncome - INCOME_TAX_BASE_AMT_8) * (INCOME_TAX_RATE_8 + MEDICARE_LEVY_RATE_8)
+					+ (taxableIncome - INCOME_TAX_THRESHOLD_8) * (INCOME_TAX_RATE_8 + MEDICARE_LEVY_RATE_8)
 					- LOW_INCOME_TAX_OFFSET_AMT_8
-					+ (taxableIncome - LOW_INCOME_TAX_OFFSET_AMT_7) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_8;
+					+ (taxableIncome - INCOME_TAX_THRESHOLD_8) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_8;
 		} else if (taxableIncome > INCOME_TAX_THRESHOLD_7) {
 			incomeTax = INCOME_TAX_BASE_AMT_7 + MEDICARE_LEVY_BASE_AMT_7
-					+ (taxableIncome - INCOME_TAX_BASE_AMT_7) * (INCOME_TAX_RATE_7 + MEDICARE_LEVY_RATE_7)
+					+ (taxableIncome - INCOME_TAX_THRESHOLD_7) * (INCOME_TAX_RATE_7 + MEDICARE_LEVY_RATE_7)
 					- LOW_INCOME_TAX_OFFSET_AMT_7
-					+ (taxableIncome - LOW_INCOME_TAX_OFFSET_AMT_6) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_7;
+					+ (taxableIncome - INCOME_TAX_THRESHOLD_7) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_7;
 		} else if (taxableIncome > INCOME_TAX_THRESHOLD_6) {
 			incomeTax = INCOME_TAX_BASE_AMT_6 + MEDICARE_LEVY_BASE_AMT_6
-					+ (taxableIncome - INCOME_TAX_BASE_AMT_6) * (INCOME_TAX_RATE_6 + MEDICARE_LEVY_RATE_6)
+					+ (taxableIncome - INCOME_TAX_THRESHOLD_6) * (INCOME_TAX_RATE_6 + MEDICARE_LEVY_RATE_6)
 					- LOW_INCOME_TAX_OFFSET_AMT_6
-					+ (taxableIncome - LOW_INCOME_TAX_OFFSET_AMT_5) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_6;
+					+ (taxableIncome - INCOME_TAX_THRESHOLD_6) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_6;
 		} else if (taxableIncome > INCOME_TAX_THRESHOLD_5) {
 			incomeTax = INCOME_TAX_BASE_AMT_5 + MEDICARE_LEVY_BASE_AMT_5
-					+ (taxableIncome - INCOME_TAX_BASE_AMT_5) * (INCOME_TAX_RATE_5 + MEDICARE_LEVY_RATE_5)
+					+ (taxableIncome - INCOME_TAX_THRESHOLD_5) * (INCOME_TAX_RATE_5 + MEDICARE_LEVY_RATE_5)
 					- LOW_INCOME_TAX_OFFSET_AMT_5
-					+ (taxableIncome - LOW_INCOME_TAX_OFFSET_AMT_4) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_5;
+					+ (taxableIncome - INCOME_TAX_THRESHOLD_5) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_5;
 		} else if (taxableIncome > INCOME_TAX_THRESHOLD_4) {
 			incomeTax = INCOME_TAX_BASE_AMT_4 + MEDICARE_LEVY_BASE_AMT_4
-					+ (taxableIncome - INCOME_TAX_BASE_AMT_4) * (INCOME_TAX_RATE_4 + MEDICARE_LEVY_RATE_4)
+					+ (taxableIncome - INCOME_TAX_THRESHOLD_4) * (INCOME_TAX_RATE_4 + MEDICARE_LEVY_RATE_4)
 					- LOW_INCOME_TAX_OFFSET_AMT_4
-					+ (taxableIncome - LOW_INCOME_TAX_OFFSET_AMT_3) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_4;
+					+ (taxableIncome - INCOME_TAX_THRESHOLD_4) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_4;
 		} else if (taxableIncome > INCOME_TAX_THRESHOLD_3) {
 			incomeTax = INCOME_TAX_BASE_AMT_3 + MEDICARE_LEVY_BASE_AMT_3
-					+ (taxableIncome - INCOME_TAX_BASE_AMT_3) * (INCOME_TAX_RATE_3 + MEDICARE_LEVY_RATE_3)
+					+ (taxableIncome - INCOME_TAX_THRESHOLD_3) * (INCOME_TAX_RATE_3 + MEDICARE_LEVY_RATE_3)
 					- LOW_INCOME_TAX_OFFSET_AMT_3
-					+ (taxableIncome - LOW_INCOME_TAX_OFFSET_AMT_2) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_3;
+					+ (taxableIncome - INCOME_TAX_THRESHOLD_3) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_3;
 		} else if (taxableIncome > INCOME_TAX_THRESHOLD_2) {
 			incomeTax = INCOME_TAX_BASE_AMT_2 + MEDICARE_LEVY_BASE_AMT_2
-					+ (taxableIncome - INCOME_TAX_BASE_AMT_2) * (INCOME_TAX_RATE_2 + MEDICARE_LEVY_RATE_2)
+					+ (taxableIncome - INCOME_TAX_THRESHOLD_2) * (INCOME_TAX_RATE_2 + MEDICARE_LEVY_RATE_2)
 					- LOW_INCOME_TAX_OFFSET_AMT_2
-					+ (taxableIncome - LOW_INCOME_TAX_OFFSET_AMT_1) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_2;
+					+ (taxableIncome - INCOME_TAX_THRESHOLD_2) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_2;
 		} else if (taxableIncome > INCOME_TAX_THRESHOLD_1) {
 			incomeTax = INCOME_TAX_BASE_AMT_1 + MEDICARE_LEVY_BASE_AMT_1
-					+ (taxableIncome - INCOME_TAX_BASE_AMT_1) * (INCOME_TAX_RATE_1 + MEDICARE_LEVY_RATE_1)
-					- LOW_INCOME_TAX_OFFSET_AMT_1 + taxableIncome * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_1;
+					+ (taxableIncome - INCOME_TAX_THRESHOLD_1) * (INCOME_TAX_RATE_1 + MEDICARE_LEVY_RATE_1)
+					- LOW_INCOME_TAX_OFFSET_AMT_1
+					+ (taxableIncome - INCOME_TAX_THRESHOLD_1) * LOW_INCOME_TAX_OFFSET_REDUCTION_RATE_1;
 		} else {
 			incomeTax = 0d;
 		}
 
 		// convert annual tax amount back to monthly equivalent
 		return incomeTax / NUM_MONTHS;
+	}
+
+	/**
+	 * Calculates and Individual's student loan repayments expense for a single
+	 * month.
+	 * 
+	 * SOURCE:<br>
+	 * https://www.ato.gov.au/rates/help,-tsl-and-sfss-repayment-thresholds-and-rates/?page=1<br>
+	 * 
+	 * @param taxableIncomePerMonth - the individual's taxable income, measured on a
+	 *                              monthly basis
+	 * @return the monthly student loan repayment due to the ATO (i.e.
+	 *         AustralianGovernment)
+	 */
+	public static double calculateStudentLoanRepayments(double taxableIncomePerMonth) {
+		// convert to annual equivalent for easier calculation
+		double taxableIncome = taxableIncomePerMonth * NUM_MONTHS;
+
+		// calculate student loan repayment using marginal rates
+		double repayment = 0d;
+		if (taxableIncome > HELP_THRESHOLD_11) {
+			repayment = HELP_BASE_AMT_11 + (taxableIncome - HELP_THRESHOLD_11) * HELP_RATE_11;
+		} else if (taxableIncome > HELP_THRESHOLD_10) {
+			repayment = HELP_BASE_AMT_10 + (taxableIncome - HELP_THRESHOLD_10) * HELP_RATE_10;
+		} else if (taxableIncome > HELP_THRESHOLD_9) {
+			repayment = HELP_BASE_AMT_9 + (taxableIncome - HELP_THRESHOLD_9) * HELP_RATE_9;
+		} else if (taxableIncome > HELP_THRESHOLD_8) {
+			repayment = HELP_BASE_AMT_8 + (taxableIncome - HELP_THRESHOLD_8) * HELP_RATE_8;
+		} else if (taxableIncome > HELP_THRESHOLD_7) {
+			repayment = HELP_BASE_AMT_7 + (taxableIncome - HELP_THRESHOLD_7) * HELP_RATE_7;
+		} else if (taxableIncome > HELP_THRESHOLD_6) {
+			repayment = HELP_BASE_AMT_6 + (taxableIncome - HELP_THRESHOLD_6) * HELP_RATE_6;
+		} else if (taxableIncome > HELP_THRESHOLD_5) {
+			repayment = HELP_BASE_AMT_5 + (taxableIncome - HELP_THRESHOLD_5) * HELP_RATE_5;
+		} else if (taxableIncome > HELP_THRESHOLD_4) {
+			repayment = HELP_BASE_AMT_4 + (taxableIncome - HELP_THRESHOLD_4) * HELP_RATE_4;
+		} else if (taxableIncome > HELP_THRESHOLD_3) {
+			repayment = HELP_BASE_AMT_3 + (taxableIncome - HELP_THRESHOLD_3) * HELP_RATE_3;
+		} else if (taxableIncome > HELP_THRESHOLD_2) {
+			repayment = HELP_BASE_AMT_2 + (taxableIncome - HELP_THRESHOLD_2) * HELP_RATE_2;
+		} else if (taxableIncome > HELP_THRESHOLD_1) {
+			repayment = HELP_BASE_AMT_1 + (taxableIncome - HELP_THRESHOLD_1) * HELP_RATE_1;
+		} else {
+			repayment = 0d;
+		}
+
+		// convert annual repayment amount back to monthly equivalent
+		return repayment / NUM_MONTHS;
 	}
 }
