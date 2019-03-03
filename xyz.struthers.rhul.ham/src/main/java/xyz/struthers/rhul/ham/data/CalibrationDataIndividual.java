@@ -671,7 +671,7 @@ public class CalibrationDataIndividual {
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Individuals Table 3A data");
 
 		int[] atoIndividualTable3aColumns = { 5, 6, 7, 20, 21, 24, 25, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
-				42, 43, 62, 63, 66, 67, 96, 97, 98, 99, 102, 103, 104, 105, 140, 141, 142, 143, 144, 145 };
+				42, 43, 46, 47, 62, 63, 66, 67, 96, 97, 98, 99, 102, 103, 104, 105, 140, 141, 142, 143, 144, 145 };
 		int ato3aMapCapacity = (int) Math.ceil(atoIndividualTable3aColumns.length / MAP_LOAD_FACTOR);
 		this.atoIndividualTable3a = new HashMap<String, Map<String, Map<String, Map<String, Map<String, String>>>>>(
 				ato3aMapCapacity);
@@ -1147,20 +1147,21 @@ public class CalibrationDataIndividual {
 								// add blank maps to data, so they can be populated below
 								if (waferNumber == 1) {
 									for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
-										if (!data.containsKey(columnTitles[0][i])) {
+										if (!columnTitles[0][i].isBlank() && !data.containsKey(columnTitles[0][i])) {
 											// add column series 1 key
 											data.put(columnTitles[0][i],
 													new HashMap<String, Map<String, Map<String, Map<String, String>>>>(
 															MAP_INIT_SIZE_INDP));
 										}
-										if (!data.get(columnTitles[0][i]).containsKey(columnTitles[1][i])) {
+										if (!columnTitles[1][i].isBlank()
+												&& !data.get(columnTitles[0][i]).containsKey(columnTitles[1][i])) {
 											// add column series 2 key
 											data.get(columnTitles[0][i]).put(columnTitles[1][i],
 													new HashMap<String, Map<String, Map<String, String>>>(
 															MAP_INIT_SIZE_INCP));
 										}
-										if (!data.get(columnTitles[0][i]).get(columnTitles[1][i])
-												.containsKey(columnTitles[2][i])) {
+										if (!columnTitles[2][i].isBlank() && !data.get(columnTitles[0][i])
+												.get(columnTitles[1][i]).containsKey(columnTitles[2][i])) {
 											// add column series 3 key
 											data.get(columnTitles[0][i]).get(columnTitles[1][i]).put(columnTitles[2][i],
 													new HashMap<String, Map<String, String>>(MAP_INIT_SIZE_LGA));
@@ -1174,7 +1175,7 @@ public class CalibrationDataIndividual {
 								if (lgaOrPoa.equalsIgnoreCase("LGA")) {
 									areaCode = this.area.getLgaCodeFromName(line[0]);
 								} else {
-									// assume it's POA in the format NNNN, SS
+									// assume it's POA in the format NNNN, SSS
 									areaCode = line[0].substring(0, line[0].indexOf(","));
 								}
 								if (areaCode != null) {
@@ -1275,13 +1276,14 @@ public class CalibrationDataIndividual {
 								// add blank maps to data, so they can be populated below
 								if (waferNumber == 1) {
 									for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
-										if (!data.containsKey(columnTitles[0][i])) {
+										if (!columnTitles[0][i].isBlank() && !data.containsKey(columnTitles[0][i])) {
 											// add column series 1 key
 											data.put(columnTitles[0][i],
 													new HashMap<String, Map<String, Map<String, String>>>(
 															MAP_INIT_SIZE_RNTRD));
 										}
-										if (!data.get(columnTitles[0][i]).containsKey(columnTitles[1][i])) {
+										if (!columnTitles[1][i].isBlank()
+												&& !data.get(columnTitles[0][i]).containsKey(columnTitles[1][i])) {
 											// add column series 2 key
 											data.get(columnTitles[0][i]).put(columnTitles[1][i],
 													new HashMap<String, Map<String, String>>(MAP_INIT_SIZE_LGA));
@@ -1396,13 +1398,14 @@ public class CalibrationDataIndividual {
 								// add blank maps to data, so they can be populated below
 								if (waferNumber == 1) {
 									for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
-										if (!data.containsKey(columnTitles[0][i])) {
+										if (!columnTitles[0][i].isBlank() && !data.containsKey(columnTitles[0][i])) {
 											// add column series 1 key
 											data.put(columnTitles[0][i],
 													new HashMap<String, Map<String, Map<String, Map<String, String>>>>(
 															Math.max(MAP_INIT_SIZE_RNTRD, MAP_INIT_SIZE_MRERD)));
 										}
-										if (!data.get(columnTitles[0][i]).containsKey(columnTitles[1][i])) {
+										if (!columnTitles[1][i].isBlank()
+												&& !data.get(columnTitles[0][i]).containsKey(columnTitles[1][i])) {
 											// add column series 2 key
 											data.get(columnTitles[0][i]).put(columnTitles[1][i],
 													new HashMap<String, Map<String, Map<String, String>>>(

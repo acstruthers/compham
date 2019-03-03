@@ -6,6 +6,7 @@ package xyz.struthers.rhul.ham.data;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,25 +42,89 @@ public class CalibrateIndividuals {
 
 	private static final double NUM_MONTHS = 12d;
 	private static final double NUM_WEEKS = 365d / 7d;
-	private static final int NUM_DIVISIONS = 19;
 
 	public static final String CALIBRATION_DATE_ATO = "01/06/2018";
 	public static final String CALIBRATION_DATE_RBA = "30/06/2018";
 
 	public static final double MAP_LOAD_FACTOR = 0.75d;
+	public static final int MAP_LGA_INIT_CAPACITY = (int) Math.ceil(540 / MAP_LOAD_FACTOR) + 1;
+	private static final String[] SEX_ARRAY = { "M", "F" };
 	private static final String[] STATES_ARRAY = { "NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT", "OT" };
 	private static final int[] MAP_STATE_POA_CAPACITY = { (int) Math.ceil(612 / MAP_LOAD_FACTOR) + 1,
 			(int) Math.ceil(382 / MAP_LOAD_FACTOR) + 1, (int) Math.ceil(429 / MAP_LOAD_FACTOR) + 1,
 			(int) Math.ceil(326 / MAP_LOAD_FACTOR) + 1, (int) Math.ceil(338 / MAP_LOAD_FACTOR) + 1,
 			(int) Math.ceil(111 / MAP_LOAD_FACTOR) + 1, (int) Math.ceil(43 / MAP_LOAD_FACTOR) + 1,
 			(int) Math.ceil(25 / MAP_LOAD_FACTOR) + 1, (int) Math.ceil(1 / MAP_LOAD_FACTOR) + 1 };
+	private static final String[] AGE_ARRAY_ATO = { "a. Under 18", "b. 18 - 24", "c. 25 - 29", "d. 30 - 34",
+			"e. 35 - 39", "f. 40 - 44", "g. 45 - 49", "h. 50 - 54", "i. 55 - 59", "j. 60 - 64", "k. 65 - 69",
+			"l. 70 - 74", "m. 75 and over" };
+	private static final String[] AGE_ARRAY_ABS = { "0-4 years", "5-9 years", "10-14 years", "15-19 years",
+			"20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years",
+			"55-59 years", "60-64 years", "65-69 years", "70-74 years", "75-79 years", "80-84 years", "85-89 years",
+			"90-94 years", "95-99 years", "100 years and over" };
+	private static final String[] DIVISION_CODE_ARRAY = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
+			"M", "N", "O", "P", "Q", "R", "S" }; // S = Other Services
+	private static final int NUM_DIVISIONS = DIVISION_CODE_ARRAY.length; // 19
+	private static final String[] INDIVIDUAL_INCOME_RANGES_ABS = { "Negative income", "Nil income",
+			"$1-$149 ($1-$7,799)", "$150-$299 ($7,800-$15,599)", "$300-$399 ($15,600-$20,799)",
+			"$400-$499 ($20,800-$25,999)", "$500-$649 ($26,000-$33,799)", "$650-$799 ($33,800-$41,599)",
+			"$800-$999 ($41,600-$51,999)", "$1,000-$1,249 ($52,000-$64,999)", "$1,250-$1,499 ($65,000-$77,999)",
+			"$1,500-$1,749 ($78,000-$90,999)", "$1,750-$1,999 ($91,000-$103,999)", "$2,000-$2,999 ($104,000-$155,999)",
+			"$3,000 or more ($156,000 or more)", "Not stated" };
+	private static final int NUM_INDIVIDUAL_INCOME_RANGES_ABS = 14;
 
 	private static final String ATO_2A_TITLE_COUNT = "Number of individuals no.";
 	private static final String ATO_2A_TITLE_TAXABLE_COUNT = "Taxable income or loss3 no.";
 	private static final String ATO_2A_TITLE_TAXABLE_AMOUNT = "Taxable income or loss3 $";
+
+	private static final String ATO_3A_TITLE_TAXABLE_COUNT = "Taxable income or loss2 no.";
+	private static final String ATO_3A_TITLE_TAXABLE_AMOUNT = "Taxable income or loss2 $";
+	private static final String ATO_3A_TITLE_TOTAL_INCOME_COUNT = "Total Income or Loss2 no.";
+	private static final String ATO_3A_TITLE_TOTAL_INCOME_AMOUNT = "Total Income or Loss2 $";
+	private static final String ATO_3A_TITLE_SALARY_COUNT = "Salary or wages no.";
+	private static final String ATO_3A_TITLE_SALARY_AMOUNT = "Salary or wages $";
+	private static final String ATO_3A_TITLE_ALLOWANCES_COUNT = "Allowances earnings tips directors fees etc no.";
+	private static final String ATO_3A_TITLE_ALLOWANCES_AMOUNT = "Allowances earnings tips directors fees etc $";
+	private static final String ATO_3A_TITLE_GOVT_ALLOW_COUNT = "Australian government allowances and payments no.";
+	private static final String ATO_3A_TITLE_GOVT_ALLOW_AMOUNT = "Australian government allowances and payments $";
+	private static final String ATO_3A_TITLE_GOVT_PENSION_COUNT = "Australian government pensions and allowances no.";
+	private static final String ATO_3A_TITLE_GOVT_PENSION_AMOUNT = "Australian government pensions and allowances $";
+	private static final String ATO_3A_TITLE_SUPER_TAXED_COUNT = "Australian annuities and superannuation income streams taxable component taxed element no.";
+	private static final String ATO_3A_TITLE_SUPER_TAXED_AMOUNT = "Australian annuities and superannuation income streams taxable component taxed element $";
+	private static final String ATO_3A_TITLE_SUPER_UNTAXED_COUNT = "Australian annuities and superannuation income streams taxable component untaxed element no.";
+	private static final String ATO_3A_TITLE_SUPER_UNTAXED_AMOUNT = "Australian annuities and superannuation income streams taxable component untaxed element $";
+	private static final String ATO_3A_TITLE_INTEREST_INCOME_COUNT = "Gross interest no."; // if they have no interest,
+																							// their cash is half of a
+																							// week's pay
+	private static final String ATO_3A_TITLE_INTEREST_INCOME_AMOUNT = "Gross interest $";
+	private static final String ATO_3A_TITLE_DIVIDENDS_UNFRANKED_COUNT = "Dividends unfranked no.";
+	private static final String ATO_3A_TITLE_DIVIDENDS_UNFRANKED_AMOUNT = "Dividends unfranked $";
+	private static final String ATO_3A_TITLE_DIVIDENDS_FRANKED_COUNT = "Dividends franked no.";
+	private static final String ATO_3A_TITLE_DIVIDENDS_FRANKED_AMOUNT = "Dividends franked $";
+	private static final String ATO_3A_TITLE_INTEREST_DEDUCTIONS_COUNT = "Interest deductions no.";
+	private static final String ATO_3A_TITLE_INTEREST_DEDUCTIONS_AMOUNT = "Interest deductions $";
+	private static final String ATO_3A_TITLE_DONATIONS_COUNT = "Gifts or donations no.";
+	private static final String ATO_3A_TITLE_DONATIONS_AMOUNT = "Gifts or donations $";
+	private static final String ATO_3A_TITLE_FOREIGN_INCOME_COUNT = "Foreign source income assessable foreign source income no.";
+	private static final String ATO_3A_TITLE_FOREIGN_INCOME_AMOUNT = "Foreign source income assessable foreign source income $";
+	private static final String ATO_3A_TITLE_FOREIGN_INCOME2_COUNT = "Foreign source income other net foreign source income no.";
+	private static final String ATO_3A_TITLE_FOREIGN_INCOME2_AMOUNT = "Foreign source income other net foreign source income $";
+	private static final String ATO_3A_TITLE_RENT_INCOME_COUNT = "Gross rent no.";
+	private static final String ATO_3A_TITLE_RENT_INCOME_AMOUNT = "Gross rent $";
+	private static final String ATO_3A_TITLE_RENT_INTEREST_COUNT = "Rent interest deductions no.";
+	private static final String ATO_3A_TITLE_RENT_INTEREST_AMOUNT = "Rent interest deductions $";
+	private static final String ATO_3A_TITLE_HELP_DEBT_COUNT = "HELP debt balance no."; // HECS became HELP in Jan-05
+	private static final String ATO_3A_TITLE_HELP_DEBT_AMOUNT = "HELP debt balance $";
+	private static final String ATO_3A_TITLE_SFSS_DEBT_COUNT = "SFSS debt balance no."; // SFSS closed on 31-Dec-03
+	private static final String ATO_3A_TITLE_SFSS_DEBT_AMOUNT = "SFSS debt balance $";
+	private static final String ATO_3A_TITLE_TSL_DEBT_COUNT = "TSL debt balance no."; // from 2014, capped at $20,808
+																						// over 4 years
+	private static final String ATO_3A_TITLE_TSL_DEBT_AMOUNT = "TSL debt balance $";
+
 	private static final String ATO_9_TITLE_COUNT = "Number of individuals";
 	private static final String ATO_9_TITLE_TAXABLE_COUNT = "Taxable income or loss4 no.";
 	private static final String ATO_9_TITLE_TAXABLE_AMOUNT = "Taxable income or loss4 $";
+
 	private static final String ATO_6B_TITLE_COUNT = "Number of individuals no.";
 	private static final String ATO_6B_TITLE_TAXABLE_COUNT = "Taxable income or loss3 no.";
 	private static final String ATO_6B_TITLE_TAXABLE_AMOUNT = "Taxable income or loss3 $";
@@ -87,8 +152,8 @@ public class CalibrateIndividuals {
 	private Date calibrationDateRba;
 	private int totalPopulationAU;
 	private double populationMultiplier;
-	private Map<String, Integer> lgaPeopleCount;
-	private Map<String, Integer> lgaDwellingsCount;
+	private Map<String, Integer> lgaPeopleCount; // adjusted to 2018
+	private Map<String, Integer> lgaDwellingsCount; // adjusted to 2018
 
 	// data sets
 	/**
@@ -266,7 +331,7 @@ public class CalibrateIndividuals {
 	 * to be interchangeable.
 	 * 
 	 * ------------------------------------------------------------------------<br>
-	 * PART A: ESTIMATING INDIVIDUAL PROFIT & LOSS STATEMENTS AND BALANCE SHEETS
+	 * PART A: ESTIMATING INDIVIDUAL PROFIT & LOSS STATEMENT MULTIPLIERS
 	 * ------------------------------------------------------------------------<br>
 	 * 
 	 * N.B. P&L composition will vary more with income, so use ATO 3A as the amounts
@@ -290,14 +355,38 @@ public class CalibrateIndividuals {
 	 * 3. ATO Individual Table 6B: people count, taxable income (per POA). Calculate
 	 * POA multiplier for each POA, by state.<br>
 	 * 
-	 * 4. ATO Individual Table 3A: age/sex count, P&L, Help Debt (by income range).
+	 * ------------------------------------------------------------------------<br>
+	 * PART B: INDIVIDUAL COUNTS AND POA POPULATION MULTIPLIERS
+	 * ------------------------------------------------------------------------<br>
+	 *
+	 * 4. Census sex, age, industry & income per POA: Get total population
+	 * multiplier, and adjust each count so it's now a 2018 equivalent. Map POA to
+	 * LGA, make a list of POAs in each LGA (which will be used when assigning
+	 * Individuals to Households).<br>
+	 * 
+	 * 5. Calculate POA population multipliers to adjust ATO 3A P&L statements so
+	 * the POA totals equal the POA counts for people with an income.
+	 * 
+	 * ------------------------------------------------------------------------<br>
+	 * PART C: CREATING INDIVIDUAL AGENTS
+	 * ------------------------------------------------------------------------<br>
+	 *
+	 * 6. ATO Individual Table 3A: age/sex count, P&L, Help Debt (by income range).
 	 * Financial position will vary more by income than any other metric, so use
 	 * table 3A as the base amounts and counts to adjust. Use these amounts, looping
 	 * through the extra dimensions and multiplying by the multipliers above. The
 	 * number of people is given in table 3A, and only needs to be multiplied by the
-	 * population forecast multiplier to adjust them forward to 2018 figures. This
-	 * ensures, for example, that the right number of people are assigned a HELP
-	 * debt, etc.<br>
+	 * population forecast multiplier to adjust them forward to 2018 figures. Need
+	 * to assign LGA from POA first so we can get the ratio to adjust the population
+	 * by. This ensures, for example, that the right number of people are assigned a
+	 * HELP debt, etc.
+	 * 
+	 * 7. Now start an POA loop, creating Individual agents per ATO data, and
+	 * Individuals with no income per ABS data for the other people in each
+	 * category. Store them in a map/matrix for now so they're easy to assign into
+	 * Households. These are the actual objects that will be used in the model, but
+	 * the matrix itself can be dropped once the Individuals are in Households and
+	 * calibration is complete.
 	 * 
 	 * N.B. Need to think about HELP debt and work out how to assign it by age &
 	 * gender, not diminish it by including it in ratios too early.
@@ -305,17 +394,7 @@ public class CalibrateIndividuals {
 	 * This gives P&L and Bal Sht by sex, age, industry division, income, POA
 	 * 
 	 * ------------------------------------------------------------------------<br>
-	 * PART B: INDIVIDUAL COUNTS
-	 * ------------------------------------------------------------------------<br>
-	 * 
-	 * 5. Census age, industry, income & sex per POA: Get total population
-	 * multiplier, and adjust each count so it's now a 2018 equivalent.<br>
-	 * 
-	 * ROUGH ALGORITHM: Calculate tax-payers per ATO/RBA data as above, then create
-	 * everyone else so they can be added into households too.
-	 * 
-	 * ------------------------------------------------------------------------<br>
-	 * PART C: HOUSEHOLD COUNTS
+	 * PART D: HOUSEHOLD COUNTS
 	 * ------------------------------------------------------------------------<br>
 	 * 
 	 * ROUGH ALGORITHM FOR HOUSEHOLD COUNTS:<br>
@@ -334,20 +413,26 @@ public class CalibrateIndividuals {
 	 * ROUGH ALGORITHM TO ASSIGN PEOPLE TO HOUSEHOLDS:
 	 * 
 	 * ------------------------------------------------------------------------<br>
-	 * PART D: ADJUSTING FINANCIALS FOR HOUSEHOLDS
+	 * PART E: ADJUSTING FINANCIALS FOR HOUSEHOLDS
 	 * ------------------------------------------------------------------------<br>
 	 * 
-	 * 4. RBA E2: Use the household debt-to-income and assets-to-income ratios to
+	 * 10. RBA E2: Use the household debt-to-income and assets-to-income ratios to
 	 * calculate total assets and total debt.<br>
 	 * 
-	 * 5. RBA E1: Calculate the ratios between household Bal Sht items. Use these,
+	 * 11. RBA E1: Calculate the ratios between household Bal Sht items. Use these,
 	 * compared to assets and debt, to estimate the other balance sheet items.<br>
 	 * 
 	 * ROUGH ALGORITHM FOR HOUSEHOLD ADJUSTMENTS:<br>
 	 * - Henderson poverty line based on family composition to be a proxy for
-	 * inelastic expenses. - Generally just one mortgage or rent payment per
-	 * household. This should probably factor into the algorithm that assigns
-	 * individuals to households.
+	 * inelastic expenses.<br>
+	 * - Generally just one mortgage or rent payment per household. This should
+	 * probably factor into the algorithm that assigns individuals to
+	 * households.<br>
+	 * - Reverse engineer home loan size and property price based on mortgage
+	 * repayments, banks' interest rate, and how many years into the loan they are.
+	 * Assume people buy homes at age 30. If they're younger than that, assume they
+	 * just bought it. Might not need the LGA home price data from ABS 1410.0
+	 * Economy, so try this algorithm first since I'm going to implement it anyway.
 	 * 
 	 */
 	public void createIndividualAgents() {
@@ -383,7 +468,7 @@ public class CalibrateIndividuals {
 
 		/*
 		 * ------------------------------------------------------------------------<br>
-		 * PART A: ESTIMATING INDIVIDUAL PROFIT & LOSS STATEMENTS
+		 * PART A: ESTIMATING INDIVIDUAL PROFIT & LOSS STATEMENT MULTIPLIERS
 		 * ------------------------------------------------------------------------<br>
 		 * 
 		 * N.B. P&L composition will vary more with income, so use ATO 3A as the amounts
@@ -431,11 +516,8 @@ public class CalibrateIndividuals {
 
 		// initialise state multiplier map
 		// Keys for stateMultiplier: Sex (2), Age (13), State (9)
-		String[] sexArray = { "M", "F" };
-		String[] ageArray = { "a. Under 18", "b. 18 - 24", "c. 25 - 29", "d. 30 - 34", "e. 35 - 39", "f. 40 - 44",
-				"g. 45 - 49", "h. 50 - 54", "i. 55 - 59", "j. 60 - 64", "k. 65 - 69", "l. 70 - 74", "m. 75 and over" };
-		int sexMapCapacity = (int) Math.ceil(sexArray.length / MAP_LOAD_FACTOR);
-		int ageMapCapacity = (int) Math.ceil(ageArray.length / MAP_LOAD_FACTOR);
+		int sexMapCapacity = (int) Math.ceil(SEX_ARRAY.length / MAP_LOAD_FACTOR);
+		int ageMapCapacity = (int) Math.ceil(AGE_ARRAY_ATO.length / MAP_LOAD_FACTOR);
 		int stateMapCapacity = (int) Math.ceil(STATES_ARRAY.length / MAP_LOAD_FACTOR);
 		Map<String, Map<String, Map<String, Double>>> stateTaxableCount = new HashMap<String, Map<String, Map<String, Double>>>(
 				sexMapCapacity);
@@ -447,13 +529,13 @@ public class CalibrateIndividuals {
 				sexMapCapacity);
 		Map<String, Map<String, Double>> stateSexAgeNationalTotalAmount = new HashMap<String, Map<String, Double>>(
 				sexMapCapacity);
-		for (String sex : sexArray) {
+		for (String sex : SEX_ARRAY) {
 			stateTaxableCount.put(sex, new HashMap<String, Map<String, Double>>(ageMapCapacity));
 			stateTaxableAmount.put(sex, new HashMap<String, Map<String, Double>>(ageMapCapacity));
 			stateMultiplier.put(sex, new HashMap<String, Map<String, Double>>(ageMapCapacity));
 			stateSexAgeNationalTotalCount.put(sex, new HashMap<String, Double>(ageMapCapacity));
 			stateSexAgeNationalTotalAmount.put(sex, new HashMap<String, Double>(ageMapCapacity));
-			for (String age : ageArray) {
+			for (String age : AGE_ARRAY_ATO) {
 				stateTaxableCount.get(sex).put(age, new HashMap<String, Double>(stateMapCapacity));
 				stateTaxableAmount.get(sex).put(age, new HashMap<String, Double>(stateMapCapacity));
 				stateMultiplier.get(sex).put(age, new HashMap<String, Double>(stateMapCapacity));
@@ -506,8 +588,8 @@ public class CalibrateIndividuals {
 		}
 
 		// calculate average income per state, and national average
-		for (String sex : sexArray) {
-			for (String age : ageArray) {
+		for (String sex : SEX_ARRAY) {
+			for (String age : AGE_ARRAY_ATO) {
 				double sexAgeCount = stateSexAgeNationalTotalCount.get(sex).get(age);
 				double sexAgeAmount = stateSexAgeNationalTotalAmount.get(sex).get(age);
 				double sexAgeTaxablePerPerson = sexAgeCount > 0d ? sexAgeAmount / sexAgeCount : 0d;
@@ -579,25 +661,130 @@ public class CalibrateIndividuals {
 		}
 
 		/*
-		 * 4. ATO Individual Table 3A: age/sex count, P&L, Help Debt (by income range).
+		 * ------------------------------------------------------------------------<br>
+		 * PART B: INDIVIDUAL COUNTS AND POA POPULATION MULTIPLIERS
+		 * ------------------------------------------------------------------------<br>
+		 *
+		 * 4. Census sex, age, industry & income per POA: Get total population
+		 * multiplier, and adjust each count so it's now a 2018 equivalent. Map POA to
+		 * LGA, make a list of POAs in each LGA (which will be used when assigning
+		 * Individuals to Households).<br>
+		 */
+		// censusSEXP_POA_AGE5P_INDP_INCP Keys: Age5, Industry Division, Personal
+		// Income, POA, Sex<br>
+		Set<String> poaSetAbs = this.censusSEXP_POA_AGE5P_INDP_INCP.get(AGE_ARRAY_ABS[5]).get(DIVISION_CODE_ARRAY[0])
+				.get(INDIVIDUAL_INCOME_RANGES_ABS[1]).keySet();
+		Map<String, List<String>> poasInEachLga = new HashMap<String, List<String>>(MAP_LGA_INIT_CAPACITY);
+		// censusMatrixPersonsPOA Keys: postcode, sex, age, division code, income
+		int[][][][][] censusMatrixPersonsAdjustedPOA = new int[poaSetAbs
+				.size()][SEX_ARRAY.length][AGE_ARRAY_ABS.length][NUM_DIVISIONS][NUM_INDIVIDUAL_INCOME_RANGES_ABS];
+
+		// initialise matrix
+		Map<String, Integer> poaIndexMap = new HashMap<String, Integer>(
+				(int) Math.ceil(poaSetAbs.size() / MAP_LOAD_FACTOR));
+		Map<String, Integer> sexIndexMap = new HashMap<String, Integer>(
+				(int) Math.ceil(SEX_ARRAY.length / MAP_LOAD_FACTOR));
+		Map<String, Integer> ageIndexMap = new HashMap<String, Integer>(
+				(int) Math.ceil(AGE_ARRAY_ABS.length / MAP_LOAD_FACTOR));
+		Map<String, Integer> divIndexMap = new HashMap<String, Integer>(
+				(int) Math.ceil(DIVISION_CODE_ARRAY.length / MAP_LOAD_FACTOR));
+		Map<String, Integer> individualIncomeIndexMap = new HashMap<String, Integer>(
+				(int) Math.ceil(INDIVIDUAL_INCOME_RANGES_ABS.length / MAP_LOAD_FACTOR));
+		int i = 0;
+		for (String poa : poaSetAbs) {
+			poaIndexMap.put(poa, i++);
+			String lgaCode = this.area.getLgaCodeFromPoa(poa);
+			if (!poasInEachLga.containsKey(lgaCode)) {
+				poasInEachLga.put(lgaCode, new ArrayList<String>());
+			}
+			poasInEachLga.get(lgaCode).add(poa);
+			for (int j = 0; j < SEX_ARRAY.length; j++) {
+				sexIndexMap.put(SEX_ARRAY[j], j);
+				for (int k = 0; k < AGE_ARRAY_ABS.length; k++) {
+					ageIndexMap.put(AGE_ARRAY_ABS[k], k);
+					for (int l = 0; l < DIVISION_CODE_ARRAY.length; l++) {
+						divIndexMap.put(DIVISION_CODE_ARRAY[l], l);
+						for (int m = 0; m < INDIVIDUAL_INCOME_RANGES_ABS.length; m++) {
+							individualIncomeIndexMap.put(INDIVIDUAL_INCOME_RANGES_ABS[m], m);
+							censusMatrixPersonsAdjustedPOA[i][j][k][l][m] = 0;
+						}
+					}
+				}
+			}
+		}
+		// convert CSV map data into matrix, and adjust population forward to 2018
+		for (String age : AGE_ARRAY_ABS) {
+			int ageIdx = ageIndexMap.get(age);
+			for (String divisionCode : DIVISION_CODE_ARRAY) {
+				int divIdx = divIndexMap.get(divisionCode);
+				String divDescr = this.abs1292_0_55_002ANZSIC.get("Division Code to Division").get(divisionCode);
+				for (String incomeRange : INDIVIDUAL_INCOME_RANGES_ABS) {
+					int incomeIdx = individualIncomeIndexMap.get(incomeRange);
+					for (String poa : poaSetAbs) {
+						int poaIdx = poaIndexMap.get(poa);
+						for (String sex : SEX_ARRAY) {
+							int sexIdx = sexIndexMap.get(sex);
+							int oldVal = censusMatrixPersonsAdjustedPOA[poaIdx][sexIdx][ageIdx][divIdx][incomeIdx];
+							int adjustedPopulation = 0;
+							try {
+								adjustedPopulation = (int) Math
+										.round(Double
+												.valueOf(this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(divDescr)
+														.get(incomeRange).get(poa).get(sex))
+												* this.populationMultiplier);
+							} catch (NumberFormatException e) {
+								adjustedPopulation = 0;
+							}
+							censusMatrixPersonsAdjustedPOA[poaIdx][sexIdx][ageIdx][divIdx][incomeIdx] = oldVal
+									+ adjustedPopulation;
+						}
+					}
+				}
+			}
+		}
+
+		/*
+		 * 5. Calculate POA population multipliers to adjust ATO 3A P&L statements so
+		 * the POA totals equal the POA counts for people with an income.
+		 */
+		// FIXME: 1. calculate multipliers to adjust ATO POA data to 2018 ABS
+		// populations
+
+		/*
+		 * ------------------------------------------------------------------------<br>
+		 * PART C: CREATING INDIVIDUAL AGENTS
+		 * ------------------------------------------------------------------------<br>
+		 *
+		 * 6. ATO Individual Table 3A: age/sex count, P&L, Help Debt (by income range).
 		 * Financial position will vary more by income than any other metric, so use
 		 * table 3A as the base amounts and counts to adjust. Use these amounts, looping
 		 * through the extra dimensions and multiplying by the multipliers above. The
 		 * number of people is given in table 3A, and only needs to be multiplied by the
-		 * population forecast multiplier to adjust them forward to 2018 figures. This
-		 * ensures, for example, that the right number of people are assigned a HELP
-		 * debt, etc.<br>
+		 * population forecast multiplier to adjust them forward to 2018 figures. Need
+		 * to assign LGA from POA first so we can get the ratio to adjust the population
+		 * by. This ensures, for example, that the right number of people are assigned a
+		 * HELP debt, etc.
+		 */
+		// FIXME: 2. implement ATO 3A P&L matrix
+
+		/*
+		 * 7. Now start an POA loop, creating Individual agents per ATO data, and
+		 * Individuals with no income per ABS data for the other people in each
+		 * category. Store them in a map/matrix for now so they're easy to assign into
+		 * Households. These are the actual objects that will be used in the model, but
+		 * the matrix itself can be dropped once the Individuals are in Households and
+		 * calibration is complete.
 		 */
 
-		// FIXME: implement me
+		// FIXME: 3. create Individual agents
 
 		/*
 		 * ------------------------------------------------------------------------<br>
-		 * PART D: ADJUSTING FINANCIALS FOR HOUSEHOLDS
+		 * PART E: ADJUSTING FINANCIALS FOR HOUSEHOLDS
 		 * ------------------------------------------------------------------------<br>
 		 * 
-		 * D1. RBA E2: Use the debt-to-income and assets-to-income ratios to calculate
-		 * total assets and total debt.<br>
+		 * D1. RBA E2: Use the household debt-to-income and assets-to-income ratios to
+		 * calculate total assets and total debt.<br>
 		 */
 		// RBA E2 Keys: Series Name, Date
 		double debtToIncomeRatioRbaE2 = Double
