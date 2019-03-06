@@ -7,8 +7,10 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -72,6 +74,18 @@ public class CalibrateIndividuals {
 			"$1,500-$1,749 ($78,000-$90,999)", "$1,750-$1,999 ($91,000-$103,999)", "$2,000-$2,999 ($104,000-$155,999)",
 			"$3,000 or more ($156,000 or more)", "Not stated" };
 	private static final int NUM_INDIVIDUAL_INCOME_RANGES_ABS = 14;
+	private static final String[] INDIVIDUAL_INCOME_RANGES_ATO3A = { "a. $6,000 or less", "b. $6,001 to $10,000",
+			"c. $10,001 to $18,200", "d. $18,201 to $25,000", "e. $25,001 to $30,000", "f. $30,001 to $37,000",
+			"g. $37,001 to $40,000", "h. $40,001 to $45,000", "i. $45,001 to $50,000", "j. $50,001 to $55,000",
+			"k. $55,001 to $60,000", "l. $60,001 to $70,000", "m. $70,001 to $80,000", "n. $80,001 to $87,000",
+			"o. $87,001 to $90,000", "p. $90,001 to $100,000", "q. $100,001 to $150,000", "r. $150,001 to $180,000",
+			"s. $180,001 to $250,000", "t. $250,001 to $500,000", "u. $500,001 to $1,000,000",
+			"v. $1,000,001 or more" };
+	private static final String[] TAXABLE_STATUS = { "Y", "N" };
+	public static final String[] MAIN_INCOME_SOURCE = { "Employed", "Unemployed", "Pension", "Self-funded Retiree",
+			"Foreign Income", "No Income" };
+	public static final String[] PNL_COMPOSITION = { "Interest Income", "Dividend Income", "Donations", "Rent Income",
+			"Student Loan" };
 
 	private static final String ATO_2A_TITLE_COUNT = "Number of individuals no.";
 	private static final String ATO_2A_TITLE_TAXABLE_COUNT = "Taxable income or loss3 no.";
@@ -201,8 +215,8 @@ public class CalibrateIndividuals {
 	private Map<String, Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>>> atoIndividualTable2a;
 	/**
 	 * ATO Individuals Table 3A<br>
-	 * Contains P&L and people count by sex and 5-year age range.<br>
-	 * Keys: Series Title, State, Age, Gender, Taxable Status, Lodgment Method
+	 * Contains P&L and people count by sex, 5-year age range, and income range.<br>
+	 * Keys: Series Title, Income Range, Age, Gender, Taxable Status
 	 */
 	private Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> atoIndividualTable3a;
 	/**
@@ -486,7 +500,8 @@ public class CalibrateIndividuals {
 		 * industry code's mean by the overall mean to produce an industry
 		 * multiplier.<br>
 		 */
-		Map<String, Double> divisionMultiplier = new HashMap<String, Double>(NUM_DIVISIONS);
+		Map<String, Double> divisionTaxableIncomeMultiplier = new HashMap<String, Double>(NUM_DIVISIONS);
+		Map<String, Double> divisionCountMultiplier = new HashMap<String, Double>(NUM_DIVISIONS);
 		Set<String> divisionCodeSet = this.atoIndividualTable9DivisionSummary.get(ATO_9_TITLE_TAXABLE_COUNT).keySet();
 		double divTotalCount9A = 0d;
 		double divTotalAmount9A = 0d;
@@ -498,14 +513,17 @@ public class CalibrateIndividuals {
 					.get(divCode);
 			double divTaxablePerPerson = divTaxableAmount / divTaxableCount;
 			// Just an efficient place to hold this. Will be overwritten in the loop below.
-			divisionMultiplier.put(divCode, divTaxablePerPerson);
+			divisionTaxableIncomeMultiplier.put(divCode, divTaxablePerPerson);
+			divisionCountMultiplier.put(divCode, divTaxableCount);
 			divTotalCount9A += divTaxableCount;
 			divTotalAmount9A += divTaxableAmount;
 		}
 		double divTotalTaxablePerPerson = divTotalCount9A > 0d ? divTotalAmount9A / divTotalCount9A : 0d;
 		for (String divCode : divisionCodeSet) {
-			double divMultiplier = divisionMultiplier.get(divCode) / divTotalTaxablePerPerson;
-			divisionMultiplier.put(divCode, divMultiplier);
+			double divTaxableIncomeMultiplier = divisionTaxableIncomeMultiplier.get(divCode) / divTotalTaxablePerPerson;
+			double divCountMultiplier = divisionCountMultiplier.get(divCode) / divTotalCount9A;
+			divisionTaxableIncomeMultiplier.put(divCode, divTaxableIncomeMultiplier);
+			divisionCountMultiplier.put(divCode, divCountMultiplier);
 		}
 
 		/*
@@ -523,7 +541,9 @@ public class CalibrateIndividuals {
 				sexMapCapacity);
 		Map<String, Map<String, Map<String, Double>>> stateTaxableAmount = new HashMap<String, Map<String, Map<String, Double>>>(
 				sexMapCapacity);
-		Map<String, Map<String, Map<String, Double>>> stateMultiplier = new HashMap<String, Map<String, Map<String, Double>>>(
+		Map<String, Map<String, Map<String, Double>>> stateTaxableIncomeMultiplier = new HashMap<String, Map<String, Map<String, Double>>>(
+				sexMapCapacity);
+		Map<String, Map<String, Map<String, Double>>> stateCountMultiplier = new HashMap<String, Map<String, Map<String, Double>>>(
 				sexMapCapacity);
 		Map<String, Map<String, Double>> stateSexAgeNationalTotalCount = new HashMap<String, Map<String, Double>>(
 				sexMapCapacity);
@@ -532,19 +552,22 @@ public class CalibrateIndividuals {
 		for (String sex : SEX_ARRAY) {
 			stateTaxableCount.put(sex, new HashMap<String, Map<String, Double>>(ageMapCapacity));
 			stateTaxableAmount.put(sex, new HashMap<String, Map<String, Double>>(ageMapCapacity));
-			stateMultiplier.put(sex, new HashMap<String, Map<String, Double>>(ageMapCapacity));
+			stateTaxableIncomeMultiplier.put(sex, new HashMap<String, Map<String, Double>>(ageMapCapacity));
+			stateCountMultiplier.put(sex, new HashMap<String, Map<String, Double>>(ageMapCapacity));
 			stateSexAgeNationalTotalCount.put(sex, new HashMap<String, Double>(ageMapCapacity));
 			stateSexAgeNationalTotalAmount.put(sex, new HashMap<String, Double>(ageMapCapacity));
 			for (String age : AGE_ARRAY_ATO) {
 				stateTaxableCount.get(sex).put(age, new HashMap<String, Double>(stateMapCapacity));
 				stateTaxableAmount.get(sex).put(age, new HashMap<String, Double>(stateMapCapacity));
-				stateMultiplier.get(sex).put(age, new HashMap<String, Double>(stateMapCapacity));
+				stateTaxableIncomeMultiplier.get(sex).put(age, new HashMap<String, Double>(stateMapCapacity));
+				stateCountMultiplier.get(sex).put(age, new HashMap<String, Double>(stateMapCapacity));
 				stateSexAgeNationalTotalCount.get(sex).put(age, 0d);
 				stateSexAgeNationalTotalAmount.get(sex).put(age, 0d);
 				for (String state : STATES_ARRAY) {
 					stateTaxableCount.get(sex).get(age).put(state, 0d);
 					stateTaxableAmount.get(sex).get(age).put(state, 0d);
-					stateMultiplier.get(sex).get(age).put(state, 0d);
+					stateTaxableIncomeMultiplier.get(sex).get(age).put(state, 0d);
+					stateCountMultiplier.get(sex).get(age).put(state, 0d);
 				}
 			}
 		}
@@ -597,10 +620,12 @@ public class CalibrateIndividuals {
 					double stateCount = stateTaxableCount.get(sex).get(age).get(state);
 					double stateAmount = stateTaxableAmount.get(sex).get(age).get(state);
 					double stateTaxablePerPerson = stateAmount / stateCount;
-					double thisStateMultiplier = sexAgeTaxablePerPerson > 0d
+					double thisStateTaxableIncomeMultiplier = sexAgeTaxablePerPerson > 0d
 							? stateTaxablePerPerson / sexAgeTaxablePerPerson
 							: 0d;
-					stateMultiplier.get(sex).get(age).put(state, thisStateMultiplier);
+					double thisStateCountMultiplier = sexAgeCount > 0d ? stateCount / sexAgeCount : 0d;
+					stateTaxableIncomeMultiplier.get(sex).get(age).put(state, thisStateTaxableIncomeMultiplier);
+					stateCountMultiplier.get(sex).get(age).put(state, thisStateCountMultiplier);
 				}
 			}
 		}
@@ -612,7 +637,9 @@ public class CalibrateIndividuals {
 
 		// ATO 6B Keys: Series Title, Post Code
 		// postcodeMultiplier Keys: State Code, Post Code
-		Map<String, Map<String, Double>> postcodeStateMultiplier = new HashMap<String, Map<String, Double>>(
+		Map<String, Map<String, Double>> postcodeStateTaxableIncomeMultiplier = new HashMap<String, Map<String, Double>>(
+				stateMapCapacity);
+		Map<String, Map<String, Double>> postcodeStateCountMultiplier = new HashMap<String, Map<String, Double>>(
 				stateMapCapacity);
 		Map<String, Double> postcodeStateTotalCount = new HashMap<String, Double>(stateMapCapacity);
 		Map<String, Double> postcodeStateTotalAmount = new HashMap<String, Double>(stateMapCapacity);
@@ -621,7 +648,8 @@ public class CalibrateIndividuals {
 		// initialise state multiplier map
 		for (int i = 0; i < STATES_ARRAY.length; i++) {
 			String state = STATES_ARRAY[i];
-			postcodeStateMultiplier.put(state, new HashMap<String, Double>(MAP_STATE_POA_CAPACITY[i]));
+			postcodeStateTaxableIncomeMultiplier.put(state, new HashMap<String, Double>(MAP_STATE_POA_CAPACITY[i]));
+			postcodeStateCountMultiplier.put(state, new HashMap<String, Double>(MAP_STATE_POA_CAPACITY[i]));
 			postcodeStateTotalCount.put(state, 0d);
 			postcodeStateTotalAmount.put(state, 0d);
 		}
@@ -638,7 +666,8 @@ public class CalibrateIndividuals {
 			double postcodeTaxablePerPerson = postcodeTaxableAmount / postcodeTaxableCount;
 
 			// Just an efficient place to hold this. Will be overwritten in the loop below.
-			postcodeStateMultiplier.get(state).put(postcode, postcodeTaxablePerPerson);
+			postcodeStateTaxableIncomeMultiplier.get(state).put(postcode, postcodeTaxablePerPerson);
+			postcodeStateCountMultiplier.get(state).put(postcode, postcodeTaxableCount);
 			double oldStateTotalCount = postcodeStateTotalCount.get(state);
 			postcodeStateTotalCount.put(state, oldStateTotalCount + postcodeTaxableCount);
 			double oldStateTotalAmount = postcodeStateTotalAmount.get(state);
@@ -656,8 +685,12 @@ public class CalibrateIndividuals {
 		for (String postcode : postcodeSet) {
 			String state = this.area.getStateFromPoa(postcode);
 			double stateTaxablePerPerson = postcodeStateTaxablePerPerson.get(state);
-			double postcodeMultiplier = postcodeStateMultiplier.get(state).get(postcode) / stateTaxablePerPerson;
-			postcodeStateMultiplier.get(state).put(postcode, postcodeMultiplier);
+			double stateCount = postcodeStateTotalCount.get(state);
+			double postcodeTaxableIncomeMultiplier = postcodeStateTaxableIncomeMultiplier.get(state).get(postcode)
+					/ stateTaxablePerPerson;
+			double postcodeCountMultiplier = postcodeStateCountMultiplier.get(state).get(postcode) / stateCount;
+			postcodeStateTaxableIncomeMultiplier.get(state).put(postcode, postcodeTaxableIncomeMultiplier);
+			postcodeStateCountMultiplier.get(state).put(postcode, postcodeCountMultiplier);
 		}
 
 		/*
@@ -670,10 +703,14 @@ public class CalibrateIndividuals {
 		 * LGA, make a list of POAs in each LGA (which will be used when assigning
 		 * Individuals to Households).<br>
 		 */
+		// ATO 6B Keys: Series Title, Post Code
 		// censusSEXP_POA_AGE5P_INDP_INCP Keys: Age5, Industry Division, Personal
 		// Income, POA, Sex<br>
+		Set<String> poaSetAto = this.atoIndividualTable6b.get(ATO_6B_TITLE_TAXABLE_COUNT).keySet();
 		Set<String> poaSetAbs = this.censusSEXP_POA_AGE5P_INDP_INCP.get(AGE_ARRAY_ABS[5]).get(DIVISION_CODE_ARRAY[0])
 				.get(INDIVIDUAL_INCOME_RANGES_ABS[1]).keySet();
+		Set<String> poaSetIntersection = new HashSet<String>(poaSetAto);
+		poaSetIntersection.retainAll(poaSetAbs); // gets just the POAs that appear in both ATO and ABS data
 		Map<String, List<String>> poasInEachLga = new HashMap<String, List<String>>(MAP_LGA_INIT_CAPACITY);
 		// censusMatrixPersonsPOA Keys: postcode, sex, age, division code, income
 		int[][][][][] censusMatrixPersonsAdjustedPOA = new int[poaSetAbs
@@ -681,7 +718,7 @@ public class CalibrateIndividuals {
 
 		// initialise matrix
 		Map<String, Integer> poaIndexMap = new HashMap<String, Integer>(
-				(int) Math.ceil(poaSetAbs.size() / MAP_LOAD_FACTOR));
+				(int) Math.ceil(poaSetIntersection.size() / MAP_LOAD_FACTOR));
 		Map<String, Integer> sexIndexMap = new HashMap<String, Integer>(
 				(int) Math.ceil(SEX_ARRAY.length / MAP_LOAD_FACTOR));
 		Map<String, Integer> ageIndexMap = new HashMap<String, Integer>(
@@ -691,7 +728,7 @@ public class CalibrateIndividuals {
 		Map<String, Integer> individualIncomeIndexMap = new HashMap<String, Integer>(
 				(int) Math.ceil(INDIVIDUAL_INCOME_RANGES_ABS.length / MAP_LOAD_FACTOR));
 		int i = 0;
-		for (String poa : poaSetAbs) {
+		for (String poa : poaSetIntersection) {
 			poaIndexMap.put(poa, i++);
 			String lgaCode = this.area.getLgaCodeFromPoa(poa);
 			if (!poasInEachLga.containsKey(lgaCode)) {
@@ -720,7 +757,7 @@ public class CalibrateIndividuals {
 				String divDescr = this.abs1292_0_55_002ANZSIC.get("Division Code to Division").get(divisionCode);
 				for (String incomeRange : INDIVIDUAL_INCOME_RANGES_ABS) {
 					int incomeIdx = individualIncomeIndexMap.get(incomeRange);
-					for (String poa : poaSetAbs) {
+					for (String poa : poaSetIntersection) {
 						int poaIdx = poaIndexMap.get(poa);
 						for (String sex : SEX_ARRAY) {
 							int sexIdx = sexIndexMap.get(sex);
@@ -744,18 +781,7 @@ public class CalibrateIndividuals {
 		}
 
 		/*
-		 * 5. Calculate POA population multipliers to adjust ATO 3A P&L statements so
-		 * the POA totals equal the POA counts for people with an income.
-		 */
-		// FIXME: 1. calculate multipliers to adjust ATO POA data to 2018 ABS
-		// populations
-
-		/*
-		 * ------------------------------------------------------------------------<br>
-		 * PART C: CREATING INDIVIDUAL AGENTS
-		 * ------------------------------------------------------------------------<br>
-		 *
-		 * 6. ATO Individual Table 3A: age/sex count, P&L, Help Debt (by income range).
+		 * 5. ATO Individual Table 3A: age/sex count, P&L, Help Debt (by income range).
 		 * Financial position will vary more by income than any other metric, so use
 		 * table 3A as the base amounts and counts to adjust. Use these amounts, looping
 		 * through the extra dimensions and multiplying by the multipliers above. The
@@ -764,10 +790,221 @@ public class CalibrateIndividuals {
 		 * to assign LGA from POA first so we can get the ratio to adjust the population
 		 * by. This ensures, for example, that the right number of people are assigned a
 		 * HELP debt, etc.
+		 * 
+		 * N.B. Need to do this before the POA population adjustment multiplier so we
+		 * have the "Actual" ATO POA populations to use.
+		 * 
+		 * 6. Calculate POA population multipliers to adjust ATO 3A P&L statements so
+		 * the POA totals equal the POA counts for people with an income. Need to do
+		 * this by finer segment so that the totals add up for each ABS segment.
 		 */
-		// FIXME: 2. implement ATO 3A P&L matrix
+		// FIXME: 1. implement ATO 3A P&L matrix
+		// FIXME: 2. calc multipliers to adjust ATO POA data to 2018 ABS pop'ns
+
+		////////////////////////////////////////////////////////////
+		// censusMatrixPersonsPOA Keys: postcode, sex, age, division code, income
+		// int[][][][][] censusMatrixPersonsAdjustedPOA = new int[poaSetAbs
+		// .size()][SEX_ARRAY.length][AGE_ARRAY_ABS.length][NUM_DIVISIONS][NUM_INDIVIDUAL_INCOME_RANGES_ABS];
+		////////////////////////////////////////////////////////////
+
+		// PNL_COMPOSITION = { "Interest Income", "Dividend Income", "Donations", "Rent
+		// Income", "Student Loan" };
+
+		// ATO 3A Keys: Series Title, Income Range, Age, Gender, Taxable Status
+
+		// censusMatrixPersonsPOA Keys: postcode, sex, age, division code, income
+		int[][][][][] ato3AMatrixTaxableCount = new int[poaSetIntersection
+				.size()][SEX_ARRAY.length][AGE_ARRAY_ATO.length][NUM_DIVISIONS][NUM_INDIVIDUAL_INCOME_RANGES_ABS];
+		// [SEX_ARRAY.length][AGE_ARRAY_ATO.length][NUM_DIVISIONS][NUM_INDIVIDUAL_INCOME_RANGES_ABS][MAIN_INCOME_SOURCE.length];
+		List<List<List<List<List<List<List<Individual>>>>>>> ato3AMatrixIndividual = new ArrayList<List<List<List<List<List<List<Individual>>>>>>>(
+				poaSetIntersection.size());
 
 		/*
+		 * ALGORITHM
+		 * 
+		 * for income, age, sex, taxable status
+		 * 
+		 * get taxable count by income, age & sex (don't care about taxable status). Use
+		 * sum of count by main income type, rather than just taxable income count.
+		 * 
+		 * for each industry, multiply by industry count ratio
+		 * 
+		 * for each state, multiply by state count ratio
+		 * 
+		 * for each poa, multiply by poa count ratio
+		 * 
+		 * this gives us taxable count by income, age, sex, industry, poa (same as ABS)
+		 * 
+		 * within this nested poa loop, divide ABS count by ATO count to get multiplier
+		 * 
+		 * for each individual type, calculate P&L line items. Store in a nested List of
+		 * Individuals.
+		 */
+		// for income, age, sex, taxable status
+		for (int incomeAtoIdx = 0; incomeAtoIdx < INDIVIDUAL_INCOME_RANGES_ATO3A.length; incomeAtoIdx++) {
+			String incomeRangeAto = INDIVIDUAL_INCOME_RANGES_ATO3A[incomeAtoIdx];
+			List<Integer> incomeIndicesAbs = this.getAbsIncomeIndices(incomeAtoIdx);
+			// Skip iterations for n:1 mappings. We need to aggregate the ATO data when calculating ratios.
+			// 0-1 ==> 2, 3 ==> 5-4, 4-5 ==> 6, 7-8 ==> 8, 9-11 ==> 9, 13-14 ==> 11
+			if (incomeAtoIdx == 1 || incomeAtoIdx == 5 || incomeAtoIdx == 8 || incomeAtoIdx == 10 || incomeAtoIdx == 11 || incomeAtoIdx == 14) {
+				// skip the rest of this nested loop because this was already dealt with in the earlier part of this multi-index mapping
+			} else {
+				// continue processing nested loop
+				for (int ageIdxAto = 0; ageIdxAto < AGE_ARRAY_ATO.length; ageIdxAto++) {
+					String age = AGE_ARRAY_ATO[ageIdxAto];
+					List<Integer> ageIndicesAbs = this.getAbsAgeIndices(ageIdxAto);
+					// [0] under 18 = 0-4, 5-9, 10-14, 15-19
+					// [12] 75+ = 75-79, 80-84, 85-89, 90-94, 95-99, 100+
+					// [1-11] 18-24 = 20-24; 25-29 = 25-29; ...; 70-74 = 70-74
+					for (int sexIdx = 0; sexIdx < SEX_ARRAY.length; sexIdx++) {
+						String sex = SEX_ARRAY[sexIdx];
+						double employedCount = 0d;
+						double unemployedCount = 0d;
+						double pensionCount = 0d;
+						double selfFundedRetireeCount = 0d;
+						double foreignIncomeCount = 0d;
+						double noIncomeCount = 0d;
+						// need corresponding if statements in the nested loops, retrieving multiple indices' values
+						// 0-1 ==> 2, 3 ==> 5-4, 4-5 ==> 6, 7-8 ==> 8, 9-11 ==> 9, 13-14 ==> 11
+						for (int taxableStatusIdx = 0; taxableStatusIdx < TAXABLE_STATUS.length; taxableStatusIdx++) {
+							String taxableStatus = TAXABLE_STATUS[taxableStatusIdx];
+							// get taxable count by income, age & sex (don't care about taxable status). Use
+							// sum of count by main income type, rather than just taxable income count.
+							employedCount += Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT)
+									.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
+							unemployedCount += Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_ALLOW_COUNT)
+									.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
+							pensionCount += Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_PENSION_COUNT)
+									.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
+							selfFundedRetireeCount += Math.max(
+									Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_TAXED_COUNT)
+											.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")),
+									Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_UNTAXED_COUNT)
+											.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")));
+							foreignIncomeCount += Math.max(
+									Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME_COUNT)
+											.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")),
+									Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME2_COUNT)
+											.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")));
+							noIncomeCount += Double
+									.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_TOTAL_INCOME_COUNT).get(incomeRangeAto)
+											.get(age).get(sex).get(taxableStatus).replace(",", ""))
+									- employedCount - unemployedCount - pensionCount - selfFundedRetireeCount
+									- foreignIncomeCount;
+							if (incomeAtoIdx == 0 || incomeAtoIdx == 4 || incomeAtoIdx == 7 || incomeAtoIdx == 9 || incomeAtoIdx == 13) {
+								// add sums for extra indices where it's a 2:1 mapping
+								// 0-1 ==> 2, 3 ==> 5-4, 4-5 ==> 6, 7-8 ==> 8, 9-11 ==> 9, 13-14 ==> 11
+								incomeRangeAto = INDIVIDUAL_INCOME_RANGES_ATO3A[incomeAtoIdx+1];
+								employedCount += Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT)
+										.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
+								unemployedCount += Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_ALLOW_COUNT)
+										.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
+								pensionCount += Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_PENSION_COUNT)
+										.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
+								selfFundedRetireeCount += Math.max(
+										Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_TAXED_COUNT)
+												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")),
+										Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_UNTAXED_COUNT)
+												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")));
+								foreignIncomeCount += Math.max(
+										Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME_COUNT)
+												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")),
+										Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME2_COUNT)
+												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")));
+								noIncomeCount += Double
+										.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_TOTAL_INCOME_COUNT).get(incomeRangeAto)
+												.get(age).get(sex).get(taxableStatus).replace(",", ""))
+										- employedCount - unemployedCount - pensionCount - selfFundedRetireeCount
+										- foreignIncomeCount;
+							} // end if 2:1 mapping
+							if (incomeAtoIdx == 9) {
+								// add sums for extra indices where it's a 3:1 mapping
+								// 9-11 ==> 9
+								incomeRangeAto = INDIVIDUAL_INCOME_RANGES_ATO3A[incomeAtoIdx+2];
+								employedCount += Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT)
+										.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
+								unemployedCount += Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_ALLOW_COUNT)
+										.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
+								pensionCount += Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_PENSION_COUNT)
+										.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
+								selfFundedRetireeCount += Math.max(
+										Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_TAXED_COUNT)
+												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")),
+										Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_UNTAXED_COUNT)
+												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")));
+								foreignIncomeCount += Math.max(
+										Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME_COUNT)
+												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")),
+										Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME2_COUNT)
+												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")));
+								noIncomeCount += Double
+										.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_TOTAL_INCOME_COUNT).get(incomeRangeAto)
+												.get(age).get(sex).get(taxableStatus).replace(",", ""))
+										- employedCount - unemployedCount - pensionCount - selfFundedRetireeCount
+										- foreignIncomeCount;
+							} // end if 3:1 mapping
+						} // end for taxable status
+						for (int idxDiv = 0; idxDiv < NUM_DIVISIONS; idxDiv++) {
+							String division = DIVISION_CODE_ARRAY[idxDiv];
+							// for each industry, multiply by industry count ratio
+							double divMult = divisionCountMultiplier.get(division);
+							employedCount *= divMult;
+							unemployedCount *= divMult;
+							pensionCount *= divMult;
+							selfFundedRetireeCount *= divMult;
+							foreignIncomeCount *= divMult;
+							noIncomeCount *= divMult;
+
+							for (int stateIdx = 0; stateIdx < STATES_ARRAY.length; stateIdx++) {
+								String state = STATES_ARRAY[stateIdx];
+								// for each state, sex & age, multiply by state count ratio
+								double stateMult = stateCountMultiplier.get(sex).get(age).get(state);
+								employedCount *= stateMult;
+								unemployedCount *= stateMult;
+								pensionCount *= stateMult;
+								selfFundedRetireeCount *= stateMult;
+								foreignIncomeCount *= stateMult;
+								noIncomeCount *= stateMult;
+
+								for (String poa : poaSetIntersection) {
+									int poaIdx = poaIndexMap.get(poa);
+									// for each poa, multiply by poa count ratio
+									double poaMult = postcodeStateCountMultiplier.get(state).get(poa);
+									employedCount *= poaMult;
+									unemployedCount *= poaMult;
+									pensionCount *= poaMult;
+									selfFundedRetireeCount *= poaMult;
+									foreignIncomeCount *= poaMult;
+									noIncomeCount *= poaMult;
+									
+									// this gives us taxable count by income, age, sex, industry, poa (same as ABS)
+
+									// divide ABS count by ATO count to get multiplier
+									// censusMatrixPersonsPOA Keys: postcode, sex, age, division code, income
+									// TODO: need to take into account 1:n and n:1 mappings
+									censusMatrixPersonsAdjustedPOA[poaIdx][sexIdx][ageIdxAbs][divIdx][incomeIdxAbs]
+									
+									// need to map income ranges and age ranges between ATO and ABS, so need to be careful if using loops here
+									
+									// [0] under 18 = 0-4, 5-9, 10-14, 15-19
+									// [12] 75+ = 75-79, 80-84, 85-89, 90-94, 95-99, 100+
+									// [1-11] 18-24 = 20-24; 25-29 = 25-29; ...; 70-74 = 70-74
+
+									// [income indices] 0-1 ==> 2, 3 ==> 5-4, 4-5 ==> 6, 7-8 ==> 8, 9-11 ==> 9, 13-14 ==> 11
+									
+								} // end for POA
+							} // end for state
+						} // end for division
+					} // end for sex
+				} // end for age
+			} // end if multi-index income range mapping
+		} // end for ATO income range
+
+		/*
+		 * ------------------------------------------------------------------------<br>
+		 * PART C: CREATING INDIVIDUAL AGENTS
+		 * ------------------------------------------------------------------------<br>
+		 *
 		 * 7. Now start an POA loop, creating Individual agents per ATO data, and
 		 * Individuals with no income per ABS data for the other people in each
 		 * category. Store them in a map/matrix for now so they're easy to assign into
@@ -785,6 +1022,8 @@ public class CalibrateIndividuals {
 		 * 
 		 * D1. RBA E2: Use the household debt-to-income and assets-to-income ratios to
 		 * calculate total assets and total debt.<br>
+		 * 
+		 * N.B. Household, not individual.
 		 */
 		// RBA E2 Keys: Series Name, Date
 		double debtToIncomeRatioRbaE2 = Double
@@ -795,6 +1034,8 @@ public class CalibrateIndividuals {
 		/*
 		 * D2. RBA E1: Calculate the ratios between Bal Sht items. Use these, compared
 		 * to assets and debt, to estimate the other balance sheet items.<br>
+		 * 
+		 * N.B. Household, not individual.
 		 */
 		// RBA E1 Keys: Series Name, Date
 		// get RBA E1 amounts ($ billions)
@@ -955,14 +1196,6 @@ public class CalibrateIndividuals {
 	 * return result; }
 	 */
 
-	/**
-	 * @param data the data to set
-	 */
-	@Autowired
-	public void setCommonData(CalibrationData commonData) {
-		this.commonData = commonData;
-	}
-
 	private String getStateCode(String stateName) {
 		String stateCode = "NA";
 		switch (stateName.toUpperCase()) {
@@ -1003,6 +1236,132 @@ public class CalibrateIndividuals {
 			break;
 		}
 		return stateCode;
+	}
+
+	private int getAtoAgeIndex(int absAgeIndex) {
+		return Math.max(0, Math.min(15, absAgeIndex) - 3);
+	}
+
+	private List<Integer> getAbsAgeIndices(int atoAgeIndex) {
+		List<Integer> indices = null;
+		if (atoAgeIndex == 0) {
+			// under 18 = 0-4, 5-9, 10-14, 15-19
+			indices = Arrays.asList(new Integer[] { 0, 1, 2, 3 });
+		} else if (atoAgeIndex > 11) {
+			// 75+ = 75-79, 80-84, 85-89, 90-94, 95-99, 100+
+			indices = Arrays.asList(new Integer[] { 15, 16, 17, 18, 19, 20 });
+		} else {
+			// 18-24 = 20-24; 25-29 = 25-29; ...; 70-74 = 70-74
+			indices = Arrays.asList(new Integer[] { atoAgeIndex + 3 });
+		}
+		return indices;
+	}
+
+	/**
+	 * Maps indices from ABS individual income ranges to ATO income ranges.
+	 * 
+	 * @param absIncomeIndex
+	 * @return a list of the matching indices, with the best match first
+	 */
+	private List<Integer> getAtoIncomeIndices(int absIncomeIndex) {
+		List<Integer> indices = null;
+		if (absIncomeIndex < 3) {
+			// <0, 0, <$8k ==> <$6k, $6-10k
+			indices = Arrays.asList(new Integer[] { 0, 1 });
+		} else if (absIncomeIndex == 3) {
+			// $8-16k ==> $10-18k
+			indices = Arrays.asList(new Integer[] { 2 });
+		} else if (absIncomeIndex == 4 || absIncomeIndex == 5) {
+			// $16-20k, $20-26k ==> $18-25k
+			indices = Arrays.asList(new Integer[] { 3 });
+		} else if (absIncomeIndex == 6) {
+			// $26-34k ==> $25-30k, $30-37k
+			indices = Arrays.asList(new Integer[] { 4, 5 });
+		} else if (absIncomeIndex == 7) {
+			// $34-41k ==> $37-40k
+			indices = Arrays.asList(new Integer[] { 6 });
+		} else if (absIncomeIndex == 8) {
+			// $41-52k ==> $40-45k, $45-50k
+			indices = Arrays.asList(new Integer[] { 7, 8 });
+		} else if (absIncomeIndex == 9) {
+			// $52-65k ==> $50-55k, $55-60k, $60-65k
+			indices = Arrays.asList(new Integer[] { 10, 9, 11 });
+		} else if (absIncomeIndex == 10) {
+			// $65-78k ==> $70-80k
+			indices = Arrays.asList(new Integer[] { 12 });
+		} else if (absIncomeIndex == 11) {
+			// $78-91k ==> $80-87k, $87-90k
+			indices = Arrays.asList(new Integer[] { 13, 14 });
+		} else if (absIncomeIndex == 12) {
+			// $91-104k ==> $90-100k
+			indices = Arrays.asList(new Integer[] { 15 });
+		} else if (absIncomeIndex == 13) {
+			// $104-156k ==> $100-150k
+			indices = Arrays.asList(new Integer[] { 16 });
+		} else if (absIncomeIndex == 14) {
+			// $156k+ ==> $150-180k, $180-250k, $250-500k, $500k-$1M, $1M+
+			indices = Arrays.asList(new Integer[] { 17, 18, 19, 20, 21 });
+		} else {
+			// not stated
+			indices = null;
+		}
+		return indices;
+	}
+
+	/**
+	 * Maps indices from ATO income ranges to ABS individual income ranges.
+	 * 
+	 * @param atoIncomeIndex
+	 * @return a list of the matching indices, with the best match first
+	 */
+	private List<Integer> getAbsIncomeIndices(int atoIncomeIndex) {
+		List<Integer> indices = null;
+		if (atoIncomeIndex < 2) {
+			// <$6k, $6-10k ==> <0, 0, <$8k
+			indices = Arrays.asList(new Integer[] { 2, 0, 1 });
+		} else if (atoIncomeIndex == 2) {
+			// $10-18k ==> $8-16k
+			indices = Arrays.asList(new Integer[] { 3 });
+		} else if (atoIncomeIndex == 3) {
+			// $18-25k ==> $16-20k, $20-26k
+			indices = Arrays.asList(new Integer[] { 5, 4 });
+		} else if (atoIncomeIndex == 4 || atoIncomeIndex == 5) {
+			// $25-30k, $30-37k ==> $26-34k
+			indices = Arrays.asList(new Integer[] { 6 });
+		} else if (atoIncomeIndex == 6) {
+			// $37-40k ==> $34-41k
+			indices = Arrays.asList(new Integer[] { 7 });
+		} else if (atoIncomeIndex == 7 || atoIncomeIndex == 8) {
+			// $40-45k, $45-50k ==> $41-52k
+			indices = Arrays.asList(new Integer[] { 8 });
+		} else if (atoIncomeIndex == 9 || atoIncomeIndex == 10 || atoIncomeIndex == 11) {
+			// $50-55k, $55-60k, $60-65k ==> $52-65k
+			indices = Arrays.asList(new Integer[] { 9 });
+		} else if (atoIncomeIndex == 12) {
+			// $70-80k ==> $65-78k
+			indices = Arrays.asList(new Integer[] { 10 });
+		} else if (atoIncomeIndex == 13 || atoIncomeIndex == 14) {
+			// $80-87k, $87-90k ==> $78-91k
+			indices = Arrays.asList(new Integer[] { 11 });
+		} else if (atoIncomeIndex == 15) {
+			// $90-100k ==> $91-104k
+			indices = Arrays.asList(new Integer[] { 12 });
+		} else if (atoIncomeIndex == 16) {
+			// $100-150k ==> $104-156k
+			indices = Arrays.asList(new Integer[] { 13 });
+		} else {
+			// $150-180k, $180-250k, $250-500k, $500k-$1M, $1M+ ==> $156k+
+			indices = Arrays.asList(new Integer[] { 14 });
+		}
+		return indices;
+	}
+
+	/**
+	 * @param data the data to set
+	 */
+	@Autowired
+	public void setCommonData(CalibrationData commonData) {
+		this.commonData = commonData;
 	}
 
 	/**
