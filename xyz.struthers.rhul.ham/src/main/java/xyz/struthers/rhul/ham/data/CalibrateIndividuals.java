@@ -840,14 +840,18 @@ public class CalibrateIndividuals {
 		 * for each individual type, calculate P&L line items. Store in a nested List of
 		 * Individuals.
 		 */
+		double atoAbsPopMult = 0d;
 		// for income, age, sex, taxable status
 		for (int incomeAtoIdx = 0; incomeAtoIdx < INDIVIDUAL_INCOME_RANGES_ATO3A.length; incomeAtoIdx++) {
 			String incomeRangeAto = INDIVIDUAL_INCOME_RANGES_ATO3A[incomeAtoIdx];
 			List<Integer> incomeIndicesAbs = this.getAbsIncomeIndices(incomeAtoIdx);
-			// Skip iterations for n:1 mappings. We need to aggregate the ATO data when calculating ratios.
+			// Skip iterations for n:1 mappings. We need to aggregate the ATO data when
+			// calculating ratios.
 			// 0-1 ==> 2, 3 ==> 5-4, 4-5 ==> 6, 7-8 ==> 8, 9-11 ==> 9, 13-14 ==> 11
-			if (incomeAtoIdx == 1 || incomeAtoIdx == 5 || incomeAtoIdx == 8 || incomeAtoIdx == 10 || incomeAtoIdx == 11 || incomeAtoIdx == 14) {
-				// skip the rest of this nested loop because this was already dealt with in the earlier part of this multi-index mapping
+			if (incomeAtoIdx == 1 || incomeAtoIdx == 5 || incomeAtoIdx == 8 || incomeAtoIdx == 10 || incomeAtoIdx == 11
+					|| incomeAtoIdx == 14) {
+				// skip the rest of this nested loop because this was already dealt with in the
+				// earlier part of this multi-index mapping
 			} else {
 				// continue processing nested loop
 				for (int ageIdxAto = 0; ageIdxAto < AGE_ARRAY_ATO.length; ageIdxAto++) {
@@ -864,7 +868,8 @@ public class CalibrateIndividuals {
 						double selfFundedRetireeCount = 0d;
 						double foreignIncomeCount = 0d;
 						double noIncomeCount = 0d;
-						// need corresponding if statements in the nested loops, retrieving multiple indices' values
+						// need corresponding if statements in the nested loops, retrieving multiple
+						// indices' values
 						// 0-1 ==> 2, 3 ==> 5-4, 4-5 ==> 6, 7-8 ==> 8, 9-11 ==> 9, 13-14 ==> 11
 						for (int taxableStatusIdx = 0; taxableStatusIdx < TAXABLE_STATUS.length; taxableStatusIdx++) {
 							String taxableStatus = TAXABLE_STATUS[taxableStatusIdx];
@@ -872,80 +877,99 @@ public class CalibrateIndividuals {
 							// sum of count by main income type, rather than just taxable income count.
 							employedCount += Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT)
 									.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
-							unemployedCount += Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_ALLOW_COUNT)
-									.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
-							pensionCount += Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_PENSION_COUNT)
-									.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
+							unemployedCount += Double
+									.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_ALLOW_COUNT)
+											.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
+							pensionCount += Double
+									.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_PENSION_COUNT)
+											.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
 							selfFundedRetireeCount += Math.max(
 									Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_TAXED_COUNT)
 											.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")),
 									Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_UNTAXED_COUNT)
-											.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")));
+											.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
+											.replace(",", "")));
 							foreignIncomeCount += Math.max(
 									Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME_COUNT)
 											.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")),
 									Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME2_COUNT)
-											.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")));
+											.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
+											.replace(",", "")));
 							noIncomeCount += Double
-									.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_TOTAL_INCOME_COUNT).get(incomeRangeAto)
-											.get(age).get(sex).get(taxableStatus).replace(",", ""))
+									.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_TOTAL_INCOME_COUNT)
+											.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""))
 									- employedCount - unemployedCount - pensionCount - selfFundedRetireeCount
 									- foreignIncomeCount;
-							if (incomeAtoIdx == 0 || incomeAtoIdx == 4 || incomeAtoIdx == 7 || incomeAtoIdx == 9 || incomeAtoIdx == 13) {
+							if (incomeAtoIdx == 0 || incomeAtoIdx == 4 || incomeAtoIdx == 7 || incomeAtoIdx == 9
+									|| incomeAtoIdx == 13) {
 								// add sums for extra indices where it's a 2:1 mapping
 								// 0-1 ==> 2, 3 ==> 5-4, 4-5 ==> 6, 7-8 ==> 8, 9-11 ==> 9, 13-14 ==> 11
-								incomeRangeAto = INDIVIDUAL_INCOME_RANGES_ATO3A[incomeAtoIdx+1];
+								incomeRangeAto = INDIVIDUAL_INCOME_RANGES_ATO3A[incomeAtoIdx + 1];
 								employedCount += Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT)
 										.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
-								unemployedCount += Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_ALLOW_COUNT)
-										.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
-								pensionCount += Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_PENSION_COUNT)
-										.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
+								unemployedCount += Double.valueOf(
+										this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_ALLOW_COUNT).get(incomeRangeAto)
+												.get(age).get(sex).get(taxableStatus).replace(",", ""));
+								pensionCount += Double.valueOf(this.atoIndividualTable3a
+										.get(ATO_3A_TITLE_GOVT_PENSION_COUNT).get(incomeRangeAto).get(age).get(sex)
+										.get(taxableStatus).replace(",", ""));
 								selfFundedRetireeCount += Math.max(
 										Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_TAXED_COUNT)
-												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")),
+												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
+												.replace(",", "")),
 										Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_UNTAXED_COUNT)
-												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")));
+												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
+												.replace(",", "")));
 								foreignIncomeCount += Math.max(
 										Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME_COUNT)
-												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")),
+												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
+												.replace(",", "")),
 										Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME2_COUNT)
-												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")));
+												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
+												.replace(",", "")));
 								noIncomeCount += Double
-										.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_TOTAL_INCOME_COUNT).get(incomeRangeAto)
-												.get(age).get(sex).get(taxableStatus).replace(",", ""))
+										.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_TOTAL_INCOME_COUNT)
+												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
+												.replace(",", ""))
 										- employedCount - unemployedCount - pensionCount - selfFundedRetireeCount
 										- foreignIncomeCount;
 							} // end if 2:1 mapping
 							if (incomeAtoIdx == 9) {
 								// add sums for extra indices where it's a 3:1 mapping
 								// 9-11 ==> 9
-								incomeRangeAto = INDIVIDUAL_INCOME_RANGES_ATO3A[incomeAtoIdx+2];
+								incomeRangeAto = INDIVIDUAL_INCOME_RANGES_ATO3A[incomeAtoIdx + 2];
 								employedCount += Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT)
 										.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
-								unemployedCount += Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_ALLOW_COUNT)
-										.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
-								pensionCount += Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_PENSION_COUNT)
-										.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", ""));
+								unemployedCount += Double.valueOf(
+										this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_ALLOW_COUNT).get(incomeRangeAto)
+												.get(age).get(sex).get(taxableStatus).replace(",", ""));
+								pensionCount += Double.valueOf(this.atoIndividualTable3a
+										.get(ATO_3A_TITLE_GOVT_PENSION_COUNT).get(incomeRangeAto).get(age).get(sex)
+										.get(taxableStatus).replace(",", ""));
 								selfFundedRetireeCount += Math.max(
 										Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_TAXED_COUNT)
-												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")),
+												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
+												.replace(",", "")),
 										Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_UNTAXED_COUNT)
-												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")));
+												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
+												.replace(",", "")));
 								foreignIncomeCount += Math.max(
 										Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME_COUNT)
-												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")),
+												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
+												.replace(",", "")),
 										Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME2_COUNT)
-												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus).replace(",", "")));
+												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
+												.replace(",", "")));
 								noIncomeCount += Double
-										.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_TOTAL_INCOME_COUNT).get(incomeRangeAto)
-												.get(age).get(sex).get(taxableStatus).replace(",", ""))
+										.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_TOTAL_INCOME_COUNT)
+												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
+												.replace(",", ""))
 										- employedCount - unemployedCount - pensionCount - selfFundedRetireeCount
 										- foreignIncomeCount;
 							} // end if 3:1 mapping
 						} // end for taxable status
-						for (int idxDiv = 0; idxDiv < NUM_DIVISIONS; idxDiv++) {
-							String division = DIVISION_CODE_ARRAY[idxDiv];
+						for (int divIdx = 0; divIdx < NUM_DIVISIONS; divIdx++) {
+							String division = DIVISION_CODE_ARRAY[divIdx];
 							// for each industry, multiply by industry count ratio
 							double divMult = divisionCountMultiplier.get(division);
 							employedCount *= divMult;
@@ -968,6 +992,8 @@ public class CalibrateIndividuals {
 
 								for (String poa : poaSetIntersection) {
 									int poaIdx = poaIndexMap.get(poa);
+
+									// get ATO taxable count by income, age, sex, industry, poa (same as ABS)
 									// for each poa, multiply by poa count ratio
 									double poaMult = postcodeStateCountMultiplier.get(state).get(poa);
 									employedCount *= poaMult;
@@ -976,22 +1002,31 @@ public class CalibrateIndividuals {
 									selfFundedRetireeCount *= poaMult;
 									foreignIncomeCount *= poaMult;
 									noIncomeCount *= poaMult;
-									
-									// this gives us taxable count by income, age, sex, industry, poa (same as ABS)
+									double totalAtoCount = employedCount + unemployedCount + pensionCount
+											+ selfFundedRetireeCount + foreignIncomeCount + noIncomeCount;
 
-									// divide ABS count by ATO count to get multiplier
-									// censusMatrixPersonsPOA Keys: postcode, sex, age, division code, income
-									// TODO: need to take into account 1:n and n:1 mappings
-									censusMatrixPersonsAdjustedPOA[poaIdx][sexIdx][ageIdxAbs][divIdx][incomeIdxAbs]
-									
-									// need to map income ranges and age ranges between ATO and ABS, so need to be careful if using loops here
-									
-									// [0] under 18 = 0-4, 5-9, 10-14, 15-19
-									// [12] 75+ = 75-79, 80-84, 85-89, 90-94, 95-99, 100+
-									// [1-11] 18-24 = 20-24; 25-29 = 25-29; ...; 70-74 = 70-74
+									// need to take into account 1:n and n:1 mappings between ATO and ABS
+									int totalAbsCount = 0;
+									for (int ageIdxAbs : ageIndicesAbs) {
+										for (int incomeIdxAbs : incomeIndicesAbs) {
+											totalAbsCount += censusMatrixPersonsAdjustedPOA[poaIdx][sexIdx][ageIdxAbs][divIdx][incomeIdxAbs];
+										}
+									}
 
-									// [income indices] 0-1 ==> 2, 3 ==> 5-4, 4-5 ==> 6, 7-8 ==> 8, 9-11 ==> 9, 13-14 ==> 11
-									
+									// divide ABS count by ATO count to get multiplier, and apply to counts
+									atoAbsPopMult = totalAbsCount / totalAtoCount;
+									int employedCountInt = (int) Math.round(employedCount *= atoAbsPopMult);
+									int unemployedCountInt = (int) Math.round(unemployedCount *= atoAbsPopMult);
+									int pensionCountInt = (int) Math.round(pensionCount *= atoAbsPopMult);
+									int selfFundedRetireeCountInt = (int) Math
+											.round(selfFundedRetireeCount *= atoAbsPopMult);
+									int foreignIncomeCountInt = (int) Math.round(foreignIncomeCount *= atoAbsPopMult);
+									int noIncomeCountInt = (int) Math.round(noIncomeCount *= atoAbsPopMult);
+
+									// FIXME: now multiply the other counts in ATO 3A data to gross up to ABS
+									// figures
+									// N.B. Make sure we have averages first, otherwise it will be understated
+
 								} // end for POA
 							} // end for state
 						} // end for division
@@ -1015,6 +1050,15 @@ public class CalibrateIndividuals {
 
 		// FIXME: 3. create Individual agents
 
+		/*
+		 * Need to calibrate the right number of agents with interest, dividend,
+		 * donation, rent, student loans, but want to do it randomly. Could make arrays
+		 * of booleans populated with as many true values as there are adjusted people
+		 * with that attribute, then use Collections.shuffle(List<T> list, Random rnd)
+		 * to shuffle the list into a pseudo-random order so the combinations at each
+		 * index are more heterogeneous.
+		 */
+		
 		/*
 		 * ------------------------------------------------------------------------<br>
 		 * PART E: ADJUSTING FINANCIALS FOR HOUSEHOLDS
