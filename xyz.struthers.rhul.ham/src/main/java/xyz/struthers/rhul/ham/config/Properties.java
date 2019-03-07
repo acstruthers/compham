@@ -3,8 +3,12 @@
  */
 package xyz.struthers.rhul.ham.config;
 
+import java.util.Random;
+
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import ec.util.MersenneTwisterFast;
 
 /**
  * @author Adam Struthers
@@ -25,11 +29,15 @@ public class Properties {
 	public static final String RESOURCE_DIRECTORY = HOME_DIRECTORY + "\\src\\main\\resources";
 	
 	public static final double SUPERANNUATION_RATE = 0.095; // 9.5%
-
+	public static final long RANDOM_SEED = 20190315L;
+	
 	// static data fields
 	public static int peoplePerAgent = 1; // change to 1000 if 1 is too slow.
 	public static int totalPopulationAU = 25000000;
 
+	// data fields
+	public Random random;
+	
 	private Properties() {
 		super();
 	}
@@ -63,4 +71,16 @@ public class Properties {
 	public static void setTotalPopulationAU(int totalPopulationAU) {
 		Properties.totalPopulationAU = totalPopulationAU;
 	}
+
+	/**
+	 * @return the random
+	 */
+	public Random getRandom() {
+		if (this.random == null) {
+			this.random = new Random(RANDOM_SEED);
+		}
+		return random;
+	}
+	
+	
 }
