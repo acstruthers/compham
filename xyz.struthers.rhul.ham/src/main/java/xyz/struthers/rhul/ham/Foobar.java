@@ -25,6 +25,12 @@ public class Foobar {
 				.getResourceAsStream("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_ACT.csv");
 		System.out.println(in != null);
 		System.out.println("done");
+		
+		int[] myArray = new int[] {1, 2, 3};
+		myArray[1] *= 5;
+		System.out.println("myArray[0]: " + myArray[0]);
+		System.out.println("myArray[1]: " + myArray[1]);
+		System.out.println("myArray[2]: " + myArray[2]);
 	}
 
 }
