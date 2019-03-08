@@ -30,8 +30,10 @@ public final class Individual extends Agent {
 
 	// "Personal" Details (4 bytes + approx. 20 bytes of Strings = 24 bytes)
 	private int age;
+	private String sex;
 	private String employmentIndustry; // can be null if not employed
 	private String localGovernmentAreaCode; // 5 chars
+	private int mainIncomeSource;
 
 	// P&L (72 bytes)
 	private double pnlWagesSalaries;
@@ -40,11 +42,15 @@ public final class Individual extends Agent {
 	private double pnlInvestmentIncome; // other income (including superannuation & dividends)
 	private double pnlInterestIncome;
 	private double pnlRentIncome; // income from investment properties
+	private double pnlForeignIncome;
+	private double pnlOtherIncome;
 	private double pnlIncomeTaxExpense;
 
 	private double pnlLivingExpenses;
 	private double pnlRentExpense;
 	private double pnlMortgageRepayments;
+	private double pnlRentInterestExpense; // assume interest-only loan
+	private double pnlDonations;
 	private double pnlOtherDiscretionaryExpenses;
 
 	// Bal Sht (48 bytes)
@@ -86,7 +92,8 @@ public final class Individual extends Agent {
 
 	public double getGrossIncome() {
 		return this.pnlWagesSalaries + this.pnlUnemploymentBenefits + this.pnlOtherSocialSecurityIncome
-				+ this.pnlInvestmentIncome;
+				+ this.pnlInvestmentIncome + this.pnlInterestIncome + this.pnlRentIncome + this.pnlForeignIncome
+				+ this.pnlOtherIncome;
 	}
 
 	public double getNetIncome() {
@@ -138,6 +145,10 @@ public final class Individual extends Agent {
 	protected void init() {
 		// Demographic
 		this.age = 0;
+		this.sex = null;
+		this.employmentIndustry = null;
+		this.localGovernmentAreaCode = null;
+		this.mainIncomeSource = 0;
 
 		// P&L
 		this.pnlWagesSalaries = 0d;
@@ -245,6 +256,20 @@ public final class Individual extends Agent {
 	}
 
 	/**
+	 * @return the sex
+	 */
+	public String getSex() {
+		return sex;
+	}
+
+	/**
+	 * @param sex the sex to set
+	 */
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
+
+	/**
 	 * @return the employmentIndustry
 	 */
 	public String getEmploymentIndustry() {
@@ -270,6 +295,20 @@ public final class Individual extends Agent {
 	 */
 	public void setLocalGovernmentAreaCode(String localGovernmentAreaCode) {
 		this.localGovernmentAreaCode = localGovernmentAreaCode;
+	}
+
+	/**
+	 * @return the mainIncomeSource
+	 */
+	public int getMainIncomeSource() {
+		return mainIncomeSource;
+	}
+
+	/**
+	 * @param mainIncomeSource the mainIncomeSource to set
+	 */
+	public void setMainIncomeSource(int mainIncomeSource) {
+		this.mainIncomeSource = mainIncomeSource;
 	}
 
 	/**
@@ -357,6 +396,34 @@ public final class Individual extends Agent {
 	}
 
 	/**
+	 * @return the pnlForeignIncome
+	 */
+	public double getPnlForeignIncome() {
+		return pnlForeignIncome;
+	}
+
+	/**
+	 * @param pnlForeignIncome the pnlForeignIncome to set
+	 */
+	public void setPnlForeignIncome(double pnlForeignIncome) {
+		this.pnlForeignIncome = pnlForeignIncome;
+	}
+
+	/**
+	 * @return the pnlOtherIncome
+	 */
+	public double getPnlOtherIncome() {
+		return pnlOtherIncome;
+	}
+
+	/**
+	 * @param pnlOtherIncome the pnlOtherIncome to set
+	 */
+	public void setPnlOtherIncome(double pnlOtherIncome) {
+		this.pnlOtherIncome = pnlOtherIncome;
+	}
+
+	/**
 	 * @return the pnlIncomeTaxExpense
 	 */
 	public double getPnlIncomeTaxExpense() {
@@ -410,6 +477,34 @@ public final class Individual extends Agent {
 	 */
 	public void setPnlMortgageRepayments(double pnlMortgageRepayments) {
 		this.pnlMortgageRepayments = pnlMortgageRepayments;
+	}
+
+	/**
+	 * @return the pnlRentInterestExpense
+	 */
+	public double getPnlRentInterestExpense() {
+		return pnlRentInterestExpense;
+	}
+
+	/**
+	 * @param pnlRentInterestExpense the pnlRentInterestExpense to set
+	 */
+	public void setPnlRentInterestExpense(double pnlRentInterestExpense) {
+		this.pnlRentInterestExpense = pnlRentInterestExpense;
+	}
+
+	/**
+	 * @return the pnlDonations
+	 */
+	public double getPnlDonations() {
+		return pnlDonations;
+	}
+
+	/**
+	 * @param pnlDonations the pnlDonations to set
+	 */
+	public void setPnlDonations(double pnlDonations) {
+		this.pnlDonations = pnlDonations;
 	}
 
 	/**
@@ -536,6 +631,13 @@ public final class Individual extends Agent {
 	 */
 	public void setBsOtherLiabilities(double bsOtherLiabilities) {
 		this.bsOtherLiabilities = bsOtherLiabilities;
+	}
+
+	/**
+	 * @return the bsTotalLiabilities
+	 */
+	public double getBsTotalLiabilities() {
+		return bsTotalLiabilities;
 	}
 
 	/**
