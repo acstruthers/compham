@@ -9,12 +9,15 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import xyz.struthers.rhul.ham.config.SpringConfiguration;
 import xyz.struthers.rhul.ham.data.AreaMapping;
 import xyz.struthers.rhul.ham.data.CalibrateBusinesses;
+import xyz.struthers.rhul.ham.data.CalibrateIndividuals;
+import xyz.struthers.rhul.ham.data.CalibrationData;
 
 /**
  * @author Adam
@@ -38,6 +41,19 @@ public class App {
 		// ClassPathXmlApplicationContext("spring/applicationContext.xml");
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfiguration.class);
 
+		/*
+		 * CalibrationData data = ctx.getBean(CalibrationData.class); Map<String,
+		 * Map<String, String>> abs1292_0_55_002ANZSIC =
+		 * data.getAbs1292_0_55_002ANZSIC(); String divCode =
+		 * abs1292_0_55_002ANZSIC.get("Division to Division Code").
+		 * get("Agriculture, Forestry and Fishing".toUpperCase());
+		 * System.out.println("divCode: " + divCode +
+		 * " (Agriculture, Forestry and Fishing)"); System.out.println("keySet: " +
+		 * abs1292_0_55_002ANZSIC.get("Division to Division Code").keySet());
+		 */
+		
+		if (true) {
+		
 		System.out.println(
 				"MEMORY USAGE BEFORE: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
 
@@ -49,8 +65,9 @@ public class App {
 		System.out.println("GCCSA is: " + gccsa + " (should be 1GSYD)");
 		System.out.println("Finished MeshblockMapping: " + new Date(System.currentTimeMillis()));
 
-		//System.out.println("Started Calibration Data Load: " + new Date(System.currentTimeMillis()));
-		//CalibrationData data = ctx.getBean(CalibrationData.class);
+		// System.out.println("Started Calibration Data Load: " + new
+		// Date(System.currentTimeMillis()));
+		// CalibrationData data = ctx.getBean(CalibrationData.class);
 
 		DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
 		Date date = null;
@@ -67,7 +84,8 @@ public class App {
 			e.printStackTrace();
 		}
 
-		//System.out.println("Finished Calibration Data Load: " + new Date(System.currentTimeMillis()));
+		// System.out.println("Finished Calibration Data Load: " + new
+		// Date(System.currentTimeMillis()));
 
 		System.out.println("Starting Business agent calibration: " + new Date(System.currentTimeMillis()));
 		// CalibrateBusinesses calBus = new CalibrateBusinesses();
@@ -79,11 +97,24 @@ public class App {
 		long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 		double megabytesAfter = memoryAfter / 1024d / 1024d;
 		System.out.println("MEMORY USAGE AFTER: " + formatter.format(megabytesAfter) + "MB");
-		System.out.println("MEMORY CONSUMED: " + formatter.format(megabytesAfter - megabytesBefore) + "MB");
+		System.out.println(
+				"MEMORY CONSUMED BY BUSINESSES, ETC.: " + formatter.format(megabytesAfter - megabytesBefore) + "MB");
+
+		memoryBefore = memoryAfter;
+
+		CalibrateIndividuals calIndiv = ctx.getBean(CalibrateIndividuals.class);
+		calIndiv.createIndividualAgents();
+
+		System.gc();
+		memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+		megabytesAfter = memoryAfter / 1024d / 1024d;
+		System.out.println("MEMORY USAGE AFTER: " + formatter.format(megabytesAfter) + "MB");
+		System.out.println(
+				"MEMORY CONSUMED BY INDIVIDUALS: " + formatter.format(megabytesAfter - megabytesBefore) + "MB");
 
 		while (true) {
-		}
-			// ctx.close();
+		}}
+		// ctx.close();
 	}
 
 	public void areaMappingTestHarness() {

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,6 +39,8 @@ import com.opencsv.CSVReader;
 @Component
 @Scope(value = "singleton")
 public class CalibrationDataIndividual {
+
+	private static final boolean DEBUG = true;
 
 	// map implementation optimisation
 	public static final double MAP_LOAD_FACTOR = 0.75d;
@@ -89,6 +92,7 @@ public class CalibrationDataIndividual {
 	private Map<String, Integer> adjustedPeopleByLga;
 	private Map<String, List<String>> title;
 	private Map<String, List<String>> unitType;
+	private Map<String, Map<String, String>> abs1292_0_55_002ANZSIC; // ANZSIC industry code mapping
 
 	private Map<String, Map<Date, String>> rbaE2; // AU Bal Sht ratios
 	private Map<String, Map<String, Map<String, String>>> abs1410_0Economy; // Data by LGA: Economy (keys: year, LGA,
@@ -236,6 +240,14 @@ public class CalibrationDataIndividual {
 	private void loadData() {
 		this.title = new HashMap<String, List<String>>();
 		this.unitType = new HashMap<String, List<String>>();
+		this.abs1292_0_55_002ANZSIC = this.sharedData.getAbs1292_0_55_002ANZSIC();
+
+		long memoryBefore = 0L; // for debugging memory consumption
+
+		if (DEBUG) {
+			System.gc();
+			memoryBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+		}
 
 		// load RBA data
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading RBA E2 data");
@@ -244,6 +256,15 @@ public class CalibrationDataIndividual {
 		this.rbaE2 = new HashMap<String, Map<Date, String>>(rbaE2MapCapacity);
 		this.loadRbaDataCsv("/data/RBA/E_HouseholdBusiness/e2-data.csv", RBA_E2, rbaE2Columns, this.title,
 				this.unitType, this.rbaE2);
+
+		if (DEBUG) {
+			System.gc();
+			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			DecimalFormat formatter = new DecimalFormat("#,##0.00");
+			System.out.println(">>> Memory used by RBA E2: " + formatter.format(megabytesConsumed) + "MB");
+			memoryBefore = memoryAfter;
+		}
 
 		// load ABS 1410.0 data
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 1410.0 Economy data");
@@ -255,6 +276,15 @@ public class CalibrationDataIndividual {
 				ABS1410_0_ECONOMY, abs1410_0EconomyColumns, abs1410_0EconomyYears, this.title, this.unitType,
 				this.abs1410_0Economy);
 
+		if (DEBUG) {
+			System.gc();
+			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			DecimalFormat formatter = new DecimalFormat("#,##0.00");
+			System.out.println(">>> Memory used by ABS 1410.0 Economy: " + formatter.format(megabytesConsumed) + "MB");
+			memoryBefore = memoryAfter;
+		}
+
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 1410.0 Family data");
 		this.abs1410_0Family = new HashMap<String, Map<String, Map<String, String>>>(7); // 7 years in the data file
 		int[] abs1410_0FamilyColumns = { 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 41, 42, 49, 57, 58, 59, 60,
@@ -264,6 +294,15 @@ public class CalibrationDataIndividual {
 				ABS1410_0_FAMILY, abs1410_0FamilyColumns, abs1410_0FamilyYears, this.title, this.unitType,
 				this.abs1410_0Family);
 
+		if (DEBUG) {
+			System.gc();
+			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			DecimalFormat formatter = new DecimalFormat("#,##0.00");
+			System.out.println(">>> Memory used by ABS 1410.0 Family: " + formatter.format(megabytesConsumed) + "MB");
+			memoryBefore = memoryAfter;
+		}
+
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 1410.0 Income data");
 		this.abs1410_0Income = new HashMap<String, Map<String, Map<String, String>>>(7); // 7 years in the data file
 		int[] abs1410_0IncomeColumns = { 15, 19, 20, 21, 25, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60 };
@@ -272,6 +311,15 @@ public class CalibrationDataIndividual {
 				"/data/ABS/1410.0_DataByRegion/Income (including Government Allowances), LGA, 2011 to 2017.csv",
 				ABS1410_0_INCOME, abs1410_0IncomeColumns, abs1410_0IncomeYears, this.title, this.unitType,
 				this.abs1410_0Income);
+
+		if (DEBUG) {
+			System.gc();
+			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			DecimalFormat formatter = new DecimalFormat("#,##0.00");
+			System.out.println(">>> Memory used by ABS 1410.0 Income: " + formatter.format(megabytesConsumed) + "MB");
+			memoryBefore = memoryAfter;
+		}
 
 		// ABS Census SEXP by POA (UR) by AGE5P, INDP and INCP
 		System.out.print(new Date(System.currentTimeMillis())
@@ -326,6 +374,16 @@ public class CalibrationDataIndividual {
 				"/data/ABS/CensusTableBuilder2016/SEXP by POA (UR) by AGE5P, INDP and INCP/SEXP by POA (UR) by AGE5P, INDP and INCP - OT.csv",
 				this.initialisedCensusSEXP_POA_AGE5P_INDP_INCP, fromColumnSEXP_POA_AGE5P_INDP_INCP,
 				toColumnSEXP_POA_AGE5P_INDP_INCP, this.censusSEXP_POA_AGE5P_INDP_INCP, "POA");
+
+		if (DEBUG) {
+			System.gc();
+			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			DecimalFormat formatter = new DecimalFormat("#,##0.00");
+			System.out.println(">>> Memory used by ABS Census SEXP by POA (UR) by AGE5P, INDP and INCP: "
+					+ formatter.format(megabytesConsumed) + "MB");
+			memoryBefore = memoryAfter;
+		}
 
 		/*
 		 * // ABS Census SEXP by LGA (UR) by AGE5P, INDP and INCP System.out.print(new
@@ -437,7 +495,17 @@ public class CalibrationDataIndividual {
 				this.initialisedCensusHCFMD_LGA_HIND_RNTRD, fromColumnHCFMD_LGA_HIND_RNTRD,
 				toColumnHCFMD_LGA_HIND_RNTRD, this.censusHCFMD_LGA_HIND_RNTRD);
 
-		// ABS Census HCFMD and TEND by LGA by HIND and MRERD
+		if (DEBUG) {
+			System.gc();
+			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			DecimalFormat formatter = new DecimalFormat("#,##0.00");
+			System.out.println(">>> Memory used by ABS Census HCFMD by LGA by HIND and RNTRD: "
+					+ formatter.format(megabytesConsumed) + "MB");
+			memoryBefore = memoryAfter;
+		}
+
+		// ABS Census HCFMD by LGA by HIND and MRERD
 		System.out.print(
 				new Date(System.currentTimeMillis()) + ": Loading ABS Census HCFMD by LGA by HIND and MRERD data");
 		this.censusHCFMD_LGA_HIND_MRERD = new HashMap<String, Map<String, Map<String, Map<String, String>>>>(
@@ -490,6 +558,16 @@ public class CalibrationDataIndividual {
 				"/data/ABS/CensusTableBuilder2016/HCFMD by LGA by HIND and MRERD/HCFMD by LGA by HIND and MRERD - OT.csv",
 				this.initialisedCensusHCFMD_LGA_HIND_MRERD, fromColumnHCFMD_LGA_HIND_MRERD,
 				toColumnHCFMD_LGA_HIND_MRERD, this.censusHCFMD_LGA_HIND_MRERD);
+
+		if (DEBUG) {
+			System.gc();
+			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			DecimalFormat formatter = new DecimalFormat("#,##0.00");
+			System.out.println(">>> Memory used by ABS Census HCFMD by LGA by HIND and MRERD: "
+					+ formatter.format(megabytesConsumed) + "MB");
+			memoryBefore = memoryAfter;
+		}
 
 		/*
 		 * // ABS Census HCFMD and TEND by LGA by HIND and RNTRD System.out.print(new
@@ -654,6 +732,16 @@ public class CalibrationDataIndividual {
 				this.initialisedCensusCDCF_LGA_FINF, fromColumnCDCF_LGA_FINF, toColumnCDCF_LGA_FINF,
 				this.censusCDCF_LGA_FINF);
 
+		if (DEBUG) {
+			System.gc();
+			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			DecimalFormat formatter = new DecimalFormat("#,##0.00");
+			System.out.println(
+					">>> Memory used by ABS Census CDCF by LGA by FINF: " + formatter.format(megabytesConsumed) + "MB");
+			memoryBefore = memoryAfter;
+		}
+
 		// Load ATO Individuals Table data
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Individuals Table 2A data");
 		// int[] atoIndividualTable2aColumns = { 5, 6, 7, 18, 19, 20, 21, 24, 25, 30,
@@ -668,6 +756,16 @@ public class CalibrationDataIndividual {
 		this.loadAtoIndividualsTable2a("/data/ATO/Individual/IndividualsTable2A.csv", ATO_INDIVIDUAL_T2A,
 				atoIndividualTable2aColumns, this.title, this.atoIndividualTable2a);
 
+		if (DEBUG) {
+			System.gc();
+			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			DecimalFormat formatter = new DecimalFormat("#,##0.00");
+			System.out.println(
+					">>> Memory used by ATO Individuals Table 2A: " + formatter.format(megabytesConsumed) + "MB");
+			memoryBefore = memoryAfter;
+		}
+
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Individuals Table 3A data");
 
 		int[] atoIndividualTable3aColumns = { 5, 6, 7, 20, 21, 24, 25, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
@@ -678,6 +776,16 @@ public class CalibrationDataIndividual {
 		this.loadAtoIndividualsTable3a("/data/ATO/Individual/IndividualsTable3A.csv", ATO_INDIVIDUAL_T3A,
 				atoIndividualTable3aColumns, this.title, this.atoIndividualTable3a);
 
+		if (DEBUG) {
+			System.gc();
+			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			DecimalFormat formatter = new DecimalFormat("#,##0.00");
+			System.out.println(
+					">>> Memory used by ATO Individuals Table 3A: " + formatter.format(megabytesConsumed) + "MB");
+			memoryBefore = memoryAfter;
+		}
+
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Individuals Table 6B data");
 		// int[] atoIndividualTable6bColumns = { 2, 3, 4, 15, 16, 17, 18, 21, 22, 28,
 		// 29, 30, 31, 32, 33, 34, 35, 36, 37,
@@ -687,6 +795,16 @@ public class CalibrationDataIndividual {
 		this.atoIndividualTable6b = new HashMap<String, Map<String, String>>(ato6bMapCapacity);
 		this.loadAtoIndividualsTable6("/data/ATO/Individual/IndividualsTable6B.csv", ATO_INDIVIDUAL_T6B,
 				atoIndividualTable6bColumns, this.title, this.atoIndividualTable6b);
+
+		if (DEBUG) {
+			System.gc();
+			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			DecimalFormat formatter = new DecimalFormat("#,##0.00");
+			System.out.println(
+					">>> Memory used by ATO Individuals Table 6B: " + formatter.format(megabytesConsumed) + "MB");
+			memoryBefore = memoryAfter;
+		}
 
 		/*
 		 * System.out.println(new Date(System.currentTimeMillis()) +
@@ -712,6 +830,16 @@ public class CalibrationDataIndividual {
 		// this.loadAtoIndividualsTable9("/data/ATO/Individual/IndividualsTable9.csv",
 		// ATO_INDIVIDUAL_T9,
 		// atoIndividualTable9Columns, this.title, this.atoIndividualTable9);
+
+		if (DEBUG) {
+			System.gc();
+			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			DecimalFormat formatter = new DecimalFormat("#,##0.00");
+			System.out.println(
+					">>> Memory used by ATO Individuals Table 9: " + formatter.format(megabytesConsumed) + "MB");
+			memoryBefore = memoryAfter;
+		}
 
 		// set flag so we only load the data once
 		System.out.println(new Date(System.currentTimeMillis()) + ": Individual data loaded");
@@ -1130,6 +1258,7 @@ public class CalibrationDataIndividual {
 						if (prevRowIsBlank && !line[0].isBlank()) {
 							// set wafer name
 							waferName = line[0].trim();
+							waferName = waferName.substring(0, 1); // wafer is sex, so just take the first letter (M, F)
 							columnSeriesNumber = 0;
 							waferNumber++;
 							prevRowIsBlank = false;
@@ -1153,17 +1282,20 @@ public class CalibrationDataIndividual {
 													new HashMap<String, Map<String, Map<String, Map<String, String>>>>(
 															MAP_INIT_SIZE_INDP));
 										}
+										String divCode = this.abs1292_0_55_002ANZSIC.get("Division to Division Code")
+												.get(columnTitles[1][i].toUpperCase());
 										if (!columnTitles[1][i].isBlank()
-												&& !data.get(columnTitles[0][i]).containsKey(columnTitles[1][i])) {
+												&& !data.get(columnTitles[0][i]).containsKey(divCode)) {
 											// add column series 2 key
-											data.get(columnTitles[0][i]).put(columnTitles[1][i],
+											// convert Industry Division Description to Code
+											data.get(columnTitles[0][i]).put(divCode,
 													new HashMap<String, Map<String, Map<String, String>>>(
 															MAP_INIT_SIZE_INCP));
 										}
-										if (!columnTitles[2][i].isBlank() && !data.get(columnTitles[0][i])
-												.get(columnTitles[1][i]).containsKey(columnTitles[2][i])) {
+										if (!columnTitles[2][i].isBlank() && !data.get(columnTitles[0][i]).get(divCode)
+												.containsKey(columnTitles[2][i])) {
 											// add column series 3 key
-											data.get(columnTitles[0][i]).get(columnTitles[1][i]).put(columnTitles[2][i],
+											data.get(columnTitles[0][i]).get(divCode).put(columnTitles[2][i],
 													new HashMap<String, Map<String, String>>(MAP_INIT_SIZE_LGA));
 										}
 									}
@@ -1176,17 +1308,21 @@ public class CalibrationDataIndividual {
 									areaCode = this.area.getLgaCodeFromName(line[0]);
 								} else {
 									// assume it's POA in the format NNNN, SSS
-									areaCode = line[0].substring(0, line[0].indexOf(","));
+									if (!line[0].equalsIgnoreCase("Total")) {
+										areaCode = line[0].substring(0, line[0].indexOf(","));
+									}
 								}
 								if (areaCode != null) {
 									// null check excludes invalid LGAs
 									for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
+										String divCode = this.abs1292_0_55_002ANZSIC.get("Division to Division Code")
+												.get(columnTitles[1][i].toUpperCase());
 										if (waferNumber == 1) {
-											data.get(columnTitles[0][i]).get(columnTitles[1][i]).get(columnTitles[2][i])
+											data.get(columnTitles[0][i]).get(divCode).get(columnTitles[2][i])
 													.put(areaCode, new HashMap<String, String>(MAP_INIT_SIZE_SEXP));
 										}
-										data.get(columnTitles[0][i]).get(columnTitles[1][i]).get(columnTitles[2][i])
-												.get(areaCode).put(waferName, line[i + fromColumnIndex]);
+										data.get(columnTitles[0][i]).get(divCode).get(columnTitles[2][i]).get(areaCode)
+												.put(waferName, line[i + fromColumnIndex]);
 									}
 								}
 							} else if (line[0].isBlank()) {
@@ -1243,7 +1379,7 @@ public class CalibrationDataIndividual {
 			String waferName = null;
 			int waferNumber = 0;
 			int columnSeriesNumber = Integer.MAX_VALUE;
-			final int columnSeriesMax = 3; // because the dataset contains 2 column series
+			final int columnSeriesMax = 2; // because the dataset contains 2 column series
 			String[][] columnTitles = new String[columnSeriesMax][toColumnIndex - fromColumnIndex];
 
 			String[] line = null;
@@ -1489,11 +1625,11 @@ public class CalibrationDataIndividual {
 						List<String> thesecolumnNames = new ArrayList<String>(columnsToImport.length);
 						for (int i = 0; i < columnsToImport.length; i++) {
 							// store title
-							seriesId[i] = line[columnsToImport[i]];
-							thesecolumnNames.add(line[columnsToImport[i]]);
+							seriesId[i] = line[columnsToImport[i]].trim();
+							thesecolumnNames.add(line[columnsToImport[i]].trim());
 
 							// store series ID as key with blank collections to populate with data below
-							data.put(line[columnsToImport[i]],
+							data.put(line[columnsToImport[i]].trim(),
 									new HashMap<String, Map<String, Map<String, Map<String, Map<String, String>>>>>());
 						}
 						titles.put(tableName, thesecolumnNames);
@@ -1503,7 +1639,7 @@ public class CalibrationDataIndividual {
 					if (!line[0].isBlank()) {
 						// Keys: Series Title, State, Age, Gender, Taxable Status, Lodgment Method
 						String thisState = line[3].trim().length() > 3 ? "Other" : line[3].trim();
-						String thisAge = line[4];
+						String thisAge = line[4].trim();
 						String thisSex = line[1].substring(0, 1).toUpperCase();
 						String thisTaxableStatus = line[2].substring(0, 1).equals("N") ? "N" : "Y";
 						String thisLodgmentMethod = line[0].substring(0, 1);
@@ -1585,11 +1721,11 @@ public class CalibrationDataIndividual {
 						List<String> theseColumnNames = new ArrayList<String>(columnsToImport.length);
 						for (int i = 0; i < columnsToImport.length; i++) {
 							// store title
-							seriesId[i] = line[columnsToImport[i]];
-							theseColumnNames.add(line[columnsToImport[i]]);
+							seriesId[i] = line[columnsToImport[i]].trim();
+							theseColumnNames.add(line[columnsToImport[i]].trim());
 
 							// store series ID as key with blank collections to populate with data below
-							data.put(line[columnsToImport[i]],
+							data.put(line[columnsToImport[i]].trim(),
 									new HashMap<String, Map<String, Map<String, Map<String, String>>>>());
 						}
 						titles.put(tableName, theseColumnNames);
@@ -1598,10 +1734,10 @@ public class CalibrationDataIndividual {
 				} else {
 					if (!line[0].isBlank()) {
 						// Keys: Series Title, Income Range, Age, Gender, Taxable Status
-						String thisIncomeRange = line[3].trim().length() > 3 ? "Other" : line[3].trim();
-						String thisAge = line[2];
-						String thisSex = line[0].substring(0, 1).toUpperCase();
-						String thisTaxableStatus = line[1].substring(0, 1).equals("N") ? "N" : "Y";
+						String thisIncomeRange = line[3].trim();
+						String thisAge = line[2].trim();
+						String thisSex = line[0].trim().substring(0, 1).toUpperCase();
+						String thisTaxableStatus = line[1].trim().substring(0, 1).equals("N") ? "N" : "Y";
 
 						for (int i = 0; i < columnsToImport.length; i++) {
 							// create nested maps for new data categories
@@ -1671,11 +1807,11 @@ public class CalibrationDataIndividual {
 						List<String> thesecolumnNames = new ArrayList<String>(columnsToImport.length);
 						for (int i = 0; i < columnsToImport.length; i++) {
 							// store title
-							seriesId[i] = line[columnsToImport[i]];
-							thesecolumnNames.add(line[columnsToImport[i]]);
+							seriesId[i] = line[columnsToImport[i]].trim();
+							thesecolumnNames.add(line[columnsToImport[i]].trim());
 
 							// store series ID as key with blank collections to populate with data below
-							data.put(line[columnsToImport[i]], new HashMap<String, String>());
+							data.put(line[columnsToImport[i]].trim(), new HashMap<String, String>());
 						}
 						titles.put(tableName, thesecolumnNames);
 						header = false;
@@ -1687,7 +1823,7 @@ public class CalibrationDataIndividual {
 						if (NumberUtils.isCreatable(line[1])) {
 							for (int i = 0; i < columnsToImport.length; i++) {
 								// parse the body of the data
-								data.get(seriesId[i]).put(line[1], line[columnsToImport[i]]);
+								data.get(seriesId[i]).put(line[1].trim(), line[columnsToImport[i]].trim());
 							}
 						}
 					} else {
@@ -1739,21 +1875,21 @@ public class CalibrationDataIndividual {
 						List<String> thesecolumnNames = new ArrayList<String>(columnsToImport.length);
 						for (int i = 0; i < columnsToImport.length; i++) {
 							// store title
-							seriesId[i] = line[columnsToImport[i]];
-							thesecolumnNames.add(line[columnsToImport[i]]);
+							seriesId[i] = line[columnsToImport[i]].trim();
+							thesecolumnNames.add(line[columnsToImport[i]].trim());
 
 							// store series ID as key with blank collections to populate with data below
-							data.put(line[columnsToImport[i]], new HashMap<String, String>());
+							data.put(line[columnsToImport[i]].trim(), new HashMap<String, String>());
 						}
 						titles.put(tableName, thesecolumnNames);
 						header = false;
 					}
 				} else {
 					if (!line[1].equals("Other individuals")) {
-						String fineIndustryCode = line[1].substring(0, 5);
+						String fineIndustryCode = line[1].trim().substring(0, 5);
 						for (int i = 0; i < columnsToImport.length; i++) {
 							// parse the body of the data
-							data.get(seriesId[i]).put(fineIndustryCode, line[columnsToImport[i]]);
+							data.get(seriesId[i]).put(fineIndustryCode, line[columnsToImport[i]].trim());
 						}
 					} else {
 						footer = true;
@@ -1805,18 +1941,18 @@ public class CalibrationDataIndividual {
 						int divisionMapCapacity = (int) Math.ceil(19 / MAP_LOAD_FACTOR + 1); // 19 divisions imported
 						for (int i = 0; i < columnsToImport.length; i++) {
 							// store title
-							seriesId[i] = line[columnsToImport[i]];
-							thesecolumnNames.add(line[columnsToImport[i]]);
+							seriesId[i] = line[columnsToImport[i]].trim();
+							thesecolumnNames.add(line[columnsToImport[i]].trim());
 
 							// store series ID as key with blank collections to populate with data below
-							data.put(line[columnsToImport[i]], new HashMap<String, Double>(divisionMapCapacity));
+							data.put(line[columnsToImport[i]].trim(), new HashMap<String, Double>(divisionMapCapacity));
 						}
 						titles.put(tableName, thesecolumnNames);
 						header = false;
 					}
 				} else {
 					if (!line[1].equals("Other individuals")) {
-						String divisionCode = line[0].substring(0, 1).toUpperCase();
+						String divisionCode = line[0].trim().substring(0, 1).toUpperCase();
 						for (int i = 0; i < columnsToImport.length; i++) {
 							// parse the body of the data
 							double oldVal = 0d;
@@ -1824,7 +1960,7 @@ public class CalibrationDataIndividual {
 								oldVal = data.get(seriesId[i]).get(divisionCode);
 							}
 							data.get(seriesId[i]).put(divisionCode,
-									oldVal + Double.valueOf(line[columnsToImport[i]].replace(",", "")));
+									oldVal + Double.valueOf(line[columnsToImport[i]].trim().replace(",", "")));
 						}
 					} else {
 						footer = true;

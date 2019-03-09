@@ -311,7 +311,67 @@ public class AreaMapping {
 			this.mapMeshblocks();
 		}
 		String lgaCode = this.mapPoaToLga.get(poaCode);
-		return this.getStateFromLgaCode(lgaCode);
+		String state = this.getStateFromLgaCode(lgaCode);
+		if (state == null) {
+			// use number mapping instead
+			// SOURCE: https://en.wikipedia.org/wiki/Postcodes_in_Australia
+			int poaInt = Integer.valueOf(poaCode);
+			switch (poaInt) {
+			case 2611:
+			case 3500:
+			case 3585:
+			case 3586:
+			case 3644:
+			case 3691:
+			case 3707:
+			case 4380:
+			case 4377:
+			case 4385:
+				state = "NSW";
+				break;
+			case 2406:
+				state = "QLD";
+				break;
+			case 872:
+				state = "SA";
+				break;
+			// case 872: // already assigned to SA
+			// state = "WA";
+			// break;
+			case 4825:
+				state = "NT";
+				break;
+			case 2620:
+				state = "ACT";
+				break;
+			case 2540:
+				state = "OT"; // Jervis Bay Territory
+				break;
+			default:
+				if ((poaInt >= 1000 && poaInt <= 2599) || (poaInt >= 2619 && poaInt <= 2899)
+						|| (poaInt >= 2921 && poaInt <= 2999)) {
+					state = "NSW";
+				} else if ((poaInt >= 3000 && poaInt <= 3999) || (poaInt >= 8000 && poaInt <= 8999)) {
+					state = "VIC";
+				} else if ((poaInt >= 4000 && poaInt <= 4999) || (poaInt >= 9000 && poaInt <= 9999)) {
+					state = "QLD";
+				} else if ((poaInt >= 5000 && poaInt <= 5999)) {
+					state = "SA";
+				} else if ((poaInt >= 6000 && poaInt <= 6797) || (poaInt >= 6800 && poaInt <= 6999)) {
+					state = "WA";
+				} else if (poaInt >= 7000 && poaInt <= 7999) {
+					state = "TAS";
+				} else if (poaInt >= 800 && poaInt <= 999) {
+					state = "NT";
+				} else if ((poaInt >= 200 && poaInt <= 299) || (poaInt >= 2600 && poaInt <= 2618)
+						|| (poaInt >= 2900 && poaInt <= 2920)) {
+					state = "ACT";
+				} else {
+					state = "OT";
+				}
+			}
+		}
+		return state;
 	}
 
 	/**
