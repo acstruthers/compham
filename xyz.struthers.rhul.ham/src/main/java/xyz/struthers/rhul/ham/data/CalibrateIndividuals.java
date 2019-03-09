@@ -4,6 +4,7 @@
 package xyz.struthers.rhul.ham.data;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -182,6 +183,8 @@ public class CalibrateIndividuals {
 	private double populationMultiplier;
 	private Map<String, Integer> lgaPeopleCount; // adjusted to 2018
 	private Map<String, Integer> lgaDwellingsCount; // adjusted to 2018
+
+	private static int agentNo = 0;
 
 	// data sets
 	/**
@@ -465,7 +468,15 @@ public class CalibrateIndividuals {
 	 * 
 	 */
 	public void createIndividualAgents() {
+		// FIXME: remove RAM usage code
+		long memoryBefore = 0L; // for debugging memory consumption
+		if (true) {
+			System.gc();
+			memoryBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+		}
+
 		System.out.println(new Date(System.currentTimeMillis()) + ": Starting creation of Individual agents");
+		DecimalFormat integerFormatter = new DecimalFormat("#,##0");
 
 		// set the calibration date
 		DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
@@ -538,13 +549,26 @@ public class CalibrateIndividuals {
 			divTotalAmount9A += divTaxableAmount;
 		}
 		double divTotalTaxablePerPerson = divTotalCount9A > 0d ? divTotalAmount9A / divTotalCount9A : 0d;
+		if (DEBUG) {
+			System.out.println("########################");
+			System.out.println("# DIVISION MULTIPLIERS #");
+			System.out.println("########################");
+		}
 		for (String divCode : divisionCodeSet) {
 			double divTaxableIncomeMultiplier = divisionTaxableIncomeMultiplier.get(divCode) / divTotalTaxablePerPerson;
 			double divCountMultiplier = divisionCountMultiplier.get(divCode) / divTotalCount9A;
 			divisionTaxableIncomeMultiplier.put(divCode, divTaxableIncomeMultiplier);
 			divisionCountMultiplier.put(divCode, divCountMultiplier);
+			if (DEBUG) {
+				System.out.println(divCode + " count: " + divCountMultiplier + ", amount: " + divTaxableIncomeMultiplier);
+			}
 		}
-
+		if (DEBUG) {
+			System.out.println("#################################");
+			System.out.println("# DIVISION MULTIPLIERS FINISHED #");
+			System.out.println("#################################");
+		}
+		
 		/*
 		 * 2. ATO Individual Table 2A: age/sex count, P&L, Help Debt (by State).
 		 * Calculate state multiplier for every age/sex combination.<br>
@@ -630,7 +654,12 @@ public class CalibrateIndividuals {
 				}
 			}
 		}
-
+		
+		if (DEBUG) {
+			System.out.println("#####################");
+			System.out.println("# STATE MULTIPLIERS #");
+			System.out.println("#####################");
+		}
 		// calculate average income per state, and national average
 		for (String sex : SEX_ARRAY) {
 			for (String age : AGE_ARRAY_ATO) {
@@ -647,10 +676,19 @@ public class CalibrateIndividuals {
 					double thisStateCountMultiplier = sexAgeCount > 0d ? stateCount / sexAgeCount : 0d;
 					stateTaxableIncomeMultiplier.get(sex).get(age).put(state, thisStateTaxableIncomeMultiplier);
 					stateCountMultiplier.get(sex).get(age).put(state, thisStateCountMultiplier);
+					
+					if (DEBUG) {
+						System.out.println(sex + " / " + age + " / " + state + " count: " + thisStateCountMultiplier + ", amount: " + thisStateTaxableIncomeMultiplier);
+					}
 				}
 			}
 		}
-
+		if (DEBUG) {
+			System.out.println("##############################");
+			System.out.println("# STATE MULTIPLIERS FINISHED #");
+			System.out.println("##############################");
+		}
+		
 		/*
 		 * 3. ATO Individual Table 6B: people count, taxable income (per POA). Calculate
 		 * POA multiplier for each POA, by state.<br>
@@ -783,7 +821,7 @@ public class CalibrateIndividuals {
 			int ageIdx = ageIndexMap.get(age);
 			for (String divisionCode : DIVISION_CODE_ARRAY) {
 				int divIdx = divIndexMap.get(divisionCode);
-				String divDescr = this.abs1292_0_55_002ANZSIC.get("Division Code to Division").get(divisionCode);
+				//String divDescr = this.abs1292_0_55_002ANZSIC.get("Division Code to Division").get(divisionCode);
 				for (String incomeRange : INDIVIDUAL_INCOME_RANGES_ABS) {
 					int incomeIdx = individualIncomeIndexMap.get(incomeRange);
 					for (String poa : poaSetIntersection) {
@@ -969,22 +1007,6 @@ public class CalibrateIndividuals {
 									&& this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT).get(incomeRangeAto)
 											.get(age).get(sex).containsKey(taxableStatus)) {
 
-								System.out.println("ATO_3A_TITLE_SALARY_COUNT: " + ATO_3A_TITLE_SALARY_COUNT);
-								System.out.println("incomeRangeAto: " + incomeRangeAto);
-								System.out.println("age: " + age);
-								System.out.println("sex: " + sex);
-								System.out.println("taxableStatus: " + taxableStatus);
-								System.out.println(
-										"this.atoIndividualTable3a.keySet(): " + this.atoIndividualTable3a.keySet());
-								System.out.println("...get(ATO_3A_TITLE_SALARY_COUNT).keySet(): "
-										+ this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT).keySet());
-								System.out.println("...get(incomeRangeAto).keySet(): " + this.atoIndividualTable3a
-										.get(ATO_3A_TITLE_SALARY_COUNT).get(incomeRangeAto).keySet());
-								System.out.println("...get(age).keySet(): " + this.atoIndividualTable3a
-										.get(ATO_3A_TITLE_SALARY_COUNT).get(incomeRangeAto).get(age).keySet());
-								System.out.println("...get(sex).keySet(): " + this.atoIndividualTable3a
-										.get(ATO_3A_TITLE_SALARY_COUNT).get(incomeRangeAto).get(age).get(sex).keySet());
-								
 								employedCount += Math.max(
 										Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT)
 												.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
@@ -1639,7 +1661,7 @@ public class CalibrateIndividuals {
 							double divAmtMult = divisionTaxableIncomeMultiplier.get(division);
 							for (String poa : poaSetIntersection) {
 								if (DEBUG) {
-									//System.out.println("            poa: " + poa);
+									// System.out.println(" poa: " + poa);
 								}
 								int poaIdx = poaIndexMap.get(poa);
 								String state = this.area.getStateFromPoa(poa);
@@ -1749,6 +1771,18 @@ public class CalibrateIndividuals {
 									mainIncomeSourceFlags.addAll(foreignIncomeFlags);
 									Collections.shuffle(mainIncomeSourceFlags, this.random);
 
+									
+									// FIXME: remove debugging code
+									/*System.out.println("incomeRangeAto: " + incomeRangeAto);
+									System.out.println("age: " + age);
+									System.out.println("sex: " + sex);
+									System.out.println("division: " + division);
+									System.out.println("state: " + state);
+									System.out.println("poa: " + poa);
+									System.out.println("flagListLength: " + flagListLength);
+									System.out.println("atoCountEmployed[0]: " + atoCountEmployed[0]);*/
+									
+									
 									subListLength = atoCountAttributeInterestIncome[0] > 0
 											? atoCountAttributeInterestIncome[0]
 											: 0;
@@ -1857,12 +1891,8 @@ public class CalibrateIndividuals {
 									}
 									Collections.shuffle(ageIndicesAgent, this.random);
 									Collections.shuffle(incomeIndicesAgent, this.random);
-
-									// matrix Keys: postcode, sex, age, industry division, income (ABS categories)
-									// this.individualMatrix = new
-									// ArrayList<List<List<List<List<List<Individual>>>>>>(poaSetIntersection.size());
-
-									// TODO: create Individual agents and store in a List matrix
+									
+									// create Individual agents and store in a List matrix
 									for (int agentIdx = 0; agentIdx < flagListLength; agentIdx++) {
 										Individual individual = new Individual();
 										individual.setAge(ageIndicesAgent.get(agentIdx));
@@ -1939,6 +1969,9 @@ public class CalibrateIndividuals {
 
 										// add Individual to list (for payment clearing algorithm)
 										this.individualAgents.add(individual);
+
+										// FIXME: remove debugging comment
+										System.out.println("Added Individual agent #" + agentNo++);
 									}
 
 									// N.B. Need to deal with 1:n and n:1 index mapping here too - make sure we
@@ -1964,6 +1997,18 @@ public class CalibrateIndividuals {
 		} // end for ATO income range
 		this.individualAgents.trimToSize();
 		System.out.println(new Date(System.currentTimeMillis()) + ": Finished creating Individual agents");
+		System.out.println("Created " + integerFormatter.format(this.individualAgents.size()) + " Individual agents");
+
+		// FIXME: remove RAM usage code
+		if (true) {
+			System.gc();
+			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			DecimalFormat decimalFormatter = new DecimalFormat("#,##0.00");
+			System.out.println(
+					">>> Memory used creating Individual agents: " + decimalFormatter.format(megabytesConsumed) + "MB");
+			memoryBefore = memoryAfter;
+		}
 
 		/*
 		 * ------------------------------------------------------------------------<br>
@@ -1997,11 +2042,13 @@ public class CalibrateIndividuals {
 		 * 
 		 * N.B. Household, not individual.
 		 */
-		// RBA E2 Keys: Series Name, Date
-		double debtToIncomeRatioRbaE2 = Double
-				.valueOf(this.rbaE2.get(RBA_E2_SERIESID_DEBT_TO_INCOME).get(this.calibrationDateRba)) * PERCENT;
-		double assetsToIncomeRatioRbaE2 = Double
-				.valueOf(this.rbaE2.get(RBA_E2_SERIESID_ASSETS_TO_INCOME).get(this.calibrationDateRba)) * PERCENT;
+		/*
+		 * // RBA E2 Keys: Series Name, Date double debtToIncomeRatioRbaE2 = Double
+		 * .valueOf(this.rbaE2.get(RBA_E2_SERIESID_DEBT_TO_INCOME).get(this.
+		 * calibrationDateRba)) * PERCENT; double assetsToIncomeRatioRbaE2 = Double
+		 * .valueOf(this.rbaE2.get(RBA_E2_SERIESID_ASSETS_TO_INCOME).get(this.
+		 * calibrationDateRba)) * PERCENT;
+		 */
 
 		/*
 		 * D2. RBA E1: Calculate the ratios between Bal Sht items. Use these, compared
@@ -2009,32 +2056,38 @@ public class CalibrateIndividuals {
 		 * 
 		 * N.B. Household, not individual.
 		 */
-		// RBA E1 Keys: Series Name, Date
-		// get RBA E1 amounts ($ billions)
-		double cashRbaE1 = Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_CASH).get(this.calibrationDateRba));
-		double superRbaE1 = Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_SUPER).get(this.calibrationDateRba));
-		double equitiesRbaE1 = Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_EQUITIES).get(this.calibrationDateRba));
-		double otherFinAssetsRbaE1 = Double
-				.valueOf(this.rbaE1.get(RBA_E1_SERIESID_OTHER_FIN_ASSETS).get(this.calibrationDateRba));
-		double totalFinancialAssetsRbaE1 = cashRbaE1 + superRbaE1 + equitiesRbaE1 + otherFinAssetsRbaE1;
-		double dwellingsRbaE1 = Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_DWELLINGS).get(this.calibrationDateRba));
-		double totalNonFinancialAssetsRbaE1 = Double
-				.valueOf(this.rbaE1.get(RBA_E1_SERIESID_NONFIN_ASSETS).get(this.calibrationDateRba));
-		double otherNonFinancialAssetsRbaE1 = totalNonFinancialAssetsRbaE1 - dwellingsRbaE1;
-		double totalAssetsRbaE1 = totalFinancialAssetsRbaE1 + totalNonFinancialAssetsRbaE1;
-		double totalLiabilitiesRbaE1 = Double
-				.valueOf(this.rbaE1.get(RBA_E1_SERIESID_TOTAL_LIABILITIES).get(this.calibrationDateRba));
-
-		// calculate ratios within balance sheet
-		double cashToAssetsRbaE1 = cashRbaE1 / totalAssetsRbaE1;
-		double superToAssetsRbaE1 = superRbaE1 / totalAssetsRbaE1;
-		double equitiesToAssetsRbaE1 = equitiesRbaE1 / totalAssetsRbaE1;
-		double otherFinAssetsToAssetsRbaE1 = otherFinAssetsRbaE1 / totalAssetsRbaE1;
-		double dwellingsToAssetsRbaE1 = dwellingsRbaE1 / totalAssetsRbaE1;
-		double otherNonFinAssetsToAssetsRbaE1 = otherNonFinancialAssetsRbaE1 / totalAssetsRbaE1;
-		double totalLiabilitiesToAssetsRbaE1 = totalLiabilitiesRbaE1 / totalAssetsRbaE1;
-		// use debt-to-income ratio to determine total debt, then subtract from total
-		// liabilities to get other liabilities
+		/*
+		 * // RBA E1 Keys: Series Name, Date // get RBA E1 amounts ($ billions) double
+		 * cashRbaE1 = Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_CASH).get(this.
+		 * calibrationDateRba)); double superRbaE1 =
+		 * Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_SUPER).get(this.
+		 * calibrationDateRba)); double equitiesRbaE1 =
+		 * Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_EQUITIES).get(this.
+		 * calibrationDateRba)); double otherFinAssetsRbaE1 = Double
+		 * .valueOf(this.rbaE1.get(RBA_E1_SERIESID_OTHER_FIN_ASSETS).get(this.
+		 * calibrationDateRba)); double totalFinancialAssetsRbaE1 = cashRbaE1 +
+		 * superRbaE1 + equitiesRbaE1 + otherFinAssetsRbaE1; double dwellingsRbaE1 =
+		 * Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_DWELLINGS).get(this.
+		 * calibrationDateRba)); double totalNonFinancialAssetsRbaE1 = Double
+		 * .valueOf(this.rbaE1.get(RBA_E1_SERIESID_NONFIN_ASSETS).get(this.
+		 * calibrationDateRba)); double otherNonFinancialAssetsRbaE1 =
+		 * totalNonFinancialAssetsRbaE1 - dwellingsRbaE1; double totalAssetsRbaE1 =
+		 * totalFinancialAssetsRbaE1 + totalNonFinancialAssetsRbaE1; double
+		 * totalLiabilitiesRbaE1 = Double
+		 * .valueOf(this.rbaE1.get(RBA_E1_SERIESID_TOTAL_LIABILITIES).get(this.
+		 * calibrationDateRba));
+		 * 
+		 * // calculate ratios within balance sheet double cashToAssetsRbaE1 = cashRbaE1
+		 * / totalAssetsRbaE1; double superToAssetsRbaE1 = superRbaE1 /
+		 * totalAssetsRbaE1; double equitiesToAssetsRbaE1 = equitiesRbaE1 /
+		 * totalAssetsRbaE1; double otherFinAssetsToAssetsRbaE1 = otherFinAssetsRbaE1 /
+		 * totalAssetsRbaE1; double dwellingsToAssetsRbaE1 = dwellingsRbaE1 /
+		 * totalAssetsRbaE1; double otherNonFinAssetsToAssetsRbaE1 =
+		 * otherNonFinancialAssetsRbaE1 / totalAssetsRbaE1; double
+		 * totalLiabilitiesToAssetsRbaE1 = totalLiabilitiesRbaE1 / totalAssetsRbaE1; //
+		 * use debt-to-income ratio to determine total debt, then subtract from total //
+		 * liabilities to get other liabilities
+		 */
 
 		this.addAgentsToEconomy();
 	}

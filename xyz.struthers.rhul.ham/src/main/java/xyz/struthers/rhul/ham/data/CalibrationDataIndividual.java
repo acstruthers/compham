@@ -76,8 +76,9 @@ public class CalibrationDataIndividual {
 	public static final String CENSUS_SEXP_POA_AGE5P_INDP_INCP = "Census SEXP by POA (UR) by AGE5P, INDP and INCP";
 	public static final String CENSUS_HCFMD_LGA_HIND_RNTRD = "Census HCFMD by LGA by HIND and RNTRD";
 	public static final String CENSUS_HCFMD_LGA_HIND_MRERD = "Census HCFMD by LGA by HIND and MRERD";
+	public static final String CENSUS_HCFMF_LGA_FINF_CDCF = "Census HCFMF by LGA by FINF and CDCF";
+	
 	public static final String CENSUS_CDCF_LGA_FINF = "Census CDCF by LGA by FINF";
-
 	static final String CENSUS_SEXP_LGA_AGE5P_INDP_INCP = "Census SEXP by LGA (UR) by AGE5P, INDP and INCP";
 	static final String CENSUS_HCFMD_TEND_LGA_HIND_RNTRD = "Census HCFMD and TEND by LGA by HIND and RNTRD";
 	static final String CENSUS_HCFMD_TEND_LGA_HIND_MRERD = "Census HCFMD and TEND by LGA by HIND and MRERD";
@@ -160,8 +161,7 @@ public class CalibrationDataIndividual {
 	 * HCFMD and TEND by LGA by HIND and RNTRD<br>
 	 * Rent by household income and composition.
 	 * 
-	 * Keys: Household Income, Rent Range, LGA, Household Composition Dwelling,
-	 * Tenure<br>
+	 * Keys: Household Income, Rent Range, LGA, Household Composition Dwelling<br>
 	 * Values: Number of dwellings
 	 */
 	private Map<String, Map<String, Map<String, Map<String, String>>>> censusHCFMD_LGA_HIND_RNTRD;
@@ -170,11 +170,19 @@ public class CalibrationDataIndividual {
 	 * HCFMD by LGA by HIND and MRERD<br>
 	 * Mortgage payments by household income and composition.
 	 * 
-	 * Keys: Household Income, Rent Range, LGA, Household Composition Dwelling,
-	 * Tenure<br>
+	 * Keys: Household Income, Rent Range, LGA, Household Composition Dwelling<br>
 	 * Values: Number of dwellings
 	 */
 	private Map<String, Map<String, Map<String, Map<String, String>>>> censusHCFMD_LGA_HIND_MRERD;
+	/**
+	 * ABS Census Table Builder data:<br>
+	 * HCFMF by LGA by FINF and CDCF<br>
+	 * Parents & children by family income and composition.
+	 * 
+	 * Keys: Family Income, Parents & Children (CDCF), LGA, Family Composition Dwelling<br>
+	 * Values: Number of dwellings
+	 */
+	private Map<String, Map<String, Map<String, Map<String, String>>>> censusHCFMF_LGA_FINF_CDCF;
 	/**
 	 * ABS Census Table Builder data:<br>
 	 * CDCF by LGA by FINF<br>
@@ -183,7 +191,7 @@ public class CalibrationDataIndividual {
 	 * Keys: Family Income, LGA, Family Composition<br>
 	 * Values: Number of families
 	 */
-	private Map<String, Map<String, Map<String, String>>> censusCDCF_LGA_FINF;
+	Map<String, Map<String, Map<String, String>>> censusCDCF_LGA_FINF;
 	/**
 	 * ABS Census Table Builder data:<br>
 	 * HCFMD and TEND by LGA by HIND and RNTRD<br>
@@ -2060,6 +2068,9 @@ public class CalibrationDataIndividual {
 	 * @return the atoIndividualTable2a
 	 */
 	public Map<String, Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>>> getAtoIndividualTable2a() {
+		if (!this.dataLoaded) {
+			this.loadData();
+		}
 		return atoIndividualTable2a;
 	}
 
@@ -2067,6 +2078,9 @@ public class CalibrationDataIndividual {
 	 * @return the atoIndividualTable3a
 	 */
 	public Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> getAtoIndividualTable3a() {
+		if (!this.dataLoaded) {
+			this.loadData();
+		}
 		return atoIndividualTable3a;
 	}
 
