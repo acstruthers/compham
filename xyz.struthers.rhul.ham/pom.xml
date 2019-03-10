@@ -45,6 +45,7 @@
 
 		<version.edu.gmu.cs.mason>19.0</version.edu.gmu.cs.mason><!-- the repository 
 			only has v14.0, so copy the JAR file for v19.0 manually -->
+		<version.it.unimi.dsi.dsiutils>2.5.4</version.it.unimi.dsi.dsiutils>
 		<version.ejml-core>0.37.1</version.ejml-core>
 
 		<version.mysql>8.0.15</version.mysql>
@@ -104,6 +105,11 @@
 				<groupId>edu.gmu.cs</groupId>
 				<artifactId>mason</artifactId>
 				<version>${version.edu.gmu.cs.mason}</version>
+			</dependency>
+			<dependency>
+				<groupId>it.unimi.dsi</groupId>
+				<artifactId>dsiutils</artifactId>
+				<version>${version.it.unimi.dsi.dsiutils}</version>
 			</dependency>
 
 			<!-- Matrix maths -->
@@ -266,6 +272,10 @@
 		<dependency>
 			<groupId>edu.gmu.cs</groupId>
 			<artifactId>mason</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>it.unimi.dsi</groupId>
+			<artifactId>dsiutils</artifactId>
 		</dependency>
 
 		<!-- AOP dependencies -->
