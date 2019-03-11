@@ -1368,9 +1368,29 @@ public class CalibrateIndividuals {
 										atoPerPersonAttributeStudentLoan.set(incomeMapNum,
 												atoPerPersonAttributeStudentLoan.get(incomeMapNum) * amountMultiplier);
 									}
-									
-									// create probability density functions for the relevant attributes
 
+									/**
+									 * FIXME: figured it out<br>
+									 * Assumptions: I don't care about the ATO counts - they can be ignored or
+									 * deleted.<br>
+									 * I do care about the average amounts per person so the P&Ls are different.<br>
+									 * I also care about the split between various P&L compositions.<br>
+									 * 
+									 * Algorithm:<br>
+									 * 1. Set the flags using percentages so that I can use a pdf lookup then
+									 * generate a random double between 0 and 1.<br>
+									 * 2. Create an Individual based on this index.<br>
+									 * 3. Repeat for as many people as are in the corresponding ABS data.<br>
+									 * 
+									 * Special cases:<br>
+									 * (A) Where there are multiple ATO categories for the one ABS category, put
+									 * them all in the one pdf array.<br>
+									 * (B) Where there are multiple ABS categories for the one ATO category, loop
+									 * through the flag arrays as per usual, but store in the relevant ABS
+									 * category's cell.
+									 */
+
+									// create probability density functions for the relevant attributes
 									double totalCountDenominator = 0d;
 									for (int incomeMapNum = 0; incomeMapNum < numAtoIncomeIndices; incomeMapNum++) {
 										totalCountDenominator += atoCountTotal.get(incomeMapNum);
@@ -1384,39 +1404,64 @@ public class CalibrateIndividuals {
 									double[][] pdfAttributeOtherIncome = new double[numAtoIncomeIndices][2];
 									double[][] pdfAttributeStudentLoan = new double[numAtoIncomeIndices][2];
 									for (int incomeMapNum = 0; incomeMapNum < numAtoIncomeIndices; incomeMapNum++) {
-										//this determines the first index
+										// this determines the first index
 										pdfAtoIncomeRange[incomeMapNum] = ((double) atoCountTotal.get(incomeMapNum))
 												/ totalCountDenominator;
-										
+
 										// create pdf for the main income source
-										pdfMainIncomeSource[incomeMapNum][0] = ((double) atoCountEmployed.get(incomeMapNum)) / totalCountDenominator;
-										pdfMainIncomeSource[incomeMapNum][1] = ((double) atoCountUnemployed.get(incomeMapNum)) / totalCountDenominator;
-										pdfMainIncomeSource[incomeMapNum][2] = ((double) atoCountPension.get(incomeMapNum)) / totalCountDenominator;
-										pdfMainIncomeSource[incomeMapNum][3] = ((double) atoCountSelfFundedRetiree.get(incomeMapNum)) / totalCountDenominator;
-										pdfMainIncomeSource[incomeMapNum][4] = 1d - pdfMainIncomeSource[incomeMapNum][0] - pdfMainIncomeSource[incomeMapNum][1] 
-												- pdfMainIncomeSource[incomeMapNum][2] - pdfMainIncomeSource[incomeMapNum][3];
-										
+										pdfMainIncomeSource[incomeMapNum][0] = ((double) atoCountEmployed
+												.get(incomeMapNum)) / totalCountDenominator;
+										pdfMainIncomeSource[incomeMapNum][1] = ((double) atoCountUnemployed
+												.get(incomeMapNum)) / totalCountDenominator;
+										pdfMainIncomeSource[incomeMapNum][2] = ((double) atoCountPension
+												.get(incomeMapNum)) / totalCountDenominator;
+										pdfMainIncomeSource[incomeMapNum][3] = ((double) atoCountSelfFundedRetiree
+												.get(incomeMapNum)) / totalCountDenominator;
+										pdfMainIncomeSource[incomeMapNum][4] = 1d - pdfMainIncomeSource[incomeMapNum][0]
+												- pdfMainIncomeSource[incomeMapNum][1]
+												- pdfMainIncomeSource[incomeMapNum][2]
+												- pdfMainIncomeSource[incomeMapNum][3];
+
 										// create pdfs for the binary attributes
-										pdfAttributeInterestIncome[incomeMapNum][0] = ((double) atoCountAttributeInterestIncome.get(incomeMapNum)) / totalCountDenominator;
-										pdfAttributeInterestIncome[incomeMapNum][1] = 1d - pdfAttributeInterestIncome[incomeMapNum][0];
-										pdfAttributeDividendIncome[incomeMapNum][0] = ((double) atoCountAttributeDividendIncome.get(incomeMapNum)) / totalCountDenominator;
-										pdfAttributeDividendIncome[incomeMapNum][1] = 1d - pdfAttributeDividendIncome[incomeMapNum][0];
-										pdfAttributeDonations[incomeMapNum][0] = ((double) atoCountAttributeDonations.get(incomeMapNum)) / totalCountDenominator;
-										pdfAttributeDonations[incomeMapNum][1] = 1d - pdfAttributeDonations[incomeMapNum][0];
-										pdfAttributeOtherIncome[incomeMapNum][0] = ((double) atoCountAttributeOtherIncome.get(incomeMapNum)) / totalCountDenominator;
-										pdfAttributeOtherIncome[incomeMapNum][1] = 1d - pdfAttributeOtherIncome[incomeMapNum][0];
-										pdfAttributeStudentLoan[incomeMapNum][0] = ((double) atoCountAttributeStudentLoan.get(incomeMapNum)) / totalCountDenominator;
-										pdfAttributeStudentLoan[incomeMapNum][1] = 1d - pdfAttributeStudentLoan[incomeMapNum][0];
-										
+										pdfAttributeInterestIncome[incomeMapNum][0] = ((double) atoCountAttributeInterestIncome
+												.get(incomeMapNum)) / totalCountDenominator;
+										pdfAttributeInterestIncome[incomeMapNum][1] = 1d
+												- pdfAttributeInterestIncome[incomeMapNum][0];
+										pdfAttributeDividendIncome[incomeMapNum][0] = ((double) atoCountAttributeDividendIncome
+												.get(incomeMapNum)) / totalCountDenominator;
+										pdfAttributeDividendIncome[incomeMapNum][1] = 1d
+												- pdfAttributeDividendIncome[incomeMapNum][0];
+										pdfAttributeDonations[incomeMapNum][0] = ((double) atoCountAttributeDonations
+												.get(incomeMapNum)) / totalCountDenominator;
+										pdfAttributeDonations[incomeMapNum][1] = 1d
+												- pdfAttributeDonations[incomeMapNum][0];
+										pdfAttributeOtherIncome[incomeMapNum][0] = ((double) atoCountAttributeOtherIncome
+												.get(incomeMapNum)) / totalCountDenominator;
+										pdfAttributeOtherIncome[incomeMapNum][1] = 1d
+												- pdfAttributeOtherIncome[incomeMapNum][0];
+										pdfAttributeStudentLoan[incomeMapNum][0] = ((double) atoCountAttributeStudentLoan
+												.get(incomeMapNum)) / totalCountDenominator;
+										pdfAttributeStudentLoan[incomeMapNum][1] = 1d
+												- pdfAttributeStudentLoan[incomeMapNum][0];
+
 										// create pdf for rental property owners
-										int propertyInvestorCount = Math.max(atoCountAttributeRentIncome.get(incomeMapNum), atoCountAttributeRentInterest.get(incomeMapNum));
-										int propertyInvestorWithLoanCount = atoCountAttributeRentInterest.get(incomeMapNum);
-										int propertyInvestorWithoutLoanCount = propertyInvestorCount - propertyInvestorWithLoanCount;
-										pdfAttributeRentIncomeInterest[incomeMapNum][0] = ((double) propertyInvestorWithLoanCount) / totalCountDenominator; // rent & interest
-										pdfAttributeRentIncomeInterest[incomeMapNum][1] = ((double) propertyInvestorWithoutLoanCount) / totalCountDenominator; // rent only
-										pdfAttributeRentIncomeInterest[incomeMapNum][2] = 1d - pdfAttributeRentIncomeInterest[incomeMapNum][0] - pdfAttributeRentIncomeInterest[incomeMapNum][1]; // neither
+										int propertyInvestorCount = Math.max(
+												atoCountAttributeRentIncome.get(incomeMapNum),
+												atoCountAttributeRentInterest.get(incomeMapNum));
+										int propertyInvestorWithLoanCount = atoCountAttributeRentInterest
+												.get(incomeMapNum);
+										int propertyInvestorWithoutLoanCount = propertyInvestorCount
+												- propertyInvestorWithLoanCount;
+										pdfAttributeRentIncomeInterest[incomeMapNum][0] = ((double) propertyInvestorWithLoanCount)
+												/ totalCountDenominator; // rent & interest
+										pdfAttributeRentIncomeInterest[incomeMapNum][1] = ((double) propertyInvestorWithoutLoanCount)
+												/ totalCountDenominator; // rent only
+										pdfAttributeRentIncomeInterest[incomeMapNum][2] = 1d
+												- pdfAttributeRentIncomeInterest[incomeMapNum][0]
+												- pdfAttributeRentIncomeInterest[incomeMapNum][1]; // neither
 									}
-									
+
+									// create Individual agents and store in a List matrix
 									// the loops take into account n:m mappings between ATO and ABS
 									for (int ageIdxAbs : ageIndicesAbs) {
 										// doesn't need to exclude children because it already filters on income range
@@ -1425,21 +1470,23 @@ public class CalibrateIndividuals {
 											for (int agentNo = 0; agentNo < absCount; agentNo++) {
 												// create one agent for each person in the ABS data
 												Individual individual = new Individual();
-												individual.setAge(AGE_ARRAY_ABS[ageIdxAbs]); // TODO: convert to integer
+												individual.setAge(AGE_ARRAY_ABS[ageIdxAbs]); // FIXME: convert to
+																								// integer
 												individual.setSex(SEX_ARRAY[sexIdx]);
 												individual.setEmploymentIndustry(DIVISION_CODE_ARRAY[divIdx]);
 												individual.setLocalGovernmentAreaCode(this.area.getLgaCodeFromPoa(poa));
-												
+
 												int incomeMapNum = CustomMath.sample(pdfAtoIncomeRange, this.random);
 												switch (incomeMapNum) {
 												case 0:
 													individual.setMainIncomeSource(0); // employed
-													individual.setPnlWagesSalaries(atoPerPersonEmployed.get(incomeMapNum) / NUM_MONTHS);
+													individual.setPnlWagesSalaries(
+															atoPerPersonEmployed.get(incomeMapNum) / NUM_MONTHS);
 													break;
 												case 1:
 													individual.setMainIncomeSource(1); // unemployed
-													individual
-															.setPnlUnemploymentBenefits(atoPerPersonUnemployed.get(incomeMapNum) / NUM_MONTHS);
+													individual.setPnlUnemploymentBenefits(
+															atoPerPersonUnemployed.get(incomeMapNum) / NUM_MONTHS);
 													break;
 												case 2:
 													individual.setMainIncomeSource(2); // pension
@@ -1449,132 +1496,91 @@ public class CalibrateIndividuals {
 												case 3:
 													individual.setMainIncomeSource(3); // self-funded retiree
 													individual.setPnlInvestmentIncome(
-															atoPerPersonSelfFundedRetiree.get(incomeMapNum) / NUM_MONTHS);
+															atoPerPersonSelfFundedRetiree.get(incomeMapNum)
+																	/ NUM_MONTHS);
 													break;
 												default:
 													individual.setMainIncomeSource(4); // foreign income
-													individual.setPnlForeignIncome(atoPerPersonForeignIncome.get(incomeMapNum) / NUM_MONTHS);
+													individual.setPnlForeignIncome(
+															atoPerPersonForeignIncome.get(incomeMapNum) / NUM_MONTHS);
 													break;
 												}
-												
-												int attributeIdx = CustomMath.sample(pdfMainIncomeSource[incomeMapNum], this.random);
+
+												int attributeIdx = CustomMath
+														.sample(pdfAttributeInterestIncome[incomeMapNum], this.random);
 												if (attributeIdx == 0) {
 													individual.setPnlInterestIncome(
-															atoPerPersonAttributeInterestIncome.get(incomeMapNum) / NUM_MONTHS);
+															atoPerPersonAttributeInterestIncome.get(incomeMapNum)
+																	/ NUM_MONTHS);
 												}
-												// FIXME: the magic should live here
-												
+												attributeIdx = CustomMath
+														.sample(pdfAttributeDividendIncome[incomeMapNum], this.random);
+												if (attributeIdx == 0) {
+													individual.setPnlInvestmentIncome(individual
+															.getPnlInvestmentIncome()
+															+ atoPerPersonAttributeDividendIncome.get(incomeMapNum)
+																	/ NUM_MONTHS);
+												}
+												attributeIdx = CustomMath.sample(pdfAttributeDonations[incomeMapNum],
+														this.random);
+												if (attributeIdx == 0) {
+													individual.setPnlDonations(
+															atoPerPersonAttributeDonations.get(incomeMapNum)
+																	/ NUM_MONTHS);
+												}
+												attributeIdx = CustomMath.sample(
+														pdfAttributeRentIncomeInterest[incomeMapNum], this.random);
+												if (attributeIdx < 2) {
+													individual.setPnlRentIncome(
+															atoPerPersonAttributeRentIncome.get(incomeMapNum)
+																	/ NUM_MONTHS);
+												} else if (attributeIdx == 1) {
+													individual.setPnlRentInterestExpense(
+															atoPerPersonAttributeRentInterest.get(incomeMapNum)
+																	/ NUM_MONTHS);
+												}
+												attributeIdx = CustomMath.sample(pdfAttributeOtherIncome[incomeMapNum],
+														this.random);
+												if (attributeIdx == 0) {
+													individual.setPnlOtherIncome(
+															atoPerPersonAttributeOtherIncome.get(incomeMapNum)
+																	/ NUM_MONTHS);
+												}
+
+												// adjust other income if the sum of the income lines is less than total
+												// income
+												/*
+												 * if (individual.getGrossIncome() <
+												 * atoPerPersonAttributeTotalIncome.get(incomeMapNum)) { double
+												 * newOtherIncome = individual.getPnlOtherIncome() +
+												 * (atoPerPersonAttributeTotalIncome.get(incomeMapNum) -
+												 * individual.getGrossIncome());
+												 * individual.setPnlOtherIncome(newOtherIncome); }
+												 */
+
+												// Bal Sht
+												attributeIdx = CustomMath.sample(pdfAttributeStudentLoan[incomeMapNum],
+														this.random);
+												if (attributeIdx == 0) {
+													individual.setBsStudentLoans(
+															atoPerPersonAttributeStudentLoan.get(incomeMapNum)
+																	/ NUM_MONTHS);
+												}
+
+												// add Individual to matrix (for household calibration) using ABS
+												// indices
+												this.individualMatrix.get(poaIdx).get(sexIdx).get(ageIdxAbs).get(divIdx)
+														.get(incomeIdxAbs).add(individual);
+
+												// add Individual to list (for payment clearing algorithm)
+												this.individualAgents.add(individual);
+
+												// FIXME: remove debugging comment
+												System.out.println("Added Individual agent #" + agentNo++);
 											}
 										}
 									}
 
-									// make flags for the age indices too (this solves the 1:n mappings)
-									List<Integer> ageIndicesAgent = new ArrayList<Integer>(flagListLength);
-									List<Integer> incomeIndicesAgent = new ArrayList<Integer>(flagListLength);
-									for (int ageIdxAbs : ageIndicesAbs) {
-										// doesn't need to exclude young children because it already filters on income
-										// range
-										for (int incomeIdxAbs : incomeIndicesAbs) {
-											int numFlags = Math.max(0,
-													censusMatrixPersonsAdjustedPOA[poaIdx][sexIdx][ageIdxAbs][divIdx][incomeIdxAbs]);
-											List<Integer> tmpAgeFlags = Collections.nCopies(numFlags, ageIdxAbs);
-											List<Integer> tmpIncomeFlags = Collections.nCopies(numFlags, ageIdxAbs);
-											ageIndicesAgent.addAll(tmpAgeFlags);
-											incomeIndicesAgent.addAll(tmpIncomeFlags);
-										}
-									}
-									Collections.shuffle(ageIndicesAgent, this.random);
-									Collections.shuffle(incomeIndicesAgent, this.random);
-
-									/**
-									 * FIXME: figured it out<br>
-									 * Assumptions: I don't care about the ATO counts - they can be ignored or
-									 * deleted.<br>
-									 * I do care about the average amounts per person so the P&Ls are different.<br>
-									 * I also care about the split between various P&L compositions.<br>
-									 * 
-									 * Algorithm:<br>
-									 * 1. Set the flags using percentages so that I can use a cdf lookup then
-									 * generate a random double between 0 and 1.<br>
-									 * 2. Create an Individual based on this index.<br>
-									 * 3. Repeat for as many people as are in the corresponding ABS data.<br>
-									 * 
-									 * Special cases: (A) Where there are multiple ATO categories for the one ABS
-									 * category, put them all in the one flag array.<br>
-									 * (B) Where there are multiple ABS categories for the one ATO category, loop
-									 * through the flag arrays as per usual, but store in the relevant ABS
-									 * category's cell.
-									 * 
-									 */
-									
-									// create Individual agents and store in a List matrix
-									for (int agentIdx = 0; agentIdx < flagListLength; agentIdx++) {
-										Individual individual = new Individual();
-										individual.setAge(ageIndicesAgent.get(agentIdx));
-										individual.setSex(SEX_ARRAY[sexIdx]);
-										individual.setEmploymentIndustry(DIVISION_CODE_ARRAY[divIdx]);
-										individual.setLocalGovernmentAreaCode(this.area.getLgaCodeFromPoa(poa));
-
-										
-
-										
-										if (flagAttributeDividendIncome.get(agentIdx)) {
-											individual.setPnlInvestmentIncome(individual.getPnlInvestmentIncome()
-													+ atoPerPersonAttributeDividendIncome[0] / NUM_MONTHS);
-										}
-										if (flagAttributeDonations.get(agentIdx)) {
-											individual.setPnlDonations(atoPerPersonAttributeDonations[0] / NUM_MONTHS);
-										}
-										if (flagAttributeRentIncomeInterest.get(agentIdx) > 0) {
-											individual
-													.setPnlRentIncome(atoPerPersonAttributeRentIncome[0] / NUM_MONTHS);
-										}
-										if (flagAttributeRentIncomeInterest.get(agentIdx) > 1) {
-											individual.setPnlRentInterestExpense(
-													atoPerPersonAttributeRentInterest[0] / NUM_MONTHS);
-										}
-										if (flagAttributeOtherIncome.get(agentIdx)) {
-											individual.setPnlOtherIncome(
-													atoPerPersonAttributeOtherIncome[0] / NUM_MONTHS);
-										}
-
-										// adjust other income if the sum of the income lines is less than total income
-										if (individual.getGrossIncome() < atoPerPersonAttributeTotalIncome[0]) {
-											double newOtherIncome = individual.getPnlOtherIncome()
-													+ (atoPerPersonAttributeTotalIncome[0]
-															- individual.getGrossIncome());
-											individual.setPnlOtherIncome(newOtherIncome);
-										}
-
-										// Bal Sht
-										if (flagAttributeStudentLoan.get(agentIdx)) {
-											individual.setBsStudentLoans(atoPerPersonAttributeStudentLoan[0]);
-										}
-
-										// add Individual to matrix (for household calibration) using ABS indices
-										this.individualMatrix.get(poaIdx).get(sexIdx).get(ageIndicesAgent.get(agentIdx))
-												.get(divIdx).get(incomeIndicesAgent.get(agentIdx)).add(individual);
-
-										// add Individual to list (for payment clearing algorithm)
-										this.individualAgents.add(individual);
-
-										// FIXME: remove debugging comment
-										System.out.println("Added Individual agent #" + agentNo++);
-									}
-
-									// N.B. Need to deal with 1:n and n:1 index mapping here too - make sure we
-									// calibrate those cells too.
-									/*
-									 * if (incomeAtoIdx == 0 || incomeAtoIdx == 4 || incomeAtoIdx == 7 ||
-									 * incomeAtoIdx == 9 || incomeAtoIdx == 13) { // calculate for extra indices
-									 * where it's a 2:1 mapping // 0-1 ==> 2, 3 ==> 5-4, 4-5 ==> 6, 7-8 ==> 8, 9-11
-									 * ==> 9, 13-14 ==> 11
-									 * 
-									 * } // end if 2:1 mapping if (incomeAtoIdx == 9) { // calculate for extra
-									 * indices where it's a 3:1 mapping // 9-11 ==> 9
-									 * 
-									 * } // end if 3:1 mapping
-									 */
 								} // end if !state.equals("Other")
 							} // end for POA
 						} // end for division
