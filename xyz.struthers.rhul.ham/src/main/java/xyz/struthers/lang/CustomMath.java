@@ -3,6 +3,8 @@
  */
 package xyz.struthers.lang;
 
+import java.util.Random;
+
 /**
  * Custom mathematical functions that aren't available in the standard
  * Java.lang.Math library.
@@ -28,14 +30,10 @@ public class CustomMath {
 	 * 
 	 * @author Glen Edmonds (Melbourne, VIC)
 	 * 
-	 * @param lat1
-	 *            - Latitude of point 1.
-	 * @param lng1
-	 *            - Longitude of point 1.
-	 * @param lat2
-	 *            - Latitude of point 2.
-	 * @param lng2
-	 *            - Longitude of point 2.
+	 * @param lat1 - Latitude of point 1.
+	 * @param lng1 - Longitude of point 1.
+	 * @param lat2 - Latitude of point 2.
+	 * @param lng2 - Longitude of point 2.
 	 * @return the great-circle distance in km between point 1 and point 2.
 	 */
 	public static final double haversine(double lat1, double lng1, double lat2, double lng2) {
@@ -49,4 +47,13 @@ public class CustomMath {
 		return d;
 	}
 
+	public static int sample(double[] pdf, Random random) {
+		double r = random.nextDouble();
+		for (int i = 0; i < pdf.length; i++) {
+			if (r < pdf[i])
+				return i;
+			r -= pdf[i];
+		}
+		return pdf.length - 1; // should not happen
+	}
 }
