@@ -100,11 +100,6 @@ public final class Individual extends Agent {
 		this.pnlOtherIncome = 0d;
 		this.pnlIncomeTaxExpense = 0d;
 
-		this.pnlLivingExpenses = 0d;
-		this.pnlRentExpense = 0d;
-		this.pnlMortgageRepayments = 0d;
-		this.pnlOtherDiscretionaryExpenses = 0d;
-
 		// Bal Sht
 		this.bsStudentLoans = 0d;
 	}
@@ -362,50 +357,6 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @return the pnlLivingExpenses
-	 */
-	public double getPnlLivingExpenses() {
-		return pnlLivingExpenses;
-	}
-
-	/**
-	 * @param pnlLivingExpenses the pnlLivingExpenses to set
-	 */
-	public void setPnlLivingExpenses(double pnlLivingExpenses) {
-		this.pnlLivingExpenses = pnlLivingExpenses;
-	}
-
-	/**
-	 * @return the pnlRentExpense
-	 */
-	public double getPnlRentExpense() {
-		return pnlRentExpense;
-	}
-
-	/**
-	 * @param pnlRentExpense the pnlRentExpense to set
-	 */
-	public void setPnlRentExpense(double pnlRentExpense) {
-		this.pnlRentExpense = pnlRentExpense;
-	}
-
-	/**
-	 * @return the pnlMortgageRepayments
-	 */
-	public double getPnlMortgageRepayments() {
-		return pnlMortgageRepayments;
-	}
-
-	/**
-	 * @param pnlMortgageRepayments the pnlMortgageRepayments to set
-	 */
-	public void setPnlMortgageRepayments(double pnlMortgageRepayments) {
-		this.pnlMortgageRepayments = pnlMortgageRepayments;
-	}
-	
-	
-
-	/**
 	 * @return the pnlWorkRelatedExpenses
 	 */
 	public double getPnlWorkRelatedExpenses() {
@@ -445,20 +396,6 @@ public final class Individual extends Agent {
 	 */
 	public void setPnlDonations(double pnlDonations) {
 		this.pnlDonations = pnlDonations;
-	}
-
-	/**
-	 * @return the pnlOtherDiscretionaryExpenses
-	 */
-	public double getPnlOtherDiscretionaryExpenses() {
-		return pnlOtherDiscretionaryExpenses;
-	}
-
-	/**
-	 * @param pnlOtherDiscretionaryExpenses the pnlOtherDiscretionaryExpenses to set
-	 */
-	public void setPnlOtherDiscretionaryExpenses(double pnlOtherDiscretionaryExpenses) {
-		this.pnlOtherDiscretionaryExpenses = pnlOtherDiscretionaryExpenses;
 	}
 
 	/**

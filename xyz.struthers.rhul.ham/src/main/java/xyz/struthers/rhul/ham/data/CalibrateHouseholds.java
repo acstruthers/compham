@@ -271,9 +271,9 @@ public class CalibrateHouseholds {
 		for (String poa : poaCodes) {
 			lgaCodesIndividual.add(this.area.getLgaCodeFromPoa(poa));
 		}
-		// TODO: get LGA codes from Household census data
+		// FIXME: get LGA codes from Household census data
 		// Keys: HIND, RNTRD, LGA, HCFMD
-		Set<String> lgaCodesRNTRD = this.censusHCFMD_LGA_HIND_RNTRD.get(hind).get(rntrd).keySet();
+		Set<String> lgaCodesRNTRD = null;//this.censusHCFMD_LGA_HIND_RNTRD.get(hind).get(rntrd).keySet();
 		// Keys: HIND, MRERD, LGA, HCFMD
 		Set<String> lgaCodesMRERD = null;
 		// Keys: FINF, CDCF, LGA, HCFMD

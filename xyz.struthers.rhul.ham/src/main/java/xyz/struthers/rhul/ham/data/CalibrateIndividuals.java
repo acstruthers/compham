@@ -188,7 +188,7 @@ public class CalibrateIndividuals {
 	private Map<String, Integer> lgaDwellingsCount; // adjusted to 2018
 	private Map<String, Integer> poaIndexMap;
 
-	private static int agentNo = 0;
+	private static int agentId = 0;
 
 	// data sets
 	/**
@@ -1606,7 +1606,7 @@ public class CalibrateIndividuals {
 												this.individualAgents.add(individual);
 
 												// FIXME: remove debugging comment
-												System.out.println("Added Individual agent #" + agentNo++);
+												//System.out.println("Added Individual agent #" + agentId++);
 											}
 										}
 									}
