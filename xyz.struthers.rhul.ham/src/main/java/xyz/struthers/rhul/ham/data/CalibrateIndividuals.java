@@ -18,8 +18,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -73,6 +71,8 @@ public class CalibrateIndividuals {
 			"20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years",
 			"55-59 years", "60-64 years", "65-69 years", "70-74 years", "75-79 years", "80-84 years", "85-89 years",
 			"90-94 years", "95-99 years", "100 years and over" };
+	private static final int[] AGE_ARRAY_ABS_MIDPOINT = { 2, 7, 12, 17, 22, 27, 32, 37, 42, 47, 52, 57, 62, 67, 72, 77,
+			82, 87, 92, 97, 102 };
 	private static final String[] DIVISION_CODE_ARRAY = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
 			"M", "N", "O", "P", "Q", "R", "S" }; // S = Other Services
 	private static final int NUM_DIVISIONS = DIVISION_CODE_ARRAY.length; // 19
@@ -124,6 +124,8 @@ public class CalibrateIndividuals {
 	private static final String ATO_3A_TITLE_DIVIDENDS_UNFRANKED_AMOUNT = "Dividends unfranked $";
 	private static final String ATO_3A_TITLE_DIVIDENDS_FRANKED_COUNT = "Dividends franked no.";
 	private static final String ATO_3A_TITLE_DIVIDENDS_FRANKED_AMOUNT = "Dividends franked $";
+	private static final String ATO_3A_TITLE_WORK_RELATED_EXP_COUNT = "Total work related expenses no.";
+	private static final String ATO_3A_TITLE_WORK_RELATED_EXP_AMOUNT = "Total work related expenses $";
 	private static final String ATO_3A_TITLE_INTEREST_DEDUCTIONS_COUNT = "Interest deductions no.";
 	private static final String ATO_3A_TITLE_INTEREST_DEDUCTIONS_AMOUNT = "Interest deductions $";
 	private static final String ATO_3A_TITLE_DONATIONS_COUNT = "Gifts or donations no.";
@@ -184,6 +186,7 @@ public class CalibrateIndividuals {
 	private double populationMultiplier;
 	private Map<String, Integer> lgaPeopleCount; // adjusted to 2018
 	private Map<String, Integer> lgaDwellingsCount; // adjusted to 2018
+	private Map<String, Integer> poaIndexMap;
 
 	private static int agentNo = 0;
 
@@ -317,6 +320,7 @@ public class CalibrateIndividuals {
 		this.populationMultiplier = 0d;
 		this.lgaPeopleCount = null;
 		this.lgaDwellingsCount = null;
+		this.poaIndexMap = null;
 
 		// data sources
 		this.abs1410_0Economy = null;
@@ -803,8 +807,7 @@ public class CalibrateIndividuals {
 				.size()][SEX_ARRAY.length][AGE_ARRAY_ABS.length][DIVISION_CODE_ARRAY.length][INDIVIDUAL_INCOME_RANGES_ABS.length];
 
 		// initialise matrix
-		Map<String, Integer> poaIndexMap = new HashMap<String, Integer>(
-				(int) Math.ceil(poaSetIntersection.size() / MAP_LOAD_FACTOR));
+		this.poaIndexMap = new HashMap<String, Integer>((int) Math.ceil(poaSetIntersection.size() / MAP_LOAD_FACTOR));
 		Map<String, Integer> sexIndexMap = new HashMap<String, Integer>(
 				(int) Math.ceil(SEX_ARRAY.length / MAP_LOAD_FACTOR));
 		Map<String, Integer> ageIndexMap = new HashMap<String, Integer>(
@@ -815,7 +818,7 @@ public class CalibrateIndividuals {
 				(int) Math.ceil(INDIVIDUAL_INCOME_RANGES_ABS.length / MAP_LOAD_FACTOR));
 		int i = 0;
 		for (String poa : poaSetIntersection) {
-			poaIndexMap.put(poa, i);
+			this.poaIndexMap.put(poa, i);
 			String lgaCode = this.area.getLgaCodeFromPoa(poa);
 			if (!poasInEachLga.containsKey(lgaCode)) {
 				poasInEachLga.put(lgaCode, new ArrayList<String>());
@@ -992,6 +995,8 @@ public class CalibrateIndividuals {
 						List<Integer> atoCountForeignIncome = new ArrayList<Integer>(numAtoIncomeIndices);
 						List<Integer> atoCountAttributeInterestIncome = new ArrayList<Integer>(numAtoIncomeIndices);
 						List<Integer> atoCountAttributeDividendIncome = new ArrayList<Integer>(numAtoIncomeIndices);
+						List<Integer> atoCountAttributeWorkRelatedExpenses = new ArrayList<Integer>(
+								numAtoIncomeIndices);
 						List<Integer> atoCountAttributeDonations = new ArrayList<Integer>(numAtoIncomeIndices);
 						List<Integer> atoCountAttributeRentIncome = new ArrayList<Integer>(numAtoIncomeIndices);
 						List<Integer> atoCountAttributeRentInterest = new ArrayList<Integer>(numAtoIncomeIndices);
@@ -1005,6 +1010,7 @@ public class CalibrateIndividuals {
 						List<Long> atoAmountForeignIncome = new ArrayList<Long>(numAtoIncomeIndices);
 						List<Long> atoAmountAttributeInterestIncome = new ArrayList<Long>(numAtoIncomeIndices);
 						List<Long> atoAmountAttributeDividendIncome = new ArrayList<Long>(numAtoIncomeIndices);
+						List<Long> atoAmountAttributeWorkRelatedExpenses = new ArrayList<Long>(numAtoIncomeIndices);
 						List<Long> atoAmountAttributeDonations = new ArrayList<Long>(numAtoIncomeIndices);
 						List<Long> atoAmountAttributeRentIncome = new ArrayList<Long>(numAtoIncomeIndices);
 						List<Long> atoAmountAttributeRentInterest = new ArrayList<Long>(numAtoIncomeIndices);
@@ -1021,6 +1027,7 @@ public class CalibrateIndividuals {
 						atoCountForeignIncome.addAll(Collections.nCopies(numAtoIncomeIndices, 0));
 						atoCountAttributeInterestIncome.addAll(Collections.nCopies(numAtoIncomeIndices, 0));
 						atoCountAttributeDividendIncome.addAll(Collections.nCopies(numAtoIncomeIndices, 0));
+						atoCountAttributeWorkRelatedExpenses.addAll(Collections.nCopies(numAtoIncomeIndices, 0));
 						atoCountAttributeDonations.addAll(Collections.nCopies(numAtoIncomeIndices, 0));
 						atoCountAttributeRentIncome.addAll(Collections.nCopies(numAtoIncomeIndices, 0));
 						atoCountAttributeRentInterest.addAll(Collections.nCopies(numAtoIncomeIndices, 0));
@@ -1034,6 +1041,7 @@ public class CalibrateIndividuals {
 						atoAmountForeignIncome.addAll(Collections.nCopies(numAtoIncomeIndices, 0L));
 						atoAmountAttributeInterestIncome.addAll(Collections.nCopies(numAtoIncomeIndices, 0L));
 						atoAmountAttributeDividendIncome.addAll(Collections.nCopies(numAtoIncomeIndices, 0L));
+						atoAmountAttributeWorkRelatedExpenses.addAll(Collections.nCopies(numAtoIncomeIndices, 0L));
 						atoAmountAttributeDonations.addAll(Collections.nCopies(numAtoIncomeIndices, 0L));
 						atoAmountAttributeRentIncome.addAll(Collections.nCopies(numAtoIncomeIndices, 0L));
 						atoAmountAttributeRentInterest.addAll(Collections.nCopies(numAtoIncomeIndices, 0L));
@@ -1143,6 +1151,9 @@ public class CalibrateIndividuals {
 											+ Integer.valueOf(this.atoIndividualTable3a
 													.get(ATO_3A_TITLE_DIVIDENDS_FRANKED_COUNT).get(incomeRangeAto)
 													.get(age).get(sex).get(taxableStatus).replace(",", "")));
+									atoCountAttributeWorkRelatedExpenses.add(Integer.valueOf(this.atoIndividualTable3a
+											.get(ATO_3A_TITLE_WORK_RELATED_EXP_COUNT).get(incomeRangeAto).get(age)
+											.get(sex).get(taxableStatus).replace(",", "")));
 									atoCountAttributeDonations.add(Integer.valueOf(this.atoIndividualTable3a
 											.get(ATO_3A_TITLE_DONATIONS_COUNT).get(incomeRangeAto).get(age).get(sex)
 											.get(taxableStatus).replace(",", "")));
@@ -1203,6 +1214,9 @@ public class CalibrateIndividuals {
 											+ Long.valueOf(this.atoIndividualTable3a
 													.get(ATO_3A_TITLE_DIVIDENDS_FRANKED_AMOUNT).get(incomeRangeAto)
 													.get(age).get(sex).get(taxableStatus).replace(",", "")));
+									atoAmountAttributeWorkRelatedExpenses.add(Long.valueOf(this.atoIndividualTable3a
+											.get(ATO_3A_TITLE_WORK_RELATED_EXP_AMOUNT).get(incomeRangeAto).get(age)
+											.get(sex).get(taxableStatus).replace(",", "")));
 									atoAmountAttributeDonations.add(Long.valueOf(this.atoIndividualTable3a
 											.get(ATO_3A_TITLE_DONATIONS_AMOUNT).get(incomeRangeAto).get(age).get(sex)
 											.get(taxableStatus).replace(",", "")));
@@ -1239,6 +1253,8 @@ public class CalibrateIndividuals {
 						List<Double> atoPerPersonForeignIncome = new ArrayList<Double>(numAtoIncomeIndices);
 						List<Double> atoPerPersonAttributeInterestIncome = new ArrayList<Double>(numAtoIncomeIndices);
 						List<Double> atoPerPersonAttributeDividendIncome = new ArrayList<Double>(numAtoIncomeIndices);
+						List<Double> atoPerPersonAttributeWorkRelatedExpenses = new ArrayList<Double>(
+								numAtoIncomeIndices);
 						List<Double> atoPerPersonAttributeDonations = new ArrayList<Double>(numAtoIncomeIndices);
 						List<Double> atoPerPersonAttributeRentIncome = new ArrayList<Double>(numAtoIncomeIndices);
 						List<Double> atoPerPersonAttributeRentInterest = new ArrayList<Double>(numAtoIncomeIndices);
@@ -1282,6 +1298,10 @@ public class CalibrateIndividuals {
 									.add(atoCountAttributeDividendIncome.get(incomeMapNum) == 0 ? 0d
 											: ((double) atoAmountAttributeDividendIncome.get(incomeMapNum))
 													/ (double) atoCountAttributeDividendIncome.get(incomeMapNum));
+							atoPerPersonAttributeWorkRelatedExpenses
+									.add(atoCountAttributeWorkRelatedExpenses.get(incomeMapNum) == 0 ? 0d
+											: ((double) atoAmountAttributeWorkRelatedExpenses.get(incomeMapNum))
+													/ (double) atoCountAttributeWorkRelatedExpenses.get(incomeMapNum));
 							atoPerPersonAttributeDonations.add(atoCountAttributeDonations.get(incomeMapNum) == 0 ? 0d
 									: ((double) atoAmountAttributeDonations.get(incomeMapNum))
 											/ (double) atoCountAttributeDonations.get(incomeMapNum));
@@ -1355,6 +1375,9 @@ public class CalibrateIndividuals {
 										atoPerPersonAttributeDividendIncome.set(incomeMapNum,
 												atoPerPersonAttributeDividendIncome.get(incomeMapNum)
 														* amountMultiplier);
+										atoPerPersonAttributeWorkRelatedExpenses.set(incomeMapNum,
+												atoPerPersonAttributeWorkRelatedExpenses.get(incomeMapNum)
+														* amountMultiplier);
 										atoPerPersonAttributeDonations.set(incomeMapNum,
 												atoPerPersonAttributeDonations.get(incomeMapNum) * amountMultiplier);
 										atoPerPersonAttributeRentIncome.set(incomeMapNum,
@@ -1370,9 +1393,8 @@ public class CalibrateIndividuals {
 									}
 
 									/**
-									 * FIXME: figured it out<br>
-									 * Assumptions: I don't care about the ATO counts - they can be ignored or
-									 * deleted.<br>
+									 * RANDOM SAMPLING ALGORITHM Assumptions: I don't care about the ATO counts -
+									 * they can be ignored or deleted.<br>
 									 * I do care about the average amounts per person so the P&Ls are different.<br>
 									 * I also care about the split between various P&L compositions.<br>
 									 * 
@@ -1470,8 +1492,7 @@ public class CalibrateIndividuals {
 											for (int agentNo = 0; agentNo < absCount; agentNo++) {
 												// create one agent for each person in the ABS data
 												Individual individual = new Individual();
-												individual.setAge(AGE_ARRAY_ABS[ageIdxAbs]); // FIXME: convert to
-																								// integer
+												individual.setAge(AGE_ARRAY_ABS_MIDPOINT[ageIdxAbs]);
 												individual.setSex(SEX_ARRAY[sexIdx]);
 												individual.setEmploymentIndustry(DIVISION_CODE_ARRAY[divIdx]);
 												individual.setLocalGovernmentAreaCode(this.area.getLgaCodeFromPoa(poa));
@@ -1482,6 +1503,9 @@ public class CalibrateIndividuals {
 													individual.setMainIncomeSource(0); // employed
 													individual.setPnlWagesSalaries(
 															atoPerPersonEmployed.get(incomeMapNum) / NUM_MONTHS);
+													individual.setPnlWorkRelatedExpenses(
+															atoPerPersonAttributeWorkRelatedExpenses.get(incomeMapNum)
+																	/ NUM_MONTHS);
 													break;
 												case 1:
 													individual.setMainIncomeSource(1); // unemployed
@@ -1559,6 +1583,12 @@ public class CalibrateIndividuals {
 												 */
 
 												// Bal Sht
+												if (individual.getPnlInterestIncome() <= EPSILON) {
+													// assume no savings, so the individual uses up their entire income
+													// each fortnight. This means the average bank balance is one week's
+													// income. Income is recorded monthly, so divid by 4 weeks.
+													individual.setBsBankDeposits(individual.getGrossIncome() / 4);
+												}
 												attributeIdx = CustomMath.sample(pdfAttributeStudentLoan[incomeMapNum],
 														this.random);
 												if (attributeIdx == 0) {
@@ -1615,8 +1645,6 @@ public class CalibrateIndividuals {
 		 * the matrix itself can be dropped once the Individuals are in Households and
 		 * calibration is complete.
 		 */
-
-		// FIXME: 3. create Individual agents
 
 		// when reading from the ATO matrix, use modulo to ensure we don't read off the
 		// end of the List. It's possible that due to rounding there are more people in
@@ -1972,6 +2000,27 @@ public class CalibrateIndividuals {
 			indices = Arrays.asList(new Integer[] { 14 });
 		}
 		return indices;
+	}
+
+	/**
+	 * @return the individualMatrix
+	 */
+	public List<List<List<List<List<List<Individual>>>>>> getIndividualMatrix() {
+		return individualMatrix;
+	}
+
+	/**
+	 * @return the populationMultiplier
+	 */
+	public double getPopulationMultiplier() {
+		return populationMultiplier;
+	}
+
+	/**
+	 * @return the poaIndexMap
+	 */
+	public Map<String, Integer> getPoaIndexMap() {
+		return poaIndexMap;
 	}
 
 	/**

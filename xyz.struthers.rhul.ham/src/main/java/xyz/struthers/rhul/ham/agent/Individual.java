@@ -6,14 +6,9 @@ package xyz.struthers.rhul.ham.agent;
 import java.util.Map;
 
 /**
- * Each instance of this class uses about 192 bytes of RAM. There are
+ * Each instance of this class uses about 191 bytes of RAM. There are
  * approximately 25 million instances of this class in the model, so they will
  * consume approximately 4.6 GB of RAM.
- * 
- * TODO: Need to work out if I'm going to store totals or calculate them (e.g.
- * total assets). That will largely be informed by the data, but will also
- * depend on the performance when I start running simulations - does it run out
- * of RAM, or is it slow?
  * 
  * @author Adam Struthers
  * @since 25-Jan-2019
@@ -28,14 +23,14 @@ public final class Individual extends Agent {
 	private AuthorisedDepositTakingInstitution depositAdi; // can be null if no deposits (e.g. children)
 	private AuthorisedDepositTakingInstitution loanAdi; // can be null if no loan
 
-	// "Personal" Details (4 bytes + approx. 20 bytes of Strings = 24 bytes)
+	// "Personal" Details (8 bytes + approx. 7 bytes of Strings = 15 bytes)
 	private int age;
-	private String sex;
-	private String employmentIndustry; // can be null if not employed
+	private String sex; // "M" / "F"
+	private String employmentIndustry; // "A" to "S", can be null if not employed
 	private String localGovernmentAreaCode; // 5 chars
 	private int mainIncomeSource;
 
-	// P&L (72 bytes)
+	// P&L (96 bytes)
 	private double pnlWagesSalaries;
 	private double pnlUnemploymentBenefits;
 	private double pnlOtherSocialSecurityIncome;
@@ -46,31 +41,19 @@ public final class Individual extends Agent {
 	private double pnlOtherIncome;
 	private double pnlIncomeTaxExpense;
 
-	private double pnlLivingExpenses;
-	private double pnlRentExpense;
-	private double pnlMortgageRepayments;
+	private double pnlWorkRelatedExpenses;
 	private double pnlRentInterestExpense; // assume interest-only loan
 	private double pnlDonations;
-	private double pnlOtherDiscretionaryExpenses;
 
-	// Bal Sht (48 bytes)
+	// Bal Sht (24 bytes)
 	private double bsBankDeposits;
-	private double bsOtherFinancialAssets;
-	private double bsResidentialLandAndDwellings;
-	private double bsOtherNonFinancialAssets;
-	private double bsTotalAssets;
-
 	private double bsLoans;
 	private double bsStudentLoans; // HELP debt
-	private double bsOtherLiabilities;
-	private double bsTotalLiabilities;
 
-	private double bsNetWorth;
-
-	// Interest rates (16 bytes)
+	// Interest rates (24 bytes)
 	protected double interestRateDeposits;
 	protected double interestRateLoans;
-	protected double interestRateStudentLoans; // in Australia this should always be CPI
+	protected double interestRateStudentLoans; // in Australia this is always CPI (by law)
 
 	/**
 	 * Default constructor
@@ -80,54 +63,10 @@ public final class Individual extends Agent {
 		this.init();
 	}
 
-	/**
-	 * Copy constructor
-	 */
-	public Individual(Individual individual) {
-		super();
-		this.init();
-
-		// TODO: implement copy constructor for Individual
-	}
-
 	public double getGrossIncome() {
 		return this.pnlWagesSalaries + this.pnlUnemploymentBenefits + this.pnlOtherSocialSecurityIncome
 				+ this.pnlInvestmentIncome + this.pnlInterestIncome + this.pnlRentIncome + this.pnlForeignIncome
 				+ this.pnlOtherIncome;
-	}
-
-	public double getNetIncome() {
-		return this.getGrossIncome() + this.pnlIncomeTaxExpense;
-	}
-
-	public double getTotalExpenses() {
-		return this.pnlLivingExpenses + this.pnlRentExpense + this.pnlMortgageRepayments
-				+ this.pnlOtherDiscretionaryExpenses;
-	}
-
-	public double getNetProfit() {
-		return this.getNetIncome() + this.getTotalExpenses();
-	}
-
-	public double getTotalFinancialAssets() {
-		return this.bsBankDeposits + this.bsOtherFinancialAssets;
-	}
-
-	public double getTotalNonFinancialAssets() {
-		return this.getTotalAssets() - this.getTotalFinancialAssets();
-	}
-
-	public double getTotalAssets() {
-		return this.bsBankDeposits + this.bsOtherFinancialAssets + this.bsResidentialLandAndDwellings
-				+ this.bsOtherNonFinancialAssets;
-	}
-
-	public double getTotalLiabilities() {
-		return this.bsLoans + this.bsOtherLiabilities;
-	}
-
-	public double getEquity() {
-		return this.getTotalAssets() + this.getTotalLiabilities();
 	}
 
 	@Override
@@ -157,6 +96,8 @@ public final class Individual extends Agent {
 		this.pnlInvestmentIncome = 0d;
 		this.pnlInterestIncome = 0d;
 		this.pnlRentIncome = 0d;
+		this.pnlForeignIncome = 0d;
+		this.pnlOtherIncome = 0d;
 		this.pnlIncomeTaxExpense = 0d;
 
 		this.pnlLivingExpenses = 0d;
@@ -165,24 +106,7 @@ public final class Individual extends Agent {
 		this.pnlOtherDiscretionaryExpenses = 0d;
 
 		// Bal Sht
-		this.bsBankDeposits = 0d;
-		this.bsOtherFinancialAssets = 0d;
-		this.bsResidentialLandAndDwellings = 0d;
-		this.bsOtherNonFinancialAssets = 0d;
-		this.bsTotalAssets = 0d;
-
-		this.bsLoans = 0d;
 		this.bsStudentLoans = 0d;
-		this.bsOtherLiabilities = 0d;
-		this.bsTotalLiabilities = 0d;
-
-		this.bsNetWorth = 0d;
-
-		// Interest rates
-		this.interestRateDeposits = 0d;
-		this.interestRateLoans = 0d;
-		this.interestRateStudentLoans = 0d;
-
 	}
 
 	/**
@@ -478,6 +402,22 @@ public final class Individual extends Agent {
 	public void setPnlMortgageRepayments(double pnlMortgageRepayments) {
 		this.pnlMortgageRepayments = pnlMortgageRepayments;
 	}
+	
+	
+
+	/**
+	 * @return the pnlWorkRelatedExpenses
+	 */
+	public double getPnlWorkRelatedExpenses() {
+		return pnlWorkRelatedExpenses;
+	}
+
+	/**
+	 * @param pnlWorkRelatedExpenses the pnlWorkRelatedExpenses to set
+	 */
+	public void setPnlWorkRelatedExpenses(double pnlWorkRelatedExpenses) {
+		this.pnlWorkRelatedExpenses = pnlWorkRelatedExpenses;
+	}
 
 	/**
 	 * @return the pnlRentInterestExpense
@@ -536,62 +476,6 @@ public final class Individual extends Agent {
 	}
 
 	/**
-	 * @return the bsOtherFinancialAssets
-	 */
-	public double getBsOtherFinancialAssets() {
-		return bsOtherFinancialAssets;
-	}
-
-	/**
-	 * @param bsOtherFinancialAssets the bsOtherFinancialAssets to set
-	 */
-	public void setBsOtherFinancialAssets(double bsOtherFinancialAssets) {
-		this.bsOtherFinancialAssets = bsOtherFinancialAssets;
-	}
-
-	/**
-	 * @return the bsResidentialLandAndDwellings
-	 */
-	public double getBsResidentialLandAndDwellings() {
-		return bsResidentialLandAndDwellings;
-	}
-
-	/**
-	 * @param bsResidentialLandAndDwellings the bsResidentialLandAndDwellings to set
-	 */
-	public void setBsResidentialLandAndDwellings(double bsResidentialLandAndDwellings) {
-		this.bsResidentialLandAndDwellings = bsResidentialLandAndDwellings;
-	}
-
-	/**
-	 * @return the bsOtherNonFinancialAssets
-	 */
-	public double getBsOtherNonFinancialAssets() {
-		return bsOtherNonFinancialAssets;
-	}
-
-	/**
-	 * @param bsOtherNonFinancialAssets the bsOtherNonFinancialAssets to set
-	 */
-	public void setBsOtherNonFinancialAssets(double bsOtherNonFinancialAssets) {
-		this.bsOtherNonFinancialAssets = bsOtherNonFinancialAssets;
-	}
-
-	/**
-	 * @return the bsTotalAssets
-	 */
-	public double getBsTotalAssets() {
-		return bsTotalAssets;
-	}
-
-	/**
-	 * @param bsTotalAssets the bsTotalAssets to set
-	 */
-	public void setBsTotalAssets(double bsTotalAssets) {
-		this.bsTotalAssets = bsTotalAssets;
-	}
-
-	/**
 	 * @return the bsLoans
 	 */
 	public double getBsLoans() {
@@ -617,48 +501,6 @@ public final class Individual extends Agent {
 	 */
 	public void setBsStudentLoans(double bsStudentLoans) {
 		this.bsStudentLoans = bsStudentLoans;
-	}
-
-	/**
-	 * @return the bsOtherLiabilities
-	 */
-	public double getBsOtherLiabilities() {
-		return bsOtherLiabilities;
-	}
-
-	/**
-	 * @param bsOtherLiabilities the bsOtherLiabilities to set
-	 */
-	public void setBsOtherLiabilities(double bsOtherLiabilities) {
-		this.bsOtherLiabilities = bsOtherLiabilities;
-	}
-
-	/**
-	 * @return the bsTotalLiabilities
-	 */
-	public double getBsTotalLiabilities() {
-		return bsTotalLiabilities;
-	}
-
-	/**
-	 * @param bsTotalLiabilities the bsTotalLiabilities to set
-	 */
-	public void setBsTotalLiabilities(double bsTotalLiabilities) {
-		this.bsTotalLiabilities = bsTotalLiabilities;
-	}
-
-	/**
-	 * @return the bsNetWorth
-	 */
-	public double getBsNetWorth() {
-		return bsNetWorth;
-	}
-
-	/**
-	 * @param bsNetWorth the bsNetWorth to set
-	 */
-	public void setBsNetWorth(double bsNetWorth) {
-		this.bsNetWorth = bsNetWorth;
 	}
 
 	/**
@@ -702,5 +544,4 @@ public final class Individual extends Agent {
 	public void setInterestRateStudentLoans(double interestRateStudentLoans) {
 		this.interestRateStudentLoans = interestRateStudentLoans;
 	}
-
 }

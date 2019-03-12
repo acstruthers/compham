@@ -26,12 +26,18 @@ public class Household extends Agent {
 	private double pnlWagesSalaries;
 	private double pnlUnemploymentBenefits;
 	private double pnlOtherSocialSecurityIncome;
-	private double pnlInvestmentIncome; // other income
+	private double pnlInvestmentIncome; // other income (including superannuation & dividends)
+	private double pnlInterestIncome;
+	private double pnlRentIncome; // income from investment properties
+	private double pnlForeignIncome;
+	private double pnlOtherIncome;
 	private double pnlIncomeTaxExpense;
 
 	private double pnlLivingExpenses;
-	private double pnlRent;
+	private double pnlRentExpense;
 	private double pnlMortgageRepayments;
+	private double pnlRentInterestExpense; // assume interest-only loan
+	private double pnlDonations;
 	private double pnlOtherDiscretionaryExpenses;
 
 	// Bal Sht (48 bytes)
@@ -39,9 +45,19 @@ public class Household extends Agent {
 	private double bsOtherFinancialAssets;
 	private double bsResidentialLandAndDwellings;
 	private double bsOtherNonFinancialAssets;
+	private double bsTotalAssets;
 
 	private double bsLoans;
+	private double bsStudentLoans; // HELP debt
 	private double bsOtherLiabilities;
+	private double bsTotalLiabilities;
+
+	private double bsNetWorth;
+
+	// Interest rates (16 bytes)
+	protected double interestRateDeposits;
+	protected double interestRateLoans;
+	protected double interestRateStudentLoans; // in Australia this is always CPI (by law)
 
 	/**
 	 * 
@@ -74,7 +90,7 @@ public class Household extends Agent {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	/**
 	 * Sets the household's financials, based on the financials of the individuals
 	 * that it comprises of. Adjusts for household composition when calculating the
@@ -88,60 +104,26 @@ public class Household extends Agent {
 			this.pnlUnemploymentBenefits += i.getPnlUnemploymentBenefits();
 			this.pnlOtherSocialSecurityIncome += i.getPnlOtherSocialSecurityIncome();
 			this.pnlInvestmentIncome += i.getPnlInvestmentIncome();
+			this.pnlInterestIncome += i.getPnlInterestIncome();
+			this.pnlRentIncome += i.getPnlRentIncome();
+			this.pnlForeignIncome += i.getPnlForeignIncome();
+			this.pnlOtherIncome += i.getPnlOtherIncome();
 
 			this.pnlIncomeTaxExpense += i.getPnlIncomeTaxExpense();
 			this.pnlLivingExpenses += i.getPnlLivingExpenses();
-			this.pnlRent += i.getPnlRentExpense();
+			this.pnlRentExpense += i.getPnlRentExpense();
 			this.pnlMortgageRepayments += i.getPnlMortgageRepayments();
+			this.pnlRentInterestExpense += i.getPnlRentInterestExpense();
+			this.pnlDonations += i.getPnlDonations();
 			this.pnlOtherDiscretionaryExpenses += i.getPnlOtherDiscretionaryExpenses();
 
 			// Bal Sht
 			this.bsBankDeposits += i.getBsBankDeposits();
-			this.bsOtherFinancialAssets += i.getBsOtherFinancialAssets();
-			this.bsResidentialLandAndDwellings += i.getBsResidentialLandAndDwellings();
-			this.bsOtherNonFinancialAssets += i.getBsOtherNonFinancialAssets();
-
 			this.bsLoans += i.getBsLoans();
-			this.bsOtherLiabilities += i.getBsOtherLiabilities();
+			this.bsStudentLoans += i.getBsStudentLoans();
 		}
-	}
 
-	public double getGrossIncome() {
-		return this.pnlWagesSalaries + this.pnlUnemploymentBenefits + this.pnlOtherSocialSecurityIncome
-				+ this.pnlInvestmentIncome;
-	}
-
-	public double getNetIncome() {
-		return this.getGrossIncome() + this.pnlIncomeTaxExpense;
-	}
-
-	public double getTotalExpenses() {
-		return this.pnlLivingExpenses + this.pnlRent + this.pnlMortgageRepayments + this.pnlOtherDiscretionaryExpenses;
-	}
-
-	public double getNetProfit() {
-		return this.getNetIncome() + this.getTotalExpenses();
-	}
-
-	public double getTotalFinancialAssets() {
-		return this.bsBankDeposits + this.bsOtherFinancialAssets;
-	}
-
-	public double getTotalNonFinancialAssets() {
-		return this.getTotalAssets() - this.getTotalFinancialAssets();
-	}
-
-	public double getTotalAssets() {
-		return this.bsBankDeposits + this.bsOtherFinancialAssets + this.bsResidentialLandAndDwellings
-				+ this.bsOtherNonFinancialAssets;
-	}
-
-	public double getTotalLiabilities() {
-		return this.bsLoans + this.bsOtherLiabilities;
-	}
-
-	public double getEquity() {
-		return this.getTotalAssets() + this.getTotalLiabilities();
+		// TODO: calculate Henderson, Bal Sht ratios, etc.
 	}
 
 	protected void init() {
@@ -152,11 +134,17 @@ public class Household extends Agent {
 		this.pnlUnemploymentBenefits = 0d;
 		this.pnlOtherSocialSecurityIncome = 0d;
 		this.pnlInvestmentIncome = 0d;
+		this.pnlInterestIncome = 0d;
+		this.pnlRentIncome = 0d;
+		this.pnlForeignIncome = 0d;
+		this.pnlOtherIncome = 0d;
 		this.pnlIncomeTaxExpense = 0d;
 
 		this.pnlLivingExpenses = 0d;
-		this.pnlRent = 0d;
+		this.pnlRentExpense = 0d;
 		this.pnlMortgageRepayments = 0d;
+		this.pnlRentInterestExpense = 0d;
+		this.pnlDonations = 0d;
 		this.pnlOtherDiscretionaryExpenses = 0d;
 
 		// Bal Sht
@@ -164,8 +152,18 @@ public class Household extends Agent {
 		this.bsOtherFinancialAssets = 0d;
 		this.bsResidentialLandAndDwellings = 0d;
 		this.bsOtherNonFinancialAssets = 0d;
+		this.bsTotalAssets = 0d;
 
 		this.bsLoans = 0d;
+		this.bsStudentLoans = 0d;
 		this.bsOtherLiabilities = 0d;
+		this.bsTotalLiabilities = 0d;
+
+		this.bsNetWorth = 0d;
+
+		// Interest rates
+		this.interestRateDeposits = 0d;
+		this.interestRateLoans = 0d;
+		this.interestRateStudentLoans = 0d;
 	}
 }
