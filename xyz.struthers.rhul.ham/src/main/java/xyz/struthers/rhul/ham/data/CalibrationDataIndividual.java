@@ -43,41 +43,21 @@ public class CalibrationDataIndividual {
 
 	public static final int MAP_INIT_SIZE_LGA = (int) Math.ceil(573 / MAP_LOAD_FACTOR); // 572 (UR) including state
 																						// totals (563 Enum)
+	public static final int MAP_INIT_SIZE_SEXP = (int) Math.ceil(2 / MAP_LOAD_FACTOR); // 2 (no totals in data)
 	public static final int MAP_INIT_SIZE_POA = (int) Math.ceil(2600 / MAP_LOAD_FACTOR); // 2567 plus room for totals
 	public static final int MAP_INIT_SIZE_AGE5P = (int) Math.ceil(22 / MAP_LOAD_FACTOR); // 21 plus totals
-	public static final int MAP_INIT_SIZE_CDCF = (int) Math.ceil(15 / MAP_LOAD_FACTOR); // 15 (no totals in data)
-	public static final int MAP_INIT_SIZE_FINF = (int) Math.ceil(25 / MAP_LOAD_FACTOR); // 25 plus totals
-	public static final int MAP_INIT_SIZE_HCFMD = (int) Math.ceil(18 / MAP_LOAD_FACTOR); // 17 plus totals
-	public static final int MAP_INIT_SIZE_HIND = (int) Math.ceil(26 / MAP_LOAD_FACTOR); // 25 plus totals
-	public static final int MAP_INIT_SIZE_INCP = (int) Math.ceil(18 / MAP_LOAD_FACTOR); // 17 plus totals
 	public static final int MAP_INIT_SIZE_INDP = (int) Math.ceil(23 / MAP_LOAD_FACTOR); // 22 plus totals
-	public static final int MAP_INIT_SIZE_MRERD = (int) Math.ceil(22 / MAP_LOAD_FACTOR); // 21 plus totals
-	public static final int MAP_INIT_SIZE_RNTRD = (int) Math.ceil(26 / MAP_LOAD_FACTOR); // 25 plus totals
-	public static final int MAP_INIT_SIZE_TEND = (int) Math.ceil(10 / MAP_LOAD_FACTOR); // 9 plus totals
-	public static final int MAP_INIT_SIZE_SEXP = (int) Math.ceil(2 / MAP_LOAD_FACTOR); // 2 (no totals in data)
+	public static final int MAP_INIT_SIZE_INCP = (int) Math.ceil(18 / MAP_LOAD_FACTOR); // 17 plus totals
+	// public static final int MAP_INIT_SIZE_CDCF = (int) Math.ceil(15 /
+	// MAP_LOAD_FACTOR); // 15 (no totals in data)
 
 	// series names
-	public static final String RBA_E2 = "RBA_E2"; // household Balance Sheet ratios
-
-	public static final String ABS1410_0_ECONOMY = "ABS_1410.0_Economy";
-	static final String ABS1410_0_FAMILY = "ABS_1410.0_Family";
-	static final String ABS1410_0_INCOME = "ABS_1410.0_Income";
-
 	public static final String ATO_INDIVIDUAL_T2A = "ATO_IndividualTable2A";
 	public static final String ATO_INDIVIDUAL_T3A = "ATO_IndividualTable3A";
 	public static final String ATO_INDIVIDUAL_T6B = "ATO_IndividualTable6B";
-	static final String ATO_INDIVIDUAL_T6C = "ATO_IndividualTable6C";
 	public static final String ATO_INDIVIDUAL_T9 = "ATO_IndividualTable9";
 
 	public static final String CENSUS_SEXP_POA_AGE5P_INDP_INCP = "Census SEXP by POA (UR) by AGE5P, INDP and INCP";
-	public static final String CENSUS_HCFMD_LGA_HIND_RNTRD = "Census HCFMD by LGA by HIND and RNTRD";
-	public static final String CENSUS_HCFMD_LGA_HIND_MRERD = "Census HCFMD by LGA by HIND and MRERD";
-	public static final String CENSUS_HCFMF_LGA_FINF_CDCF = "Census HCFMF by LGA by FINF and CDCF";
-
-	static final String CENSUS_CDCF_LGA_FINF = "Census CDCF by LGA by FINF";
-	static final String CENSUS_SEXP_LGA_AGE5P_INDP_INCP = "Census SEXP by LGA (UR) by AGE5P, INDP and INCP";
-	static final String CENSUS_HCFMD_TEND_LGA_HIND_RNTRD = "Census HCFMD and TEND by LGA by HIND and RNTRD";
-	static final String CENSUS_HCFMD_TEND_LGA_HIND_MRERD = "Census HCFMD and TEND by LGA by HIND and MRERD";
 
 	// beans
 	private AreaMapping area;
@@ -91,12 +71,6 @@ public class CalibrationDataIndividual {
 	private Map<String, List<String>> unitType;
 	private Map<String, Map<String, String>> abs1292_0_55_002ANZSIC; // ANZSIC industry code mapping
 
-	private Map<String, Map<Date, String>> rbaE2; // AU Bal Sht ratios
-	private Map<String, Map<String, Map<String, String>>> abs1410_0Economy; // Data by LGA: Economy (keys: year, LGA,
-																			// series)
-	Map<String, Map<String, Map<String, String>>> abs1410_0Family; // Data by LGA: Family (keys: year, LGA,
-																	// series)
-	Map<String, Map<String, Map<String, String>>> abs1410_0Income; // Data by LGA: Income
 	/**
 	 * ATO Individuals Table 2A<br>
 	 * Contains P&L and people count by sex, 5-year age range, and state.<br>
@@ -109,25 +83,12 @@ public class CalibrationDataIndividual {
 	 * Keys: Series Title, Income Range, Age, Gender, Taxable Status
 	 */
 	private Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> atoIndividualTable3a;
-
 	/**
 	 * ATO Individuals Table 6B<br>
 	 * Contains P&L and people count by post code.<br>
 	 * Keys: Series Title, Post Code
 	 */
 	private Map<String, Map<String, String>> atoIndividualTable6b;
-	/**
-	 * ATO Individuals Table 6C<br>
-	 * Contains income ranges people count by post code.<br>
-	 * Keys: Series Title, Post Code
-	 */
-	Map<String, Map<String, String>> atoIndividualTable6c;
-	/**
-	 * ATO Individuals Table 9<br>
-	 * Contains P&L by industry code.<br>
-	 * Keys: Series Title, Industry Code
-	 */
-	private Map<String, Map<String, String>> atoIndividualTable9;
 	/**
 	 * ATO Individuals Table 9 (Industry Division summary)<br>
 	 * Contains count and taxable income, summarised by industry division.<br>
@@ -143,81 +104,7 @@ public class CalibrationDataIndividual {
 	 * Values: Number of persons
 	 */
 	private Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> censusSEXP_POA_AGE5P_INDP_INCP;
-	/**
-	 * ABS Census Table Builder data:<br>
-	 * SEXP by LGA (UR) by AGE5P, INDP and INCP<br>
-	 * Individual income by industry and demographic.
-	 * 
-	 * Keys: Age5, Industry Division, Personal Income, LGA, Sex<br>
-	 * Values: Number of persons
-	 */
-	Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> censusSEXP_LGA_AGE5P_INDP_INCP;
-	/**
-	 * ABS Census Table Builder data:<br>
-	 * HCFMD by LGA by HIND and RNTRD<br>
-	 * Rent by household income and composition.
-	 * 
-	 * Keys: Household Income, Rent Range, LGA, Household Composition Dwelling<br>
-	 * Values: Number of dwellings
-	 */
-	private Map<String, Map<String, Map<String, Map<String, String>>>> censusHCFMD_LGA_HIND_RNTRD;
-	/**
-	 * ABS Census Table Builder data:<br>
-	 * HCFMD by LGA by HIND and MRERD<br>
-	 * Mortgage payments by household income and composition.
-	 * 
-	 * Keys: Household Income, Rent Range, LGA, Household Composition Dwelling<br>
-	 * Values: Number of dwellings
-	 */
-	private Map<String, Map<String, Map<String, Map<String, String>>>> censusHCFMD_LGA_HIND_MRERD;
-	/**
-	 * ABS Census Table Builder data:<br>
-	 * HCFMF by LGA by FINF and CDCF<br>
-	 * Parents & children by family income and composition.
-	 * 
-	 * Keys: Family Income, Parents & Children (CDCF), LGA, Family Composition
-	 * Dwelling<br>
-	 * Values: Number of dwellings
-	 */
-	private Map<String, Map<String, Map<String, Map<String, String>>>> censusHCFMF_LGA_FINF_CDCF;
-	/**
-	 * ABS Census Table Builder data:<br>
-	 * CDCF by LGA by FINF<br>
-	 * Family income by family composition.
-	 * 
-	 * Keys: Family Income, LGA, Family Composition<br>
-	 * Values: Number of families
-	 */
-	Map<String, Map<String, Map<String, String>>> censusCDCF_LGA_FINF;
-	/**
-	 * ABS Census Table Builder data:<br>
-	 * HCFMD and TEND by LGA by HIND and RNTRD<br>
-	 * Rent by tenure, household income and composition.
-	 * 
-	 * Keys: Household Income, Rent Range, LGA, Household Composition Dwelling,
-	 * Tenure<br>
-	 * Values: Number of dwellings
-	 */
-	Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> censusHCFMD_TEND_LGA_HIND_RNTRD;
-	/**
-	 * ABS Census Table Builder data:<br>
-	 * HCFMD and TEND by LGA by HIND and MRERD<br>
-	 * Mortgage payments by tenure, household income and composition.
-	 * 
-	 * Keys: Household Income, Rent Range, LGA, Household Composition Dwelling,
-	 * Tenure<br>
-	 * Values: Number of dwellings
-	 */
-	Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> censusHCFMD_TEND_LGA_HIND_MRERD;
-
 	private boolean initialisedCensusSEXP_POA_AGE5P_INDP_INCP;
-	private boolean initialisedCensusHCFMD_LGA_HIND_RNTRD;
-	private boolean initialisedCensusHCFMD_LGA_HIND_MRERD;
-	private boolean initialisedCensusCDCF_LGA_FINF;
-
-	boolean initialisedCensusSEXP_LGA_AGE5P_INDP_INCP;
-	boolean initialisedCensusHCFMD_TEND_LGA_HIND_RNTRD;
-	boolean initialisedCensusHCFMD_TEND_LGA_HIND_MRERD;
 
 	/**
 	 * 
@@ -234,11 +121,128 @@ public class CalibrationDataIndividual {
 	/**
 	 * Deletes all the field variables, freeing up memory.
 	 * 
-	 * Does not do a deep delete because most objects are passed to other classes by
-	 * reference, and the other classes will probably still need to refer to them.
+	 * Performs a deep delete of the objects that won't be needed after Individuals
+	 * are calibrated.
 	 */
 	@PreDestroy
 	public void close() {
+		this.area = null;
+		this.sharedData = null;
+		this.totalPopulation = null;
+		this.adjustedPeopleByLga = null;
+		this.abs1292_0_55_002ANZSIC = null;
+
+		for (String key : this.title.keySet()) {
+			this.title.get(key).clear();
+			this.title.put(key, null);
+		}
+		this.title = null;
+		for (String key : this.unitType.keySet()) {
+			this.unitType.get(key).clear();
+			this.unitType.put(key, null);
+		}
+		this.unitType = null;
+		// ATO 2A Keys: Series Title, State, Age, Gender, Taxable Status, Lodgment
+		// Method
+		for (String series : this.atoIndividualTable2a.keySet()) {
+			for (String state : this.atoIndividualTable2a.get(series).keySet()) {
+				for (String age : this.atoIndividualTable2a.get(series).get(state).keySet()) {
+					for (String sex : this.atoIndividualTable2a.get(series).get(state).get(age).keySet()) {
+						for (String taxableStatus : this.atoIndividualTable2a.get(series).get(state).get(age).get(sex)
+								.keySet()) {
+							for (String lodgment : this.atoIndividualTable2a.get(series).get(state).get(age).get(sex)
+									.get(taxableStatus).keySet()) {
+								this.atoIndividualTable2a.get(series).get(state).get(age).get(sex).get(taxableStatus)
+										.put(lodgment, null);
+							} // end lodgment loop
+							this.atoIndividualTable2a.get(series).get(state).get(age).get(sex).get(taxableStatus)
+									.clear();
+							this.atoIndividualTable2a.get(series).get(state).get(age).get(sex).put(taxableStatus, null);
+						} // end taxable status loop
+						this.atoIndividualTable2a.get(series).get(state).get(age).get(sex).clear();
+						this.atoIndividualTable2a.get(series).get(state).get(age).put(sex, null);
+					} // end sex loop
+					this.atoIndividualTable2a.get(series).get(state).get(age).clear();
+					this.atoIndividualTable2a.get(series).get(state).put(age, null);
+				} // end age loop
+				this.atoIndividualTable2a.get(series).get(state).clear();
+				this.atoIndividualTable2a.get(series).put(state, null);
+			} // end state loop
+			this.atoIndividualTable2a.get(series).clear();
+			this.atoIndividualTable2a.put(series, null);
+		} // end series loop
+		this.atoIndividualTable2a.clear();
+		this.atoIndividualTable2a = null;
+
+		// ATO 3A Keys: Series Title, Income Range, Age, Gender, Taxable Status
+		for (String series : this.atoIndividualTable3a.keySet()) {
+			for (String income : this.atoIndividualTable3a.get(series).keySet()) {
+				for (String age : this.atoIndividualTable3a.get(series).get(income).keySet()) {
+					for (String sex : this.atoIndividualTable3a.get(series).get(income).get(age).keySet()) {
+						for (String taxableStatus : this.atoIndividualTable3a.get(series).get(income).get(age).get(sex).keySet()) {
+							this.atoIndividualTable3a.get(series).get(income).get(age).get(sex).put(taxableStatus, null);
+						} // end taxable status loop
+						this.atoIndividualTable3a.get(series).get(income).get(age).get(sex).clear();
+						this.atoIndividualTable3a.get(series).get(income).get(age).put(sex, null);
+					} // end sex loop
+					this.atoIndividualTable3a.get(series).get(income).get(age).clear();
+					this.atoIndividualTable3a.get(series).get(income).put(age, null);
+				} // end age loop
+				this.atoIndividualTable3a.get(series).get(income).clear();
+				this.atoIndividualTable3a.get(series).put(income, null);
+			} // end state loop
+			this.atoIndividualTable3a.get(series).clear();
+			this.atoIndividualTable3a.put(series, null);
+		} // end series loop
+		this.atoIndividualTable3a.clear();
+		this.atoIndividualTable3a = null;
+
+		// ATO 6B Keys: Series Title, Post Code
+		for (String series : this.atoIndividualTable6b.keySet()) {
+			for (String poa : this.atoIndividualTable6b.get(series).keySet()) {
+				this.atoIndividualTable6b.get(series).put(poa, null);
+			} // end poa loop
+			this.atoIndividualTable6b.get(series).clear();
+			this.atoIndividualTable6b.put(series, null);
+		}
+		this.atoIndividualTable6b.clear();
+		this.atoIndividualTable6b = null;
+
+		// ATO 9 Keys: Series Title, Industry Division Code
+		for (String series : this.atoIndividualTable9DivisionSummary.keySet()) {
+			for (String div : this.atoIndividualTable9DivisionSummary.get(series).keySet()) {
+				this.atoIndividualTable9DivisionSummary.get(series).put(div, null);
+			} // end poa loop
+			this.atoIndividualTable9DivisionSummary.get(series).clear();
+			this.atoIndividualTable9DivisionSummary.put(series, null);
+		}
+		this.atoIndividualTable9DivisionSummary.clear();
+		this.atoIndividualTable9DivisionSummary = null;
+
+		// Census SEXP Keys: Age5, Industry Division, Personal Income, POA, Sex<br>
+		for (String age : this.censusSEXP_POA_AGE5P_INDP_INCP.keySet()) {
+			for (String div : this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).keySet()) {
+				for (String income : this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).keySet()) {
+					for (String poa : this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).keySet()) {
+						for (String sex : this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).get(poa).keySet()) {
+							this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).get(poa).put(sex, null);
+						} // end taxable status loop
+						this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).get(poa).clear();
+						this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).put(poa, null);
+					} // end sex loop
+					this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).clear();
+					this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).put(income, null);
+				} // end age loop
+				this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).clear();
+				this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).put(div, null);
+			} // end state loop
+			this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).clear();
+			this.censusSEXP_POA_AGE5P_INDP_INCP.put(age, null);
+		} // end series loop
+		this.censusSEXP_POA_AGE5P_INDP_INCP.clear();
+		this.censusSEXP_POA_AGE5P_INDP_INCP = null;
+		this.initialisedCensusSEXP_POA_AGE5P_INDP_INCP = false;
+		
 		this.init(); // set all the pointers to null
 	}
 
@@ -441,63 +445,37 @@ public class CalibrationDataIndividual {
 	 * @param titles               - column titles in CSV file
 	 * @param data                 - the data map that the values are returned in
 	 */
-	private void loadAbsCensusTableCsv2D(String fileResourceLocation, String tableName, int[] columnsToImport,
-			boolean isInitialised, Map<String, List<String>> titles, Map<String, Map<String, String>> data) {
-
-		CSVReader reader = null;
-		try {
-			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
-			reader = new CSVReader(new InputStreamReader(is));
-			boolean header = true;
-			boolean footer = false;
-			int currentRow = 1;
-			int titleRow = 10;
-			int lastHeaderRow = 11;
-			String[] seriesId = new String[columnsToImport.length];
-
-			String[] line = null;
-			while ((line = reader.readNext()) != null) {
-				if (header) {
-					if (currentRow == titleRow) {
-						for (int i = 0; i < columnsToImport.length; i++) {
-							seriesId[i] = line[columnsToImport[i]];
-						}
-						if (!isInitialised) {
-							titles.put(tableName, new ArrayList<String>(columnsToImport.length));
-							for (int i = 0; i < columnsToImport.length; i++) {
-								// store title
-								titles.get(tableName).add(line[columnsToImport[i]]);
-
-								// store series ID as key with blank collections to populate with data below
-								data.put(line[columnsToImport[i]], new HashMap<String, String>());
-							}
-						}
-					} else if (currentRow == lastHeaderRow) {
-						header = false;
-					}
-				} else if (!footer) {
-					if (line.length > 0 && line[0].equals("Total")) {
-						footer = true;
-					} else {
-						for (int i = 0; i < columnsToImport.length; i++) {
-							// parse the body of the data
-							String lgaCode = this.area.getLgaCodeFromName(line[0]);
-							data.get(seriesId[i]).put(lgaCode, line[columnsToImport[i]]);
-							// WISHLIST: modify this so it can use POA, state, etc. not just LGA
-						}
-					}
-				}
-			}
-			reader.close();
-			reader = null;
-		} catch (FileNotFoundException e) {
-			// open file
-			e.printStackTrace();
-		} catch (IOException e) {
-			// read next
-			e.printStackTrace();
-		}
-	}
+	/*
+	 * private void loadAbsCensusTableCsv2D(String fileResourceLocation, String
+	 * tableName, int[] columnsToImport, boolean isInitialised, Map<String,
+	 * List<String>> titles, Map<String, Map<String, String>> data) {
+	 * 
+	 * CSVReader reader = null; try { InputStream is =
+	 * this.getClass().getResourceAsStream(fileResourceLocation); reader = new
+	 * CSVReader(new InputStreamReader(is)); boolean header = true; boolean footer =
+	 * false; int currentRow = 1; int titleRow = 10; int lastHeaderRow = 11;
+	 * String[] seriesId = new String[columnsToImport.length];
+	 * 
+	 * String[] line = null; while ((line = reader.readNext()) != null) { if
+	 * (header) { if (currentRow == titleRow) { for (int i = 0; i <
+	 * columnsToImport.length; i++) { seriesId[i] = line[columnsToImport[i]]; } if
+	 * (!isInitialised) { titles.put(tableName, new
+	 * ArrayList<String>(columnsToImport.length)); for (int i = 0; i <
+	 * columnsToImport.length; i++) { // store title
+	 * titles.get(tableName).add(line[columnsToImport[i]]);
+	 * 
+	 * // store series ID as key with blank collections to populate with data below
+	 * data.put(line[columnsToImport[i]], new HashMap<String, String>()); } } } else
+	 * if (currentRow == lastHeaderRow) { header = false; } } else if (!footer) { if
+	 * (line.length > 0 && line[0].equals("Total")) { footer = true; } else { for
+	 * (int i = 0; i < columnsToImport.length; i++) { // parse the body of the data
+	 * String lgaCode = this.area.getLgaCodeFromName(line[0]);
+	 * data.get(seriesId[i]).put(lgaCode, line[columnsToImport[i]]); // WISHLIST:
+	 * modify this so it can use POA, state, etc. not just LGA } } } }
+	 * reader.close(); reader = null; } catch (FileNotFoundException e) { // open
+	 * file e.printStackTrace(); } catch (IOException e) { // read next
+	 * e.printStackTrace(); } }
+	 */
 
 	/**
 	 * Loads ABS Census Table Builder tables with three dimensions (row, column &
@@ -521,86 +499,45 @@ public class CalibrationDataIndividual {
 	 * @param data                 - the data map that the values are returned in.
 	 *                             Keys are: column, row, wafer. (div, LGA, income)
 	 */
-	private void loadAbsCensusTableCsv1Column1Wafer(String fileResourceLocation, boolean isInitialised,
-			int fromColumnIndex, int toColumnIndex, Map<String, Map<String, Map<String, String>>> data) {
-
-		CSVReader reader = null;
-		try {
-			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
-			reader = new CSVReader(new InputStreamReader(is));
-			boolean header = true;
-			boolean footer = false;
-			int currentRow = 1;
-			int lastHeaderRow = 9; // the row before the first wafer's title row
-			boolean prevRowIsBlank = true; // there's a blank row before wafer names
-			boolean prevRowIsWaferName = false;
-			String waferName = null;
-			int waferNumber = 0;
-			String[] seriesId = new String[toColumnIndex - fromColumnIndex];
-
-			String[] line = null;
-			while ((line = reader.readNext()) != null) {
-				if (header) {
-					if (currentRow++ == lastHeaderRow) {
-						header = false;
-					}
-				} else if (!footer) {
-					if (line[0].length() > 11 && line[0].substring(0, 11).equals("Data Source")) {
-						footer = true;
-					} else {
-						if (prevRowIsBlank && !line[0].isBlank()) {
-							// set wafer name
-							waferName = line[0].trim();
-							prevRowIsWaferName = true;
-							waferNumber++;
-							prevRowIsBlank = false;
-						} else {
-							if (prevRowIsWaferName) {
-								if (waferNumber == 1) {
-									// set series ID
-									for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
-										seriesId[i] = line[i + fromColumnIndex];
-									}
-									if (!isInitialised) {
-										for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
-											// store series ID as key with blank collections to populate with data below
-											data.put(line[i + fromColumnIndex],
-													new HashMap<String, Map<String, String>>(MAP_INIT_SIZE_LGA));
-										}
-									}
-								}
-								prevRowIsWaferName = false;
-							} else if (line.length > 1 && !line[1].isBlank()) {
-								// parse the body of the data
-								// WISHLIST: modify this so it can use POA, state, etc. not just LGA
-								String lgaCode = this.area.getLgaCodeFromName(line[0]);
-								if (lgaCode != null) {
-									// null check excludes invalid LGAs
-									for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
-										if (waferNumber == 1) {
-											data.get(seriesId[i]).put(lgaCode,
-													new HashMap<String, String>(MAP_INIT_SIZE_CDCF));
-										}
-										data.get(seriesId[i]).get(lgaCode).put(waferName, line[i + fromColumnIndex]);
-									}
-								}
-							} else if (line[0].isBlank()) {
-								prevRowIsBlank = true;
-							}
-						}
-					}
-				}
-			}
-			reader.close();
-			reader = null;
-		} catch (FileNotFoundException e) {
-			// open file
-			e.printStackTrace();
-		} catch (IOException e) {
-			// read next
-			e.printStackTrace();
-		}
-	}
+	/*
+	 * private void loadAbsCensusTableCsv1Column1Wafer(String fileResourceLocation,
+	 * boolean isInitialised, int fromColumnIndex, int toColumnIndex, Map<String,
+	 * Map<String, Map<String, String>>> data) {
+	 * 
+	 * CSVReader reader = null; try { InputStream is =
+	 * this.getClass().getResourceAsStream(fileResourceLocation); reader = new
+	 * CSVReader(new InputStreamReader(is)); boolean header = true; boolean footer =
+	 * false; int currentRow = 1; int lastHeaderRow = 9; // the row before the first
+	 * wafer's title row boolean prevRowIsBlank = true; // there's a blank row
+	 * before wafer names boolean prevRowIsWaferName = false; String waferName =
+	 * null; int waferNumber = 0; String[] seriesId = new String[toColumnIndex -
+	 * fromColumnIndex];
+	 * 
+	 * String[] line = null; while ((line = reader.readNext()) != null) { if
+	 * (header) { if (currentRow++ == lastHeaderRow) { header = false; } } else if
+	 * (!footer) { if (line[0].length() > 11 && line[0].substring(0,
+	 * 11).equals("Data Source")) { footer = true; } else { if (prevRowIsBlank &&
+	 * !line[0].isBlank()) { // set wafer name waferName = line[0].trim();
+	 * prevRowIsWaferName = true; waferNumber++; prevRowIsBlank = false; } else { if
+	 * (prevRowIsWaferName) { if (waferNumber == 1) { // set series ID for (int i =
+	 * 0; i < toColumnIndex - fromColumnIndex; i++) { seriesId[i] = line[i +
+	 * fromColumnIndex]; } if (!isInitialised) { for (int i = 0; i < toColumnIndex -
+	 * fromColumnIndex; i++) { // store series ID as key with blank collections to
+	 * populate with data below data.put(line[i + fromColumnIndex], new
+	 * HashMap<String, Map<String, String>>(MAP_INIT_SIZE_LGA)); } } }
+	 * prevRowIsWaferName = false; } else if (line.length > 1 && !line[1].isBlank())
+	 * { // parse the body of the data // WISHLIST: modify this so it can use POA,
+	 * state, etc. not just LGA String lgaCode =
+	 * this.area.getLgaCodeFromName(line[0]); if (lgaCode != null) { // null check
+	 * excludes invalid LGAs for (int i = 0; i < toColumnIndex - fromColumnIndex;
+	 * i++) { if (waferNumber == 1) { data.get(seriesId[i]).put(lgaCode, new
+	 * HashMap<String, String>(MAP_INIT_SIZE_CDCF)); }
+	 * data.get(seriesId[i]).get(lgaCode).put(waferName, line[i + fromColumnIndex]);
+	 * } } } else if (line[0].isBlank()) { prevRowIsBlank = true; } } } } }
+	 * reader.close(); reader = null; } catch (FileNotFoundException e) { // open
+	 * file e.printStackTrace(); } catch (IOException e) { // read next
+	 * e.printStackTrace(); } }
+	 */
 
 	/**
 	 * Loads ABS Census Table Builder tables with one row series, three column
@@ -761,112 +698,64 @@ public class CalibrationDataIndividual {
 	 *                             Keys are: 2 columns, row, 2 wafers. (HIND,
 	 *                             RNTRD/MRERD, LGA, HCFMD, TEND)
 	 */
-	private void loadAbsCensusTableCsv2Columns2Wafers(String fileResourceLocation, boolean isInitialised,
-			int fromColumnIndex, int toColumnIndex,
-			Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> data) {
-
-		CSVReader reader = null;
-		try {
-			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
-			reader = new CSVReader(new InputStreamReader(is));
-			boolean header = true;
-			boolean footer = false;
-			int currentRow = 1;
-			int lastHeaderRow = 9; // the row before the first wafer's title row
-			boolean prevRowIsBlank = true; // there's a blank row before wafer names
-			final int numWafers = 2;
-			String[] waferName = new String[numWafers];
-			int waferNumber = 0;
-			int columnSeriesNumber = Integer.MAX_VALUE;
-			final int columnSeriesMax = 2; // because the dataset contains 2 column series
-			String[][] columnTitles = new String[columnSeriesMax][toColumnIndex - fromColumnIndex];
-
-			String[] line = null;
-			while ((line = reader.readNext()) != null) {
-				if (header) {
-					if (currentRow++ == lastHeaderRow) {
-						header = false;
-					}
-				} else if (!footer) {
-					if (line[0].length() > 11 && line[0].substring(0, 11).equals("Data Source")) {
-						footer = true;
-					} else {
-						if (prevRowIsBlank && !line[0].isBlank()) {
-							// set wafer name
-							String[] tmp = line[0].split(","); // wafer names are separated by commas
-							for (int i = 0; i < numWafers; i++) {
-								waferName[i] = tmp[i].trim();
-							}
-							columnSeriesNumber = 0;
-							waferNumber++;
-							prevRowIsBlank = false;
-						} else {
-							if (columnSeriesNumber < columnSeriesMax) {
-								// set series ID
-								String thisTitle = null;
-								for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
-									thisTitle = line[i + fromColumnIndex].isEmpty() ? thisTitle
-											: line[i + fromColumnIndex];
-									columnTitles[columnSeriesNumber][i] = thisTitle;
-								}
-								columnSeriesNumber++;
-							} else if (columnSeriesNumber == columnSeriesMax && !isInitialised) {
-								// add blank maps to data, so they can be populated below
-								if (waferNumber == 1) {
-									for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
-										if (!columnTitles[0][i].isBlank() && !data.containsKey(columnTitles[0][i])) {
-											// add column series 1 key
-											data.put(columnTitles[0][i],
-													new HashMap<String, Map<String, Map<String, Map<String, String>>>>(
-															Math.max(MAP_INIT_SIZE_RNTRD, MAP_INIT_SIZE_MRERD)));
-										}
-										if (!columnTitles[1][i].isBlank()
-												&& !data.get(columnTitles[0][i]).containsKey(columnTitles[1][i])) {
-											// add column series 2 key
-											data.get(columnTitles[0][i]).put(columnTitles[1][i],
-													new HashMap<String, Map<String, Map<String, String>>>(
-															MAP_INIT_SIZE_LGA));
-										}
-									}
-								}
-							} else if (line.length > 1 && !line[1].isBlank()) {
-								// parse the body of the data
-								// WISHLIST: modify this so it can use POA, state, etc. not just LGA
-								String lgaCode = this.area.getLgaCodeFromName(line[0]);
-								if (lgaCode != null) {
-									// null check excludes invalid LGAs
-									for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
-										if (waferNumber == 1) {
-											data.get(columnTitles[0][i]).get(columnTitles[1][i]).put(lgaCode,
-													new HashMap<String, Map<String, String>>(MAP_INIT_SIZE_HCFMD));
-										}
-										if (!data.get(columnTitles[0][i]).get(columnTitles[1][i]).get(lgaCode)
-												.containsKey(waferName[0])) {
-											// add map if this is the first time the wafer 1 has been read
-											data.get(columnTitles[0][i]).get(columnTitles[1][i]).get(lgaCode)
-													.put(waferName[0], new HashMap<String, String>(MAP_INIT_SIZE_TEND));
-										}
-										data.get(columnTitles[0][i]).get(columnTitles[1][i]).get(lgaCode)
-												.get(waferName[0]).put(waferName[1], line[i + fromColumnIndex]);
-									}
-								}
-							} else if (line[0].isBlank()) {
-								prevRowIsBlank = true;
-							}
-						}
-					}
-				}
-			}
-			reader.close();
-			reader = null;
-		} catch (FileNotFoundException e) {
-			// open file
-			e.printStackTrace();
-		} catch (IOException e) {
-			// read next
-			e.printStackTrace();
-		}
-	}
+	/*
+	 * private void loadAbsCensusTableCsv2Columns2Wafers(String
+	 * fileResourceLocation, boolean isInitialised, int fromColumnIndex, int
+	 * toColumnIndex, Map<String, Map<String, Map<String, Map<String, Map<String,
+	 * String>>>>> data) {
+	 * 
+	 * CSVReader reader = null; try { InputStream is =
+	 * this.getClass().getResourceAsStream(fileResourceLocation); reader = new
+	 * CSVReader(new InputStreamReader(is)); boolean header = true; boolean footer =
+	 * false; int currentRow = 1; int lastHeaderRow = 9; // the row before the first
+	 * wafer's title row boolean prevRowIsBlank = true; // there's a blank row
+	 * before wafer names final int numWafers = 2; String[] waferName = new
+	 * String[numWafers]; int waferNumber = 0; int columnSeriesNumber =
+	 * Integer.MAX_VALUE; final int columnSeriesMax = 2; // because the dataset
+	 * contains 2 column series String[][] columnTitles = new
+	 * String[columnSeriesMax][toColumnIndex - fromColumnIndex];
+	 * 
+	 * String[] line = null; while ((line = reader.readNext()) != null) { if
+	 * (header) { if (currentRow++ == lastHeaderRow) { header = false; } } else if
+	 * (!footer) { if (line[0].length() > 11 && line[0].substring(0,
+	 * 11).equals("Data Source")) { footer = true; } else { if (prevRowIsBlank &&
+	 * !line[0].isBlank()) { // set wafer name String[] tmp = line[0].split(","); //
+	 * wafer names are separated by commas for (int i = 0; i < numWafers; i++) {
+	 * waferName[i] = tmp[i].trim(); } columnSeriesNumber = 0; waferNumber++;
+	 * prevRowIsBlank = false; } else { if (columnSeriesNumber < columnSeriesMax) {
+	 * // set series ID String thisTitle = null; for (int i = 0; i < toColumnIndex -
+	 * fromColumnIndex; i++) { thisTitle = line[i + fromColumnIndex].isEmpty() ?
+	 * thisTitle : line[i + fromColumnIndex]; columnTitles[columnSeriesNumber][i] =
+	 * thisTitle; } columnSeriesNumber++; } else if (columnSeriesNumber ==
+	 * columnSeriesMax && !isInitialised) { // add blank maps to data, so they can
+	 * be populated below if (waferNumber == 1) { for (int i = 0; i < toColumnIndex
+	 * - fromColumnIndex; i++) { if (!columnTitles[0][i].isBlank() &&
+	 * !data.containsKey(columnTitles[0][i])) { // add column series 1 key
+	 * data.put(columnTitles[0][i], new HashMap<String, Map<String, Map<String,
+	 * Map<String, String>>>>( Math.max(MAP_INIT_SIZE_RNTRD, MAP_INIT_SIZE_MRERD)));
+	 * } if (!columnTitles[1][i].isBlank() &&
+	 * !data.get(columnTitles[0][i]).containsKey(columnTitles[1][i])) { // add
+	 * column series 2 key data.get(columnTitles[0][i]).put(columnTitles[1][i], new
+	 * HashMap<String, Map<String, Map<String, String>>>( MAP_INIT_SIZE_LGA)); } } }
+	 * } else if (line.length > 1 && !line[1].isBlank()) { // parse the body of the
+	 * data // WISHLIST: modify this so it can use POA, state, etc. not just LGA
+	 * String lgaCode = this.area.getLgaCodeFromName(line[0]); if (lgaCode != null)
+	 * { // null check excludes invalid LGAs for (int i = 0; i < toColumnIndex -
+	 * fromColumnIndex; i++) { if (waferNumber == 1) {
+	 * data.get(columnTitles[0][i]).get(columnTitles[1][i]).put(lgaCode, new
+	 * HashMap<String, Map<String, String>>(MAP_INIT_SIZE_HCFMD)); } if
+	 * (!data.get(columnTitles[0][i]).get(columnTitles[1][i]).get(lgaCode)
+	 * .containsKey(waferName[0])) { // add map if this is the first time the wafer
+	 * 1 has been read
+	 * data.get(columnTitles[0][i]).get(columnTitles[1][i]).get(lgaCode)
+	 * .put(waferName[0], new HashMap<String, String>(MAP_INIT_SIZE_TEND)); }
+	 * data.get(columnTitles[0][i]).get(columnTitles[1][i]).get(lgaCode)
+	 * .get(waferName[0]).put(waferName[1], line[i + fromColumnIndex]); } } } else
+	 * if (line[0].isBlank()) { prevRowIsBlank = true; } } } } } reader.close();
+	 * reader = null; } catch (FileNotFoundException e) { // open file
+	 * e.printStackTrace(); } catch (IOException e) { // read next
+	 * e.printStackTrace(); } }
+	 */
 
 	/**
 	 * Load data from ATO Individuals Table 2A
@@ -1136,56 +1025,35 @@ public class CalibrationDataIndividual {
 	 * @param titles               - column titles in CSV file
 	 * @param data                 - the data map that the values are returned in
 	 */
-	private void loadAtoIndividualsTable9(String fileResourceLocation, String tableName, int[] columnsToImport,
-			Map<String, List<String>> titles, Map<String, Map<String, String>> data) {
-
-		CSVReader reader = null;
-		try {
-			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
-			reader = new CSVReader(new InputStreamReader(is));
-			boolean header = true;
-			boolean footer = false;
-			String[] seriesId = new String[columnsToImport.length];
-
-			String[] line = null;
-			while ((line = reader.readNext()) != null && !footer) {
-				if (header) {
-					if (line[0].equals("Broad Industry1")) {
-						// title row
-						List<String> thesecolumnNames = new ArrayList<String>(columnsToImport.length);
-						for (int i = 0; i < columnsToImport.length; i++) {
-							// store title
-							seriesId[i] = line[columnsToImport[i]].trim();
-							thesecolumnNames.add(line[columnsToImport[i]].trim());
-
-							// store series ID as key with blank collections to populate with data below
-							data.put(line[columnsToImport[i]].trim(), new HashMap<String, String>());
-						}
-						titles.put(tableName, thesecolumnNames);
-						header = false;
-					}
-				} else {
-					if (!line[1].equals("Other individuals")) {
-						String fineIndustryCode = line[1].trim().substring(0, 5);
-						for (int i = 0; i < columnsToImport.length; i++) {
-							// parse the body of the data
-							data.get(seriesId[i]).put(fineIndustryCode, line[columnsToImport[i]].trim());
-						}
-					} else {
-						footer = true;
-					}
-				}
-			}
-			reader.close();
-			reader = null;
-		} catch (FileNotFoundException e) {
-			// open file
-			e.printStackTrace();
-		} catch (IOException e) {
-			// read next
-			e.printStackTrace();
-		}
-	}
+	/*
+	 * private void loadAtoIndividualsTable9(String fileResourceLocation, String
+	 * tableName, int[] columnsToImport, Map<String, List<String>> titles,
+	 * Map<String, Map<String, String>> data) {
+	 * 
+	 * CSVReader reader = null; try { InputStream is =
+	 * this.getClass().getResourceAsStream(fileResourceLocation); reader = new
+	 * CSVReader(new InputStreamReader(is)); boolean header = true; boolean footer =
+	 * false; String[] seriesId = new String[columnsToImport.length];
+	 * 
+	 * String[] line = null; while ((line = reader.readNext()) != null && !footer) {
+	 * if (header) { if (line[0].equals("Broad Industry1")) { // title row
+	 * List<String> thesecolumnNames = new
+	 * ArrayList<String>(columnsToImport.length); for (int i = 0; i <
+	 * columnsToImport.length; i++) { // store title seriesId[i] =
+	 * line[columnsToImport[i]].trim();
+	 * thesecolumnNames.add(line[columnsToImport[i]].trim());
+	 * 
+	 * // store series ID as key with blank collections to populate with data below
+	 * data.put(line[columnsToImport[i]].trim(), new HashMap<String, String>()); }
+	 * titles.put(tableName, thesecolumnNames); header = false; } } else { if
+	 * (!line[1].equals("Other individuals")) { String fineIndustryCode =
+	 * line[1].trim().substring(0, 5); for (int i = 0; i < columnsToImport.length;
+	 * i++) { // parse the body of the data
+	 * data.get(seriesId[i]).put(fineIndustryCode, line[columnsToImport[i]].trim());
+	 * } } else { footer = true; } } } reader.close(); reader = null; } catch
+	 * (FileNotFoundException e) { // open file e.printStackTrace(); } catch
+	 * (IOException e) { // read next e.printStackTrace(); } }
+	 */
 
 	/**
 	 * Load data from ATO Individuals Table 9
@@ -1267,73 +1135,13 @@ public class CalibrationDataIndividual {
 		this.title = null;
 		this.unitType = null;
 
-		this.rbaE2 = null;
-
-		this.abs1410_0Economy = null;
-		this.abs1410_0Family = null;
-		this.abs1410_0Income = null;
-
 		this.atoIndividualTable2a = null;
 		this.atoIndividualTable3a = null;
 		this.atoIndividualTable6b = null;
-		this.atoIndividualTable6c = null;
-		this.atoIndividualTable9 = null;
 		this.atoIndividualTable9DivisionSummary = null;
 
-		this.censusCDCF_LGA_FINF = null;
-		this.censusHCFMD_TEND_LGA_HIND_MRERD = null;
-		this.censusHCFMD_TEND_LGA_HIND_RNTRD = null;
-		this.censusSEXP_LGA_AGE5P_INDP_INCP = null;
 		this.censusSEXP_POA_AGE5P_INDP_INCP = null;
 		this.initialisedCensusSEXP_POA_AGE5P_INDP_INCP = false;
-		this.initialisedCensusHCFMD_LGA_HIND_MRERD = false;
-		this.initialisedCensusHCFMD_LGA_HIND_RNTRD = false;
-		this.initialisedCensusCDCF_LGA_FINF = false;
-
-		this.initialisedCensusHCFMD_TEND_LGA_HIND_MRERD = false;
-		this.initialisedCensusHCFMD_TEND_LGA_HIND_RNTRD = false;
-		this.initialisedCensusSEXP_LGA_AGE5P_INDP_INCP = false;
-
-	}
-
-	/**
-	 * @return the rbaE2
-	 */
-	public Map<String, Map<Date, String>> getRbaE2() {
-		if (!this.dataLoaded) {
-			this.loadData();
-		}
-		return rbaE2;
-	}
-
-	/**
-	 * @return the abs1410_0Economy
-	 */
-	public Map<String, Map<String, Map<String, String>>> getAbs1410_0Economy() {
-		if (!this.dataLoaded) {
-			this.loadData();
-		}
-		return abs1410_0Economy;
-	}
-
-	/**
-	 * @return the abs1410_0Family
-	 */
-	public Map<String, Map<String, Map<String, String>>> getAbs1410_0Family() {
-		if (!this.dataLoaded) {
-			this.loadData();
-		}
-		return abs1410_0Family;
-	}
-
-	/**
-	 * @return the abs1410_0Income
-	 */
-	public Map<String, Map<String, Map<String, String>>> getAbs1410_0Income() {
-		if (!this.dataLoaded) {
-			this.loadData();
-		}
-		return abs1410_0Income;
 	}
 
 	/**
@@ -1367,26 +1175,6 @@ public class CalibrationDataIndividual {
 	}
 
 	/**
-	 * @return the atoIndividualTable6c
-	 */
-	public Map<String, Map<String, String>> getAtoIndividualTable6c() {
-		if (!this.dataLoaded) {
-			this.loadData();
-		}
-		return atoIndividualTable6c;
-	}
-
-	/**
-	 * @return the atoIndividualTable9
-	 */
-	public Map<String, Map<String, String>> getAtoIndividualTable9() {
-		if (!this.dataLoaded) {
-			this.loadData();
-		}
-		return atoIndividualTable9;
-	}
-
-	/**
 	 * @return the atoIndividualTable9DivisionSummary
 	 */
 	public Map<String, Map<String, Double>> getAtoIndividualTable9DivisionSummary() {
@@ -1397,16 +1185,6 @@ public class CalibrationDataIndividual {
 	}
 
 	/**
-	 * @return the censusHCFMD_LGA_HIND_MRERD
-	 */
-	public Map<String, Map<String, Map<String, Map<String, String>>>> getCensusHCFMD_LGA_HIND_MRERD() {
-		if (!this.dataLoaded) {
-			this.loadData();
-		}
-		return censusHCFMD_LGA_HIND_MRERD;
-	}
-
-	/**
 	 * @return the censusSEXP_POA_AGE5P_INDP_INCP
 	 */
 	public Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> getCensusSEXP_POA_AGE5P_INDP_INCP() {
@@ -1414,26 +1192,6 @@ public class CalibrationDataIndividual {
 			this.loadData();
 		}
 		return censusSEXP_POA_AGE5P_INDP_INCP;
-	}
-
-	/**
-	 * @return the censusHCFMD_LGA_HIND_RNTRD
-	 */
-	public Map<String, Map<String, Map<String, Map<String, String>>>> getCensusHCFMD_LGA_HIND_RNTRD() {
-		if (!this.dataLoaded) {
-			this.loadData();
-		}
-		return censusHCFMD_LGA_HIND_RNTRD;
-	}
-
-	/**
-	 * @return the censusCDCF_LGA_FINF
-	 */
-	public Map<String, Map<String, Map<String, String>>> getCensusCDCF_LGA_FINF() {
-		if (!this.dataLoaded) {
-			this.loadData();
-		}
-		return censusCDCF_LGA_FINF;
 	}
 
 	/**

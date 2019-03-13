@@ -14,6 +14,8 @@ import java.util.Random;
  */
 public class CustomMath {
 
+	private static final double EPSILON_LOAN = 0.0001d; // to compare interest rates in loan calculations
+
 	/**
 	 * 
 	 */
@@ -55,5 +57,71 @@ public class CustomMath {
 			r -= pdf[i];
 		}
 		return pdf.length - 1; // should not happen
+	}
+
+	/**
+	 * Calculates the original purchase price of a house/unit based on the mortgage
+	 * repayments.
+	 *
+	 * SOURCE: https://en.wikipedia.org/wiki/Mortgage_calculator
+	 * 
+	 * @param repaymentAmount - the monthly repayment amount
+	 * @param interestRate    - the annual interest rate divided by 12
+	 * @param termMonths      - the term of the loan, expressed in months
+	 * @return the original purchase price (in original nominal dollars)
+	 */
+	public double getPropertyPurchasePrice(double repaymentAmount, double interestRate, int termMonths) {
+		double purchasePrice = 0d;
+		if (Math.abs(interestRate - 0d) < EPSILON_LOAN) { // rate is 0%
+			purchasePrice = repaymentAmount * (double) termMonths;
+		} else {
+			purchasePrice = repaymentAmount * (1d - Math.pow(1d + interestRate, (double) -termMonths)) / interestRate;
+		}
+		return purchasePrice;
+	}
+
+	/**
+	 * Calculates the current loan balance, assuming a constant interest rate and
+	 * contractual repayments only (i.e. no additional repayments).
+	 * 
+	 * SOURCE: https://en.wikipedia.org/wiki/Mortgage_calculator
+	 * 
+	 * @param repaymentAmount
+	 * @param interestRate
+	 * @param purchasePrice
+	 * @return the current loan balance
+	 */
+	public double getCurrentLoanBalance(double repaymentAmount, double interestRate, double purchasePrice,
+			int currentMonth) {
+		double currentBalance = 0d;
+		if (Math.abs(interestRate - 0d) < EPSILON_LOAN) { // rate is 0%
+			currentBalance = purchasePrice - repaymentAmount * (double) currentMonth;
+		} else {
+			currentBalance = purchasePrice * Math.pow(1d + interestRate, (double) currentMonth)
+					- (Math.pow(1d + interestRate, (double) currentMonth) - 1d) * repaymentAmount / interestRate;
+		}
+
+		return currentBalance;
+	}
+
+	/**
+	 * Calculates the loan repayments, assuming a constant interest rate. This can
+	 * be used to calculate the new loan repayments if/when interest rates change
+	 * during the life of a loan.
+	 * 
+	 * @param interestRate
+	 * @param purchasePrice
+	 * @param termMonths
+	 * @return the monthly loan repayments due
+	 */
+	public double getRepaymentAmount(Double interestRate, double originalLoanBalance, int termMonths) {
+		double repaymentAmount = 0d;
+		if (Math.abs(interestRate - 0d) < EPSILON_LOAN) { // rate is 0%
+			repaymentAmount = originalLoanBalance / (double) termMonths;
+		} else {
+			repaymentAmount = (interestRate * originalLoanBalance * Math.pow(1d + interestRate, (double) termMonths))
+					/ (Math.pow(1d + interestRate, (double) termMonths) - 1d);
+		}
+		return repaymentAmount;
 	}
 }

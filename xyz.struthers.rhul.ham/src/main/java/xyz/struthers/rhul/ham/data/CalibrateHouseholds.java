@@ -43,7 +43,6 @@ public class CalibrateHouseholds {
 	private static final double MILLION = 1000000d;
 	private static final double THOUSAND = 1000d;
 	private static final double PERCENT = 0.01d;
-	private static final double EPSILON = 0.1d; // to round business counts so the integer sums match
 
 	private static final double NUM_MONTHS = 12d;
 	private static final double NUM_WEEKS = 365d / 7d;
@@ -404,18 +403,38 @@ public class CalibrateHouseholds {
 					}
 					int totalDwellingsCell = Math.max(totalDwellingsRntrd, totalDwellingsMrerd);
 
-					for (int rntrdIdx = 0; rntrdIdx < ABS_RNTRD_MIDPOINT.length; rntrdIdx++) {
-						pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][rntrdIdx] = 0d;
-						if (rntrdIdx == 21 || rntrdIdx == 22) {
-							// map "Not stated" and "Not applicable" into the $0 category
-							//FIXME: up to here
-						}
+					// calculate PDF for RNTRD
+					double restOfCell = 0d;
+					for (int rntrdIdx = 1; rntrdIdx < ABS_RNTRD_MIDPOINT.length; rntrdIdx++) {
+						String rntrd = ABS_RNTRD_RANGES[rntrdIdx];
+						pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][rntrdIdx] = ((double) this.censusHCFMD_LGA_HIND_RNTRD
+								.get(hind).get(rntrd).get(lgaCode).get(hcfmd)) / (double) totalDwellingsCell;
+						restOfCell += pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][rntrdIdx];
 					}
+					pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][0] = 1d - restOfCell; // map "Not stated" and "Not applicable"
+																				// into the $0 category
+
+					// calculate PDF for MRERD
+					restOfCell = 0d;
+					for (int mrerdIdx = 1; mrerdIdx < ABS_MRERD_MIDPOINT.length; mrerdIdx++) {
+						String mrerd = ABS_MRERD_RANGES[mrerdIdx];
+						pdfMrerd[lgaIdx][hcfmdIdx][hindIdx][mrerdIdx] = this.censusHCFMD_LGA_HIND_MRERD.get(hind)
+								.get(mrerd).get(lgaCode).get(hcfmd);
+						restOfCell += pdfMrerd[lgaIdx][hcfmdIdx][hindIdx][mrerdIdx];
+					}
+					pdfMrerd[lgaIdx][hcfmdIdx][hindIdx][0] = 1d - restOfCell; // map "Not stated" and "Not applicable"
+																				// into the $0 category
 				} // end for HCFMD
 
 			} // end for HIND
 
 			// merge the combined MRERD/RNTRD data with the CDCF data (using pdf sampling?)
+
+			/*
+			 * HCFMD has these additional categories compared to HCFMF: "Lone person
+			 * household", "Group household", "Visitors only household", "Other
+			 * non-classifiable household"
+			 */
 
 			// assign individuals to households using PDF sampling
 

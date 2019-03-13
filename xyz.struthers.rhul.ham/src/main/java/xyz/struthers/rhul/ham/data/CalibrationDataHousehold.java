@@ -58,7 +58,6 @@ public class CalibrationDataHousehold {
 
 	public static final String ABS1410_0_ECONOMY = "ABS_1410.0_Economy";
 	static final String ABS1410_0_FAMILY = "ABS_1410.0_Family";
-	static final String ABS1410_0_INCOME = "ABS_1410.0_Income";
 
 	public static final String CENSUS_HCFMD_LGA_HIND_RNTRD = "Census HCFMD by LGA by HIND and RNTRD";
 	public static final String CENSUS_HCFMD_LGA_HIND_MRERD = "Census HCFMD by LGA by HIND and MRERD";
