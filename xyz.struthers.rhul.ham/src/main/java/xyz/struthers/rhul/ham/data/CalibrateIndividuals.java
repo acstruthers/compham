@@ -350,6 +350,8 @@ public class CalibrateIndividuals {
 	 * Calibrates individual financials, and works out how many of each to create,
 	 * then adds them to the economy.
 	 * 
+	 * FIXME: Creates 21M Individuals because it's missing those with no income (kids, etc.)
+	 * 
 	 * =============<br>
 	 * = ALGORITHM =<br>
 	 * =============<br>

@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -73,7 +74,6 @@ public class CalibrateHouseholds {
 			"$1,500-$1,749 ($78,000-$90,999)", "$1,750-$1,999 ($91,000-$103,999)", "$2,000-$2,999 ($104,000-$155,999)",
 			"$3,000 or more ($156,000 or more)", "Not stated" };
 	private static final int NUM_INDIVIDUAL_INCOME_RANGES_ABS = INDIVIDUAL_INCOME_RANGES_ABS.length; // 14
-	// FIXME: populate these census household title arrays
 	private static final String[] ABS_HIND_RANGES = { "Negative income", "Nil income", "$1-$149 ($1-$7,799)",
 			"$150-$299 ($7,800-$15,599)", "$300-$399 ($15,600-$20,799)", "$400-$499 ($20,800-$25,999)",
 			"$500-$649 ($26,000-$33,799)", "$650-$799 ($33,800-$41,599)", "$800-$999 ($41,600-$51,999)",
@@ -84,15 +84,65 @@ public class CalibrateHouseholds {
 			"$4,500-$4,999 ($234,000-$259,999)", "$5,000-$5,999 ($260,000-$311,999)",
 			"$6,000-$7,999 ($312,000-$415,999)", "$8,000 or more ($416,000 or more)", "Partial income stated",
 			"All incomes not stated", "Not applicable" };
-	private static final String[] ABS_FINF_RANGES = { "" };
-	private static final String[] ABS_MRERD_DRANGES = { "Nil repayments", "$1-$149", "$150-$299", "$300-$449",
+	private static final String[] ABS_FINF_RANGES = { "Negative income", "Nil income", "$1-$149 ($1-$7,799)",
+			"$150-$299 ($7,800-$15,599)", "$300-$399 ($15,600-$20,799)", "$400-$499 ($20,800-$25,999)",
+			"$500-$649 ($26,000-$33,799)", "$650-$799 ($33,800-$41,599)", "$800-$999 ($41,600-$51,999)",
+			"$1,000-$1,249 ($52,000-$64,999)", "$1,250-$1,499 ($65,000-$77,999)", "$1,500-$1,749 ($78,000-$90,999)",
+			"$1,750-$1,999 ($91,000-$103,999)", "$2,000-$2,499 ($104,000-$129,999)",
+			"$2,500-$2,999 ($130,000-$155,999)", "$3,000-$3,499 ($156,000-$181,999)",
+			"$3,500-$3,999 ($182,000-$207,999)", "$4,000-$4,499 ($208,000-$233,999)",
+			"$4,500-$4,999 ($234,000-$259,999)", "$5,000-$5,999 ($260,000-$311,999)",
+			"$6,000-$7,999 ($312,000-$415,999)", "$8,000 or more ($416,000 or more)", "Partial income stated",
+			"All incomes not stated", "Not applicable" };
+	private static final String[] ABS_MRERD_RANGES = { "Nil repayments", "$1-$149", "$150-$299", "$300-$449",
 			"$450-$599", "$600-$799", "$800-$999", "$1,000-$1,199", "$1,200-$1,399", "$1,400-$1,599", "$1,600-$1,799",
 			"$1,800-$1,999", "$2,000-$2,199", "$2,200-$2,399", "$2,400-$2,599", "$2,600-$2,999", "$3,000-$3,999",
 			"$4,000-$4,999", "$5000 and over", "Not stated", "Not applicable" };
-	private static final String[] ABS_RNTRD_RANGES = { "" };
-	private static final String[] ABS_HCFMD = { "" };
-	private static final String[] ABS_HCFMF = { "" };
-	private static final String[] ABS_CDCF = { "" };
+	/**
+	 * ABS_MRERD_MIDPOINT is an array of the monthly mortgage repayments that the
+	 * Households will be calibrated with. It takes the midpoint of each range, and
+	 * combines "Nil payments", "Not states" and "Not applicable" into the $0
+	 * category.
+	 */
+	private static final int[] ABS_MRERD_MIDPOINT = { 0, 75, 225, 375, 525, 700, 900, 1100, 1300, 1500, 1700, 1900,
+			2100, 2300, 2500, 2800, 3500, 4500, 6000 };
+	private static final String[] ABS_RNTRD_RANGES = { "Nil payments", "$1-$74", "$75-$99", "$100-$124", "$125-$149",
+			"$150-$174", "$175-$199", "$200-$224", "$225-$249", "$250-$274", "$275-$299", "$300-$324", "$325-$349",
+			"$350-$374", "$375-$399", "$400-$424", "$425-$449", "$450-$549", "$550-$649", "$650-$749", "$750-$849",
+			"$850-$949", "$950 and over", "Not stated", "Not applicable" };
+	/**
+	 * ABS_RNTRD_MIDPOINT is an array of the monthly rental payments that the
+	 * Households will be calibrated with. It takes the midpoint of each range, and
+	 * combines "Nil payments", "Not stated" and "Not applicable" into the $0
+	 * category.
+	 */
+	private static final int[] ABS_RNTRD_MIDPOINT = { 0, 160, 380, 490, 600, 700, 815, 925, 1030, 1140, 1250, 1360,
+			1465, 1575, 1685, 1795, 1900, 2170, 2600, 3040, 3475, 3910, 4565 };
+	private static final String[] ABS_HCFMD = { "One family household: Couple family with no children",
+			"One family household: Couple family with children", "One family household: One parent family",
+			"One family household: Other family", "Two family household: Couple family with no children",
+			"Two family household: Couple family with children", "Two family household: One parent family",
+			"Two family household: Other family", "Three or more family household: Couple family with no children",
+			"Three or more family household: Couple family with children",
+			"Three or more family household: One parent family", "Three or more family household: Other family",
+			"Lone person household", "Group household", "Visitors only household", "Other non-classifiable household",
+			"Not applicable" };
+	private static final String[] ABS_HCFMF = { "One family household: Couple family with no children",
+			"One family household: Couple family with children", "One family household: One parent family",
+			"One family household: Other family", "Two family household: Couple family with no children",
+			"Two family household: Couple family with children", "Two family household: One parent family",
+			"Two family household: Other family", "Three or more family household: Couple family with no children",
+			"Three or more family household: Couple family with children",
+			"Three or more family household: One parent family", "Three or more family household: Other family",
+			"Not applicable" };
+	private static final String[] ABS_CDCF = { "Couple family with: No dependent children",
+			"Couple family with: One dependent child", "Couple family with: Two dependent children",
+			"Couple family with: Three dependent children", "Couple family with: Four dependent children",
+			"Couple family with: Five dependent children", "Couple family with: Six or more dependent children",
+			"One parent family with: No dependent children", "One parent family with: One dependent child",
+			"One parent family with: Two dependent children", "One parent family with: Three dependent children",
+			"One parent family with: Four dependent children", "One parent family with: Five dependent children",
+			"One parent family with: Six or more dependent children", "Not applicable", "Total" };
 
 	// series titles
 	private static final String RBA_E1_SERIESID_CASH = "BSPNSHUFAD"; // Household deposits
@@ -271,13 +321,14 @@ public class CalibrateHouseholds {
 		for (String poa : poaCodes) {
 			lgaCodesIndividual.add(this.area.getLgaCodeFromPoa(poa));
 		}
-		// FIXME: get LGA codes from Household census data
 		// Keys: HIND, RNTRD, LGA, HCFMD
-		Set<String> lgaCodesRNTRD = null;//this.censusHCFMD_LGA_HIND_RNTRD.get(hind).get(rntrd).keySet();
+		Set<String> lgaCodesRNTRD = this.censusHCFMD_LGA_HIND_RNTRD.get(ABS_HIND_RANGES[0]).get(ABS_RNTRD_RANGES[0])
+				.keySet();
 		// Keys: HIND, MRERD, LGA, HCFMD
-		Set<String> lgaCodesMRERD = null;
+		Set<String> lgaCodesMRERD = this.censusHCFMD_LGA_HIND_MRERD.get(ABS_HIND_RANGES[0]).get(ABS_MRERD_RANGES[0])
+				.keySet();
 		// Keys: FINF, CDCF, LGA, HCFMD
-		Set<String> lgaCodesCDCF = null;
+		Set<String> lgaCodesCDCF = this.censusHCFMF_LGA_FINF_CDCF.get(ABS_FINF_RANGES[0]).get(ABS_CDCF[0]).keySet();
 
 		// find intersection of LGA codes for household and individual data
 		Set<String> lgaCodesIntersection = new HashSet<String>(lgaCodesIndividual);
@@ -289,17 +340,90 @@ public class CalibrateHouseholds {
 		lgaCodesIntersection.retainAll(lgaCodesMRERD);
 		lgaCodesIntersection.retainAll(lgaCodesCDCF);
 
+		/**
+		 * ROUGH ALGORITHM:
+		 * 
+		 * Don't try to map the family compositions in CDCF to the family compositions
+		 * in HCFMD ... just use HCFMD to create ratios/multipliers, then apply them to
+		 * the CDCF data. Use CDCF for the families with kids, but use HCFMD for the
+		 * other families because it has more detail on lone person, group, etc.
+		 * Everything else is identical, so it should be an easy mapping. Use the PDF
+		 * sampling method from IndividualCalibration so that the counts are correct.
+		 * 
+		 * If we sample from the RNTRD and MRERD PDFs using rand and (1 - rand) it will
+		 * make it more likely for a household to be paying either rent or a mortgage
+		 * but not both, with a small degree of overlap in the middle. I can't get the
+		 * number of dwellings in each MRERD and RNTRD range because my Basic account on
+		 * the Census data tables website is limited to 40 million cells, and that
+		 * degree of granularity results in too many cells for my free account. In the
+		 * absence of real data, I'm happy to accept whatever correlation between high
+		 * and low mortgage/rent payments happens to eventuate using this method. It
+		 * will tend to put higher mortgage repayments with lower rent payments, and
+		 * vice-versa.
+		 * 
+		 * N.B. At the end, if an Individual is not assigned to a Household (even a lone
+		 * person Household) then they should be removed from the List of Individuals so
+		 * they're not included in Clearing Payments Vector calculations. Alternatively,
+		 * any remaining Individuals could be assigned to a group Household.
+		 * 
+		 */
+		// PDF Keys: LGA, HCFMD, HIND, RNTRD/MRERD midpoints
+		double[][][][] pdfRntrd = new double[lgaCodesIntersection
+				.size()][ABS_HCFMD.length][ABS_HIND_RANGES.length][ABS_RNTRD_MIDPOINT.length];
+		double[][][][] pdfMrerd = new double[lgaCodesIntersection
+				.size()][ABS_HCFMD.length][ABS_HIND_RANGES.length][ABS_RNTRD_MIDPOINT.length];
+		int lgaIdx = 0;
+		Map<String, Integer> lgaIndexMap = new HashMap<String, Integer>(
+				(int) Math.ceil(lgaCodesIntersection.size() / MAP_LOAD_FACTOR) + 1);
+		String[] lgaArray = new String[lgaCodesIntersection.size()];
 		for (String lgaCode : lgaCodesIntersection) {
-			// combine MRERD and RNTRD data
+			lgaIndexMap.put(lgaCode, lgaIdx);
+			lgaArray[lgaIdx] = lgaCode;
+			// combine MRERD and RNTRD data, and calculate ratios/multipliers. MRERD and
+			// RNTRD ratios for all categories, and family composition ratios for the
+			// non-kids family types (the ones that map to N/A in CDCF).
+			for (int hindIdx = 0; hindIdx < ABS_HIND_RANGES.length; hindIdx++) {
+				String hind = ABS_HIND_RANGES[hindIdx];
+				for (int hcfmdIdx = 0; hcfmdIdx < ABS_HCFMD.length; hcfmdIdx++) {
+					String hcfmd = ABS_HCFMD[hcfmdIdx];
+					// N.B. The RNTRD and MRERD data sometimes have different total counts, so take
+					// the max and use it when determining the ratios.
+					// Keys: HIND, RNTRD, LGA, HCFMD
+					int totalDwellingsRntrd = 0;
+					for (int rntrdIdx = 0; rntrdIdx < ABS_RNTRD_RANGES.length; rntrdIdx++) {
+						String rntrd = ABS_RNTRD_RANGES[rntrdIdx];
+						totalDwellingsRntrd += this.censusHCFMD_LGA_HIND_RNTRD.get(hind).get(rntrd).get(lgaCode)
+								.get(hcfmd);
+					}
+					// Keys: HIND, MRERD, LGA, HCFMD
+					int totalDwellingsMrerd = 0;
+					for (int mrerdIdx = 0; mrerdIdx < ABS_MRERD_RANGES.length; mrerdIdx++) {
+						String mrerd = ABS_MRERD_RANGES[mrerdIdx];
+						totalDwellingsMrerd += this.censusHCFMD_LGA_HIND_MRERD.get(hind).get(mrerd).get(lgaCode)
+								.get(hcfmd);
+					}
+					int totalDwellingsCell = Math.max(totalDwellingsRntrd, totalDwellingsMrerd);
+
+					for (int rntrdIdx = 0; rntrdIdx < ABS_RNTRD_MIDPOINT.length; rntrdIdx++) {
+						pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][rntrdIdx] = 0d;
+						if (rntrdIdx == 21 || rntrdIdx == 22) {
+							// map "Not stated" and "Not applicable" into the $0 category
+							//FIXME: up to here
+						}
+					}
+				} // end for HCFMD
+
+			} // end for HIND
 
 			// merge the combined MRERD/RNTRD data with the CDCF data (using pdf sampling?)
 
-			// somehow assign individuals to households
+			// assign individuals to households using PDF sampling
 
 			// add households to matrix and list
 			// (matrix to enable easier links when creating network topology)
 
-		}
+			lgaIdx++;
+		} // end for LGA
 		this.householdAgents.trimToSize();
 
 		this.addAgentsToEconomy();
