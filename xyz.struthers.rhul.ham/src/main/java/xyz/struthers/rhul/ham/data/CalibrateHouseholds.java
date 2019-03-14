@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import xyz.struthers.lang.CustomMath;
 import xyz.struthers.rhul.ham.agent.Household;
 import xyz.struthers.rhul.ham.agent.Individual;
 import xyz.struthers.rhul.ham.config.Properties;
@@ -53,7 +54,7 @@ public class CalibrateHouseholds {
 
 	private static final int AGENT_LIST_INIT_SIZE = 10000000; // 10 million households
 	private static final int AGENT_LIST_CDCF_INIT_SIZE = 5; // initial size of the lists in each cell
-	
+
 	// map optimisation
 	public static final double MAP_LOAD_FACTOR = 0.75d;
 	public static final int MAP_LGA_INIT_CAPACITY = (int) Math.ceil(540 / MAP_LOAD_FACTOR) + 1;
@@ -145,6 +146,10 @@ public class CalibrateHouseholds {
 			"One parent family with: Two dependent children", "One parent family with: Three dependent children",
 			"One parent family with: Four dependent children", "One parent family with: Five dependent children",
 			"One parent family with: Six or more dependent children", "Not applicable", "Total" };
+	// assume one adult in "Lone person household" and four in "Group household"
+	private static final int[] ABS_CDCF_ADULT_COUNT = { 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 4 };
+	// assume there are no children in "Lone person household" or "Group household"
+	private static final int[] ABS_CDCF_CHILD_COUNT = { 0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6, 0, 0 };
 
 	// series titles
 	private static final String RBA_E1_SERIESID_CASH = "BSPNSHUFAD"; // Household deposits
@@ -347,12 +352,13 @@ public class CalibrateHouseholds {
 		this.householdAgents = new ArrayList<Household>(AGENT_LIST_INIT_SIZE);
 		// Keys: LGA, HIND, CDCF, then values are a list of households in that cell
 		this.householdMatrix = new ArrayList<ArrayList<ArrayList<ArrayList<Household>>>>(lgaCodesIntersection.size());
-		for (int lgaIdx=0; lgaIdx < lgaCodesIntersection.size(); lgaIdx++) {
+		for (int lgaIdx = 0; lgaIdx < lgaCodesIntersection.size(); lgaIdx++) {
 			this.householdMatrix.add(new ArrayList<ArrayList<ArrayList<Household>>>(ABS_HIND_RANGES.length));
-			for (int hindIdx=0; hindIdx < ABS_HIND_RANGES.length; hindIdx++) {
+			for (int hindIdx = 0; hindIdx < ABS_HIND_RANGES.length; hindIdx++) {
 				this.householdMatrix.get(lgaIdx).add(new ArrayList<ArrayList<Household>>(ABS_CDCF.length));
-				for (int cdcfIdx=0; cdcfIdx<ABS_CDCF.length; cdcfIdx++) {
-					this.householdMatrix.get(lgaIdx).get(hindIdx).add(new ArrayList<Household>(AGENT_LIST_CDCF_INIT_SIZE));
+				for (int cdcfIdx = 0; cdcfIdx < ABS_CDCF.length; cdcfIdx++) {
+					this.householdMatrix.get(lgaIdx).get(hindIdx)
+							.add(new ArrayList<Household>(AGENT_LIST_CDCF_INIT_SIZE));
 				}
 			}
 		}
@@ -495,6 +501,8 @@ public class CalibrateHouseholds {
 					if (hcfmdIdx == ABS_HCFMF.length - 1) {
 						String hcfmdLone = hcfmd;
 						String hcfmdGroup = ABS_HCFMD[hcfmdIdx + 1];
+
+						// calculate PDF for RNTRD
 						restOfCell = 0d;
 						for (int rntrdIdx = 1; rntrdIdx < ABS_RNTRD_MIDPOINT.length; rntrdIdx++) {
 							String rntrd = ABS_RNTRD_RANGES[rntrdIdx];
@@ -515,29 +523,68 @@ public class CalibrateHouseholds {
 						pdfRntrd[lgaIdx][hcfmdIdx + 1][hindIdx][0] = 1d - restOfCell; // map "Not stated" and "Not
 																						// applicable"
 
-						/*
-						 * That's the end of the logic to create PDFs for RNTRD/MRERD data. Next step is
-						 * to map to the CDCF data and cross-reference to calculate the number
-						 * Households in each category. We can do this in the same loop because LGA is
-						 * the same for both data sets, HIND is the same as FINF, and we're restricting
-						 * HCFMD to the indices that are the same as HCFMF, and then splitting the last
-						 * index value into lone person and group households using the ratios we just
-						 * calculated.
-						 */
-						for (int cdcfIdx=0; cdcfIdx<ABS_CDCF.length; cdcfIdx++) {
-							String cdcf = ABS_CDCF[cdcfIdx];
-							// get number of families
-							int numFamilies = 0;
-							// if it's the last HCFMD index, process the split between lone person and group households
-							
-							
-							// randomly sample from PDFs for RNTRD and MRERD
-							for (int familyNum=0; familyNum<numFamilies; familyNum++) {
-								// FIXME: up to here making householdsn
-							}
-							
-						} // end for CDCF
-					}
+						// calculate PDF for MRERD
+						restOfCell = 0d;
+						for (int mrerdIdx = 1; mrerdIdx < ABS_MRERD_MIDPOINT.length; mrerdIdx++) {
+							String mrerd = ABS_MRERD_RANGES[mrerdIdx];
+							pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][mrerdIdx] = ((double) this.censusHCFMD_LGA_HIND_MRERD
+									.get(hind).get(mrerd).get(lgaCode).get(hcfmdLone)) / (double) totalDwellingsCell;
+							restOfCell += pdfMrerd[lgaIdx][hcfmdIdx][hindIdx][mrerdIdx];
+						}
+						pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][0] = 1d - restOfCell; // map "Not stated" and "Not
+																					// applicable"
+						restOfCell = 0d;
+						for (int mrerdIdx = 1; mrerdIdx < ABS_MRERD_MIDPOINT.length; mrerdIdx++) {
+							String mrerd = ABS_MRERD_RANGES[mrerdIdx];
+							pdfMrerd[lgaIdx][hcfmdIdx
+									+ 1][hindIdx][mrerdIdx] = ((double) this.censusHCFMD_LGA_HIND_MRERD.get(hind)
+											.get(mrerd).get(lgaCode).get(hcfmdGroup)) / (double) totalDwellingsCell;
+							restOfCell += pdfMrerd[lgaIdx][hcfmdIdx + 1][hindIdx][mrerdIdx];
+						}
+						pdfRntrd[lgaIdx][hcfmdIdx + 1][hindIdx][0] = 1d - restOfCell; // map "Not stated" and "Not
+																						// applicable"
+					} // end lone person & group household special case
+
+					/*
+					 * That's the end of the logic to create PDFs for RNTRD/MRERD data. Next step is
+					 * to map to the CDCF data and cross-reference to calculate the number
+					 * Households in each category. We can do this in the same loop because LGA is
+					 * the same for both data sets, HIND is the same as FINF, and we're restricting
+					 * HCFMD to the indices that are the same as HCFMF, and then splitting the last
+					 * index value into lone person and group households using the ratios we just
+					 * calculated.
+					 */
+					for (int cdcfIdx = 0; cdcfIdx < ABS_CDCF.length; cdcfIdx++) {
+						String cdcf = ABS_CDCF[cdcfIdx];
+						int numAdults = ABS_CDCF_ADULT_COUNT[cdcfIdx];
+						int numChildren = ABS_CDCF_CHILD_COUNT[cdcfIdx];
+
+						// TODO: get number of families
+						int numFamilies = 0;
+						// if it's the last HCFMD index, process the split between lone person and group
+						// households
+
+						// randomly sample from PDFs for RNTRD and MRERD
+						for (int familyNum = 0; familyNum < numFamilies; familyNum++) {
+							Household household = new Household();
+
+							household.setNumAdults(numAdults);
+							household.setNumChildren(numChildren);
+
+							double rand = this.random.nextDouble();
+							int attributeIdx = CustomMath.sample(pdfMrerd[lgaIdx][hcfmdIdx][hindIdx], rand);
+							household.setPnlMortgageRepayments(ABS_MRERD_MIDPOINT[attributeIdx]);
+							attributeIdx = CustomMath.sample(pdfRntrd[lgaIdx][hcfmdIdx][hindIdx], 1d - rand);
+							household.setPnlRentExpense(ABS_RNTRD_MIDPOINT[attributeIdx]);
+
+							// FIXME: up to here making households
+							// assign adults
+
+							// assign children (might need to create them first)
+						}
+
+					} // end for CDCF
+
 				} // end for HCFMD
 
 			} // end for HIND

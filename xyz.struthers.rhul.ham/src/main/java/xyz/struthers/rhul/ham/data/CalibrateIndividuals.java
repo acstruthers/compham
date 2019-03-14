@@ -1449,7 +1449,8 @@ public class CalibrateIndividuals {
 												individual.setLocalGovernmentAreaCode(this.area.getLgaCodeFromPoa(poa));
 
 												int incomeMapNum = CustomMath.sample(pdfAtoIncomeRange, this.random);
-												switch (incomeMapNum) {
+												int incomeSourceNum = CustomMath.sample(pdfMainIncomeSource[incomeMapNum], this.random);
+												switch (incomeSourceNum) {
 												case 0:
 													individual.setMainIncomeSource(0); // employed
 													individual.setPnlWagesSalaries(
