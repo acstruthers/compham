@@ -51,6 +51,9 @@ public class CalibrateHouseholds {
 	public static final String CALIBRATION_DATE_ABS = "01/06/2018";
 	public static final String CALIBRATION_DATE_RBA = "30/06/2018";
 
+	private static final int AGENT_LIST_INIT_SIZE = 10000000; // 10 million households
+	private static final int AGENT_LIST_CDCF_INIT_SIZE = 5; // initial size of the lists in each cell
+	
 	// map optimisation
 	public static final double MAP_LOAD_FACTOR = 0.75d;
 	public static final int MAP_LGA_INIT_CAPACITY = (int) Math.ceil(540 / MAP_LOAD_FACTOR) + 1;
@@ -190,11 +193,12 @@ public class CalibrateHouseholds {
 	private static int agentNo = 0;
 
 	// households should have an LGA
-	ArrayList<Household> householdAgents;
+	private ArrayList<Household> householdAgents;
 	/**
-	 * A matrix of Household agents. Keys: LGA code, list of households in each LGA
+	 * A matrix of Household agents.<br>
+	 * Keys: LGA code, HIND, CDCF Values: list of households in each LGA
 	 */
-	ArrayList<ArrayList<Household>> householdMatrix;
+	private ArrayList<ArrayList<ArrayList<ArrayList<Household>>>> householdMatrix;
 
 	// data sets
 	/**
@@ -339,6 +343,20 @@ public class CalibrateHouseholds {
 		lgaCodesIntersection.retainAll(lgaCodesMRERD);
 		lgaCodesIntersection.retainAll(lgaCodesCDCF);
 
+		// create the Household agent objects
+		this.householdAgents = new ArrayList<Household>(AGENT_LIST_INIT_SIZE);
+		// Keys: LGA, HIND, CDCF, then values are a list of households in that cell
+		this.householdMatrix = new ArrayList<ArrayList<ArrayList<ArrayList<Household>>>>(lgaCodesIntersection.size());
+		for (int lgaIdx=0; lgaIdx < lgaCodesIntersection.size(); lgaIdx++) {
+			this.householdMatrix.add(new ArrayList<ArrayList<ArrayList<Household>>>(ABS_HIND_RANGES.length));
+			for (int hindIdx=0; hindIdx < ABS_HIND_RANGES.length; hindIdx++) {
+				this.householdMatrix.get(lgaIdx).add(new ArrayList<ArrayList<Household>>(ABS_CDCF.length));
+				for (int cdcfIdx=0; cdcfIdx<ABS_CDCF.length; cdcfIdx++) {
+					this.householdMatrix.get(lgaIdx).get(hindIdx).add(new ArrayList<Household>(AGENT_LIST_CDCF_INIT_SIZE));
+				}
+			}
+		}
+
 		/**
 		 * ROUGH ALGORITHM:
 		 * 
@@ -367,10 +385,10 @@ public class CalibrateHouseholds {
 		 * 
 		 */
 		// PDF Keys: LGA, HCFMD, HIND, RNTRD/MRERD midpoints
-		double[][][][] pdfRntrd = new double[lgaCodesIntersection
-				.size()][ABS_HCFMD.length][ABS_HIND_RANGES.length][ABS_RNTRD_MIDPOINT.length];
-		double[][][][] pdfMrerd = new double[lgaCodesIntersection
-				.size()][ABS_HCFMD.length][ABS_HIND_RANGES.length][ABS_RNTRD_MIDPOINT.length];
+		double[][][][] pdfRntrd = new double[lgaCodesIntersection.size()][ABS_HCFMF.length
+				+ 1][ABS_HIND_RANGES.length][ABS_RNTRD_MIDPOINT.length];
+		double[][][][] pdfMrerd = new double[lgaCodesIntersection.size()][ABS_HCFMF.length
+				+ 1][ABS_HIND_RANGES.length][ABS_RNTRD_MIDPOINT.length];
 		int lgaIdx = 0;
 		Map<String, Integer> lgaIndexMap = new HashMap<String, Integer>(
 				(int) Math.ceil(lgaCodesIntersection.size() / MAP_LOAD_FACTOR) + 1);
@@ -383,8 +401,11 @@ public class CalibrateHouseholds {
 			// non-kids family types (the ones that map to N/A in CDCF).
 			for (int hindIdx = 0; hindIdx < ABS_HIND_RANGES.length; hindIdx++) {
 				String hind = ABS_HIND_RANGES[hindIdx];
-				for (int hcfmdIdx = 0; hcfmdIdx < ABS_HCFMD.length; hcfmdIdx++) {
+				for (int hcfmdIdx = 0; hcfmdIdx < ABS_HCFMF.length; hcfmdIdx++) {
+					// N.B. Using HCFMF array length to iterate over HCFMD data due to the 4 extra
+					// categories in HCFMD discussed below.
 					String hcfmd = ABS_HCFMD[hcfmdIdx];
+
 					// N.B. The RNTRD and MRERD data sometimes have different total counts, so take
 					// the max and use it when determining the ratios.
 					// Keys: HIND, RNTRD, LGA, HCFMD
@@ -403,6 +424,52 @@ public class CalibrateHouseholds {
 					}
 					int totalDwellingsCell = Math.max(totalDwellingsRntrd, totalDwellingsMrerd);
 
+					/*
+					 * HCFMD has these additional categories compared to HCFMF: "Lone person
+					 * household", "Group household", "Visitors only household", "Other
+					 * non-classifiable household".
+					 * 
+					 * To simplify, use the ratio between "Lone person household" and
+					 * "Group household" to split the count in the "Not applicable" category in the
+					 * HCFMF data. To ensure the family count doesn't drop data by rounding down,
+					 * multiply by the ratio to get the number of "Lone person" households, then
+					 * subtract that number from the total count of "Not applicable" households from
+					 * the HCFMF data to ensure that the model ends up with the same total number of
+					 * Households.
+					 */
+					double lonePersonRatio = 0d;
+					int lonePersonCountRntrd = 0;
+					int lonePersonCountMrerd = 0;
+					int loneAndGroupCountRntrd = 0;
+					int loneAndGroupCountMrerd = 0;
+					if (hcfmdIdx == ABS_HCFMF.length - 1) {
+						String hcfmdLone = hcfmd;
+						String hcfmdGroup = ABS_HCFMD[hcfmdIdx + 1];
+						for (int rntrdIdx = 0; rntrdIdx < ABS_RNTRD_RANGES.length; rntrdIdx++) {
+							String rntrd = ABS_RNTRD_RANGES[rntrdIdx];
+							int lone = this.censusHCFMD_LGA_HIND_RNTRD.get(hind).get(rntrd).get(lgaCode).get(hcfmdLone);
+							int grp = this.censusHCFMD_LGA_HIND_RNTRD.get(hind).get(rntrd).get(lgaCode).get(hcfmdGroup);
+							lonePersonCountRntrd += lone;
+							loneAndGroupCountRntrd += lone + grp;
+						}
+						for (int mrerdIdx = 0; mrerdIdx < ABS_MRERD_RANGES.length; mrerdIdx++) {
+							String mrerd = ABS_MRERD_RANGES[mrerdIdx];
+							int lone = this.censusHCFMD_LGA_HIND_MRERD.get(hind).get(mrerd).get(lgaCode).get(hcfmdLone);
+							int grp = this.censusHCFMD_LGA_HIND_MRERD.get(hind).get(mrerd).get(lgaCode).get(hcfmdGroup);
+							lonePersonCountMrerd += lone;
+							loneAndGroupCountMrerd += lone + grp;
+						}
+						// "Lone person household" category in the HCFMD data
+						if ((lonePersonCountRntrd + lonePersonCountMrerd) == 0) {
+							lonePersonRatio = 0d;
+						} else if ((loneAndGroupCountRntrd + loneAndGroupCountMrerd) == 0) {
+							lonePersonRatio = 1d;
+						} else {
+							lonePersonRatio = ((double) (lonePersonCountRntrd + lonePersonCountMrerd))
+									/ ((double) (loneAndGroupCountRntrd + loneAndGroupCountMrerd));
+						}
+					} // END IF lone person ratio calc
+
 					// calculate PDF for RNTRD
 					double restOfCell = 0d;
 					for (int rntrdIdx = 1; rntrdIdx < ABS_RNTRD_MIDPOINT.length; rntrdIdx++) {
@@ -413,7 +480,6 @@ public class CalibrateHouseholds {
 					}
 					pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][0] = 1d - restOfCell; // map "Not stated" and "Not applicable"
 																				// into the $0 category
-
 					// calculate PDF for MRERD
 					restOfCell = 0d;
 					for (int mrerdIdx = 1; mrerdIdx < ABS_MRERD_MIDPOINT.length; mrerdIdx++) {
@@ -424,6 +490,54 @@ public class CalibrateHouseholds {
 					}
 					pdfMrerd[lgaIdx][hcfmdIdx][hindIdx][0] = 1d - restOfCell; // map "Not stated" and "Not applicable"
 																				// into the $0 category
+
+					// add lone person & group household PDF calcs
+					if (hcfmdIdx == ABS_HCFMF.length - 1) {
+						String hcfmdLone = hcfmd;
+						String hcfmdGroup = ABS_HCFMD[hcfmdIdx + 1];
+						restOfCell = 0d;
+						for (int rntrdIdx = 1; rntrdIdx < ABS_RNTRD_MIDPOINT.length; rntrdIdx++) {
+							String rntrd = ABS_RNTRD_RANGES[rntrdIdx];
+							pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][rntrdIdx] = ((double) this.censusHCFMD_LGA_HIND_RNTRD
+									.get(hind).get(rntrd).get(lgaCode).get(hcfmdLone)) / (double) totalDwellingsCell;
+							restOfCell += pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][rntrdIdx];
+						}
+						pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][0] = 1d - restOfCell; // map "Not stated" and "Not
+																					// applicable"
+						restOfCell = 0d;
+						for (int rntrdIdx = 1; rntrdIdx < ABS_RNTRD_MIDPOINT.length; rntrdIdx++) {
+							String rntrd = ABS_RNTRD_RANGES[rntrdIdx];
+							pdfRntrd[lgaIdx][hcfmdIdx
+									+ 1][hindIdx][rntrdIdx] = ((double) this.censusHCFMD_LGA_HIND_RNTRD.get(hind)
+											.get(rntrd).get(lgaCode).get(hcfmdGroup)) / (double) totalDwellingsCell;
+							restOfCell += pdfRntrd[lgaIdx][hcfmdIdx + 1][hindIdx][rntrdIdx];
+						}
+						pdfRntrd[lgaIdx][hcfmdIdx + 1][hindIdx][0] = 1d - restOfCell; // map "Not stated" and "Not
+																						// applicable"
+
+						/*
+						 * That's the end of the logic to create PDFs for RNTRD/MRERD data. Next step is
+						 * to map to the CDCF data and cross-reference to calculate the number
+						 * Households in each category. We can do this in the same loop because LGA is
+						 * the same for both data sets, HIND is the same as FINF, and we're restricting
+						 * HCFMD to the indices that are the same as HCFMF, and then splitting the last
+						 * index value into lone person and group households using the ratios we just
+						 * calculated.
+						 */
+						for (int cdcfIdx=0; cdcfIdx<ABS_CDCF.length; cdcfIdx++) {
+							String cdcf = ABS_CDCF[cdcfIdx];
+							// get number of families
+							int numFamilies = 0;
+							// if it's the last HCFMD index, process the split between lone person and group households
+							
+							
+							// randomly sample from PDFs for RNTRD and MRERD
+							for (int familyNum=0; familyNum<numFamilies; familyNum++) {
+								// FIXME: up to here making householdsn
+							}
+							
+						} // end for CDCF
+					}
 				} // end for HCFMD
 
 			} // end for HIND

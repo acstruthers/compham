@@ -49,12 +49,21 @@ public class CustomMath {
 		return d;
 	}
 
-	public static int sample(double[] pdf, Random random) {
+	public static int sample(final double[] pdf, Random random) {
 		double r = random.nextDouble();
 		for (int i = 0; i < pdf.length; i++) {
 			if (r < pdf[i])
 				return i;
 			r -= pdf[i];
+		}
+		return pdf.length - 1; // should not happen
+	}
+	
+	public static int sample(final double[] pdf, double random) {
+		for (int i = 0; i < pdf.length; i++) {
+			if (random < pdf[i])
+				return i;
+			random -= pdf[i];
 		}
 		return pdf.length - 1; // should not happen
 	}
