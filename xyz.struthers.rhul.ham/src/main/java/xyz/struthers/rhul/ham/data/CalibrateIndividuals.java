@@ -42,17 +42,19 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
 public class CalibrateIndividuals {
 
 	private static final boolean DEBUG = true;
+	private static final boolean DEBUG_DETAIL = false;
 
 	// CONSTANTS
 	private static final double EPSILON = 0.1d; // to round business counts so the integer sums match
-	private static final double NUM_MONTHS = 12d;
+	public static final double NUM_MONTHS = 12d;
 	public static final String CALIBRATION_DATE_ATO = "01/06/2018";
 	public static final String CALIBRATION_DATE_RBA = "30/06/2018";
+	public static final double POPULATION_MULTIPLIER = 1.2d; // HACK: forces it up to the right number of people
 
 	// map optimisation
 	public static final double MAP_LOAD_FACTOR = 0.75d;
 	public static final int MAP_LGA_INIT_CAPACITY = (int) Math.ceil(540 / MAP_LOAD_FACTOR) + 1;
-	private static final String[] SEX_ARRAY = { "M", "F" };
+	public static final String[] SEX_ARRAY = { "M", "F" };
 	private static final String[] STATES_ARRAY = { "NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT", "OT" };
 	private static final int[] MAP_STATE_POA_CAPACITY = { (int) Math.ceil(612 / MAP_LOAD_FACTOR) + 1,
 			(int) Math.ceil(382 / MAP_LOAD_FACTOR) + 1, (int) Math.ceil(429 / MAP_LOAD_FACTOR) + 1,
@@ -61,25 +63,25 @@ public class CalibrateIndividuals {
 			(int) Math.ceil(25 / MAP_LOAD_FACTOR) + 1, (int) Math.ceil(1 / MAP_LOAD_FACTOR) + 1 };
 
 	// data series titles
-	private static final String[] AGE_ARRAY_ATO = { "a. Under 18", "b. 18 - 24", "c. 25 - 29", "d. 30 - 34",
+	public static final String[] AGE_ARRAY_ATO = { "a. Under 18", "b. 18 - 24", "c. 25 - 29", "d. 30 - 34",
 			"e. 35 - 39", "f. 40 - 44", "g. 45 - 49", "h. 50 - 54", "i. 55 - 59", "j. 60 - 64", "k. 65 - 69",
 			"l. 70 - 74", "m. 75 and over" };
-	private static final String[] AGE_ARRAY_ABS = { "0-4 years", "5-9 years", "10-14 years", "15-19 years",
+	public static final String[] AGE_ARRAY_ABS = { "0-4 years", "5-9 years", "10-14 years", "15-19 years",
 			"20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years",
 			"55-59 years", "60-64 years", "65-69 years", "70-74 years", "75-79 years", "80-84 years", "85-89 years",
 			"90-94 years", "95-99 years", "100 years and over" };
-	private static final int[] AGE_ARRAY_ABS_MIDPOINT = { 2, 7, 12, 17, 22, 27, 32, 37, 42, 47, 52, 57, 62, 67, 72, 77,
+	public static final int[] AGE_ARRAY_ABS_MIDPOINT = { 2, 7, 12, 17, 22, 27, 32, 37, 42, 47, 52, 57, 62, 67, 72, 77,
 			82, 87, 92, 97, 102 };
-	private static final String[] DIVISION_CODE_ARRAY = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
+	public static final String[] DIVISION_CODE_ARRAY = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
 			"M", "N", "O", "P", "Q", "R", "S" }; // S = Other Services
-	private static final int NUM_DIVISIONS = DIVISION_CODE_ARRAY.length; // 19
-	private static final String[] INDIVIDUAL_INCOME_RANGES_ABS = { "Negative income", "Nil income",
+	public static final int NUM_DIVISIONS = DIVISION_CODE_ARRAY.length; // 19
+	public static final String[] INDIVIDUAL_INCOME_RANGES_ABS = { "Negative income", "Nil income",
 			"$1-$149 ($1-$7,799)", "$150-$299 ($7,800-$15,599)", "$300-$399 ($15,600-$20,799)",
 			"$400-$499 ($20,800-$25,999)", "$500-$649 ($26,000-$33,799)", "$650-$799 ($33,800-$41,599)",
 			"$800-$999 ($41,600-$51,999)", "$1,000-$1,249 ($52,000-$64,999)", "$1,250-$1,499 ($65,000-$77,999)",
 			"$1,500-$1,749 ($78,000-$90,999)", "$1,750-$1,999 ($91,000-$103,999)", "$2,000-$2,999 ($104,000-$155,999)",
 			"$3,000 or more ($156,000 or more)", "Not stated" };
-	private static final int NUM_INDIVIDUAL_INCOME_RANGES_ABS = 14;
+	public static final int NUM_INDIVIDUAL_INCOME_RANGES_ABS = 14;
 	private static final String[] INDIVIDUAL_INCOME_RANGES_ATO3A = { "a. $6,000 or less", "b. $6,001 to $10,000",
 			"c. $10,001 to $18,200", "d. $18,201 to $25,000", "e. $25,001 to $30,000", "f. $30,001 to $37,000",
 			"g. $37,001 to $40,000", "h. $40,001 to $45,000", "i. $45,001 to $50,000", "j. $50,001 to $55,000",
@@ -162,7 +164,13 @@ public class CalibrateIndividuals {
 	 * Keys: postcode, sex, age, industry division, income (ABS categories)
 	 */
 	private List<List<List<List<List<List<Individual>>>>>> individualMatrix;
-	private ArrayList<Individual> individualAgents;
+	/**
+	 * A simplified map to make it easier to populate Households.<br>
+	 * Keys: LGA, AGE5P, INCP.<br>
+	 * Values: an ArrayList of Individuals for that combination of keys.
+	 */
+	private Map<String, Map<String, Map<String, ArrayList<Individual>>>> individualMap;
+	// private ArrayList<Individual> individualAgents;
 	private Date calibrationDateAto;
 	private Date calibrationDateRba;
 	private int totalPopulationAU;
@@ -249,7 +257,8 @@ public class CalibrateIndividuals {
 
 	private void init() {
 		this.individualMatrix = null;
-		this.individualAgents = null;
+		this.individualMap = null;
+		// this.individualAgents = null;
 		this.calibrationDateAto = null;
 		this.calibrationDateRba = null;
 		this.totalPopulationAU = 0;
@@ -311,9 +320,6 @@ public class CalibrateIndividuals {
 	/**
 	 * Calibrates individual financials, and works out how many of each to create,
 	 * then adds them to the economy.
-	 * 
-	 * FIXME: Creates 21M Individuals because it's missing those with no income
-	 * (kids, etc.)
 	 * 
 	 * =============<br>
 	 * = ALGORITHM =<br>
@@ -512,7 +518,7 @@ public class CalibrateIndividuals {
 			divTotalAmount9A += divTaxableAmount;
 		}
 		double divTotalTaxablePerPerson = divTotalCount9A > 0d ? divTotalAmount9A / divTotalCount9A : 0d;
-		if (DEBUG) {
+		if (DEBUG_DETAIL) {
 			System.out.println("########################");
 			System.out.println("# DIVISION MULTIPLIERS #");
 			System.out.println("########################");
@@ -522,12 +528,12 @@ public class CalibrateIndividuals {
 			double divCountMultiplier = divisionCountMultiplier.get(divCode) / divTotalCount9A;
 			divisionTaxableIncomeMultiplier.put(divCode, divTaxableIncomeMultiplier);
 			divisionCountMultiplier.put(divCode, divCountMultiplier);
-			if (DEBUG) {
+			if (DEBUG_DETAIL) {
 				System.out
 						.println(divCode + " count: " + divCountMultiplier + ", amount: " + divTaxableIncomeMultiplier);
 			}
 		}
-		if (DEBUG) {
+		if (DEBUG_DETAIL) {
 			System.out.println("#################################");
 			System.out.println("# DIVISION MULTIPLIERS FINISHED #");
 			System.out.println("#################################");
@@ -619,7 +625,7 @@ public class CalibrateIndividuals {
 			}
 		}
 
-		if (DEBUG) {
+		if (DEBUG_DETAIL) {
 			System.out.println("#####################");
 			System.out.println("# STATE MULTIPLIERS #");
 			System.out.println("#####################");
@@ -641,14 +647,14 @@ public class CalibrateIndividuals {
 					stateTaxableIncomeMultiplier.get(sex).get(age).put(state, thisStateTaxableIncomeMultiplier);
 					stateCountMultiplier.get(sex).get(age).put(state, thisStateCountMultiplier);
 
-					if (DEBUG) {
+					if (DEBUG_DETAIL) {
 						System.out.println(sex + " / " + age + " / " + state + " count: " + thisStateCountMultiplier
 								+ ", amount: " + thisStateTaxableIncomeMultiplier);
 					}
 				}
 			}
 		}
-		if (DEBUG) {
+		if (DEBUG_DETAIL) {
 			System.out.println("##############################");
 			System.out.println("# STATE MULTIPLIERS FINISHED #");
 			System.out.println("##############################");
@@ -708,7 +714,7 @@ public class CalibrateIndividuals {
 			postcodeStateTaxablePerPerson.put(state, stateCount > 0d ? stateAmount / stateCount : 0d);
 		}
 
-		if (DEBUG) {
+		if (DEBUG_DETAIL) {
 			System.out.println("##############################");
 			System.out.println("# POSTCODE STATE MULTIPLIERS #");
 			System.out.println("##############################");
@@ -725,7 +731,7 @@ public class CalibrateIndividuals {
 				postcodeStateTaxableIncomeMultiplier.get(state).put(postcode, postcodeTaxableIncomeMultiplier);
 				postcodeStateCountMultiplier.get(state).put(postcode, postcodeCountMultiplier);
 
-				if (DEBUG) {
+				if (DEBUG_DETAIL) {
 					if (state.equals("NSW")) {
 						System.out.println(state + " / " + postcode + " count: " + postcodeCountMultiplier
 								+ ", amount: " + postcodeTaxableIncomeMultiplier);
@@ -733,7 +739,7 @@ public class CalibrateIndividuals {
 				}
 			}
 		}
-		if (DEBUG) {
+		if (DEBUG_DETAIL) {
 			System.out.println("#######################################");
 			System.out.println("# POSTCODE STATE MULTIPLIERS FINISHED #");
 			System.out.println("#######################################");
@@ -813,11 +819,10 @@ public class CalibrateIndividuals {
 							int oldVal = censusMatrixPersonsAdjustedPOA[poaIdx][sexIdx][ageIdx][divIdx][incomeIdx];
 							int adjustedPopulation = 0;
 							try {
-								adjustedPopulation = (int) Math
-										.round(Double
-												.valueOf(this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(divisionCode)
-														.get(incomeRange).get(poa).get(sex))
-												* this.populationMultiplier);
+								adjustedPopulation = (int) Math.round(Double
+										.valueOf(this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(divisionCode)
+												.get(incomeRange).get(poa).get(sex))
+										* this.populationMultiplier * POPULATION_MULTIPLIER);
 							} catch (NumberFormatException e) {
 								adjustedPopulation = 0;
 							}
@@ -850,35 +855,37 @@ public class CalibrateIndividuals {
 		System.out.println(new Date(System.currentTimeMillis()) + ": 5. ATO Individual Table 3A P&L figures");
 
 		// matrix Keys: postcode, sex, age, industry division, income (ABS categories)
-		if (this.individualMatrix == null) {
-			this.individualMatrix = new ArrayList<List<List<List<List<List<Individual>>>>>>(poaSetIntersection.size());
-			// initialise matrix
-			for (String poa : poaSetIntersection) {
-				int poaIdx = poaIndexMap.get(poa);
-				this.individualMatrix.add(new ArrayList<List<List<List<List<Individual>>>>>(SEX_ARRAY.length));
-				for (int sexIdx = 0; sexIdx < SEX_ARRAY.length; sexIdx++) {
-					this.individualMatrix.get(poaIdx)
-							.add(new ArrayList<List<List<List<Individual>>>>(AGE_ARRAY_ABS.length));
-					for (int ageIdx = 0; ageIdx < AGE_ARRAY_ABS.length; ageIdx++) {
-						this.individualMatrix.get(poaIdx).get(sexIdx)
-								.add(new ArrayList<List<List<Individual>>>(DIVISION_CODE_ARRAY.length));
-						for (int divIdx = 0; divIdx < DIVISION_CODE_ARRAY.length; divIdx++) {
-							this.individualMatrix.get(poaIdx).get(sexIdx).get(ageIdx)
-									.add(new ArrayList<List<Individual>>(INDIVIDUAL_INCOME_RANGES_ABS.length));
-							for (int incomeIdx = 0; incomeIdx < INDIVIDUAL_INCOME_RANGES_ABS.length; incomeIdx++) {
-								this.individualMatrix.get(poaIdx).get(sexIdx).get(ageIdx).get(divIdx)
-										.add(new ArrayList<Individual>());
-							}
-						}
-					}
-				}
-			}
-		}
-		if (this.individualAgents == null) {
-			// add in a 5% buffer so the List doesn't end up double the size it needs to be
-			int initCapacity = (int) Math.round(this.totalPopulationAU * 1.05d);
-			this.individualAgents = new ArrayList<Individual>(initCapacity);
-		}
+		/*
+		 * if (this.individualMatrix == null) { this.individualMatrix = new
+		 * ArrayList<List<List<List<List<List<Individual>>>>>>(poaSetIntersection.size()
+		 * ); // initialise matrix for (String poa : poaSetIntersection) { int poaIdx =
+		 * poaIndexMap.get(poa); this.individualMatrix.add(new
+		 * ArrayList<List<List<List<List<Individual>>>>>(SEX_ARRAY.length)); for (int
+		 * sexIdx = 0; sexIdx < SEX_ARRAY.length; sexIdx++) {
+		 * this.individualMatrix.get(poaIdx) .add(new
+		 * ArrayList<List<List<List<Individual>>>>(AGE_ARRAY_ABS.length)); for (int
+		 * ageIdx = 0; ageIdx < AGE_ARRAY_ABS.length; ageIdx++) {
+		 * this.individualMatrix.get(poaIdx).get(sexIdx) .add(new
+		 * ArrayList<List<List<Individual>>>(DIVISION_CODE_ARRAY.length)); for (int
+		 * divIdx = 0; divIdx < DIVISION_CODE_ARRAY.length; divIdx++) {
+		 * this.individualMatrix.get(poaIdx).get(sexIdx).get(ageIdx) .add(new
+		 * ArrayList<List<Individual>>(INDIVIDUAL_INCOME_RANGES_ABS.length)); for (int
+		 * incomeIdx = 0; incomeIdx < INDIVIDUAL_INCOME_RANGES_ABS.length; incomeIdx++)
+		 * { this.individualMatrix.get(poaIdx).get(sexIdx).get(ageIdx).get(divIdx)
+		 * .add(new ArrayList<Individual>()); } } } } } }
+		 */
+
+		// create Individual map
+		// Keys: LGA, AGE5P, INCP.
+		this.individualMap = new HashMap<String, Map<String, Map<String, ArrayList<Individual>>>>(
+				(int) Math.ceil(poasInEachLga.size() / MAP_LOAD_FACTOR) + 1);
+
+		/*
+		 * if (this.individualAgents == null) { // add in a 5% buffer so the List
+		 * doesn't end up double the size it needs to be int initCapacity = (int)
+		 * Math.round(this.totalPopulationAU * 1.05d); this.individualAgents = new
+		 * ArrayList<Individual>(initCapacity); }
+		 */
 
 		/*
 		 * ALGORITHM
@@ -923,7 +930,7 @@ public class CalibrateIndividuals {
 				for (int ageIdxAto = 0; ageIdxAto < AGE_ARRAY_ATO.length; ageIdxAto++) {
 					String age = AGE_ARRAY_ATO[ageIdxAto];
 					List<Integer> ageIndicesAbs = this.getAbsAgeIndices(ageIdxAto);
-					if (DEBUG) {
+					if (DEBUG_DETAIL) {
 						System.out.println("   age: " + age);
 					}
 					// [0] under 18 = 0-4, 5-9, 10-14, 15-19
@@ -931,7 +938,7 @@ public class CalibrateIndividuals {
 					// [1-11] 18-24 = 20-24; 25-29 = 25-29; ...; 70-74 = 70-74
 					for (int sexIdx = 0; sexIdx < SEX_ARRAY.length; sexIdx++) {
 						String sex = SEX_ARRAY[sexIdx];
-						if (DEBUG) {
+						if (DEBUG_DETAIL) {
 							System.out.println("      sex: " + sex);
 						}
 						// variables to calculate ABS/ATO population multiplier
@@ -1012,7 +1019,7 @@ public class CalibrateIndividuals {
 						// ==> 14
 						for (int taxableStatusIdx = 0; taxableStatusIdx < TAXABLE_STATUS.length; taxableStatusIdx++) {
 							String taxableStatus = TAXABLE_STATUS[taxableStatusIdx];
-							if (DEBUG) {
+							if (DEBUG_DETAIL) {
 								System.out.println("      -taxableStatus: " + taxableStatus);
 							}
 							// variables to calculate ABS/ATO population multiplier
@@ -1285,16 +1292,17 @@ public class CalibrateIndividuals {
 
 						for (int divIdx = 0; divIdx < NUM_DIVISIONS; divIdx++) {
 							String division = DIVISION_CODE_ARRAY[divIdx];
-							if (DEBUG) {
+							if (DEBUG_DETAIL) {
 								System.out.println("         division: " + division);
 							}
 							// for each industry, multiply by industry count ratio
 							double divAmtMult = divisionTaxableIncomeMultiplier.get(division);
 							for (String poa : poaSetIntersection) {
-								if (DEBUG) {
-									// System.out.println(" poa: " + poa);
+								if (DEBUG_DETAIL) {
+									System.out.println(" poa: " + poa);
 								}
 								int poaIdx = poaIndexMap.get(poa);
+								String lgaCode = this.area.getLgaCodeFromPoa(poa);
 								String state = this.area.getStateFromPoa(poa);
 								if (!state.equals("Other")) { // skip "Other" to solve mapping issues
 									// for each state, sex & age, multiply by state count ratio
@@ -1449,7 +1457,8 @@ public class CalibrateIndividuals {
 												individual.setLocalGovernmentAreaCode(this.area.getLgaCodeFromPoa(poa));
 
 												int incomeMapNum = CustomMath.sample(pdfAtoIncomeRange, this.random);
-												int incomeSourceNum = CustomMath.sample(pdfMainIncomeSource[incomeMapNum], this.random);
+												int incomeSourceNum = CustomMath
+														.sample(pdfMainIncomeSource[incomeMapNum], this.random);
 												switch (incomeSourceNum) {
 												case 0:
 													individual.setMainIncomeSource(0); // employed
@@ -1551,14 +1560,40 @@ public class CalibrateIndividuals {
 
 												// add Individual to matrix (for household calibration) using ABS
 												// indices
-												this.individualMatrix.get(poaIdx).get(sexIdx).get(ageIdxAbs).get(divIdx)
-														.get(incomeIdxAbs).add(individual);
+												// this.individualMatrix.get(poaIdx).get(sexIdx).get(ageIdxAbs).get(divIdx)
+												// .get(incomeIdxAbs).add(individual);
+
+												// TODO: add individual to simplified map
+												// Keys: LGA, AGE5P, INCP
+												if (!this.individualMap.containsKey(lgaCode)) {
+													this.individualMap.put(lgaCode,
+															new HashMap<String, Map<String, ArrayList<Individual>>>(
+																	AGE_ARRAY_ABS.length));
+												}
+												if (!this.individualMap.get(lgaCode)
+														.containsKey(AGE_ARRAY_ABS[ageIdxAbs])) {
+													this.individualMap.get(lgaCode).put(AGE_ARRAY_ABS[ageIdxAbs],
+															new HashMap<String, ArrayList<Individual>>(
+																	INDIVIDUAL_INCOME_RANGES_ABS.length));
+												}
+												if (!this.individualMap.get(lgaCode).get(AGE_ARRAY_ABS[ageIdxAbs])
+														.containsKey(INDIVIDUAL_INCOME_RANGES_ABS[incomeIdxAbs])) {
+													this.individualMap.get(lgaCode).get(AGE_ARRAY_ABS[ageIdxAbs]).put(
+															INDIVIDUAL_INCOME_RANGES_ABS[incomeIdxAbs],
+															new ArrayList<Individual>());
+												}
+												this.individualMap.get(lgaCode).get(AGE_ARRAY_ABS[ageIdxAbs])
+														.get(INDIVIDUAL_INCOME_RANGES_ABS[incomeIdxAbs])
+														.add(individual);
 
 												// add Individual to list (for payment clearing algorithm)
-												this.individualAgents.add(individual);
-											}
-										}
-									}
+												// CHANGE OF MIND: add the chosen Individuals as they are assigned into
+												// Households
+												//this.individualAgents.add(individual);
+												agentId++;
+											} // end Individual creation loop
+										} // end ABS income indices loop
+									} // end ABS age indices loop
 
 								} // end if !state.equals("Other")
 							} // end for POA
@@ -1567,11 +1602,33 @@ public class CalibrateIndividuals {
 				} // end for age
 			} // end if multi-index income range mapping
 		} // end for ATO income range
-		this.individualAgents.trimToSize();
+			// this.individualAgents.trimToSize();
+		for (String lga : this.individualMap.keySet()) {
+			for (String age : this.individualMap.get(lga).keySet()) {
+				for (String incp : this.individualMap.get(lga).get(age).keySet()) {
+					this.individualMap.get(lga).get(age).get(incp).trimToSize();
+				}
+			}
+		}
 		System.out.println(new Date(System.currentTimeMillis()) + ": Finished creating Individual agents");
-		System.out.println("Created " + integerFormatter.format(this.individualAgents.size()) + " Individual agents");
+		System.out.println("Created " + integerFormatter.format(agentId) + " Individual agents");
 
 		if (DEBUG) {
+			int calculatedAdjustedPopulationByLgaTotal = 0;
+			for (int poaIdx = 0; poaIdx < censusMatrixPersonsAdjustedPOA.length; poaIdx++) {
+				for (int sexIdx = 0; sexIdx < censusMatrixPersonsAdjustedPOA[poaIdx].length; sexIdx++) {
+					for (int ageIdx = 0; ageIdx < censusMatrixPersonsAdjustedPOA[poaIdx][sexIdx].length; ageIdx++) {
+						for (int divIdx = 0; divIdx < censusMatrixPersonsAdjustedPOA[poaIdx][sexIdx][ageIdx].length; divIdx++) {
+							for (int incomeIdx = 0; incomeIdx < censusMatrixPersonsAdjustedPOA[poaIdx][sexIdx][ageIdx][divIdx].length; incomeIdx++) {
+								calculatedAdjustedPopulationByLgaTotal += censusMatrixPersonsAdjustedPOA[poaIdx][sexIdx][ageIdx][divIdx][incomeIdx];
+							}
+						}
+					}
+				}
+			}
+			System.out.println(
+					"### calculatedAdjustedPopulationByLgaTotal ==> " + calculatedAdjustedPopulationByLgaTotal);
+
 			System.gc();
 			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
@@ -1658,15 +1715,19 @@ public class CalibrateIndividuals {
 		 * liabilities to get other liabilities
 		 */
 
-		this.addAgentsToEconomy();
-	}
-
-	private void addAgentsToEconomy() {
-		this.economy.setIndividuals(this.individualAgents);
-		
 		// release about 7GB of RAM that's no longer needed
 		this.close();
+
+		// N.B. Agents are added to economy after being assigned to Households
+		// this.addAgentsToEconomy();
 	}
+
+	/*
+	 * private void addAgentsToEconomy() {
+	 * //this.economy.setIndividuals(this.individualAgents);
+	 * 
+	 * // release about 7GB of RAM that's no longer needed this.close(); }
+	 */
 
 	private String getStateCode(String stateName) {
 		String stateCode = "NA";
@@ -1834,6 +1895,20 @@ public class CalibrateIndividuals {
 	 */
 	public List<List<List<List<List<List<Individual>>>>>> getIndividualMatrix() {
 		return individualMatrix;
+	}
+
+	/**
+	 * @return the individualMap
+	 */
+	public Map<String, Map<String, Map<String, ArrayList<Individual>>>> getIndividualMap() {
+		return individualMap;
+	}
+
+	/**
+	 * @return the totalPopulationAU
+	 */
+	public int getTotalPopulationAU() {
+		return totalPopulationAU;
 	}
 
 	/**

@@ -47,7 +47,7 @@ public final class Individual extends Agent {
 
 	// Bal Sht (24 bytes)
 	private double bsBankDeposits;
-	private double bsLoans;
+	// private double bsLoans;
 	private double bsStudentLoans; // HELP debt
 
 	// Interest rates (24 bytes)
@@ -61,6 +61,39 @@ public final class Individual extends Agent {
 	public Individual() {
 		super();
 		this.init();
+	}
+
+	/**
+	 * Copy constructor (used in Household calibration).
+	 * 
+	 * WARNING: Does not copy links to other agents.
+	 * 
+	 * @param individual - the Individual to copy
+	 */
+	public Individual(Individual individual) {
+		super();
+		this.age = individual.age;
+		this.sex = individual.sex;
+		this.employmentIndustry = individual.employmentIndustry;
+		this.localGovernmentAreaCode = individual.localGovernmentAreaCode;
+		this.mainIncomeSource = individual.mainIncomeSource;
+		this.pnlWagesSalaries = individual.pnlWagesSalaries;
+		this.pnlUnemploymentBenefits = individual.pnlUnemploymentBenefits;
+		this.pnlOtherSocialSecurityIncome = individual.pnlOtherSocialSecurityIncome;
+		this.pnlInvestmentIncome = individual.pnlInvestmentIncome;
+		this.pnlInterestIncome = individual.pnlInterestIncome;
+		this.pnlRentIncome = individual.pnlRentIncome;
+		this.pnlForeignIncome = individual.pnlForeignIncome;
+		this.pnlOtherIncome = individual.pnlOtherIncome;
+		this.pnlIncomeTaxExpense = individual.pnlIncomeTaxExpense;
+		this.pnlWorkRelatedExpenses = individual.pnlWorkRelatedExpenses;
+		this.pnlRentInterestExpense = individual.pnlRentInterestExpense;
+		this.pnlDonations = individual.pnlDonations;
+		this.bsBankDeposits = individual.bsBankDeposits;
+		this.bsStudentLoans = individual.bsStudentLoans;
+		this.interestRateDeposits = individual.interestRateDeposits;
+		this.interestRateLoans = individual.interestRateLoans;
+		this.interestRateStudentLoans = individual.interestRateStudentLoans;
 	}
 
 	public double getGrossIncome() {
@@ -100,7 +133,12 @@ public final class Individual extends Agent {
 		this.pnlOtherIncome = 0d;
 		this.pnlIncomeTaxExpense = 0d;
 
+		this.pnlWorkRelatedExpenses = 0d;
+		this.pnlRentInterestExpense = 0d;
+		this.pnlDonations = 0d;
+
 		// Bal Sht
+		this.bsBankDeposits = 0d;
 		this.bsStudentLoans = 0d;
 	}
 
@@ -410,20 +448,6 @@ public final class Individual extends Agent {
 	 */
 	public void setBsBankDeposits(double bsBankDeposits) {
 		this.bsBankDeposits = bsBankDeposits;
-	}
-
-	/**
-	 * @return the bsLoans
-	 */
-	public double getBsLoans() {
-		return bsLoans;
-	}
-
-	/**
-	 * @param bsLoans the bsLoans to set
-	 */
-	public void setBsLoans(double bsLoans) {
-		this.bsLoans = bsLoans;
 	}
 
 	/**

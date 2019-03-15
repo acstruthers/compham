@@ -35,12 +35,13 @@ public class Household extends Agent {
 	private double pnlOtherIncome;
 	private double pnlIncomeTaxExpense;
 
-	private double pnlLivingExpenses;
+	private double pnlLivingExpenses; // Henderson poverty line (excl. housing costs)
 	private double pnlRentExpense;
 	private double pnlMortgageRepayments;
+	private double pnlWorkRelatedExpenses;
 	private double pnlRentInterestExpense; // assume interest-only loan
 	private double pnlDonations;
-	private double pnlOtherDiscretionaryExpenses;
+	private double pnlOtherDiscretionaryExpenses; // TODO: review this ... it might be unnecessary
 
 	// Bal Sht (48 bytes)
 	private double bsBankDeposits;
@@ -78,7 +79,7 @@ public class Household extends Agent {
 		super();
 		this.init();
 		this.individuals = householdIndividuals;
-		this.initialiseFinancials();
+		this.initialiseFinancialsFromIndividuals();
 	}
 
 	@Override
@@ -94,12 +95,13 @@ public class Household extends Agent {
 	}
 
 	/**
-	 * Sets the household's financials, based on the financials of the individuals
-	 * that it comprises of. Adjusts for household composition when calculating the
-	 * Henderson Poverty Line, which is being used as a proxy for non-discretionary
-	 * living expenses.
+	 * Sets the household's financials, based on the financials of the Individuals
+	 * that it comprises of.
+	 * 
+	 * Does not set living expenses because the Henderson Poverty Line has already
+	 * been calculated and set when the Household was instantiated.
 	 */
-	public void initialiseFinancials() {
+	public void initialiseFinancialsFromIndividuals() {
 		for (Individual i : this.individuals) {
 			// P&L
 			this.pnlWagesSalaries += i.getPnlWagesSalaries();
@@ -112,12 +114,12 @@ public class Household extends Agent {
 			this.pnlOtherIncome += i.getPnlOtherIncome();
 
 			this.pnlIncomeTaxExpense += i.getPnlIncomeTaxExpense();
+			this.pnlWorkRelatedExpenses += i.getPnlWorkRelatedExpenses();
 			this.pnlRentInterestExpense += i.getPnlRentInterestExpense();
 			this.pnlDonations += i.getPnlDonations();
-			
+
 			// Bal Sht
 			this.bsBankDeposits += i.getBsBankDeposits();
-			this.bsLoans += i.getBsLoans();
 			this.bsStudentLoans += i.getBsStudentLoans();
 		}
 
@@ -378,6 +380,20 @@ public class Household extends Agent {
 	}
 
 	/**
+	 * @return the pnlWorkRelatedExpenses
+	 */
+	public double getPnlWorkRelatedExpenses() {
+		return pnlWorkRelatedExpenses;
+	}
+
+	/**
+	 * @param pnlWorkRelatedExpenses the pnlWorkRelatedExpenses to set
+	 */
+	public void setPnlWorkRelatedExpenses(double pnlWorkRelatedExpenses) {
+		this.pnlWorkRelatedExpenses = pnlWorkRelatedExpenses;
+	}
+
+	/**
 	 * @return the pnlRentInterestExpense
 	 */
 	public double getPnlRentInterestExpense() {
@@ -600,6 +616,5 @@ public class Household extends Agent {
 	public void setInterestRateStudentLoans(double interestRateStudentLoans) {
 		this.interestRateStudentLoans = interestRateStudentLoans;
 	}
-	
-	
+
 }
