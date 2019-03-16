@@ -143,7 +143,7 @@ public class CalibrateHouseholds {
 	private static final double[] CDCF_HENDERSON_EXCL_HOUSING = { 505.82, 628.75, 751.69, 874.62, 996.2, 1117.78,
 			1239.36, 347.93, 477.85, 600.79, 723.72, 846.66, 969.6, 1092.54 };
 	private static final double HENDERSON_EXCL_HOUSING_LONE_PERSON = CDCF_HENDERSON_EXCL_HOUSING[7];
-	private static final double HENDERSON_EXCL_HOUSING_GROUP = CDCF_HENDERSON_EXCL_HOUSING[2];
+	private static final double HENDERSON_EXCL_HOUSING_GROUP = 821.60; // assumes 4 adults, no children
 
 	// series titles
 	private static final String RBA_E1_SERIESID_CASH = "BSPNSHUFAD"; // Household deposits
@@ -175,18 +175,6 @@ public class CalibrateHouseholds {
 
 	// field variables
 	private Random random;
-	/**
-	 * The matrix of Individual agents.<br>
-	 * Keys: postcode, sex, age, industry division, income (ABS categories)
-	 */
-	private List<List<List<List<List<List<Individual>>>>>> individualMatrix;
-	/**
-	 * A simplified map to make it easier to populate Households.<br>
-	 * Keys: LGA, AGE5P, INCP.<br>
-	 * Values: an ArrayList of Individuals for that combination of keys.
-	 */
-	private Map<String, Map<String, Map<String, ArrayList<Individual>>>> individualMap;
-	private ArrayList<Individual> individualAgents;
 	private Date calibrationDateAbs;
 	private Date calibrationDateRba;
 	private int totalPopulationAU;
@@ -198,13 +186,22 @@ public class CalibrateHouseholds {
 
 	private static int agentNo = 0;
 
-	// households should have an LGA
-	private ArrayList<Household> householdAgents;
+	// agents
+	/**
+	 * A simplified map to make it easier to populate Households.<br>
+	 * Keys: LGA, AGE5P, INCP.<br>
+	 * Values: an ArrayList of Individuals for that combination of keys.
+	 */
+	private Map<String, Map<String, Map<String, ArrayList<Individual>>>> individualMap;
+	private ArrayList<Individual> individualAgents;
+	private ArrayList<Household> householdAgents; // households should have an LGA
 	/**
 	 * A matrix of Household agents.<br>
 	 * Keys: LGA code, HIND, CDCF Values: list of households in each LGA
 	 */
 	private ArrayList<ArrayList<ArrayList<ArrayList<Household>>>> householdMatrix;
+
+	private static int agentId = 0;
 
 	// data sets
 	/**
@@ -290,12 +287,12 @@ public class CalibrateHouseholds {
 	 */
 	public void createHouseholdAgents() {
 		long memoryBefore = 0L; // for debugging memory consumption
-		if (true) {
+		if (DEBUG) {
 			System.gc();
 			memoryBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 		}
 
-		System.out.println(new Date(System.currentTimeMillis()) + ": Starting creation of Individual agents");
+		System.out.println(new Date(System.currentTimeMillis()) + ": Starting creation of Household agents");
 		DecimalFormat integerFormatter = new DecimalFormat("#,##0");
 
 		// set the calibration date
@@ -355,7 +352,16 @@ public class CalibrateHouseholds {
 		lgaCodesIntersection.retainAll(lgaCodesMRERD);
 		lgaCodesIntersection.retainAll(lgaCodesCDCF);
 		String[] lgaCodes = new String[lgaCodesIntersection.size()];
-		lgaCodes = Arrays.asList(lgaCodesIntersection).toArray(lgaCodes);
+		{ // limit the scope of lgaIdx
+			int lgaIdx = 0;
+			for (String lga : lgaCodesIntersection) {
+				lgaCodes[lgaIdx] = lga;
+				lgaIdx++;
+			}
+		}
+		// lgaCodes = Arrays.asList(lgaCodesIntersection).toArray(lgaCodes);
+		// FIXME: java.lang.ArrayStoreException: arraycopy: type mismatch: can not copy
+		// java.util.Set[] into java.lang.String[]
 
 		// create the Household agent objects
 		this.householdAgents = new ArrayList<Household>(AGENT_LIST_INIT_SIZE);
@@ -408,10 +414,12 @@ public class CalibrateHouseholds {
 		double[][][][] pdfRntrd = new double[lgaCodesIntersection.size()][ABS_HCFMF.length
 				+ 1][ABS_HIND_RANGES.length][ABS_RNTRD_MIDPOINT.length];
 		double[][][][] pdfMrerd = new double[lgaCodesIntersection.size()][ABS_HCFMF.length
-				+ 1][ABS_HIND_RANGES.length][ABS_RNTRD_MIDPOINT.length];
+				+ 1][ABS_HIND_RANGES.length][ABS_MRERD_MIDPOINT.length];
 		// Map<String, Integer> lgaIndexMap = new HashMap<String, Integer>(
 		// (int) Math.ceil(lgaCodesIntersection.size() / MAP_LOAD_FACTOR) + 1);
+		System.out.println(new Date(System.currentTimeMillis()) + ": Creating households for each LGA");
 		for (int lgaIdx = 0; lgaIdx < lgaCodes.length; lgaIdx++) {
+			System.out.print(".");
 			String lgaCode = lgaCodes[lgaIdx];
 			// lgaIndexMap.put(lgaCode, lgaIdx);
 
@@ -420,16 +428,33 @@ public class CalibrateHouseholds {
 
 			// children are <20 years old (indexes 0 to 3)
 			double[] pdfAgeChild = new double[4];
+			double[][] pdfIncpGivenAgeChild = new double[4][CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS.length];
 			int divisor = 0;
 			for (int ageIdx = 0; ageIdx < 4; ageIdx++) {
+				// initialise PDF for INCP given AGE5P
+				for (int incpIdx = 0; incpIdx < CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS.length; incpIdx++) {
+					pdfIncpGivenAgeChild[ageIdx][incpIdx] = 0d;
+				}
+				// calculate values
 				int numInAge = 0;
-				for (String incp : CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS) {
+				for (int incpIdx = 0; incpIdx < CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS.length; incpIdx++) {
+					String incp = CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS[incpIdx];
 					if (this.individualMap.get(lgaCode).containsKey(CalibrateIndividuals.AGE_ARRAY_ABS[ageIdx])
 							&& this.individualMap.get(lgaCode).get(CalibrateIndividuals.AGE_ARRAY_ABS[ageIdx])
 									.containsKey(incp)) {
 						// add the number of people in this cell, if this cell contains data
-						numInAge += this.individualMap.get(lgaCode).get(CalibrateIndividuals.AGE_ARRAY_ABS[ageIdx])
+						int numInCell = this.individualMap.get(lgaCode).get(CalibrateIndividuals.AGE_ARRAY_ABS[ageIdx])
 								.get(incp).size();
+						pdfIncpGivenAgeChild[ageIdx][incpIdx] = Double.valueOf(numInCell);
+						numInAge += numInCell;
+					}
+				}
+				for (int incpIdx = 0; incpIdx < CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS.length; incpIdx++) {
+					if (numInAge == 0) {
+						pdfIncpGivenAgeChild[ageIdx][incpIdx] = 0d;
+					} else {
+						pdfIncpGivenAgeChild[ageIdx][incpIdx] = pdfIncpGivenAgeChild[ageIdx][incpIdx]
+								/ Double.valueOf(numInAge);
 					}
 				}
 				pdfAgeChild[ageIdx] = Double.valueOf(numInAge);
@@ -507,7 +532,11 @@ public class CalibrateHouseholds {
 				for (String incp : CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS) {
 					makeCopies.get(age).put(incp, false);
 					nextIndex.get(age).put(incp, 0);
-					int numIndividualsInCell = this.individualMap.get(lgaCode).get(age).get(incp).size();
+					int numIndividualsInCell = 0;
+					if (this.individualMap.containsKey(lgaCode) && this.individualMap.get(lgaCode).containsKey(age)
+							&& this.individualMap.get(lgaCode).get(age).containsKey(incp)) {
+						numIndividualsInCell = this.individualMap.get(lgaCode).get(age).get(incp).size();
+					}
 					List<Integer> range = IntStream.rangeClosed(0, numIndividualsInCell - 1).boxed()
 							.collect(Collectors.toList());
 					Collections.shuffle(range, this.random);
@@ -672,129 +701,136 @@ public class CalibrateHouseholds {
 						int numAdults = Math.min(ABS_CDCF_ADULT_COUNT[cdcfIdx], 2);
 						int numChildren = Math.min(ABS_CDCF_CHILD_COUNT[cdcfIdx], 6);
 
-						// determine Henderson poverty line based on family composition
-						double henderson = 0d;
-						if (cdcfIdx == ABS_CDCF.length - 1) {
-							// TODO: lone person or group household
-						} else {
-							if (numAdults > 1) {
-								// couple
-								henderson = CDCF_HENDERSON_EXCL_HOUSING[numChildren];
+						// get number of families
+						int numCdcfCategories = (cdcfIdx == (ABS_CDCF.length - 1)) ? 2 : 1;
+						List<Integer> hcfmdSplitIdx = new ArrayList<Integer>(numCdcfCategories);
+						List<Integer> numFamilies = new ArrayList<Integer>(numCdcfCategories);
+
+						// Census CDCF Keys: FINF, CDCF, LGA, HCFMF
+						if (this.censusHCFMF_LGA_FINF_CDCF.containsKey(hind)
+								&& this.censusHCFMF_LGA_FINF_CDCF.get(hind).containsKey(cdcf)
+								&& this.censusHCFMF_LGA_FINF_CDCF.get(hind).get(cdcf).containsKey(lgaCode)
+								&& this.censusHCFMF_LGA_FINF_CDCF.get(hind).get(cdcf).get(lgaCode).containsKey(hcfmd)) {
+							int numFamiliesInCell = this.censusHCFMF_LGA_FINF_CDCF.get(hind).get(cdcf).get(lgaCode)
+									.get(hcfmd);
+
+							// if it's the last HCFMD index, split between lone person & group households
+							if (cdcfIdx == ABS_CDCF.length - 1) {
+								int hcfmdIdxLone = hcfmdIdx;
+								int hcfmdIdxGroup = hcfmdIdx + 1;
+								hcfmdSplitIdx.add(hcfmdIdxLone);
+								hcfmdSplitIdx.add(hcfmdIdxGroup);
+								numFamilies.add((int) Math.round(lonePersonRatio * Double.valueOf(numFamiliesInCell)));
+								numFamilies.add(numFamiliesInCell - numFamilies.get(0));
 							} else {
-								// single
-								henderson = CDCF_HENDERSON_EXCL_HOUSING[numChildren + 7];
+								hcfmdSplitIdx.add(hcfmdIdx);
+								numFamilies.add(numFamiliesInCell);
 							}
 						}
-
-						// TODO: get number of families
-						int numFamilies = 0;
-						// if it's the last HCFMD index, process the split between lone person and group
-						// households
+						// FIXME: up to here splitting lone/group households
 
 						// randomly sample from PDFs for RNTRD and MRERD
-						for (int familyNum = 0; familyNum < numFamilies; familyNum++) {
-							Household household = new Household();
+						for (int cdcfSplit = 0; cdcfSplit < numCdcfCategories; cdcfSplit++) {
+							for (int familyNum = 0; familyNum < numFamilies.get(cdcfSplit); familyNum++) {
+								Household household = new Household();
 
-							household.setNumAdults(numAdults);
-							household.setNumChildren(numChildren);
+								household.setNumAdults(numAdults);
+								household.setNumChildren(numChildren);
 
-							household.setPnlLivingExpenses(henderson); // non-discretionary living expenses
-
-							double rand = this.random.nextDouble();
-							int attributeIdx = CustomMath.sample(pdfMrerd[lgaIdx][hcfmdIdx][hindIdx], rand);
-							household.setPnlMortgageRepayments(ABS_MRERD_MIDPOINT[attributeIdx]);
-							attributeIdx = CustomMath.sample(pdfRntrd[lgaIdx][hcfmdIdx][hindIdx], 1d - rand);
-							household.setPnlRentExpense(ABS_RNTRD_MIDPOINT[attributeIdx]);
-
-							List<Individual> members = new ArrayList<Individual>(numAdults + numChildren);
-							// assign adults
-							if (numAdults == 1) {
-								// get random age for an adult
-								int ageIdx = 0;
-								if (numChildren == 0) {
-									// get random age for an adult
-									ageIdx = CustomMath.sample(pdfAgeAdult, this.random) + 4;
+								// determine Henderson poverty line based on family composition
+								double henderson = 0d;
+								if (cdcfIdx == ABS_CDCF.length - 1) {
+									if (cdcfSplit == 0) {
+										// lone person household (same as single parent with no children)
+										henderson = HENDERSON_EXCL_HOUSING_LONE_PERSON;
+									} else {
+										// group household (assume four adults, no children)
+										henderson = HENDERSON_EXCL_HOUSING_GROUP;
+									}
 								} else {
-									// get random age for a parent
-									ageIdx = CustomMath.sample(pdfAgeParent, this.random) + 4;
+									if (numAdults > 1) {
+										// couple
+										henderson = CDCF_HENDERSON_EXCL_HOUSING[numChildren];
+									} else {
+										// single
+										henderson = CDCF_HENDERSON_EXCL_HOUSING[numChildren + 7];
+									}
 								}
-								String age = CalibrateIndividuals.AGE_ARRAY_ABS[ageIdx];
+								household.setPnlLivingExpenses(henderson); // non-discretionary living expenses
 
-								// income brackets align fairly well
-								String incp = null;
-								if (hindIdx < 14) {
-									// 1:1 mapping between income brackets
-									incp = CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS[hindIdx];
-								} else if (hindIdx == 14) {
-									// 2:1 mapping between income brackets
-									incp = CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS[13];
-								} else {
-									// all higher FINF brackets map to the highest INCP
-									incp = CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS[14];
-								}
+								double rand = this.random.nextDouble();
+								int attributeIdx = CustomMath
+										.sample(pdfMrerd[lgaIdx][hcfmdSplitIdx.get(cdcfSplit)][hindIdx], rand);
+								household.setPnlMortgageRepayments(ABS_MRERD_MIDPOINT[attributeIdx]);
+								attributeIdx = CustomMath
+										.sample(pdfRntrd[lgaIdx][hcfmdSplitIdx.get(cdcfSplit)][hindIdx], 1d - rand);
+								household.setPnlRentExpense(ABS_RNTRD_MIDPOINT[attributeIdx]);
 
-								// get next random individual in this LGA, AGE5P & INCP category
-								int nextIdx = nextIndex.get(age).get(incp)
-										% randomIndividualIdx.get(age).get(incp).size(); // stay within the List bounds
-								int nextIndividualIdx = randomIndividualIdx.get(age).get(incp).get(nextIdx);
-								Individual newFamilyMember = null;
-								if (makeCopies.get(age).get(incp)) {
-									// we're iterating over the list a second time (or more), so make a copy of the
-									// Individual so we don't have multiple Households pointing to the same object
-									newFamilyMember = new Individual(
-											this.individualMap.get(lgaCode).get(age).get(incp).get(nextIndividualIdx));
-								} else {
-									// use original Individual instance
-									newFamilyMember = this.individualMap.get(lgaCode).get(age).get(incp)
-											.get(nextIndividualIdx);
-								}
-								members.add(newFamilyMember);
-							} else {
-								// multiple adults, so income brackets not so well behaved
-								for (int adultNo = 0; adultNo < numAdults; adultNo++) {
+								List<Individual> members = new ArrayList<Individual>(numAdults + numChildren);
+								int firstAdultIncpIdx = 0;
+								// assign adults
+								if (numAdults == 1) {
 									// get random age for an adult
 									int ageIdx = 0;
-									if (adultNo > 0) {
-										// base the subsequent adults' ages on the previous adult's age
-										int adultOneAgeIdx = (members.get(members.size() - 1).getAge() + 3) / 5 - 1;
-										if (adultOneAgeIdx == 4) {
-											// other adult is older (younger would be a child)
-											ageIdx = adultOneAgeIdx + 1;
-										} else if (adultOneAgeIdx > 18) {
-											// other adult is younger (older would probably be dead)
-											ageIdx = adultOneAgeIdx - 1;
-										}
+									if (numChildren == 0) {
+										// get random age for an adult
+										ageIdx = CustomMath.sample(pdfAgeAdult, this.random) + 4;
 									} else {
-										// randomly choose an age
-										if (numChildren == 0) {
-											// get random age for an adult
-											ageIdx = CustomMath.sample(pdfAgeAdult, this.random) + 4;
-										} else {
-											// get random age for a parent
-											ageIdx = CustomMath.sample(pdfAgeParent, this.random) + 4;
-										}
+										// get random age for a parent
+										ageIdx = CustomMath.sample(pdfAgeParent, this.random) + 4;
 									}
 									String age = CalibrateIndividuals.AGE_ARRAY_ABS[ageIdx];
 
-									// income brackets do not align so well
+									// FIXME: need to ensure there are people in the chosen cell
+									/*
+									 * Choose the preferred index. Then in a loop, check if there are any people in
+									 * this cell. If there are, that's the chosen index. If not, increment/decrement
+									 * the index and try again. Repeat until a populated cell is found.
+									 * 
+									 * N.B. Age is chosen from a PDF, so there should definitely be people in that
+									 * age range for this LGA - it's just the income ranges that aren't guaranteed.
+									 */
+									// income brackets align fairly well
 									String incp = null;
-									if (hindIdx < 3) {
-										// negative and nil combined into the less than $7,800 category
-										incp = CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS[2];
-									} else if (hindIdx > 19) {
-										// family income over $312k means two individuals over $156k
-										incp = CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS[14];
-									} else {
-										// everything in between can be a complicated combination
-
-										// FIXME: up to here making households
-
-									}
+									{ // limit the scope of idx
+										int idx = 0;
+										// determine the best starting point, based on income mapping
+										if (hindIdx < 14) {
+											// 1:1 mapping between income brackets
+											idx = hindIdx;
+										} else if (hindIdx == 14) {
+											// 2:1 mapping between income brackets
+											idx = 13;
+										} else {
+											// all higher FINF brackets map to the highest INCP
+											idx = 14;
+										}
+										// now loop through, searching the cells to find one with people in it
+										peopleCheck: for (int i = 0; i < 15; i++) {
+											if (randomIndividualIdx.get(age).containsKey(
+													CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS[(idx + i) % 15])
+													&& randomIndividualIdx.get(age).get(
+															CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS[(idx + i)
+																	% 15])
+															.size() > 0) {
+												idx = (idx + i) % 15;
+												break peopleCheck;
+											}
+										}
+										incp = CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS[idx];
+										firstAdultIncpIdx = idx;
+									} // end limit the scope of idx
 
 									// get next random individual in this LGA, AGE5P & INCP category
-									int nextIdx = nextIndex.get(age).get(incp)
-											% randomIndividualIdx.get(age).get(incp).size(); // stay within the List
-																								// bounds
+									int nextIdx = 0;
+									if (randomIndividualIdx.get(age).get(incp).size() > 0) {
+										// stay within the List bounds
+										nextIdx = nextIndex.get(age).get(incp)
+												% randomIndividualIdx.get(age).get(incp).size();
+									}
+
+
+
 									int nextIndividualIdx = randomIndividualIdx.get(age).get(incp).get(nextIdx);
 									Individual newFamilyMember = null;
 									if (makeCopies.get(age).get(incp)) {
@@ -808,21 +844,506 @@ public class CalibrateHouseholds {
 												.get(nextIndividualIdx);
 									}
 									members.add(newFamilyMember);
+								} else {
+									// multiple adults, so income brackets not so well behaved
+									for (int adultNo = 0; adultNo < numAdults; adultNo++) {
+										// get random age for an adult
+										int ageIdx = 0;
+										if (adultNo > 0) {
+											// base the subsequent adults' ages on the previous adult's age
+											int adultOneAgeIdx = (members.get(members.size() - 1).getAge() + 3) / 5 - 1;
+											if (adultOneAgeIdx == 4) {
+												// other adult is older (younger would be a child)
+												ageIdx = adultOneAgeIdx + 1;
+											} else if (adultOneAgeIdx > 18) {
+												// other adult is younger (older would probably be dead)
+												ageIdx = adultOneAgeIdx - 1;
+											}
+										} else {
+											// randomly choose an age
+											if (numChildren == 0) {
+												// get random age for an adult
+												ageIdx = CustomMath.sample(pdfAgeAdult, this.random) + 4;
+											} else {
+												// get random age for a parent
+												ageIdx = CustomMath.sample(pdfAgeParent, this.random) + 4;
+											}
+										}
+										String age = CalibrateIndividuals.AGE_ARRAY_ABS[ageIdx];
+
+										// income brackets do not align so well
+										String incp = null;
+										if (hindIdx < 3) {
+											// negative and nil combined into the less than $7,800 category
+											firstAdultIncpIdx = 2;
+											incp = CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS[2];
+										} else if (hindIdx > 19) {
+											// family income over $312k means two individuals over $156k
+											firstAdultIncpIdx = 14;
+											incp = CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS[14];
+										} else {
+											// everything in between can be a complicated combination
+											if (adultNo == 1) {
+												// Randomly choose an income from the range of values that allows the
+												// second
+												// adult to bring the family income up to the right range.
+												int incpIdx = 0;
+												switch (hindIdx) { // for the relevant HIND/FINF income range
+												case 3:
+													incpIdx = 3;
+													break;
+												case 4:
+													incpIdx = this.random.nextInt(2) + 3;
+													break;
+												case 5:
+													incpIdx = this.random.nextInt(3) + 3;
+													break;
+												case 6:
+													incpIdx = this.random.nextInt(4) + 3;
+													break;
+												case 7:
+													incpIdx = this.random.nextInt(5) + 3;
+													break;
+												case 8:
+													incpIdx = this.random.nextInt(6) + 3;
+													break;
+												case 9:
+													incpIdx = this.random.nextInt(7) + 3;
+													break;
+												case 10:
+													incpIdx = this.random.nextInt(8) + 3;
+													break;
+												case 11:
+													incpIdx = this.random.nextInt(9) + 3;
+													break;
+												case 12:
+													incpIdx = this.random.nextInt(10) + 3;
+													break;
+												case 13:
+													incpIdx = this.random.nextInt(11) + 3;
+													break;
+												case 14:
+													incpIdx = this.random.nextInt(11) + 3;
+													break;
+												case 15:
+													incpIdx = this.random.nextInt(12) + 3;
+													break;
+												case 16:
+													incpIdx = this.random.nextInt(10) + 5;
+													break;
+												case 17:
+													incpIdx = this.random.nextInt(7) + 8;
+													break;
+												case 18:
+													incpIdx = this.random.nextInt(5) + 10;
+													break;
+												default: // case 19:
+													incpIdx = this.random.nextInt(2) + 13;
+													break;
+												}
+												firstAdultIncpIdx = incpIdx;
+												incp = CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS[incpIdx];
+											} else {
+												// Choose the income that makes the family income correct, given the
+												// first
+												// adult's income. N.B. Assumes two adults.
+												int incpIdx = 0;
+												switch (hindIdx) { // for the relevant HIND/FINF income range
+												case 3: // HIND $7800
+													incpIdx = 2;
+													break;
+												case 4: // HIND $15600
+													switch (firstAdultIncpIdx) {
+													case 3:
+														incpIdx = 3;
+													default: // case 4
+														incpIdx = 2;
+													}
+													break;
+												case 5: // HIND $20800
+													switch (firstAdultIncpIdx) {
+													case 3:
+														incpIdx = 4;
+													case 4:
+														incpIdx = 3;
+													default: // case 5
+														incpIdx = 2;
+													}
+													break;
+												case 6: // HIND $26000
+													switch (firstAdultIncpIdx) {
+													case 3:
+														incpIdx = 5;
+													case 4:
+													case 5:
+														incpIdx = 3;
+													default: // case 6
+														incpIdx = 2;
+													}
+													break;
+												case 7: // HIND $33800
+													switch (firstAdultIncpIdx) {
+													case 3:
+														incpIdx = 6;
+													case 4:
+													case 5:
+														incpIdx = 4;
+													case 6:
+														incpIdx = 3;
+													default: // case 7
+														incpIdx = 2;
+													}
+													break;
+												case 8: // HIND $41600
+													switch (firstAdultIncpIdx) {
+													case 3:
+														incpIdx = 7;
+													case 4:
+														incpIdx = 6;
+													case 5:
+														incpIdx = 5;
+													case 6:
+														incpIdx = 4;
+													case 7:
+														incpIdx = 3;
+													default: // case 8
+														incpIdx = 2;
+													}
+													break;
+												case 9: // HIND $52k
+													switch (firstAdultIncpIdx) {
+													case 3:
+														incpIdx = 8;
+													case 4:
+													case 5:
+														incpIdx = 7;
+													case 6:
+														incpIdx = 6;
+													case 7:
+														incpIdx = 4;
+													case 8:
+														incpIdx = 3;
+													default: // case 9
+														incpIdx = 2;
+													}
+													break;
+												case 10: // HIND $65k
+													switch (firstAdultIncpIdx) {
+													case 3:
+													case 4:
+														incpIdx = 9;
+													case 5:
+													case 6:
+														incpIdx = 8;
+													case 7:
+														incpIdx = 7;
+													case 8:
+														incpIdx = 6;
+													case 9:
+														incpIdx = 3;
+													default: // case 10
+														incpIdx = 2;
+													}
+													break;
+												case 11: // HIND $78k
+													switch (firstAdultIncpIdx) {
+													case 3:
+													case 4:
+														incpIdx = 10;
+													case 5:
+													case 6:
+														incpIdx = 9;
+													case 7:
+													case 8:
+														incpIdx = 8;
+													case 9:
+														incpIdx = 6;
+													case 10:
+														incpIdx = 3;
+													default: // case 11
+														incpIdx = 2;
+													}
+													break;
+												case 12: // HIND $91k
+													switch (firstAdultIncpIdx) {
+													case 3:
+													case 4:
+														incpIdx = 11;
+													case 5:
+													case 6:
+														incpIdx = 10;
+													case 7:
+													case 8:
+														incpIdx = 9;
+													case 9:
+														incpIdx = 8;
+													case 10:
+														incpIdx = 6;
+													case 11:
+														incpIdx = 3;
+													default: // case 12
+														incpIdx = 2;
+													}
+													break;
+												case 13: // HIND $104k
+													switch (firstAdultIncpIdx) {
+													case 3:
+													case 4:
+														incpIdx = 12;
+													case 5:
+													case 6:
+														incpIdx = 11;
+													case 7:
+													case 8:
+														incpIdx = 10;
+													case 9:
+														incpIdx = 9;
+													case 10:
+														incpIdx = 8;
+													case 11:
+														incpIdx = 6;
+													case 12:
+														incpIdx = 3;
+													default: // case 13
+														incpIdx = 2;
+													}
+													break;
+												case 14: // HIND $130k
+													switch (firstAdultIncpIdx) {
+													case 3:
+													case 4:
+													case 5:
+													case 6:
+														incpIdx = 13;
+													case 7:
+													case 8:
+													case 9:
+														incpIdx = 12;
+													case 10:
+														incpIdx = 10;
+													case 11:
+													case 12:
+														incpIdx = 9;
+													default: // case 13
+														incpIdx = 6;
+													}
+													break;
+												case 15: // HIND $156k
+													switch (firstAdultIncpIdx) {
+													case 3:
+													case 4:
+													case 5:
+													case 6:
+													case 7:
+													case 8:
+													case 9:
+														incpIdx = 13;
+													case 10:
+														incpIdx = 12;
+													case 11:
+														incpIdx = 11;
+													case 12:
+														incpIdx = 10;
+													case 13:
+														incpIdx = 9;
+													default: // case 14
+														incpIdx = 2;
+													}
+													break;
+												case 16: // HIND $182k
+													switch (firstAdultIncpIdx) {
+													case 5:
+													case 6:
+													case 7:
+														incpIdx = 14;
+													case 8:
+													case 9:
+													case 10:
+													case 11:
+														incpIdx = 13;
+													case 12:
+														incpIdx = 12;
+													case 13:
+														incpIdx = 9;
+													default: // case 14
+														incpIdx = 6;
+													}
+													break;
+												case 17: // HIND $208k
+													switch (firstAdultIncpIdx) {
+													case 8:
+													case 9:
+													case 10:
+														incpIdx = 14;
+													case 11:
+													case 12:
+													case 13:
+														incpIdx = 13;
+													default: // case 14
+														incpIdx = 9;
+													}
+													break;
+												case 18: // HIND $234k
+													switch (firstAdultIncpIdx) {
+													case 10:
+													case 11:
+														incpIdx = 14;
+													case 12:
+													case 13:
+														incpIdx = 13;
+													default: // case 14
+														incpIdx = 11;
+													}
+													break;
+												default: // case 19: // HIND $260k
+													switch (firstAdultIncpIdx) {
+													case 13:
+														incpIdx = 14;
+													default: // case 14
+														incpIdx = 13;
+													}
+													break;
+												}
+												incp = CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS[incpIdx];
+											}
+										} // end hindIdx if/switch for multiple adults
+
+										// FIXME: up to here making households
+
+										// get next random individual in this LGA, AGE5P & INCP category
+										int nextIdx = 0;
+										int nextIndividualIdx = 0;
+										if (randomIndividualIdx.get(age).get(incp).size() > 0) {
+											// stay within the List bounds
+											nextIdx = nextIndex.get(age).get(incp)
+													% randomIndividualIdx.get(age).get(incp).size();
+											nextIndividualIdx = randomIndividualIdx.get(age).get(incp).get(nextIdx);
+											nextIdx++;
+											nextIndex.get(age).put(incp, nextIdx);
+											if (nextIdx % randomIndividualIdx.get(age).get(incp).size() == 0) {
+												// reached the upper bound of the List, so set the makeCopies flag to
+												// true
+												makeCopies.get(age).put(incp, true);
+											}
+										}
+										Individual newFamilyMember = null;
+										
+										// FIXME: remove debugging code
+										System.out.println("LGA: " + lgaCode);
+										System.out.println("age: " + age);
+										System.out.println("incp: " + incp);
+										System.out.println("hindIdx: " + hindIdx);
+										System.out.println("nextIdx: " + nextIdx);
+										System.out.println("randomIndividualIdx.keySet(): " + randomIndividualIdx.keySet());
+										System.out.println("randomIndividualIdx.get(age).keySet(): "
+												+ randomIndividualIdx.get(age).keySet());
+										System.out.println("randomIndividualIdx.get(age).get(incp): "
+												+ randomIndividualIdx.get(age).get(incp));
+										System.out.println("this.individualMap.get(lgaCode).keySet(): " + this.individualMap.get(lgaCode).keySet());
+										System.out.println("this.individualMap.get(lgaCode).get(age).keySet(): " + this.individualMap.get(lgaCode).get(age).keySet());
+										System.out.println("this.individualMap.get(lgaCode).get(age).get(incp): " + this.individualMap.get(lgaCode).get(age).get(incp));
+										
+										if (makeCopies.get(age).get(incp)) {
+											// we're iterating over the list a second time (or more), so make a copy of
+											// the Individual so we don't have multiple Households pointing to the same
+											// object
+											newFamilyMember = new Individual(this.individualMap.get(lgaCode).get(age)
+													.get(incp).get(nextIndividualIdx));
+										} else {
+											// use original Individual instance
+											newFamilyMember = this.individualMap.get(lgaCode).get(age).get(incp)
+													.get(nextIndividualIdx);
+										}
+										members.add(newFamilyMember);
+									} // end Adult Number loop
+								} // end if numAdults == 1
+
+								// assign children (assume under 20 years because dependent)
+								for (int childNo = 0; childNo < numChildren; childNo++) {
+									// get random age for a child
+									int ageIdx = CustomMath.sample(pdfAgeChild, this.random);
+									String age = CalibrateIndividuals.AGE_ARRAY_ABS[ageIdx];
+
+									// children's income is immaterial, so just sample randomly
+									int incpIdx = CustomMath.sample(pdfIncpGivenAgeChild[ageIdx], this.random);
+									String incp = null;
+									if (incpIdx < 14) {
+										// 1:1 mapping between income brackets
+										incp = CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS[incpIdx];
+									} else if (incpIdx == 14) {
+										// 2:1 mapping between income brackets
+										incp = CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS[13];
+									} else {
+										// all higher FINF brackets map to the highest INCP
+										incp = CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS[14];
+									}
+
+									// get next random individual in this LGA, AGE5P & INCP category
+									int nextIdx = nextIndex.get(age).get(incp)
+											% randomIndividualIdx.get(age).get(incp).size(); // stay within the List
+																								// bounds
+									int nextIndividualIdx = randomIndividualIdx.get(age).get(incp).get(nextIdx);
+									nextIdx++;
+									nextIndex.get(age).put(incp, nextIdx);
+									if (nextIdx % randomIndividualIdx.get(age).get(incp).size() == 0) {
+										// reached the upper bound of the List, so set the makeCopies flag to true
+										makeCopies.get(age).put(incp, true);
+									}
+									Individual newFamilyMember = null;
+									
+									// FIXME: remove debugging code
+									System.out.println("LGA: " + lgaCode);
+									System.out.println("age: " + age);
+									System.out.println("incp: " + incp);
+									System.out.println("hindIdx: " + hindIdx);
+									System.out.println("nextIdx: " + nextIdx);
+									System.out.println("randomIndividualIdx.keySet(): " + randomIndividualIdx.keySet());
+									System.out.println("randomIndividualIdx.get(age).keySet(): "
+											+ randomIndividualIdx.get(age).keySet());
+									System.out.println("randomIndividualIdx.get(age).get(incp): "
+											+ randomIndividualIdx.get(age).get(incp));
+									System.out.println("this.individualMap.get(lgaCode).keySet(): " + this.individualMap.get(lgaCode).keySet());
+									System.out.println("this.individualMap.get(lgaCode).get(age).keySet(): " + this.individualMap.get(lgaCode).get(age).keySet());
+									System.out.println("this.individualMap.get(lgaCode).get(age).get(incp): " + this.individualMap.get(lgaCode).get(age).get(incp));
+									
+									if (makeCopies.get(age).get(incp)) {
+										// we're iterating over the list a second time (or more), so make a copy of the
+										// Individual so we don't have multiple Households pointing to the same object
+										newFamilyMember = new Individual(this.individualMap.get(lgaCode).get(age)
+												.get(incp).get(nextIndividualIdx));
+									} else {
+										// use original Individual instance
+										newFamilyMember = this.individualMap.get(lgaCode).get(age).get(incp)
+												.get(nextIndividualIdx);
+									}
+									members.add(newFamilyMember);
 								}
-							}
 
-							// assign children (assume under 20 years because dependent)
-							for (int childNo = 0; childNo < numChildren; childNo++) {
+								// add family members to Household
+								household.setIndividuals(members.toArray(Individual[]::new));
 
-							}
+								// consolidate Individual financials into Household financials
+								household.initialiseFinancialsFromIndividuals();
 
-							// add family members to Household
-							household.setIndividuals(members.toArray(Individual[]::new));
+								// FIXME: calibrate Bal Sht based on RBA data
 
-							// consolidate Individual financials into Household financials
-							household.initialiseFinancialsFromIndividuals();
-						}
+								// add Individuals and Households to more permanent data structures
+								// add to matrix so it has LGA data and can be used to calibrate topology
+								ArrayList<Household> existingHouseholds = this.householdMatrix.get(lgaIdx).get(hindIdx)
+										.get(cdcfIdx);
+								existingHouseholds.add(household);
+								this.householdMatrix.get(lgaIdx).get(hindIdx).add(cdcfIdx, existingHouseholds);
 
+								// add to List so they can be used in Payments Clearing algorithm
+								this.householdAgents.add(household);
+								this.individualAgents.addAll(members);
+
+								agentId++;
+
+							} // end family number loop
+						} // end cdcf split loop
+
+						this.householdMatrix.get(lgaIdx).get(hindIdx).get(cdcfIdx).trimToSize();
 					} // end for CDCF
 
 				} // end for HCFMD
@@ -850,6 +1371,19 @@ public class CalibrateHouseholds {
 		} // end for LGA
 		this.individualAgents.trimToSize();
 		this.householdAgents.trimToSize();
+		System.out.println();
+		System.out.println(new Date(System.currentTimeMillis()) + ": Finished creating Households");
+		System.out.println("Created " + integerFormatter.format(agentId) + " Household agents");
+
+		if (DEBUG) {
+			System.gc();
+			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			DecimalFormat decimalFormatter = new DecimalFormat("#,##0.00");
+			System.out.println(
+					">>> Memory used creating Household agents: " + decimalFormatter.format(megabytesConsumed) + "MB");
+			memoryBefore = memoryAfter;
+		}
 
 		this.addAgentsToEconomy();
 	}
@@ -878,7 +1412,6 @@ public class CalibrateHouseholds {
 		this.poaIndexMap = null;
 
 		// agents
-		this.individualMatrix = null;
 		this.individualAgents = null;
 		this.householdMatrix = null;
 		this.householdAgents = null;
