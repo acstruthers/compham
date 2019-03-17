@@ -168,7 +168,125 @@ public class CalibrationDataHousehold {
 	 */
 	@PreDestroy
 	public void close() {
-		this.init(); // set all the pointers to null
+
+		this.area = null;
+		this.sharedData = null;
+
+		this.dataLoaded = false;
+		this.totalPopulation = null;
+		this.adjustedPeopleByLga = null;
+
+		for (String key : this.title.keySet()) {
+			this.title.get(key).clear();
+			this.title.put(key, null);
+		}
+		this.title = null;
+		for (String key : this.unitType.keySet()) {
+			this.unitType.get(key).clear();
+			this.unitType.put(key, null);
+		}
+		this.unitType = null;
+
+		// RBA E2
+		for (String key1 : this.rbaE2.keySet()) {
+			for (Date key2 : this.rbaE2.get(key1).keySet()) {
+				this.rbaE2.get(key1).put(key2, null);
+			}
+			this.rbaE2.get(key1).clear();
+			this.rbaE2.put(key1, null);
+		}
+		this.rbaE2.clear();
+		this.rbaE2 = null;
+
+		// ABS 1410.0 Economy
+		for (String key1 : this.abs1410_0Economy.keySet()) {
+			for (String key2 : this.abs1410_0Economy.get(key1).keySet()) {
+				for (String key3 : this.abs1410_0Economy.get(key1).get(key2).keySet()) {
+					this.abs1410_0Economy.get(key1).get(key2).put(key3, null);
+				}
+				this.abs1410_0Economy.get(key1).get(key2).clear();
+				this.abs1410_0Economy.get(key1).put(key2, null);
+			}
+			this.abs1410_0Economy.get(key1).clear();
+			this.abs1410_0Economy.put(key1, null);
+		}
+		this.abs1410_0Economy.clear();
+		this.abs1410_0Economy = null;
+
+		// ABS 1410.0 Family
+		for (String key1 : this.abs1410_0Family.keySet()) {
+			for (String key2 : this.abs1410_0Family.get(key1).keySet()) {
+				for (String key3 : this.abs1410_0Family.get(key1).get(key2).keySet()) {
+					this.abs1410_0Family.get(key1).get(key2).put(key3, null);
+				}
+				this.abs1410_0Family.get(key1).get(key2).clear();
+				this.abs1410_0Family.get(key1).put(key2, null);
+			}
+			this.abs1410_0Family.get(key1).clear();
+			this.abs1410_0Family.put(key1, null);
+		}
+		this.abs1410_0Family.clear();
+		this.abs1410_0Family = null;
+
+		// census RNTRD
+		for (String key1 : this.censusHCFMD_LGA_HIND_RNTRD.keySet()) {
+			for (String key2 : this.censusHCFMD_LGA_HIND_RNTRD.get(key1).keySet()) {
+				for (String key3 : this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).keySet()) {
+					for (String key4 : this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).get(key3).keySet()) {
+						this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).get(key3).put(key4, null);
+					}
+					this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).get(key3).clear();
+					this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).put(key3, null);
+				}
+				this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).clear();
+				this.censusHCFMD_LGA_HIND_RNTRD.get(key1).put(key2, null);
+			}
+			this.censusHCFMD_LGA_HIND_RNTRD.get(key1).clear();
+			this.censusHCFMD_LGA_HIND_RNTRD.put(key1, null);
+		}
+		this.censusHCFMD_LGA_HIND_RNTRD.clear();
+		this.censusHCFMD_LGA_HIND_RNTRD = null;
+		this.initialisedCensusHCFMD_LGA_HIND_RNTRD = false;
+
+		// census MRERD
+		for (String key1 : this.censusHCFMD_LGA_HIND_MRERD.keySet()) {
+			for (String key2 : this.censusHCFMD_LGA_HIND_MRERD.get(key1).keySet()) {
+				for (String key3 : this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).keySet()) {
+					for (String key4 : this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).get(key3).keySet()) {
+						this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).get(key3).put(key4, null);
+					}
+					this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).get(key3).clear();
+					this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).put(key3, null);
+				}
+				this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).clear();
+				this.censusHCFMD_LGA_HIND_MRERD.get(key1).put(key2, null);
+			}
+			this.censusHCFMD_LGA_HIND_MRERD.get(key1).clear();
+			this.censusHCFMD_LGA_HIND_MRERD.put(key1, null);
+		}
+		this.censusHCFMD_LGA_HIND_MRERD.clear();
+		this.censusHCFMD_LGA_HIND_MRERD = null;
+		this.initialisedCensusHCFMD_LGA_HIND_MRERD = false;
+
+		// census CDCF
+		for (String key1 : this.censusHCFMF_LGA_FINF_CDCF.keySet()) {
+			for (String key2 : this.censusHCFMF_LGA_FINF_CDCF.get(key1).keySet()) {
+				for (String key3 : this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).keySet()) {
+					for (String key4 : this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).get(key3).keySet()) {
+						this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).get(key3).put(key4, null);
+					}
+					this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).get(key3).clear();
+					this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).put(key3, null);
+				}
+				this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).clear();
+				this.censusHCFMF_LGA_FINF_CDCF.get(key1).put(key2, null);
+			}
+			this.censusHCFMF_LGA_FINF_CDCF.get(key1).clear();
+			this.censusHCFMF_LGA_FINF_CDCF.put(key1, null);
+		}
+		this.censusHCFMF_LGA_FINF_CDCF.clear();
+		this.censusHCFMF_LGA_FINF_CDCF = null;
+		this.initialisedCensusHCFMF_LGA_FINF_CDCF = false;
 	}
 
 	private void loadData() {
@@ -201,45 +319,43 @@ public class CalibrationDataHousehold {
 		}
 
 		// load ABS 1410.0 data
-		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 1410.0 Economy data");
-		this.abs1410_0Economy = new HashMap<String, Map<String, Map<String, Double>>>(7); // 7 years in the data file
-		int[] abs1410_0EconomyColumns = { 49, 50, 51, 52 };
-		// int[] abs1410_0EconomyColumns = { 49, 50, 51, 52, 85, 86, 87, 88, 89, 90, 91,
-		// 92, 93, 94, 95, 96, 97, 98, 99,
-		// 100, 101, 102, 103, 104 };
-		String[] abs1410_0EconomyYears = { "2016" };
-		this.loadAbsDataCsv_1410_0("/data/ABS/1410.0_DataByRegion/Economy and Industry, LGA, 2011 to 2017.csv",
-				ABS1410_0_ECONOMY, abs1410_0EconomyColumns, abs1410_0EconomyYears, this.title, this.unitType,
-				this.abs1410_0Economy);
-
-		if (DEBUG) {
-			System.gc();
-			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
-			DecimalFormat formatter = new DecimalFormat("#,##0.00");
-			System.out.println(">>> Memory used by ABS 1410.0 Economy: " + formatter.format(megabytesConsumed) + "MB");
-			memoryBefore = memoryAfter;
-		}
-
-		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 1410.0 Family data");
-		this.abs1410_0Family = new HashMap<String, Map<String, Map<String, Double>>>(7); // 7 years in the data file
-		int[] abs1410_0FamilyColumns = { 61, 63 };
-		// int[] abs1410_0FamilyColumns = { 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
-		// 29, 30, 41, 42, 49, 57, 58, 59, 60,
-		// 61, 62, 63 };
-		String[] abs1410_0FamilyYears = { "2016" };
-		this.loadAbsDataCsv_1410_0("/data/ABS/1410.0_DataByRegion/Family and Community, LGA, 2011 to 2017.csv",
-				ABS1410_0_FAMILY, abs1410_0FamilyColumns, abs1410_0FamilyYears, this.title, this.unitType,
-				this.abs1410_0Family);
-
-		if (DEBUG) {
-			System.gc();
-			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
-			DecimalFormat formatter = new DecimalFormat("#,##0.00");
-			System.out.println(">>> Memory used by ABS 1410.0 Family: " + formatter.format(megabytesConsumed) + "MB");
-			memoryBefore = memoryAfter;
-		}
+		/*
+		 * System.out.println(new Date(System.currentTimeMillis()) +
+		 * ": Loading ABS 1410.0 Economy data"); this.abs1410_0Economy = new
+		 * HashMap<String, Map<String, Map<String, Double>>>(7); // 7 years in the data
+		 * file int[] abs1410_0EconomyColumns = { 49, 50, 51, 52 }; // int[]
+		 * abs1410_0EconomyColumns = { 49, 50, 51, 52, 85, 86, 87, 88, 89, 90, 91, //
+		 * 92, 93, 94, 95, 96, 97, 98, 99, // 100, 101, 102, 103, 104 }; String[]
+		 * abs1410_0EconomyYears = { "2016" }; this.
+		 * loadAbsDataCsv_1410_0("/data/ABS/1410.0_DataByRegion/Economy and Industry, LGA, 2011 to 2017.csv"
+		 * , ABS1410_0_ECONOMY, abs1410_0EconomyColumns, abs1410_0EconomyYears,
+		 * this.title, this.unitType, this.abs1410_0Economy);
+		 * 
+		 * if (DEBUG) { System.gc(); long memoryAfter =
+		 * Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+		 * double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+		 * DecimalFormat formatter = new DecimalFormat("#,##0.00");
+		 * System.out.println(">>> Memory used by ABS 1410.0 Economy: " +
+		 * formatter.format(megabytesConsumed) + "MB"); memoryBefore = memoryAfter; }
+		 * 
+		 * System.out.println(new Date(System.currentTimeMillis()) +
+		 * ": Loading ABS 1410.0 Family data"); this.abs1410_0Family = new
+		 * HashMap<String, Map<String, Map<String, Double>>>(7); // 7 years in the data
+		 * file int[] abs1410_0FamilyColumns = { 61, 63 }; // int[]
+		 * abs1410_0FamilyColumns = { 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, // 29,
+		 * 30, 41, 42, 49, 57, 58, 59, 60, // 61, 62, 63 }; String[]
+		 * abs1410_0FamilyYears = { "2016" }; this.
+		 * loadAbsDataCsv_1410_0("/data/ABS/1410.0_DataByRegion/Family and Community, LGA, 2011 to 2017.csv"
+		 * , ABS1410_0_FAMILY, abs1410_0FamilyColumns, abs1410_0FamilyYears, this.title,
+		 * this.unitType, this.abs1410_0Family);
+		 * 
+		 * if (DEBUG) { System.gc(); long memoryAfter =
+		 * Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+		 * double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+		 * DecimalFormat formatter = new DecimalFormat("#,##0.00");
+		 * System.out.println(">>> Memory used by ABS 1410.0 Family: " +
+		 * formatter.format(megabytesConsumed) + "MB"); memoryBefore = memoryAfter; }
+		 */
 
 		/*
 		 * System.out.println(new Date(System.currentTimeMillis()) +

@@ -1589,7 +1589,7 @@ public class CalibrateIndividuals {
 												// add Individual to list (for payment clearing algorithm)
 												// CHANGE OF MIND: add the chosen Individuals as they are assigned into
 												// Households
-												//this.individualAgents.add(individual);
+												// this.individualAgents.add(individual);
 												agentId++;
 											} // end Individual creation loop
 										} // end ABS income indices loop

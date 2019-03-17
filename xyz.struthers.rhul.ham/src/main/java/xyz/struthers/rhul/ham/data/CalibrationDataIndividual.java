@@ -179,8 +179,10 @@ public class CalibrationDataIndividual {
 			for (String income : this.atoIndividualTable3a.get(series).keySet()) {
 				for (String age : this.atoIndividualTable3a.get(series).get(income).keySet()) {
 					for (String sex : this.atoIndividualTable3a.get(series).get(income).get(age).keySet()) {
-						for (String taxableStatus : this.atoIndividualTable3a.get(series).get(income).get(age).get(sex).keySet()) {
-							this.atoIndividualTable3a.get(series).get(income).get(age).get(sex).put(taxableStatus, null);
+						for (String taxableStatus : this.atoIndividualTable3a.get(series).get(income).get(age).get(sex)
+								.keySet()) {
+							this.atoIndividualTable3a.get(series).get(income).get(age).get(sex).put(taxableStatus,
+									null);
 						} // end taxable status loop
 						this.atoIndividualTable3a.get(series).get(income).get(age).get(sex).clear();
 						this.atoIndividualTable3a.get(series).get(income).get(age).put(sex, null);
@@ -224,7 +226,8 @@ public class CalibrationDataIndividual {
 			for (String div : this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).keySet()) {
 				for (String income : this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).keySet()) {
 					for (String poa : this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).keySet()) {
-						for (String sex : this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).get(poa).keySet()) {
+						for (String sex : this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).get(poa)
+								.keySet()) {
 							this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).get(poa).put(sex, null);
 						} // end taxable status loop
 						this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).get(poa).clear();
@@ -242,7 +245,7 @@ public class CalibrationDataIndividual {
 		this.censusSEXP_POA_AGE5P_INDP_INCP.clear();
 		this.censusSEXP_POA_AGE5P_INDP_INCP = null;
 		this.initialisedCensusSEXP_POA_AGE5P_INDP_INCP = false;
-		
+
 		this.init(); // set all the pointers to null
 	}
 

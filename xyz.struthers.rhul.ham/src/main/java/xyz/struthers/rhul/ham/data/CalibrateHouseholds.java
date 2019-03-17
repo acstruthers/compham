@@ -1651,6 +1651,47 @@ public class CalibrateHouseholds {
 	}
 
 	/**
+	 * A destructor to free up the resources used by this class.
+	 * 
+	 * Performs a deep delete of variables that won't be needed anymore, then
+	 * invokes the garbage collector. The purpose is to free up as much RAM as
+	 * possible ready for network topology calibration, and then the simulation
+	 * itself.
+	 */
+	public void close() {
+		long memoryBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+
+		// leave economy, Household matrix, Household List, and Individual List alone
+
+		// just make these null because the classes they came from will do a deep delete
+		// at an appropriate time
+		this.properties = null;
+		this.random = null;
+		this.calibrationDateAbs = null;
+		this.calibrationDateRba = null;
+		this.lgaPeopleCount = null;
+		this.lgaDwellingsCount = null;
+		this.poaIndexMap = null;
+		this.lgaIndexMap = null;
+
+		// finished with Household-specific data, so perform a deep delete
+		this.householdData.close();
+		this.householdData = null;
+
+		// invoke garbage collector
+		System.gc();
+
+		// report how much RAM was released
+		long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+		double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+		DecimalFormat decimalFormatter = new DecimalFormat("#,##0.00");
+		System.out.println(">>> Memory released after creating Household agents: "
+				+ decimalFormatter.format(megabytesConsumed) + "MB");
+		System.out.println(
+				">>> Current memory consumption: " + decimalFormatter.format(memoryAfter / 1024d / 1024d) + "MB");
+	}
+
+	/**
 	 * @param data the data to set
 	 */
 	@Autowired

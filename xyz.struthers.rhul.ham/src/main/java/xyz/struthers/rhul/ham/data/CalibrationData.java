@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -153,7 +154,358 @@ public class CalibrationData {
 	 */
 	@PreDestroy
 	public void close() {
-		this.init(); // set all the pointers to null
+		long memoryBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+
+		// just make these null because the classes they came from will do a deep delete
+		// at an appropriate time
+		this.area = null;
+
+		for (String key : this.title.keySet()) {
+			this.title.get(key).clear();
+			this.title.put(key, null);
+		}
+		this.title = null;
+		for (String key : this.unitType.keySet()) {
+			this.unitType.get(key).clear();
+			this.unitType.put(key, null);
+		}
+		this.unitType = null;
+
+		// RBA E1
+		for (String key1 : this.rbaE1.keySet()) {
+			for (Date key2 : this.rbaE1.get(key1).keySet()) {
+				this.rbaE1.get(key1).put(key2, null);
+			}
+			this.rbaE1.get(key1).clear();
+			this.rbaE1.put(key1, null);
+		}
+		this.rbaE1.clear();
+		this.rbaE1 = null;
+
+		// ANZSIC
+		for (String key1 : this.abs1292_0_55_002ANZSIC.keySet()) {
+			for (String key2 : this.abs1292_0_55_002ANZSIC.get(key1).keySet()) {
+				this.abs1292_0_55_002ANZSIC.get(key1).put(key2, null);
+			}
+			this.abs1292_0_55_002ANZSIC.get(key1).clear();
+			this.abs1292_0_55_002ANZSIC.put(key1, null);
+		}
+		this.abs1292_0_55_002ANZSIC.clear();
+		this.abs1292_0_55_002ANZSIC = null;
+
+		// ABS 5368.0 Table 14A
+		for (String key1 : this.abs5368_0Table14a.keySet()) {
+			for (Date key2 : this.abs5368_0Table14a.get(key1).keySet()) {
+				this.abs5368_0Table14a.get(key1).put(key2, null);
+			}
+			this.abs5368_0Table14a.get(key1).clear();
+			this.abs5368_0Table14a.put(key1, null);
+		}
+		this.abs5368_0Table14a.clear();
+		this.abs5368_0Table14a = null;
+
+		// ABS 5368.0 Table 14B
+		for (String key1 : this.abs5368_0Table14b.keySet()) {
+			for (Date key2 : this.abs5368_0Table14b.get(key1).keySet()) {
+				this.abs5368_0Table14b.get(key1).put(key2, null);
+			}
+			this.abs5368_0Table14b.get(key1).clear();
+			this.abs5368_0Table14b.put(key1, null);
+		}
+		this.abs5368_0Table14b.clear();
+		this.abs5368_0Table14b = null;
+
+		// ABS 5368.0 Table 36A
+		for (String key1 : this.abs5368_0Table36a.keySet()) {
+			for (Date key2 : this.abs5368_0Table36a.get(key1).keySet()) {
+				this.abs5368_0Table36a.get(key1).put(key2, null);
+			}
+			this.abs5368_0Table36a.get(key1).clear();
+			this.abs5368_0Table36a.put(key1, null);
+		}
+		this.abs5368_0Table36a.clear();
+		this.abs5368_0Table36a = null;
+
+		// ABS 5368.0 Table 36B
+		for (String key1 : this.abs5368_0Table36b.keySet()) {
+			for (Date key2 : this.abs5368_0Table36b.get(key1).keySet()) {
+				this.abs5368_0Table36b.get(key1).put(key2, null);
+			}
+			this.abs5368_0Table36b.get(key1).clear();
+			this.abs5368_0Table36b.put(key1, null);
+		}
+		this.abs5368_0Table36b.clear();
+		this.abs5368_0Table36b = null;
+
+		// ABS 5368.0 Table 36C
+		for (String key1 : this.abs5368_0Table36c.keySet()) {
+			for (Date key2 : this.abs5368_0Table36c.get(key1).keySet()) {
+				this.abs5368_0Table36c.get(key1).put(key2, null);
+			}
+			this.abs5368_0Table36c.get(key1).clear();
+			this.abs5368_0Table36c.put(key1, null);
+		}
+		this.abs5368_0Table36c.clear();
+		this.abs5368_0Table36c = null;
+
+		// ABS 5368.0 Table 36D
+		for (String key1 : this.abs5368_0Table36d.keySet()) {
+			for (Date key2 : this.abs5368_0Table36d.get(key1).keySet()) {
+				this.abs5368_0Table36d.get(key1).put(key2, null);
+			}
+			this.abs5368_0Table36d.get(key1).clear();
+			this.abs5368_0Table36d.put(key1, null);
+		}
+		this.abs5368_0Table36d.clear();
+		this.abs5368_0Table36d = null;
+
+		// ABS 5368.0 Table 36E
+		for (String key1 : this.abs5368_0Table36e.keySet()) {
+			for (Date key2 : this.abs5368_0Table36e.get(key1).keySet()) {
+				this.abs5368_0Table36e.get(key1).put(key2, null);
+			}
+			this.abs5368_0Table36e.get(key1).clear();
+			this.abs5368_0Table36e.put(key1, null);
+		}
+		this.abs5368_0Table36e.clear();
+		this.abs5368_0Table36e = null;
+
+		// ABS 5368.0 Table 36F
+		for (String key1 : this.abs5368_0Table36f.keySet()) {
+			for (Date key2 : this.abs5368_0Table36f.get(key1).keySet()) {
+				this.abs5368_0Table36f.get(key1).put(key2, null);
+			}
+			this.abs5368_0Table36f.get(key1).clear();
+			this.abs5368_0Table36f.put(key1, null);
+		}
+		this.abs5368_0Table36f.clear();
+		this.abs5368_0Table36f = null;
+
+		// ABS 5368.0 Table 36G
+		for (String key1 : this.abs5368_0Table36g.keySet()) {
+			for (Date key2 : this.abs5368_0Table36g.get(key1).keySet()) {
+				this.abs5368_0Table36g.get(key1).put(key2, null);
+			}
+			this.abs5368_0Table36g.get(key1).clear();
+			this.abs5368_0Table36g.put(key1, null);
+		}
+		this.abs5368_0Table36g.clear();
+		this.abs5368_0Table36g = null;
+
+		// ABS 5368.0 Table 36H
+		for (String key1 : this.abs5368_0Table36h.keySet()) {
+			for (Date key2 : this.abs5368_0Table36h.get(key1).keySet()) {
+				this.abs5368_0Table36h.get(key1).put(key2, null);
+			}
+			this.abs5368_0Table36h.get(key1).clear();
+			this.abs5368_0Table36h.put(key1, null);
+		}
+		this.abs5368_0Table36h.clear();
+		this.abs5368_0Table36h = null;
+
+		// ABS 5368.0 Table 37A
+		for (String key1 : this.abs5368_0Table37a.keySet()) {
+			for (Date key2 : this.abs5368_0Table37a.get(key1).keySet()) {
+				this.abs5368_0Table37a.get(key1).put(key2, null);
+			}
+			this.abs5368_0Table37a.get(key1).clear();
+			this.abs5368_0Table37a.put(key1, null);
+		}
+		this.abs5368_0Table37a.clear();
+		this.abs5368_0Table37a = null;
+
+		// ABS 5368.0 Table 37B
+		for (String key1 : this.abs5368_0Table37b.keySet()) {
+			for (Date key2 : this.abs5368_0Table37b.get(key1).keySet()) {
+				this.abs5368_0Table37b.get(key1).put(key2, null);
+			}
+			this.abs5368_0Table37b.get(key1).clear();
+			this.abs5368_0Table37b.put(key1, null);
+		}
+		this.abs5368_0Table37b.clear();
+		this.abs5368_0Table37b = null;
+
+		// ABS 5368.0 Table 37C
+		for (String key1 : this.abs5368_0Table37c.keySet()) {
+			for (Date key2 : this.abs5368_0Table37c.get(key1).keySet()) {
+				this.abs5368_0Table37c.get(key1).put(key2, null);
+			}
+			this.abs5368_0Table37c.get(key1).clear();
+			this.abs5368_0Table37c.put(key1, null);
+		}
+		this.abs5368_0Table37c.clear();
+		this.abs5368_0Table37c = null;
+
+		// ABS 5368.0 Table 37D
+		for (String key1 : this.abs5368_0Table37d.keySet()) {
+			for (Date key2 : this.abs5368_0Table37d.get(key1).keySet()) {
+				this.abs5368_0Table37d.get(key1).put(key2, null);
+			}
+			this.abs5368_0Table37d.get(key1).clear();
+			this.abs5368_0Table37d.put(key1, null);
+		}
+		this.abs5368_0Table37d.clear();
+		this.abs5368_0Table37d = null;
+
+		// ABS 5368.0 Table 37E
+		for (String key1 : this.abs5368_0Table37e.keySet()) {
+			for (Date key2 : this.abs5368_0Table37e.get(key1).keySet()) {
+				this.abs5368_0Table37e.get(key1).put(key2, null);
+			}
+			this.abs5368_0Table37e.get(key1).clear();
+			this.abs5368_0Table37e.put(key1, null);
+		}
+		this.abs5368_0Table37e.clear();
+		this.abs5368_0Table37e = null;
+
+		// ABS 5368.0 Table 37F
+		for (String key1 : this.abs5368_0Table37f.keySet()) {
+			for (Date key2 : this.abs5368_0Table37f.get(key1).keySet()) {
+				this.abs5368_0Table37f.get(key1).put(key2, null);
+			}
+			this.abs5368_0Table37f.get(key1).clear();
+			this.abs5368_0Table37f.put(key1, null);
+		}
+		this.abs5368_0Table37f.clear();
+		this.abs5368_0Table37f = null;
+
+		// ABS 5368.0 Table 37G
+		for (String key1 : this.abs5368_0Table37g.keySet()) {
+			for (Date key2 : this.abs5368_0Table37g.get(key1).keySet()) {
+				this.abs5368_0Table37g.get(key1).put(key2, null);
+			}
+			this.abs5368_0Table37g.get(key1).clear();
+			this.abs5368_0Table37g.put(key1, null);
+		}
+		this.abs5368_0Table37g.clear();
+		this.abs5368_0Table37g = null;
+
+		// ABS 5368.0 Table 37H
+		for (String key1 : this.abs5368_0Table37h.keySet()) {
+			for (Date key2 : this.abs5368_0Table37h.get(key1).keySet()) {
+				this.abs5368_0Table37h.get(key1).put(key2, null);
+			}
+			this.abs5368_0Table37h.get(key1).clear();
+			this.abs5368_0Table37h.put(key1, null);
+		}
+		this.abs5368_0Table37h.clear();
+		this.abs5368_0Table37h = null;
+
+		// ABS 5368 exporters
+		for (String key1 : this.abs5368_0Exporters.keySet()) {
+			for (String key2 : this.abs5368_0Exporters.get(key1).keySet()) {
+				for (String key3 : this.abs5368_0Exporters.get(key1).get(key2).keySet()) {
+					for (String key4 : this.abs5368_0Exporters.get(key1).get(key2).get(key3).keySet()) {
+						this.abs5368_0Exporters.get(key1).get(key2).get(key3).put(key4, null);
+					}
+					this.abs5368_0Exporters.get(key1).get(key2).get(key3).clear();
+					this.abs5368_0Exporters.get(key1).get(key2).put(key3, null);
+				}
+				this.abs5368_0Exporters.get(key1).get(key2).clear();
+				this.abs5368_0Exporters.get(key1).put(key2, null);
+			}
+			this.abs5368_0Exporters.get(key1).clear();
+			this.abs5368_0Exporters.put(key1, null);
+		}
+		this.abs5368_0Exporters.clear();
+		this.abs5368_0Exporters = null;
+
+		// ABS 8167.0 Table 3
+		for (String key1 : this.abs8167_0Table3.keySet()) {
+			for (String key2 : this.abs8167_0Table3.get(key1).keySet()) {
+				this.abs8167_0Table3.get(key1).put(key2, null);
+			}
+			this.abs8167_0Table3.get(key1).clear();
+			this.abs8167_0Table3.put(key1, null);
+		}
+		this.abs8167_0Table3.clear();
+		this.abs8167_0Table3 = null;
+
+		// ABS 8167.0 Table 6
+		for (String key1 : this.abs8167_0Table6.keySet()) {
+			for (String key2 : this.abs8167_0Table6.get(key1).keySet()) {
+				this.abs8167_0Table6.get(key1).put(key2, null);
+			}
+			this.abs8167_0Table6.get(key1).clear();
+			this.abs8167_0Table6.put(key1, null);
+		}
+		this.abs8167_0Table6.clear();
+		this.abs8167_0Table6 = null;
+
+		// ADI data
+		for (String key1 : this.adiData.keySet()) {
+			for (String key2 : this.adiData.get(key1).keySet()) {
+				this.adiData.get(key1).put(key2, null);
+			}
+			this.adiData.get(key1).clear();
+			this.adiData.put(key1, null);
+		}
+		this.adiData.clear();
+		this.adiData = null;
+
+		// Currency data
+		for (String key1 : this.currencyData.keySet()) {
+			for (String key2 : this.currencyData.get(key1).keySet()) {
+				this.currencyData.get(key1).put(key2, null);
+			}
+			this.currencyData.get(key1).clear();
+			this.currencyData.put(key1, null);
+		}
+		this.currencyData.clear();
+		this.currencyData = null;
+
+		// Country data
+		for (String key1 : this.countryData.keySet()) {
+			for (String key2 : this.countryData.get(key1).keySet()) {
+				this.countryData.get(key1).put(key2, null);
+			}
+			this.countryData.get(key1).clear();
+			this.countryData.put(key1, null);
+		}
+		this.countryData.clear();
+		this.countryData = null;
+
+		// RBA Bal Sht
+		for (String key1 : this.rbaBalSht.keySet()) {
+			this.rbaBalSht.put(key1, null);
+		}
+		this.rbaBalSht.clear();
+		this.rbaBalSht = null;
+
+		// RBA P&L
+		for (String key1 : this.rbaProfitLoss.keySet()) {
+			this.rbaProfitLoss.put(key1, null);
+		}
+		this.rbaProfitLoss.clear();
+		this.rbaProfitLoss = null;
+
+		// Govt Bal Sht
+		for (String key1 : this.govtBalSht.keySet()) {
+			this.govtBalSht.put(key1, null);
+		}
+		this.govtBalSht.clear();
+		this.govtBalSht = null;
+
+		// Govt P&L
+		for (String key1 : this.govtProfitLoss.keySet()) {
+			this.govtProfitLoss.put(key1, null);
+		}
+		this.govtProfitLoss.clear();
+		this.govtProfitLoss = null;
+
+		this.dataLoaded = false;
+
+		// invoke garbage collector
+		System.gc();
+
+		// report how much RAM was released
+		long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+		double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+		DecimalFormat decimalFormatter = new DecimalFormat("#,##0.00");
+		System.out.println(">>> Memory released after clearing common calibration data: "
+				+ decimalFormatter.format(megabytesConsumed) + "MB");
+		System.out.println(
+				">>> Current memory consumption: " + decimalFormatter.format(memoryAfter / 1024d / 1024d) + "MB");
 	}
 
 	private void loadData() {

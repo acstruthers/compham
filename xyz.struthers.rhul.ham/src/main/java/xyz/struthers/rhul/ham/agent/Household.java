@@ -48,10 +48,10 @@ public class Household extends Agent {
 	private double bsSuperannuation;
 	private double bsEquities;
 	private double bsOtherFinancialAssets;
-	
+
 	private double bsResidentialLandAndDwellings;
 	private double bsOtherNonFinancialAssets;
-	
+
 	private double bsTotalAssets;
 
 	private double bsLoans;
