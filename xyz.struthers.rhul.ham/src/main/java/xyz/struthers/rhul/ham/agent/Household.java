@@ -45,9 +45,13 @@ public class Household extends Agent {
 
 	// Bal Sht (48 bytes)
 	private double bsBankDeposits;
+	private double bsSuperannuation;
+	private double bsEquities;
 	private double bsOtherFinancialAssets;
+	
 	private double bsResidentialLandAndDwellings;
 	private double bsOtherNonFinancialAssets;
+	
 	private double bsTotalAssets;
 
 	private double bsLoans;
@@ -124,6 +128,12 @@ public class Household extends Agent {
 		}
 
 		// TODO: calculate Henderson, Bal Sht ratios, etc.
+	}
+
+	public double getGrossIncome() {
+		return this.pnlWagesSalaries + this.pnlUnemploymentBenefits + this.pnlOtherSocialSecurityIncome
+				+ this.pnlInvestmentIncome + this.pnlInterestIncome + this.pnlRentIncome + this.pnlForeignIncome
+				+ this.pnlOtherIncome;
 	}
 
 	protected void init() {
@@ -447,6 +457,34 @@ public class Household extends Agent {
 	 */
 	public void setBsBankDeposits(double bsBankDeposits) {
 		this.bsBankDeposits = bsBankDeposits;
+	}
+
+	/**
+	 * @return the bsSuperannuation
+	 */
+	public double getBsSuperannuation() {
+		return bsSuperannuation;
+	}
+
+	/**
+	 * @param bsSuperannuation the bsSuperannuation to set
+	 */
+	public void setBsSuperannuation(double bsSuperannuation) {
+		this.bsSuperannuation = bsSuperannuation;
+	}
+
+	/**
+	 * @return the bsEquities
+	 */
+	public double getBsEquities() {
+		return bsEquities;
+	}
+
+	/**
+	 * @param bsEquities the bsEquities to set
+	 */
+	public void setBsEquities(double bsEquities) {
+		this.bsEquities = bsEquities;
 	}
 
 	/**

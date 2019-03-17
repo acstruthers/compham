@@ -507,18 +507,18 @@ public class CalibrationDataHousehold {
 					if (line[0].equals("Title")) {
 						// store title
 						titles.put(dataSourceName, new ArrayList<String>(columnsToImport.length));
-						for (int i = 1; i < columnsToImport.length; i++) {
+						for (int i = 0; i < columnsToImport.length; i++) {
 							titles.get(dataSourceName).add(line[columnsToImport[i]]);
 						}
 					} else if (line[0].equals("Units")) {
 						// store unit types
 						units.put(dataSourceName, new ArrayList<String>(columnsToImport.length));
-						for (int i = 1; i < columnsToImport.length; i++) {
+						for (int i = 0; i < columnsToImport.length; i++) {
 							units.get(dataSourceName).add(line[columnsToImport[i]]);
 						}
 					} else if (line[0].equals("Series ID")) {
 						// store series ID as key with blank collections to populate with data below
-						for (int i = 1; i < columnsToImport.length; i++) {
+						for (int i = 0; i < columnsToImport.length; i++) {
 							seriesId[i] = line[columnsToImport[i]];
 							data.put(line[columnsToImport[i]], new HashMap<Date, String>());
 						}
@@ -528,7 +528,7 @@ public class CalibrationDataHousehold {
 					if (line[0].isEmpty()) {
 						footer = true;
 					} else {
-						for (int i = 1; i < columnsToImport.length; i++) {
+						for (int i = 0; i < columnsToImport.length; i++) {
 							// parse the body of the data
 							data.get(seriesId[i]).put(dateFormat.parse(line[0]), line[columnsToImport[i]]);
 						}
