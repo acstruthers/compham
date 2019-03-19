@@ -3,6 +3,7 @@
  */
 package xyz.struthers.rhul.ham.agent;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -20,9 +21,13 @@ public class Household extends Agent {
 	private static final long serialVersionUID = 1L;
 
 	// Object relationships (approx. 28 bytes)
-	private Individual[] individuals;
+	private Individual[] individuals; // get employers from individuals
 	private int numAdults;
 	private int numChildren;
+
+	private AuthorisedDepositTakingInstitution depositAdi; // can be null if no deposits (e.g. children)
+	private AuthorisedDepositTakingInstitution loanAdi; // can be null if no loan
+	private ArrayList<Business> suppliers; // household spending goes to these per ABS 6530.0
 
 	// P&L (72 bytes)
 	private double pnlWagesSalaries;

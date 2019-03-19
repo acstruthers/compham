@@ -188,105 +188,117 @@ public class CalibrationDataHousehold {
 		this.unitType = null;
 
 		// RBA E2
-		for (String key1 : this.rbaE2.keySet()) {
-			for (Date key2 : this.rbaE2.get(key1).keySet()) {
-				this.rbaE2.get(key1).put(key2, null);
+		if (this.rbaE2 != null) {
+			for (String key1 : this.rbaE2.keySet()) {
+				for (Date key2 : this.rbaE2.get(key1).keySet()) {
+					this.rbaE2.get(key1).put(key2, null);
+				}
+				this.rbaE2.get(key1).clear();
+				this.rbaE2.put(key1, null);
 			}
-			this.rbaE2.get(key1).clear();
-			this.rbaE2.put(key1, null);
+			this.rbaE2.clear();
+			this.rbaE2 = null;
 		}
-		this.rbaE2.clear();
-		this.rbaE2 = null;
 
 		// ABS 1410.0 Economy
-		for (String key1 : this.abs1410_0Economy.keySet()) {
-			for (String key2 : this.abs1410_0Economy.get(key1).keySet()) {
-				for (String key3 : this.abs1410_0Economy.get(key1).get(key2).keySet()) {
-					this.abs1410_0Economy.get(key1).get(key2).put(key3, null);
+		if (this.abs1410_0Economy != null) {
+			for (String key1 : this.abs1410_0Economy.keySet()) {
+				for (String key2 : this.abs1410_0Economy.get(key1).keySet()) {
+					for (String key3 : this.abs1410_0Economy.get(key1).get(key2).keySet()) {
+						this.abs1410_0Economy.get(key1).get(key2).put(key3, null);
+					}
+					this.abs1410_0Economy.get(key1).get(key2).clear();
+					this.abs1410_0Economy.get(key1).put(key2, null);
 				}
-				this.abs1410_0Economy.get(key1).get(key2).clear();
-				this.abs1410_0Economy.get(key1).put(key2, null);
+				this.abs1410_0Economy.get(key1).clear();
+				this.abs1410_0Economy.put(key1, null);
 			}
-			this.abs1410_0Economy.get(key1).clear();
-			this.abs1410_0Economy.put(key1, null);
+			this.abs1410_0Economy.clear();
+			this.abs1410_0Economy = null;
 		}
-		this.abs1410_0Economy.clear();
-		this.abs1410_0Economy = null;
 
 		// ABS 1410.0 Family
-		for (String key1 : this.abs1410_0Family.keySet()) {
-			for (String key2 : this.abs1410_0Family.get(key1).keySet()) {
-				for (String key3 : this.abs1410_0Family.get(key1).get(key2).keySet()) {
-					this.abs1410_0Family.get(key1).get(key2).put(key3, null);
+		if (this.abs1410_0Family != null) {
+			for (String key1 : this.abs1410_0Family.keySet()) {
+				for (String key2 : this.abs1410_0Family.get(key1).keySet()) {
+					for (String key3 : this.abs1410_0Family.get(key1).get(key2).keySet()) {
+						this.abs1410_0Family.get(key1).get(key2).put(key3, null);
+					}
+					this.abs1410_0Family.get(key1).get(key2).clear();
+					this.abs1410_0Family.get(key1).put(key2, null);
 				}
-				this.abs1410_0Family.get(key1).get(key2).clear();
-				this.abs1410_0Family.get(key1).put(key2, null);
+				this.abs1410_0Family.get(key1).clear();
+				this.abs1410_0Family.put(key1, null);
 			}
-			this.abs1410_0Family.get(key1).clear();
-			this.abs1410_0Family.put(key1, null);
+			this.abs1410_0Family.clear();
+			this.abs1410_0Family = null;
 		}
-		this.abs1410_0Family.clear();
-		this.abs1410_0Family = null;
 
 		// census RNTRD
-		for (String key1 : this.censusHCFMD_LGA_HIND_RNTRD.keySet()) {
-			for (String key2 : this.censusHCFMD_LGA_HIND_RNTRD.get(key1).keySet()) {
-				for (String key3 : this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).keySet()) {
-					for (String key4 : this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).get(key3).keySet()) {
-						this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).get(key3).put(key4, null);
+		if (this.censusHCFMD_LGA_HIND_RNTRD != null) {
+			for (String key1 : this.censusHCFMD_LGA_HIND_RNTRD.keySet()) {
+				for (String key2 : this.censusHCFMD_LGA_HIND_RNTRD.get(key1).keySet()) {
+					for (String key3 : this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).keySet()) {
+						for (String key4 : this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).get(key3).keySet()) {
+							this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).get(key3).put(key4, null);
+						}
+						this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).get(key3).clear();
+						this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).put(key3, null);
 					}
-					this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).get(key3).clear();
-					this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).put(key3, null);
+					this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).clear();
+					this.censusHCFMD_LGA_HIND_RNTRD.get(key1).put(key2, null);
 				}
-				this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).clear();
-				this.censusHCFMD_LGA_HIND_RNTRD.get(key1).put(key2, null);
+				this.censusHCFMD_LGA_HIND_RNTRD.get(key1).clear();
+				this.censusHCFMD_LGA_HIND_RNTRD.put(key1, null);
 			}
-			this.censusHCFMD_LGA_HIND_RNTRD.get(key1).clear();
-			this.censusHCFMD_LGA_HIND_RNTRD.put(key1, null);
+			this.censusHCFMD_LGA_HIND_RNTRD.clear();
+			this.censusHCFMD_LGA_HIND_RNTRD = null;
+			this.initialisedCensusHCFMD_LGA_HIND_RNTRD = false;
 		}
-		this.censusHCFMD_LGA_HIND_RNTRD.clear();
-		this.censusHCFMD_LGA_HIND_RNTRD = null;
-		this.initialisedCensusHCFMD_LGA_HIND_RNTRD = false;
 
 		// census MRERD
-		for (String key1 : this.censusHCFMD_LGA_HIND_MRERD.keySet()) {
-			for (String key2 : this.censusHCFMD_LGA_HIND_MRERD.get(key1).keySet()) {
-				for (String key3 : this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).keySet()) {
-					for (String key4 : this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).get(key3).keySet()) {
-						this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).get(key3).put(key4, null);
+		if (this.censusHCFMD_LGA_HIND_MRERD != null) {
+			for (String key1 : this.censusHCFMD_LGA_HIND_MRERD.keySet()) {
+				for (String key2 : this.censusHCFMD_LGA_HIND_MRERD.get(key1).keySet()) {
+					for (String key3 : this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).keySet()) {
+						for (String key4 : this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).get(key3).keySet()) {
+							this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).get(key3).put(key4, null);
+						}
+						this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).get(key3).clear();
+						this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).put(key3, null);
 					}
-					this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).get(key3).clear();
-					this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).put(key3, null);
+					this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).clear();
+					this.censusHCFMD_LGA_HIND_MRERD.get(key1).put(key2, null);
 				}
-				this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).clear();
-				this.censusHCFMD_LGA_HIND_MRERD.get(key1).put(key2, null);
+				this.censusHCFMD_LGA_HIND_MRERD.get(key1).clear();
+				this.censusHCFMD_LGA_HIND_MRERD.put(key1, null);
 			}
-			this.censusHCFMD_LGA_HIND_MRERD.get(key1).clear();
-			this.censusHCFMD_LGA_HIND_MRERD.put(key1, null);
+			this.censusHCFMD_LGA_HIND_MRERD.clear();
+			this.censusHCFMD_LGA_HIND_MRERD = null;
+			this.initialisedCensusHCFMD_LGA_HIND_MRERD = false;
 		}
-		this.censusHCFMD_LGA_HIND_MRERD.clear();
-		this.censusHCFMD_LGA_HIND_MRERD = null;
-		this.initialisedCensusHCFMD_LGA_HIND_MRERD = false;
 
 		// census CDCF
-		for (String key1 : this.censusHCFMF_LGA_FINF_CDCF.keySet()) {
-			for (String key2 : this.censusHCFMF_LGA_FINF_CDCF.get(key1).keySet()) {
-				for (String key3 : this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).keySet()) {
-					for (String key4 : this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).get(key3).keySet()) {
-						this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).get(key3).put(key4, null);
+		if (this.censusHCFMF_LGA_FINF_CDCF != null) {
+			for (String key1 : this.censusHCFMF_LGA_FINF_CDCF.keySet()) {
+				for (String key2 : this.censusHCFMF_LGA_FINF_CDCF.get(key1).keySet()) {
+					for (String key3 : this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).keySet()) {
+						for (String key4 : this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).get(key3).keySet()) {
+							this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).get(key3).put(key4, null);
+						}
+						this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).get(key3).clear();
+						this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).put(key3, null);
 					}
-					this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).get(key3).clear();
-					this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).put(key3, null);
+					this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).clear();
+					this.censusHCFMF_LGA_FINF_CDCF.get(key1).put(key2, null);
 				}
-				this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).clear();
-				this.censusHCFMF_LGA_FINF_CDCF.get(key1).put(key2, null);
+				this.censusHCFMF_LGA_FINF_CDCF.get(key1).clear();
+				this.censusHCFMF_LGA_FINF_CDCF.put(key1, null);
 			}
-			this.censusHCFMF_LGA_FINF_CDCF.get(key1).clear();
-			this.censusHCFMF_LGA_FINF_CDCF.put(key1, null);
+			this.censusHCFMF_LGA_FINF_CDCF.clear();
+			this.censusHCFMF_LGA_FINF_CDCF = null;
+			this.initialisedCensusHCFMF_LGA_FINF_CDCF = false;
 		}
-		this.censusHCFMF_LGA_FINF_CDCF.clear();
-		this.censusHCFMF_LGA_FINF_CDCF = null;
-		this.initialisedCensusHCFMF_LGA_FINF_CDCF = false;
 	}
 
 	private void loadData() {

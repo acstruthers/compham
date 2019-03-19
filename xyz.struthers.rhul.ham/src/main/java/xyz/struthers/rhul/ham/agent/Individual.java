@@ -3,6 +3,8 @@
  */
 package xyz.struthers.rhul.ham.agent;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,8 +22,6 @@ public final class Individual extends Agent {
 	// Object relationships (4 pointers = 32 bytes)
 	private Household household;
 	private Business employer; // can be null if not employed
-	private AuthorisedDepositTakingInstitution depositAdi; // can be null if no deposits (e.g. children)
-	private AuthorisedDepositTakingInstitution loanAdi; // can be null if no loan
 
 	// "Personal" Details (8 bytes + approx. 7 bytes of Strings = 15 bytes)
 	private int age;
@@ -115,6 +115,10 @@ public final class Individual extends Agent {
 	}
 
 	protected void init() {
+		// agents
+		this.household = null;
+		this.employer = null;
+
 		// Demographic
 		this.age = 0;
 		this.sex = null;
@@ -168,34 +172,6 @@ public final class Individual extends Agent {
 	 */
 	public void setEmployer(Business employer) {
 		this.employer = employer;
-	}
-
-	/**
-	 * @return the depositAdi
-	 */
-	public AuthorisedDepositTakingInstitution getDepositAdi() {
-		return depositAdi;
-	}
-
-	/**
-	 * @param depositAdi the depositAdi to set
-	 */
-	public void setDepositAdi(AuthorisedDepositTakingInstitution depositAdi) {
-		this.depositAdi = depositAdi;
-	}
-
-	/**
-	 * @return the loanAdi
-	 */
-	public AuthorisedDepositTakingInstitution getLoanAdi() {
-		return loanAdi;
-	}
-
-	/**
-	 * @param loanAdi the loanAdi to set
-	 */
-	public void setLoanAdi(AuthorisedDepositTakingInstitution loanAdi) {
-		this.loanAdi = loanAdi;
 	}
 
 	/**

@@ -68,6 +68,44 @@ public class CalibrateEconomy {
 		this.init();
 	}
 
+	private void init() {
+		// agents
+		this.households = null;
+		this.individuals = null;
+		this.businesses = null;
+		this.adis = null;
+		this.countries = null;
+		this.currencies = null;
+
+		// field variables
+		this.random = null;
+	}
+
+	/**
+	 * Deletes all the field variables, freeing up memory.
+	 * 
+	 * Does not do a deep delete because most objects are passed to other classes by
+	 * reference, and the other classes will probably still need to refer to them.
+	 */
+	public void close() {
+		// beans
+		this.commonData = null;
+		this.area = null;
+		this.economy = null;
+		this.properties = null;
+
+		// agents
+		this.households = null;
+		this.individuals = null;
+		this.businesses = null;
+		this.adis = null;
+		this.countries = null;
+		this.currencies = null;
+
+		// field variables
+		this.random = null;
+	}
+
 	/**
 	 * Joins all the agents in the economy, and finishes calibrating the figures
 	 * that can't be calibrated until they're linked (e.g. loan balances and
@@ -80,8 +118,9 @@ public class CalibrateEconomy {
 	 * 
 	 * ROUGH ALGORITHM:
 	 * 
-	 * --------------------------------------------- - PART A: Assigning employees
-	 * to businesses - ---------------------------------------------
+	 * ---------------------------------------------<br>
+	 * - PART A: Assigning employees to businesses -<br>
+	 * ---------------------------------------------<br>
 	 * 
 	 * Make a PDF of businesses by their wage expense: one for each industry
 	 * division.
@@ -91,9 +130,9 @@ public class CalibrateEconomy {
 	 * small tolerance)<br>
 	 * THEN assign individual to business
 	 * 
-	 * FIXME: Randomly select 50k businesses and make a PDF of these businesses' relative
-	 * revenue (foreign revenue?), by state. Assign foreign countries to the
-	 * businesses based on the given probabilities.
+	 * FIXME: Randomly select 50k businesses and make a PDF of these businesses'
+	 * relative revenue (foreign revenue?), by state. Assign foreign countries to
+	 * the businesses based on the given probabilities.
 	 */
 	public void linkAllAgents() {
 		// get agents
@@ -105,17 +144,30 @@ public class CalibrateEconomy {
 
 	}
 
-	private void init() {
-		// agents
-		this.households = null;
-		this.individuals = null;
-		this.businesses = null;
-		this.adis = null;
-		this.countries = null;
-		this.currencies = null;
+	/**
+	 * Links the Households to their banks, employers and suppliers.
+	 * 
+	 * This includes linking Individuals to their employers, though they will only
+	 * be included in the payment clearing vector at a Household level.
+	 */
+	public void linkHouseholds() {
 
-		// field variables
-		this.random = null;
+	}
+
+	/**
+	 * Links the Businesses to their banks and foreign trading parties.
+	 */
+	public void linkBusinesses() {
+
+	}
+
+	/**
+	 * After the Households and Businesses have been linked to the ADIs, this
+	 * re-calibrates the ADI's financials so that they're proportional to the actual
+	 * amount of business that has been assigned to them.
+	 */
+	public void calibrateAdis() {
+
 	}
 
 	/**

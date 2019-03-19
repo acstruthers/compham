@@ -3,8 +3,11 @@
  */
 package xyz.struthers.rhul.ham.agent;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import xyz.struthers.rhul.ham.process.Employer;
 import xyz.struthers.rhul.ham.process.Tax;
 
 /**
@@ -15,7 +18,7 @@ import xyz.struthers.rhul.ham.process.Tax;
  * @author Adam Struthers
  * @since 02-Feb-2019
  */
-public class Business extends Agent {
+public class Business extends Agent implements Employer {
 
 	private static final long serialVersionUID = 1L;
 
@@ -39,8 +42,10 @@ public class Business extends Agent {
 	protected char size; // S = small, M = medium, L = large
 	protected boolean isExporter;
 
+	// agent relationships
 	protected int employeeCountTarget;
-	protected Map<Individual, Double> employeeWages;
+	protected ArrayList<Individual> employees; // calculate wages & super
+	protected AuthorisedDepositTakingInstitution adi; // loans & deposits
 
 	// P&L (88 bytes)
 	protected double totalIncome;
@@ -153,6 +158,20 @@ public class Business extends Agent {
 	}
 
 	@Override
+	public List<Individual> getEmployees() {
+		return this.employees;
+	}
+
+	@Override
+	public void addEmployee(Individual employee) {
+		if (this.employees == null) {
+			this.employees = new ArrayList<Individual>(1);
+		}
+		this.employees.add(employee);
+		this.employees.trimToSize();
+	}
+
+	@Override
 	public Map<Agent, Double> getAmountsReceivable(int iteration) {
 		// TODO Auto-generated method stub
 		return null;
@@ -178,7 +197,7 @@ public class Business extends Agent {
 		this.isExporter = false;
 
 		this.employeeCountTarget = 0;
-		this.employeeWages = null;
+		this.employees = null;
 
 		// P&L
 		this.totalIncome = 0d;
@@ -230,8 +249,7 @@ public class Business extends Agent {
 	 * @return the tax expense
 	 */
 	public double getTax() {
-		return this.getGrossProfit()
-				* Tax.calculateCompanyTax(this.totalIncome, this.totalIncome - this.totalExpenses);
+		return this.getGrossProfit() * Tax.calculateCompanyTax(this.totalIncome, this.totalIncome - this.totalExpenses);
 	}
 
 	public double getNetProfit() {
@@ -390,20 +408,6 @@ public class Business extends Agent {
 	 */
 	public void setEmployeeCountTarget(int employeeCountTarget) {
 		this.employeeCountTarget = employeeCountTarget;
-	}
-
-	/**
-	 * @return the employeeWages
-	 */
-	public Map<Individual, Double> getEmployeeWages() {
-		return employeeWages;
-	}
-
-	/**
-	 * @param employeeWages the employeeWages to set
-	 */
-	public void setEmployeeWages(Map<Individual, Double> employeeWages) {
-		this.employeeWages = employeeWages;
 	}
 
 	/**

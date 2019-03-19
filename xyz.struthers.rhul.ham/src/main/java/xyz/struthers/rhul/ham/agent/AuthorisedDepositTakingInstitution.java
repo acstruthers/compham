@@ -3,7 +3,11 @@
  */
 package xyz.struthers.rhul.ham.agent;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+
+import xyz.struthers.rhul.ham.process.Employer;
 
 /**
  * Each instance of this class stores 41 doubles and 4 strings, so will consume
@@ -14,7 +18,7 @@ import java.util.Map;
  * @author Adam Struthers
  * @since 20-Dec-2018
  */
-public abstract class AuthorisedDepositTakingInstitution extends Agent {
+public abstract class AuthorisedDepositTakingInstitution extends Agent implements Employer {
 
 	private static final long serialVersionUID = 1L;
 
@@ -22,6 +26,9 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent {
 	protected String australianBusinessNumber;
 	protected String shortName;
 	protected String adiCategory;
+
+	// agent relationships
+	protected ArrayList<Individual> employees; // calculate wages & super
 
 	// P&L (80 bytes)
 	protected double pnlInterestIncome;
@@ -150,6 +157,20 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent {
 		this.capitalTotalAmount = financialStatementAmounts.get("capitalTotalAmount").doubleValue();
 		this.capitalTotalRWA = financialStatementAmounts.get("capitalTotalRWA").doubleValue();
 		this.capitalCreditRWA = financialStatementAmounts.get("capitalCreditRWA").doubleValue();
+	}
+
+	@Override
+	public List<Individual> getEmployees() {
+		return this.employees;
+	}
+
+	@Override
+	public void addEmployee(Individual employee) {
+		if (this.employees == null) {
+			this.employees = new ArrayList<Individual>(1);
+		}
+		this.employees.add(employee);
+		this.employees.trimToSize();
 	}
 
 	@Override
