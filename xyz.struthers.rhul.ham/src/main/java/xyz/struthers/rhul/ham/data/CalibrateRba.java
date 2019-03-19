@@ -43,6 +43,9 @@ public class CalibrateRba {
 		this.rbaAgent = new ReserveBankOfAustralia(this.rbaBalSht, this.rbaProfitLoss);
 
 		this.addAgentToEconomy();
+		
+		// release memory
+		this.data.dropRbaFinancialData();
 	}
 
 	private void addAgentToEconomy() {

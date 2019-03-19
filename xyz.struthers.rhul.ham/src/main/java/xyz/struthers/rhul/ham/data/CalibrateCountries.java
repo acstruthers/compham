@@ -62,6 +62,9 @@ public class CalibrateCountries {
 		}
 
 		this.addAgentsToEconomy();
+		
+		// release memory
+		this.data.dropCountryData();
 	}
 
 	private void addAgentsToEconomy() {

@@ -44,6 +44,9 @@ public class CalibrateGovernment {
 		this.govtAgent = new AustralianGovernment(this.govtBalSht, this.govtProfitLoss);
 		
 		this.addAgentToEconomy();
+		
+		// release memory
+		this.data.dropGovtFinancialData();
 	}
 	
 	private void addAgentToEconomy() {

@@ -1602,16 +1602,6 @@ public class CalibrateIndividuals {
 				} // end for age
 			} // end if multi-index income range mapping
 		} // end for ATO income range
-			// this.individualAgents.trimToSize();
-		for (String lga : this.individualMap.keySet()) {
-			for (String age : this.individualMap.get(lga).keySet()) {
-				for (String incp : this.individualMap.get(lga).get(age).keySet()) {
-					this.individualMap.get(lga).get(age).get(incp).trimToSize();
-				}
-			}
-		}
-		System.out.println(new Date(System.currentTimeMillis()) + ": Finished creating Individual agents");
-		System.out.println("Created " + integerFormatter.format(agentId) + " Individual agents");
 
 		if (DEBUG) {
 			int calculatedAdjustedPopulationByLgaTotal = 0;
@@ -1628,7 +1618,22 @@ public class CalibrateIndividuals {
 			}
 			System.out.println(
 					"### calculatedAdjustedPopulationByLgaTotal ==> " + calculatedAdjustedPopulationByLgaTotal);
+		}
 
+		// release about 7GB of RAM that's no longer needed
+		for (String lga : this.individualMap.keySet()) {
+			for (String age : this.individualMap.get(lga).keySet()) {
+				for (String incp : this.individualMap.get(lga).get(age).keySet()) {
+					this.individualMap.get(lga).get(age).get(incp).trimToSize();
+				}
+			}
+		}
+		this.close();
+
+		System.out.println(new Date(System.currentTimeMillis()) + ": Finished creating Individual agents");
+		System.out.println("Created " + integerFormatter.format(agentId) + " Individual agents");
+
+		if (DEBUG) {
 			System.gc();
 			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
@@ -1657,66 +1662,6 @@ public class CalibrateIndividuals {
 		// going from the beginning of the List. Will need to make a copy of the
 		// Individual on subsequent iterations over the list so we don't end up with
 		// multiple pointers to the same person.
-
-		/*
-		 * ------------------------------------------------------------------------<br>
-		 * PART E: ADJUSTING FINANCIALS FOR HOUSEHOLDS
-		 * ------------------------------------------------------------------------<br>
-		 * 
-		 * D1. RBA E2: Use the household debt-to-income and assets-to-income ratios to
-		 * calculate total assets and total debt.<br>
-		 * 
-		 * N.B. Household, not individual.
-		 */
-		/*
-		 * // RBA E2 Keys: Series Name, Date double debtToIncomeRatioRbaE2 = Double
-		 * .valueOf(this.rbaE2.get(RBA_E2_SERIESID_DEBT_TO_INCOME).get(this.
-		 * calibrationDateRba)) * PERCENT; double assetsToIncomeRatioRbaE2 = Double
-		 * .valueOf(this.rbaE2.get(RBA_E2_SERIESID_ASSETS_TO_INCOME).get(this.
-		 * calibrationDateRba)) * PERCENT;
-		 */
-
-		/*
-		 * D2. RBA E1: Calculate the ratios between Bal Sht items. Use these, compared
-		 * to assets and debt, to estimate the other balance sheet items.<br>
-		 * 
-		 * N.B. Household, not individual.
-		 */
-		/*
-		 * // RBA E1 Keys: Series Name, Date // get RBA E1 amounts ($ billions) double
-		 * cashRbaE1 = Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_CASH).get(this.
-		 * calibrationDateRba)); double superRbaE1 =
-		 * Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_SUPER).get(this.
-		 * calibrationDateRba)); double equitiesRbaE1 =
-		 * Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_EQUITIES).get(this.
-		 * calibrationDateRba)); double otherFinAssetsRbaE1 = Double
-		 * .valueOf(this.rbaE1.get(RBA_E1_SERIESID_OTHER_FIN_ASSETS).get(this.
-		 * calibrationDateRba)); double totalFinancialAssetsRbaE1 = cashRbaE1 +
-		 * superRbaE1 + equitiesRbaE1 + otherFinAssetsRbaE1; double dwellingsRbaE1 =
-		 * Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_DWELLINGS).get(this.
-		 * calibrationDateRba)); double totalNonFinancialAssetsRbaE1 = Double
-		 * .valueOf(this.rbaE1.get(RBA_E1_SERIESID_NONFIN_ASSETS).get(this.
-		 * calibrationDateRba)); double otherNonFinancialAssetsRbaE1 =
-		 * totalNonFinancialAssetsRbaE1 - dwellingsRbaE1; double totalAssetsRbaE1 =
-		 * totalFinancialAssetsRbaE1 + totalNonFinancialAssetsRbaE1; double
-		 * totalLiabilitiesRbaE1 = Double
-		 * .valueOf(this.rbaE1.get(RBA_E1_SERIESID_TOTAL_LIABILITIES).get(this.
-		 * calibrationDateRba));
-		 * 
-		 * // calculate ratios within balance sheet double cashToAssetsRbaE1 = cashRbaE1
-		 * / totalAssetsRbaE1; double superToAssetsRbaE1 = superRbaE1 /
-		 * totalAssetsRbaE1; double equitiesToAssetsRbaE1 = equitiesRbaE1 /
-		 * totalAssetsRbaE1; double otherFinAssetsToAssetsRbaE1 = otherFinAssetsRbaE1 /
-		 * totalAssetsRbaE1; double dwellingsToAssetsRbaE1 = dwellingsRbaE1 /
-		 * totalAssetsRbaE1; double otherNonFinAssetsToAssetsRbaE1 =
-		 * otherNonFinancialAssetsRbaE1 / totalAssetsRbaE1; double
-		 * totalLiabilitiesToAssetsRbaE1 = totalLiabilitiesRbaE1 / totalAssetsRbaE1; //
-		 * use debt-to-income ratio to determine total debt, then subtract from total //
-		 * liabilities to get other liabilities
-		 */
-
-		// release about 7GB of RAM that's no longer needed
-		this.close();
 
 		// N.B. Agents are added to economy after being assigned to Households
 		// this.addAgentsToEconomy();

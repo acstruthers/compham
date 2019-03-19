@@ -1586,8 +1586,7 @@ public class CalibrateHouseholds {
 
 			lgaIdx++;
 		} // end for LGA
-		this.individualAgents.trimToSize();
-		this.householdAgents.trimToSize();
+
 		System.out.println();
 		System.out.println(new Date(System.currentTimeMillis()) + ": Finished creating Households");
 		System.out.println("Created " + integerFormatter.format(agentId) + " Household agents");
@@ -1607,6 +1606,11 @@ public class CalibrateHouseholds {
 			}
 		}
 		System.out.println("Raw CDCF family count: " + integerFormatter.format(dataCount) + " from the data itself");
+
+		// release memory
+		this.individualAgents.trimToSize();
+		this.householdAgents.trimToSize();
+		this.close();
 
 		if (DEBUG) {
 			System.gc();
@@ -1677,6 +1681,8 @@ public class CalibrateHouseholds {
 		// finished with Household-specific data, so perform a deep delete
 		this.householdData.close();
 		this.householdData = null;
+		this.commonData.dropRbaE1Data();
+		this.commonData.dropAnzsicData();
 
 		// invoke garbage collector
 		System.gc();

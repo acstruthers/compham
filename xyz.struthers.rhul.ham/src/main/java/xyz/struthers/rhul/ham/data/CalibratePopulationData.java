@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.util.CollectionTools;
 
 /**

@@ -154,6 +154,9 @@ public class CalibrateAdis {
 		}
 
 		this.addAgentsToEconomy();
+		
+		// release memory
+		this.data.dropAdiFinancialData();
 	}
 
 	private void addAgentsToEconomy() {

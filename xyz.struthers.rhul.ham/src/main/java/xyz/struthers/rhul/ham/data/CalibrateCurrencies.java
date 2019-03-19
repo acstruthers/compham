@@ -59,6 +59,9 @@ public class CalibrateCurrencies {
 		}
 
 		this.addAgentsToEconomy();
+		
+		// release memory
+		this.data.dropCurrencyData();
 	}
 
 	private void addAgentsToEconomy() {
