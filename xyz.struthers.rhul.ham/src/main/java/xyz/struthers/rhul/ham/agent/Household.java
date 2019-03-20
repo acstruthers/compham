@@ -73,6 +73,7 @@ public class Household extends Agent {
 
 	private float bsNetWorth;
 
+	// FIXME: moving interest rates to ADI and govt will save about 100MB of RAM each
 	// Interest rates (16 bytes)
 	protected float interestRateDeposits;
 	protected float interestRateLoans;
@@ -151,6 +152,7 @@ public class Household extends Agent {
 		}
 		liabilities.add(new NodePayment(this.govt.getPaymentClearingIndex(), incomeTax));
 
+		liabilities.trimToSize();
 		return null;
 	}
 

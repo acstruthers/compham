@@ -38,6 +38,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	protected int paymentClearingIndex;
 	protected ArrayList<Individual> employees; // calculate wages & super
 	protected ArrayList<Business> domesticSuppliers;
+	protected ArrayList<Float> domesticSupplierRatios;
 	protected ArrayList<Float> supplierRatios;
 	protected AustralianGovernment govt;
 	protected ArrayList<Household> retailDepositors; // TODO: implement me
@@ -217,8 +218,9 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		if (this.domesticSuppliers != null && this.pnlOtherExpenses > 0d) {
 			numberOfCreditors += this.domesticSuppliers.size();
 		}
-		// there will always be retail depositors
-		numberOfCreditors += this.retailDepositors.size();
+		if (this.retailDepositors != null) {
+			numberOfCreditors += this.retailDepositors.size();
+		}
 		if (this.commercialDepositors != null) {
 			numberOfCreditors += this.commercialDepositors.size();
 		}
@@ -239,25 +241,12 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 
 		// calculate amounts due to domestic suppliers
 		if (this.domesticSuppliers != null && this.pnlOtherExpenses > 0d) {
-			for (Business supplier : this.domesticSuppliers) {
-				int index = supplier.getPaymentClearingIndex();
-				float expense = this.pnlOtherExpenses / this.domesticSuppliers.size();
+			for (int busIdx = 0; busIdx < this.domesticSuppliers.size(); busIdx++) {
+				int index = this.domesticSuppliers.get(busIdx).getPaymentClearingIndex();
+				float expense = this.pnlOtherExpenses * this.domesticSupplierRatios.get(busIdx);
 				liabilities.add(new NodePayment(index, expense));
 			}
 		}
-
-		// calculate tax due to government (payroll & income)
-		float payrollTax = 0f;
-		if (this.employees != null && this.pnlPersonnelExpenses > 0d) {
-			float totalWages = 0f;
-			for (Individual employee : this.employees) {
-				totalWages += employee.getPnlWagesSalaries();
-			}
-			payrollTax = Tax.calculatePayrollTax(totalWages, this.state, this.isGccsa);
-		}
-		float totalTax = payrollTax
-				+ Tax.calculateCompanyTax(this.getTotalIncome(), this.getTotalIncome() - this.getTotalExpenses());
-		liabilities.add(new NodePayment(govt.getPaymentClearingIndex(), totalTax));
 
 		// calculate amount due to retail depositors
 		for (Household depositor : this.retailDepositors) {
@@ -276,6 +265,19 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 			}
 		}
 
+		// calculate tax due to government (payroll & income)
+		float payrollTax = 0f;
+		if (this.employees != null && this.pnlPersonnelExpenses > 0d) {
+			float totalWages = 0f;
+			for (Individual employee : this.employees) {
+				totalWages += employee.getPnlWagesSalaries();
+			}
+			payrollTax = Tax.calculatePayrollTax(totalWages, this.state, this.isGccsa);
+		}
+		float totalTax = payrollTax
+				+ Tax.calculateCompanyTax(this.getTotalIncome(), this.getTotalIncome() - this.getTotalExpenses());
+		liabilities.add(new NodePayment(govt.getPaymentClearingIndex(), totalTax));
+
 		// calculate amount due to ADI investors
 		if (this.adiInvestors != null) {
 			for (int adiIdx = 0; adiIdx < this.adiInvestors.size(); adiIdx++) {
@@ -283,9 +285,11 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 				int index = adi.getPaymentClearingIndex();
 				float monthlyInterest = this.adiInvestorAmounts.get(adiIdx) * this.rateBondsNotesBorrowings
 						/ NUMBER_MONTHS;
+				liabilities.add(new NodePayment(index, monthlyInterest));
 			}
 		}
 
+		liabilities.trimToSize();
 		return liabilities;
 	}
 
