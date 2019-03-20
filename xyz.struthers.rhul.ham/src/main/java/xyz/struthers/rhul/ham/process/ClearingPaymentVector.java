@@ -39,8 +39,8 @@ import java.util.Map;
  * Each instance of this class stores 5 float lists, 3 float nested lists, 1
  * integer list, 1 integer nested list, 1 nested NodeLink list, and 1 integer.
  * With 27 million agents and 20 links per node, it will consume approximately
- * 14.7GB of RAM. At 37 million agents this becomes 20.2GB of RAM, and with only
- * 12.5 million agents it drops down to 6.8GB of RAM.
+ * 17GB of RAM. At 37 million agents this becomes 23.5GB of RAM, and with only
+ * 12.5 million agents it drops down to 7.9GB of RAM.
  * 
  * TODO: If an ADI defaults, apply the govt g'tee rules to customer's deposits.
  * Not just the $250k limit per account, but also the $15Bn limit per ADI
