@@ -65,6 +65,14 @@ public class Foobar {
 		listTwo.add(3);
 		List<Integer> listThree = ListUtils.union(listOne, listTwo);
 		System.out.println("listThree: " + listThree);
+
+		// float might be big enough for this model? ...and would halve memory footprint
+		System.out.println("Double.MIN_VALUE: " + Double.MIN_VALUE);
+		System.out.println("Double.MAX_VALUE: " + Double.MAX_VALUE);
+		System.out.println("Double.SIZE: " + Double.SIZE);
+		System.out.println("Float.MIN_VALUE: " + Float.MIN_VALUE);
+		System.out.println("Float.MAX_VALUE: " + Float.MAX_VALUE);
+		System.out.println("Float.SIZE: " + Float.SIZE);
 	}
 
 }

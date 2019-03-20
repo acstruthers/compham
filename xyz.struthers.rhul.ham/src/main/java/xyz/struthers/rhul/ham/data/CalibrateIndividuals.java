@@ -1547,7 +1547,7 @@ public class CalibrateIndividuals {
 												if (individual.getPnlInterestIncome() <= EPSILON) {
 													// assume no savings, so the individual uses up their entire income
 													// each fortnight. This means the average bank balance is one week's
-													// income. Income is recorded monthly, so divid by 4 weeks.
+													// income. Income is recorded monthly, so divide by 4 weeks.
 													individual.setBsBankDeposits(individual.getGrossIncome() / 4);
 												}
 												attributeIdx = CustomMath.sample(pdfAttributeStudentLoan[incomeMapNum],

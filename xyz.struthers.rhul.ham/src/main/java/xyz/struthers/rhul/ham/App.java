@@ -19,7 +19,11 @@ import xyz.struthers.rhul.ham.data.CalibrateHouseholds;
 import xyz.struthers.rhul.ham.data.CalibrateIndividuals;
 
 /**
- * @author Adam
+ * FIXME: Change from Double to Float to halve memory consumption
+ * Double.MAX_VALUE = 1.7976931348623157E308 (64 bits)
+ * Float.MAX_VALUE = 3.4028235E38 (32 bits)
+ * 
+ * @author Adam Struthers
  *
  */
 // @SpringBootApplication

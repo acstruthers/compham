@@ -342,6 +342,7 @@ public class ClearingPaymentVector {
 		final int to;
 
 		protected NodeLink(final int fromNodeIndex, final int to) {
+			super();
 			this.fromIndex = fromNodeIndex;
 			this.to = to;
 		}

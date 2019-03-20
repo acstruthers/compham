@@ -7,7 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.process.Employer;
+import xyz.struthers.rhul.ham.process.NodePayment;
+import xyz.struthers.rhul.ham.process.Tax;
 
 /**
  * Each instance of this class stores 41 doubles and 4 strings, so will consume
@@ -22,13 +25,25 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 
 	private static final long serialVersionUID = 1L;
 
+	public static final double NUMBER_MONTHS = 12d; // for interest calcs
+
 	// Company details (approx. 60 chars)
 	protected String australianBusinessNumber;
 	protected String shortName;
 	protected String adiCategory;
+	protected String state; // FIXME: implement state
+	protected boolean isGccsa; // FIXME: implement capital city
 
 	// agent relationships
+	protected int paymentClearingIndex;
 	protected ArrayList<Individual> employees; // calculate wages & super
+	protected ArrayList<Business> domesticSuppliers;
+	protected ArrayList<Double> supplierRatios;
+	protected AustralianGovernment govt;
+	protected ArrayList<Household> retailDepositors; // TODO: implement me
+	protected ArrayList<Business> commercialDepositors;// TODO: implement me
+	protected ArrayList<AuthorisedDepositTakingInstitution> adiInvestors;// TODO: implement me
+	protected ArrayList<Double> adiInvestorAmounts;// TODO: implement me
 
 	// P&L (80 bytes)
 	protected double pnlInterestIncome;
@@ -159,6 +174,16 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		this.capitalCreditRWA = financialStatementAmounts.get("capitalCreditRWA").doubleValue();
 	}
 
+	public double getTotalIncome() {
+		// FIXME: implement me
+		return 0d;
+	}
+
+	public double getTotalExpenses() {
+		// FIXME: implement me
+		return 0d;
+	}
+
 	@Override
 	public List<Individual> getEmployees() {
 		return this.employees;
@@ -174,15 +199,95 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	}
 
 	@Override
-	public Map<Agent, Double> getAmountsReceivable(int iteration) {
-		// TODO Auto-generated method stub
-		return null;
+	public int getPaymentClearingIndex() {
+		return this.paymentClearingIndex;
 	}
 
 	@Override
-	public Map<Agent, Double> getAmountsPayable(int iteration) {
-		// TODO Auto-generated method stub
-		return null;
+	public void setPaymentClearingIndex(int index) {
+		this.paymentClearingIndex = index;
+	}
+
+	@Override
+	public List<NodePayment> getAmountsPayable(int iteration) {
+		int numberOfCreditors = 1; // government
+		if (this.employees != null && this.pnlPersonnelExpenses > 0d) {
+			numberOfCreditors += this.employees.size();
+		}
+		if (this.domesticSuppliers != null && this.pnlOtherExpenses > 0d) {
+			numberOfCreditors += this.domesticSuppliers.size();
+		}
+		// there will always be retail depositors
+		numberOfCreditors += this.retailDepositors.size();
+		if (this.commercialDepositors != null) {
+			numberOfCreditors += this.commercialDepositors.size();
+		}
+		if (this.adiInvestors != null) {
+			numberOfCreditors += this.adiInvestors.size();
+		}
+		ArrayList<NodePayment> liabilities = new ArrayList<NodePayment>(numberOfCreditors);
+
+		// calculate wages due to employees (incl. superannuation)
+		if (this.employees != null && this.pnlPersonnelExpenses > 0d) {
+			for (Individual employee : this.employees) {
+				int index = employee.getPaymentClearingIndex();
+				double monthlyWagesIncludingSuper = employee.getPnlWagesSalaries()
+						* (1d + Properties.SUPERANNUATION_RATE);
+				liabilities.add(new NodePayment(index, monthlyWagesIncludingSuper));
+			}
+		}
+
+		// calculate amounts due to domestic suppliers
+		if (this.domesticSuppliers != null && this.pnlOtherExpenses > 0d) {
+			for (Business supplier : this.domesticSuppliers) {
+				int index = supplier.getPaymentClearingIndex();
+				double expense = this.pnlOtherExpenses / this.domesticSuppliers.size();
+				liabilities.add(new NodePayment(index, expense));
+			}
+		}
+
+		// calculate tax due to government (payroll & income)
+		double payrollTax = 0d;
+		if (this.employees != null && this.pnlPersonnelExpenses > 0d) {
+			double totalWages = 0d;
+			for (Individual employee : this.employees) {
+				totalWages += employee.getPnlWagesSalaries();
+			}
+			payrollTax = Tax.calculatePayrollTax(totalWages, this.state, this.isGccsa);
+		}
+		double totalTax = payrollTax
+				+ Tax.calculateCompanyTax(this.getTotalIncome(), this.getTotalIncome() - this.getTotalExpenses());
+		liabilities.add(new NodePayment(govt.getPaymentClearingIndex(), totalTax));
+
+		// calculate amount due to retail depositors
+		for (Household depositor : this.retailDepositors) {
+			int index = depositor.getPaymentClearingIndex();
+			double monthlyInterest = depositor.getBsBankDeposits() * depositor.getInterestRateDeposits()
+					/ NUMBER_MONTHS;
+			liabilities.add(new NodePayment(index, monthlyInterest));
+		}
+
+		// calculate amount due to business depositors
+		if (this.commercialDepositors != null) {
+			for (Business depositor : this.commercialDepositors) {
+				int index = depositor.getPaymentClearingIndex();
+				double monthlyInterest = depositor.getBankDeposits() * depositor.getInterestRateDeposits()
+						/ NUMBER_MONTHS;
+				liabilities.add(new NodePayment(index, monthlyInterest));
+			}
+		}
+
+		// calculate amount due to ADI investors
+		if (this.adiInvestors != null) {
+			for (int adiIdx = 0; adiIdx < this.adiInvestors.size(); adiIdx++) {
+				AuthorisedDepositTakingInstitution adi = this.adiInvestors.get(adiIdx);
+				int index = adi.getPaymentClearingIndex();
+				double monthlyInterest = this.adiInvestorAmounts.get(adiIdx) * this.rateBondsNotesBorrowings
+						/ NUMBER_MONTHS;
+			}
+		}
+
+		return liabilities;
 	}
 
 	/**

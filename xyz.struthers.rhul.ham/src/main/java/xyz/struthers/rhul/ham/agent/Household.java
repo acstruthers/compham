@@ -4,7 +4,10 @@
 package xyz.struthers.rhul.ham.agent;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
+
+import xyz.struthers.rhul.ham.process.NodePayment;
+import xyz.struthers.rhul.ham.process.Tax;
 
 /**
  * Each instance of this class uses about 148 bytes of RAM. There are
@@ -20,7 +23,8 @@ public class Household extends Agent {
 
 	private static final long serialVersionUID = 1L;
 
-	// Object relationships (approx. 28 bytes)
+	// Agent relationships (approx. 28 bytes)
+	protected int paymentClearingIndex;
 	private Individual[] individuals; // get employers from individuals
 	private int numAdults;
 	private int numChildren;
@@ -28,6 +32,9 @@ public class Household extends Agent {
 	private AuthorisedDepositTakingInstitution depositAdi; // can be null if no deposits (e.g. children)
 	private AuthorisedDepositTakingInstitution loanAdi; // can be null if no loan
 	private ArrayList<Business> suppliers; // household spending goes to these per ABS 6530.0
+	private ArrayList<Double> supplierRatios; // per ABS 6530.0
+	private Business landlord;
+	private AustralianGovernment govt;
 
 	// P&L (72 bytes)
 	private double pnlWagesSalaries;
@@ -92,14 +99,58 @@ public class Household extends Agent {
 	}
 
 	@Override
-	public Map<Agent, Double> getAmountsReceivable(int iteration) {
-		// TODO Auto-generated method stub
-		return null;
+	public int getPaymentClearingIndex() {
+		return this.paymentClearingIndex;
 	}
 
 	@Override
-	public Map<Agent, Double> getAmountsPayable(int iteration) {
-		// TODO Auto-generated method stub
+	public void setPaymentClearingIndex(int index) {
+		this.paymentClearingIndex = index;
+	}
+
+	@Override
+	public List<NodePayment> getAmountsPayable(int iteration) {
+		int numberOfCreditors = 1; // government
+		if (this.suppliers != null && this.pnlLivingExpenses > 0d) {
+			numberOfCreditors += this.suppliers.size();
+		}
+		if (this.landlord != null && this.pnlRentExpense > 0d) {
+			numberOfCreditors++;
+		}
+		if (this.loanAdi != null && this.bsLoans > 0d) {
+			numberOfCreditors++;
+		}
+		ArrayList<NodePayment> liabilities = new ArrayList<NodePayment>(numberOfCreditors);
+
+		// calculate amounts due to domestic suppliers
+		if (this.suppliers != null && this.pnlLivingExpenses > 0d) {
+			double totalExpense = this.pnlLivingExpenses + this.pnlWorkRelatedExpenses
+					+ this.pnlOtherDiscretionaryExpenses;
+			for (int supIdx = 0; supIdx < this.suppliers.size(); supIdx++) {
+				int index = this.suppliers.get(supIdx).getPaymentClearingIndex();
+				// split expenses per the ABS 6530.0 ratios
+				double expense = totalExpense * this.supplierRatios.get(index);
+				liabilities.add(new NodePayment(index, expense));
+			}
+		}
+
+		// calculate rent due to landlord
+		if (this.landlord != null && this.pnlRentExpense > 0d) {
+			liabilities.add(new NodePayment(this.landlord.getPaymentClearingIndex(), this.pnlRentExpense));
+		}
+
+		// calculate loan repayment due to bank
+		if (this.loanAdi != null && (this.pnlMortgageRepayments > 0d || this.pnlRentInterestExpense > 0d))
+			liabilities.add(new NodePayment(this.loanAdi.getPaymentClearingIndex(),
+					this.pnlMortgageRepayments + this.pnlRentInterestExpense));
+
+		// calculate income tax due to government
+		float incomeTax = 0f;
+		for (int indivIdx = 0; indivIdx < this.individuals.length; indivIdx++) {
+			incomeTax += Tax.calculateIndividualIncomeTax(individuals[indivIdx].getGrossIncome());
+		}
+		liabilities.add(new NodePayment(this.govt.getPaymentClearingIndex(), incomeTax));
+
 		return null;
 	}
 

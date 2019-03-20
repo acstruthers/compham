@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import xyz.struthers.rhul.ham.data.Currency;
+import xyz.struthers.rhul.ham.process.NodePayment;
 
 /**
  * There are approximately 50,000 exporters in the model. Each one uses rouhgly
@@ -55,17 +56,14 @@ public final class Exporter extends Business {
 			this.currencies.add(ccy);
 		}
 	}
-	
-	@Override
-	public Map<Agent, Double> getAmountsReceivable(int iteration) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
-	public Map<Agent, Double> getAmountsPayable(int iteration) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<NodePayment> getAmountsPayable(int iteration) {
+		List<NodePayment> liabilities = super.getAmountsPayable(iteration);
+		
+		// TODO: add import/export liabilities
+		
+		return liabilities;
 	}
 
 	protected void init() {
@@ -83,8 +81,7 @@ public final class Exporter extends Business {
 	}
 
 	/**
-	 * @param destinationCountries
-	 *            the destinationCountries to set
+	 * @param destinationCountries the destinationCountries to set
 	 */
 	public void setDestinationCountryAmounts(Map<ForeignCountry, Double> destinationCountryAmounts) {
 		this.destinationCountryAmounts = destinationCountryAmounts;
@@ -98,8 +95,7 @@ public final class Exporter extends Business {
 	}
 
 	/**
-	 * @param currencies
-	 *            the currencies to set
+	 * @param currencies the currencies to set
 	 */
 	public void setCurrencies(List<Currency> currencies) {
 		this.currencies = currencies;

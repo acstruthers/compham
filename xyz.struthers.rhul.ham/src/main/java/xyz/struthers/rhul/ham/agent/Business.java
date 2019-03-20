@@ -5,9 +5,10 @@ package xyz.struthers.rhul.ham.agent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.process.Employer;
+import xyz.struthers.rhul.ham.process.NodePayment;
 import xyz.struthers.rhul.ham.process.Tax;
 
 /**
@@ -43,9 +44,16 @@ public class Business extends Agent implements Employer {
 	protected boolean isExporter;
 
 	// agent relationships
+	protected int paymentClearingIndex;
 	protected int employeeCountTarget;
 	protected ArrayList<Individual> employees; // calculate wages & super
 	protected AuthorisedDepositTakingInstitution adi; // loans & deposits
+	protected ArrayList<Business> domesticSuppliers;
+	protected ArrayList<Double> supplierRatios;
+	protected ArrayList<ForeignCountry> foreignSuppliers;
+	protected ArrayList<Double> foreignSupplierRatios;
+	protected Business landlord;
+	protected AustralianGovernment govt;
 
 	// P&L (88 bytes)
 	protected double totalIncome;
@@ -169,18 +177,85 @@ public class Business extends Agent implements Employer {
 		}
 		this.employees.add(employee);
 		this.employees.trimToSize();
+
+		// FIXME: re-calc wage exp, super exp, payroll tax (and total exp)
 	}
 
 	@Override
-	public Map<Agent, Double> getAmountsReceivable(int iteration) {
-		// TODO Auto-generated method stub
-		return null;
+	public int getPaymentClearingIndex() {
+		return this.paymentClearingIndex;
 	}
 
 	@Override
-	public Map<Agent, Double> getAmountsPayable(int iteration) {
-		// TODO Auto-generated method stub
-		return null;
+	public void setPaymentClearingIndex(int index) {
+		this.paymentClearingIndex = index;
+	}
+
+	@Override
+	public List<NodePayment> getAmountsPayable(int iteration) {
+		int numberOfCreditors = 1; // government
+		if (this.employees != null && this.wageExpenses > 0d) {
+			numberOfCreditors += this.employees.size();
+		}
+		if (this.domesticSuppliers != null && this.otherExpenses > 0d) {
+			numberOfCreditors += this.domesticSuppliers.size();
+		}
+		if (this.foreignSuppliers != null && this.foreignExpenses > 0d) {
+			numberOfCreditors += this.foreignSuppliers.size();
+		}
+		if (this.landlord != null && this.rentExpense > 0d) {
+			numberOfCreditors++;
+		}
+		if (this.adi != null && this.interestExpense > 0d) {
+			numberOfCreditors++;
+		}
+		ArrayList<NodePayment> liabilities = new ArrayList<NodePayment>(numberOfCreditors);
+
+		// calculate wages due to employees (incl. superannuation)
+		if (this.employees != null && this.wageExpenses > 0d) {
+			for (Individual employee : this.employees) {
+				int index = employee.getPaymentClearingIndex();
+				double monthlyWagesIncludingSuper = employee.getPnlWagesSalaries()
+						* (1d + Properties.SUPERANNUATION_RATE);
+				liabilities.add(new NodePayment(index, monthlyWagesIncludingSuper));
+			}
+		}
+
+		// calculate amounts due to domestic suppliers
+		if (this.domesticSuppliers != null && this.otherExpenses > 0d) {
+			for (Business supplier : this.domesticSuppliers) {
+				int index = supplier.getPaymentClearingIndex();
+				double expense = this.otherExpenses / this.domesticSuppliers.size();
+				liabilities.add(new NodePayment(index, expense));
+			}
+		}
+
+		// calculate amounts due to foreign suppliers
+		if (this.foreignSuppliers != null && this.foreignExpenses > 0d) {
+			for (ForeignCountry supplier : this.foreignSuppliers) {
+				int index = supplier.getPaymentClearingIndex();
+				double expense = this.foreignExpenses / this.domesticSuppliers.size();
+				liabilities.add(new NodePayment(index, expense));
+			}
+		}
+
+		// calculate rent due to landlord
+		if (this.landlord != null && this.rentExpense > 0d) {
+			liabilities.add(new NodePayment(this.landlord.getPaymentClearingIndex(), this.rentExpense));
+		}
+
+		// calculate tax due to government (payroll & income)
+		double totalTax = this.payrollTaxExpense
+				+ Tax.calculateCompanyTax(this.totalIncome, this.totalIncome - this.totalExpenses);
+		liabilities.add(new NodePayment(govt.getPaymentClearingIndex(), totalTax));
+
+		// calculate interest due to bank
+		if (this.adi != null && this.interestExpense > 0d) {
+			liabilities.add(new NodePayment(this.adi.getPaymentClearingIndex(), this.interestExpense));
+		}
+
+		liabilities.trimToSize();
+		return liabilities;
 	}
 
 	protected void init() {
@@ -294,6 +369,7 @@ public class Business extends Agent implements Employer {
 	/**
 	 * @param industrySubdivisionCode the industrySubdivisionCode to set
 	 */
+	@SuppressWarnings("unused")
 	private void setIndustrySubdivisionCode(String industrySubdivisionCode) {
 		this.industrySubdivisionCode = industrySubdivisionCode;
 	}
@@ -308,6 +384,7 @@ public class Business extends Agent implements Employer {
 	/**
 	 * @param industryGroupCode the industryGroupCode to set
 	 */
+	@SuppressWarnings("unused")
 	private void setIndustryGroupCode(String industryGroupCode) {
 		this.industryGroupCode = industryGroupCode;
 	}
@@ -322,6 +399,7 @@ public class Business extends Agent implements Employer {
 	/**
 	 * @param industryClassCode the industryClassCode to set
 	 */
+	@SuppressWarnings("unused")
 	private void setIndustryClassCode(String industryClassCode) {
 		this.industryClassCode = industryClassCode;
 	}

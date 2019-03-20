@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import xyz.struthers.rhul.ham.process.NodePayment;
+
 /**
  * Each instance of this class uses about 191 bytes of RAM. There are
  * approximately 25 million instances of this class in the model, so they will
@@ -19,7 +21,8 @@ public final class Individual extends Agent {
 
 	private static final long serialVersionUID = 1L;
 
-	// Object relationships (4 pointers = 32 bytes)
+	// Agent relationships (3 pointers = 24 bytes)
+	protected int paymentClearingIndex;
 	private Household household;
 	private Business employer; // can be null if not employed
 
@@ -103,13 +106,17 @@ public final class Individual extends Agent {
 	}
 
 	@Override
-	public Map<Agent, Double> getAmountsReceivable(int iteration) {
-		// TODO Auto-generated method stub
-		return null;
+	public int getPaymentClearingIndex() {
+		return this.paymentClearingIndex;
 	}
 
 	@Override
-	public Map<Agent, Double> getAmountsPayable(int iteration) {
+	public void setPaymentClearingIndex(int index) {
+		this.paymentClearingIndex = index;
+	}
+
+	@Override
+	public List<NodePayment> getAmountsPayable(int iteration) {
 		// TODO Auto-generated method stub
 		return null;
 	}

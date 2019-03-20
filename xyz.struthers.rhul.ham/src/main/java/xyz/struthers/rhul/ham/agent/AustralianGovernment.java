@@ -4,7 +4,10 @@
 package xyz.struthers.rhul.ham.agent;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import xyz.struthers.rhul.ham.process.NodePayment;
 
 /**
  * Each instance of this class stores 19 doubles, so will consume approximately
@@ -17,6 +20,9 @@ public final class AustralianGovernment extends Agent {
 
 	private static final long serialVersionUID = 1L;
 
+	// agernt relationships
+	protected int paymentClearingIndex;
+	
 	// P&L
 	private double pnlTaxIncome;
 	private double pnlSaleOfGoodsAndServices;
@@ -94,13 +100,17 @@ public final class AustralianGovernment extends Agent {
 	}
 
 	@Override
-	public Map<Agent, Double> getAmountsReceivable(int iteration) {
-		// TODO Auto-generated method stub
-		return null;
+	public int getPaymentClearingIndex() {
+		return this.paymentClearingIndex;
 	}
 
 	@Override
-	public Map<Agent, Double> getAmountsPayable(int iteration) {
+	public void setPaymentClearingIndex(int index) {
+		this.paymentClearingIndex = index;
+	}
+
+	@Override
+	public List<NodePayment> getAmountsPayable(int iteration) {
 		// TODO Auto-generated method stub
 		return null;
 	}

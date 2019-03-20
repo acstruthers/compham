@@ -136,11 +136,18 @@ public class CalibrateEconomy {
 	 */
 	public void linkAllAgents() {
 		// get agents
+		this.households = this.economy.getHouseholds();
+		this.individuals = this.economy.getIndividuals();
+		this.businesses = this.economy.getBusinesses();
+		this.adis = this.economy.getAdis();
+		this.countries = this.economy.getCountries();
+		this.currencies = this.economy.getCurrencies();
 
 		this.random = this.properties.getRandom();
 
-		// FIXME: implement me
-		double[] abs6530SpendRatios = this.calcAbs6530SpendRatios();
+		this.linkHouseholds();
+		this.linkBusinesses();
+		this.calibrateAdis();
 
 	}
 
@@ -151,6 +158,13 @@ public class CalibrateEconomy {
 	 * be included in the payment clearing vector at a Household level.
 	 */
 	public void linkHouseholds() {
+		// FIXME: implement me
+		
+		// link income-earning adults to employers
+		
+		// link Household spending to businesses
+		double[] abs6530SpendRatios = this.calcAbs6530SpendRatios();
+		
 
 	}
 
@@ -158,7 +172,10 @@ public class CalibrateEconomy {
 	 * Links the Businesses to their banks and foreign trading parties.
 	 */
 	public void linkBusinesses() {
-
+// link to banks
+		
+		// link to foeign countries
+		
 	}
 
 	/**

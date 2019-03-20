@@ -3,9 +3,11 @@
  */
 package xyz.struthers.rhul.ham.agent;
 
+import java.util.List;
 import java.util.Map;
 
 import xyz.struthers.rhul.ham.data.Currency;
+import xyz.struthers.rhul.ham.process.NodePayment;
 
 /**
  * The model does not care about the financial impact on foreign countries -
@@ -25,6 +27,10 @@ public final class ForeignCountry extends Agent {
 
 	private static final long serialVersionUID = 1L;
 	
+	// agent relationships
+	protected int paymentClearingIndex;
+	
+	// field variables
 	private Currency currency;
 	private double totalExportsFromAustralia;
 	private double totalImportsToAustralia;
@@ -68,13 +74,17 @@ public final class ForeignCountry extends Agent {
 	}
 	
 	@Override
-	public Map<Agent, Double> getAmountsReceivable(int iteration) {
-		// TODO Auto-generated method stub
-		return null;
+	public int getPaymentClearingIndex() {
+		return this.paymentClearingIndex;
 	}
 
 	@Override
-	public Map<Agent, Double> getAmountsPayable(int iteration) {
+	public void setPaymentClearingIndex(int index) {
+		this.paymentClearingIndex = index;
+	}
+
+	@Override
+	public List<NodePayment> getAmountsPayable(int iteration) {
 		// TODO Auto-generated method stub
 		return null;
 	}
