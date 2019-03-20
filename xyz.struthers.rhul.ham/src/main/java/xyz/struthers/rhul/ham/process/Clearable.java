@@ -37,7 +37,7 @@ public interface Clearable {
 	 * @return a map of the agents that owe money to this Clearable object, and the
 	 *         amounts owed.
 	 */
-	// public Map<Agent, Double> getAmountsReceivable(int iteration);
+	// public Map<Agent, Float> getAmountsReceivable(int iteration);
 
 	/**
 	 * Gets the contractual obligations of this node to other nodes. It doesn't

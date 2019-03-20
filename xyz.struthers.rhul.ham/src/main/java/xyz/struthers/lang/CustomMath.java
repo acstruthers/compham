@@ -14,7 +14,7 @@ import java.util.Random;
  */
 public class CustomMath {
 
-	private static final double EPSILON_LOAN = 0.0001d; // to compare interest rates in loan calculations
+	private static final double EPSILON_LOAN = 0.0001f; // to compare interest rates in loan calculations
 
 	/**
 	 * 
@@ -58,8 +58,27 @@ public class CustomMath {
 		}
 		return pdf.length - 1; // should not happen
 	}
-	
+
+	public static int sample(final float[] pdf, Random random) {
+		float r = random.nextFloat();
+		for (int i = 0; i < pdf.length; i++) {
+			if (r < pdf[i])
+				return i;
+			r -= pdf[i];
+		}
+		return pdf.length - 1; // should not happen
+	}
+
 	public static int sample(final double[] pdf, double random) {
+		for (int i = 0; i < pdf.length; i++) {
+			if (random < pdf[i])
+				return i;
+			random -= pdf[i];
+		}
+		return pdf.length - 1; // should not happen
+	}
+
+	public static int sample(final float[] pdf, float random) {
 		for (int i = 0; i < pdf.length; i++) {
 			if (random < pdf[i])
 				return i;
@@ -79,12 +98,13 @@ public class CustomMath {
 	 * @param termMonths      - the term of the loan, expressed in months
 	 * @return the original purchase price (in original nominal dollars)
 	 */
-	public double getPropertyPurchasePrice(double repaymentAmount, double interestRate, int termMonths) {
-		double purchasePrice = 0d;
-		if (Math.abs(interestRate - 0d) < EPSILON_LOAN) { // rate is 0%
-			purchasePrice = repaymentAmount * (double) termMonths;
+	public float getPropertyPurchasePrice(float repaymentAmount, float interestRate, int termMonths) {
+		float purchasePrice = 0f;
+		if (Math.abs(interestRate - 0f) < EPSILON_LOAN) { // rate is 0%
+			purchasePrice = repaymentAmount * (float) termMonths;
 		} else {
-			purchasePrice = repaymentAmount * (1d - Math.pow(1d + interestRate, (double) -termMonths)) / interestRate;
+			purchasePrice = repaymentAmount * (1f - (float) Math.pow(1d + interestRate, (double) -termMonths))
+					/ interestRate;
 		}
 		return purchasePrice;
 	}
@@ -100,16 +120,16 @@ public class CustomMath {
 	 * @param purchasePrice
 	 * @return the current loan balance
 	 */
-	public double getCurrentLoanBalance(double repaymentAmount, double interestRate, double purchasePrice,
+	public float getCurrentLoanBalance(float repaymentAmount, float interestRate, float purchasePrice,
 			int currentMonth) {
-		double currentBalance = 0d;
-		if (Math.abs(interestRate - 0d) < EPSILON_LOAN) { // rate is 0%
-			currentBalance = purchasePrice - repaymentAmount * (double) currentMonth;
+		float currentBalance = 0f;
+		if (Math.abs(interestRate - 0f) < EPSILON_LOAN) { // rate is 0%
+			currentBalance = purchasePrice - repaymentAmount * (float) currentMonth;
 		} else {
-			currentBalance = purchasePrice * Math.pow(1d + interestRate, (double) currentMonth)
-					- (Math.pow(1d + interestRate, (double) currentMonth) - 1d) * repaymentAmount / interestRate;
+			currentBalance = purchasePrice * (float) Math.pow(1d + interestRate, (double) currentMonth)
+					- ((float) Math.pow(1d + interestRate, (double) currentMonth) - 1f) * repaymentAmount
+							/ interestRate;
 		}
-
 		return currentBalance;
 	}
 
@@ -123,14 +143,16 @@ public class CustomMath {
 	 * @param termMonths
 	 * @return the monthly loan repayments due
 	 */
-	public double getRepaymentAmount(Double interestRate, double originalLoanBalance, int termMonths) {
-		double repaymentAmount = 0d;
-		if (Math.abs(interestRate - 0d) < EPSILON_LOAN) { // rate is 0%
-			repaymentAmount = originalLoanBalance / (double) termMonths;
+	public float getRepaymentAmount(Float interestRate, float originalLoanBalance, int termMonths) {
+		float repaymentAmount = 0f;
+		if (Math.abs(interestRate - 0f) < EPSILON_LOAN) { // rate is 0%
+			repaymentAmount = originalLoanBalance / (float) termMonths;
 		} else {
-			repaymentAmount = (interestRate * originalLoanBalance * Math.pow(1d + interestRate, (double) termMonths))
-					/ (Math.pow(1d + interestRate, (double) termMonths) - 1d);
+			repaymentAmount = (interestRate * originalLoanBalance
+					* (float) Math.pow(1d + interestRate, (double) termMonths))
+					/ ((float) Math.pow(1d + interestRate, (double) termMonths) - 1f);
 		}
 		return repaymentAmount;
 	}
+
 }

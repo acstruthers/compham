@@ -41,7 +41,7 @@ public class CalibrationDataHousehold {
 	private static final boolean DEBUG = true;
 
 	// map implementation optimisation
-	public static final double MAP_LOAD_FACTOR = 0.75d;
+	public static final float MAP_LOAD_FACTOR = 0.75f;
 
 	public static final int MAP_INIT_SIZE_LGA = (int) Math.ceil(573 / MAP_LOAD_FACTOR); // 572 (UR) including state
 																						// totals (563 Enum)
@@ -84,7 +84,7 @@ public class CalibrationDataHousehold {
 	 * 
 	 * Keys: Year (yyyy), LGA code, Series Title
 	 */
-	private Map<String, Map<String, Map<String, Double>>> abs1410_0Economy;
+	private Map<String, Map<String, Map<String, Float>>> abs1410_0Economy;
 	/**
 	 * Data by LGA: Family
 	 * 
@@ -94,8 +94,8 @@ public class CalibrationDataHousehold {
 	 * 
 	 * Keys: Year (yyyy), LGA code, Series Title
 	 */
-	private Map<String, Map<String, Map<String, Double>>> abs1410_0Family;
-	// Map<String, Map<String, Map<String, Double>>> abs1410_0Income; // Data by
+	private Map<String, Map<String, Map<String, Float>>> abs1410_0Family;
+	// Map<String, Map<String, Map<String, Float>>> abs1410_0Income; // Data by
 	// LGA: Income
 	/**
 	 * ABS Census Table Builder data:<br>
@@ -324,7 +324,7 @@ public class CalibrationDataHousehold {
 		if (DEBUG) {
 			System.gc();
 			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			float megabytesConsumed = (memoryAfter - memoryBefore) / 1024f / 1024f;
 			DecimalFormat formatter = new DecimalFormat("#,##0.00");
 			System.out.println(">>> Memory used by RBA E2: " + formatter.format(megabytesConsumed) + "MB");
 			memoryBefore = memoryAfter;
@@ -334,7 +334,7 @@ public class CalibrationDataHousehold {
 		/*
 		 * System.out.println(new Date(System.currentTimeMillis()) +
 		 * ": Loading ABS 1410.0 Economy data"); this.abs1410_0Economy = new
-		 * HashMap<String, Map<String, Map<String, Double>>>(7); // 7 years in the data
+		 * HashMap<String, Map<String, Map<String, Float>>>(7); // 7 years in the data
 		 * file int[] abs1410_0EconomyColumns = { 49, 50, 51, 52 }; // int[]
 		 * abs1410_0EconomyColumns = { 49, 50, 51, 52, 85, 86, 87, 88, 89, 90, 91, //
 		 * 92, 93, 94, 95, 96, 97, 98, 99, // 100, 101, 102, 103, 104 }; String[]
@@ -344,15 +344,15 @@ public class CalibrationDataHousehold {
 		 * this.title, this.unitType, this.abs1410_0Economy);
 		 * 
 		 * if (DEBUG) { System.gc(); long memoryAfter =
-		 * Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-		 * double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+		 * Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory(); float
+		 * megabytesConsumed = (memoryAfter - memoryBefore) / 1024f / 1024f;
 		 * DecimalFormat formatter = new DecimalFormat("#,##0.00");
 		 * System.out.println(">>> Memory used by ABS 1410.0 Economy: " +
 		 * formatter.format(megabytesConsumed) + "MB"); memoryBefore = memoryAfter; }
 		 * 
 		 * System.out.println(new Date(System.currentTimeMillis()) +
 		 * ": Loading ABS 1410.0 Family data"); this.abs1410_0Family = new
-		 * HashMap<String, Map<String, Map<String, Double>>>(7); // 7 years in the data
+		 * HashMap<String, Map<String, Map<String, Float>>>(7); // 7 years in the data
 		 * file int[] abs1410_0FamilyColumns = { 61, 63 }; // int[]
 		 * abs1410_0FamilyColumns = { 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, // 29,
 		 * 30, 41, 42, 49, 57, 58, 59, 60, // 61, 62, 63 }; String[]
@@ -362,8 +362,8 @@ public class CalibrationDataHousehold {
 		 * this.unitType, this.abs1410_0Family);
 		 * 
 		 * if (DEBUG) { System.gc(); long memoryAfter =
-		 * Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-		 * double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+		 * Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory(); float
+		 * megabytesConsumed = (memoryAfter - memoryBefore) / 1024f / 1024f;
 		 * DecimalFormat formatter = new DecimalFormat("#,##0.00");
 		 * System.out.println(">>> Memory used by ABS 1410.0 Family: " +
 		 * formatter.format(megabytesConsumed) + "MB"); memoryBefore = memoryAfter; }
@@ -381,8 +381,8 @@ public class CalibrationDataHousehold {
 		 * this.unitType, this.abs1410_0Income);
 		 * 
 		 * if (DEBUG) { System.gc(); long memoryAfter =
-		 * Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-		 * double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+		 * Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory(); float
+		 * megabytesConsumed = (memoryAfter - memoryBefore) / 1024f / 1024f;
 		 * DecimalFormat formatter = new DecimalFormat("#,##0.00");
 		 * System.out.println(">>> Memory used by ABS 1410.0 Income: " +
 		 * formatter.format(megabytesConsumed) + "MB"); memoryBefore = memoryAfter; }
@@ -446,7 +446,7 @@ public class CalibrationDataHousehold {
 		if (DEBUG) {
 			System.gc();
 			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			float megabytesConsumed = (memoryAfter - memoryBefore) / 1024f / 1024f;
 			DecimalFormat formatter = new DecimalFormat("#,##0.00");
 			System.out.println(">>> Memory used by ABS Census HCFMD by LGA by HIND and RNTRD: "
 					+ formatter.format(megabytesConsumed) + "MB");
@@ -511,7 +511,7 @@ public class CalibrationDataHousehold {
 		if (DEBUG) {
 			System.gc();
 			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			float megabytesConsumed = (memoryAfter - memoryBefore) / 1024f / 1024f;
 			DecimalFormat formatter = new DecimalFormat("#,##0.00");
 			System.out.println(">>> Memory used by ABS Census HCFMD by LGA by HIND and MRERD: "
 					+ formatter.format(megabytesConsumed) + "MB");
@@ -576,7 +576,7 @@ public class CalibrationDataHousehold {
 		if (DEBUG) {
 			System.gc();
 			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			float megabytesConsumed = (memoryAfter - memoryBefore) / 1024f / 1024f;
 			DecimalFormat formatter = new DecimalFormat("#,##0.00");
 			System.out.println(
 					">>> Memory used by ABS Census CDCF by LGA by FINF: " + formatter.format(megabytesConsumed) + "MB");
@@ -701,7 +701,7 @@ public class CalibrationDataHousehold {
 	 */
 	private void loadAbsDataCsv_1410_0(String fileResourceLocation, String catalogueName, int[] columnsToImport,
 			String[] yearsToImport, Map<String, List<String>> titles, Map<String, List<String>> units,
-			Map<String, Map<String, Map<String, Double>>> data) {
+			Map<String, Map<String, Map<String, Float>>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -725,9 +725,9 @@ public class CalibrationDataHousehold {
 
 						// store series ID as key with blank collections to populate with data below
 						for (int i = 0; i < yearsToImport.length; i++) {
-							data.put(yearsToImport[i], new HashMap<String, Map<String, Double>>());
+							data.put(yearsToImport[i], new HashMap<String, Map<String, Float>>());
 							for (int j = 0; j < columnsToImport.length; j++) {
-								data.get(yearsToImport[i]).put(line[columnsToImport[j]], new HashMap<String, Double>());
+								data.get(yearsToImport[i]).put(line[columnsToImport[j]], new HashMap<String, Float>());
 							}
 						}
 					} else if (line[0].equals("CODE")) {
@@ -752,15 +752,15 @@ public class CalibrationDataHousehold {
 						// for (int j = 1; j < columnsToImport.length; j++) {
 						for (int j = 0; j < columnsToImport.length; j++) {
 							// parse the body of the data
-							double value = 0d;
+							float value = 0f;
 							try {
 								if (line[columnsToImport[j]].trim().replace(",", "").equals("-")) {
-									value = 0d; // change "-" into 0d
+									value = 0f; // change "-" into 0d
 								} else {
-									value = Double.valueOf(line[columnsToImport[j]].trim().replace(",", ""));
+									value = Float.valueOf(line[columnsToImport[j]].trim().replace(",", ""));
 								}
 							} catch (NumberFormatException e) {
-								value = 0d;
+								value = 0f;
 							}
 							data.get(line[yearCol]).get(seriesId[j]).put(line[0], value);
 						}
@@ -914,7 +914,7 @@ public class CalibrationDataHousehold {
 	/**
 	 * @return the abs1410_0Economy
 	 */
-	public Map<String, Map<String, Map<String, Double>>> getAbs1410_0Economy() {
+	public Map<String, Map<String, Map<String, Float>>> getAbs1410_0Economy() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -924,7 +924,7 @@ public class CalibrationDataHousehold {
 	/**
 	 * @return the abs1410_0Family
 	 */
-	public Map<String, Map<String, Map<String, Double>>> getAbs1410_0Family() {
+	public Map<String, Map<String, Map<String, Float>>> getAbs1410_0Family() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}

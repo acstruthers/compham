@@ -65,78 +65,75 @@ public class CalibrateAdis {
 			String adiCategory = this.allAdiData.get(key).get("Diss Model Category");
 
 			// create map to hold financial statements
-			Map<String, Double> financialStatement = new HashMap<String, Double>();
+			Map<String, Float> financialStatement = new HashMap<String, Float>();
 
 			// P&L
-			financialStatement.put("pnlInterestIncome",
-					Double.valueOf(this.allAdiData.get(key).get("Interest income")));
+			financialStatement.put("pnlInterestIncome", Float.valueOf(this.allAdiData.get(key).get("Interest income")));
 			financialStatement.put("pnlInterestExpense",
-					Double.valueOf(this.allAdiData.get(key).get("Interest expense")));
-			financialStatement.put("pnlTradingIncome", Double.valueOf(this.allAdiData.get(key).get("Trading Income")));
+					Float.valueOf(this.allAdiData.get(key).get("Interest expense")));
+			financialStatement.put("pnlTradingIncome", Float.valueOf(this.allAdiData.get(key).get("Trading Income")));
 			financialStatement.put("pnlInvestmentIncome",
-					Double.valueOf(this.allAdiData.get(key).get("Investment income")));
-			financialStatement.put("pnlOtherIncome", Double.valueOf(this.allAdiData.get(key).get("Other income")));
+					Float.valueOf(this.allAdiData.get(key).get("Investment income")));
+			financialStatement.put("pnlOtherIncome", Float.valueOf(this.allAdiData.get(key).get("Other income")));
 
-			financialStatement.put("pnlPersonnelExpenses", Double.valueOf(this.allAdiData.get(key).get("Personnel")));
+			financialStatement.put("pnlPersonnelExpenses", Float.valueOf(this.allAdiData.get(key).get("Personnel")));
 			financialStatement.put("pnlLoanImpairmentExpense",
-					Double.valueOf(this.allAdiData.get(key).get("Bad & doubtful debts")));
+					Float.valueOf(this.allAdiData.get(key).get("Bad & doubtful debts")));
 			financialStatement.put("pnlDepreciationAmortisation",
-					Double.valueOf(this.allAdiData.get(key).get("Depreciation & Amortisation")));
-			financialStatement.put("pnlOtherExpenses", Double.valueOf(this.allAdiData.get(key).get("Other expenses")));
+					Float.valueOf(this.allAdiData.get(key).get("Depreciation & Amortisation")));
+			financialStatement.put("pnlOtherExpenses", Float.valueOf(this.allAdiData.get(key).get("Other expenses")));
 
-			financialStatement.put("pnlIncomeTaxExpense", Double.valueOf(this.allAdiData.get(key).get("Income Tax")));
+			financialStatement.put("pnlIncomeTaxExpense", Float.valueOf(this.allAdiData.get(key).get("Income Tax")));
 
 			// Bal Sht
-			financialStatement.put("bsCash", Double.valueOf(this.allAdiData.get(key).get("Cash")));
+			financialStatement.put("bsCash", Float.valueOf(this.allAdiData.get(key).get("Cash")));
 			financialStatement.put("bsTradingSecurities",
-					Double.valueOf(this.allAdiData.get(key).get("Trading Securities")));
+					Float.valueOf(this.allAdiData.get(key).get("Trading Securities")));
 			financialStatement.put("bsDerivativeAssets",
-					Double.valueOf(this.allAdiData.get(key).get("Derivative Assets")));
+					Float.valueOf(this.allAdiData.get(key).get("Derivative Assets")));
 			financialStatement.put("bsInvestments",
-					Double.valueOf(this.allAdiData.get(key).get("Investment Securities")));
-			financialStatement.put("bsLoansPersonal", Double.valueOf(this.allAdiData.get(key).get("Personal Loans")));
-			financialStatement.put("bsLoansHome", Double.valueOf(this.allAdiData.get(key).get("Home Loans")));
-			financialStatement.put("bsLoansBusiness", Double.valueOf(this.allAdiData.get(key).get("Business Loans")));
-			financialStatement.put("bsLoansADI", Double.valueOf(this.allAdiData.get(key).get("ADI Loans")));
+					Float.valueOf(this.allAdiData.get(key).get("Investment Securities")));
+			financialStatement.put("bsLoansPersonal", Float.valueOf(this.allAdiData.get(key).get("Personal Loans")));
+			financialStatement.put("bsLoansHome", Float.valueOf(this.allAdiData.get(key).get("Home Loans")));
+			financialStatement.put("bsLoansBusiness", Float.valueOf(this.allAdiData.get(key).get("Business Loans")));
+			financialStatement.put("bsLoansADI", Float.valueOf(this.allAdiData.get(key).get("ADI Loans")));
 			financialStatement.put("bsLoansGovernment",
-					Double.valueOf(this.allAdiData.get(key).get("Government Loans")));
+					Float.valueOf(this.allAdiData.get(key).get("Government Loans")));
 			financialStatement.put("bsOtherNonFinancialAssets",
-					Double.valueOf(this.allAdiData.get(key).get("Non-financial assets")));
+					Float.valueOf(this.allAdiData.get(key).get("Non-financial assets")));
 
-			financialStatement.put("bsDepositsAtCall", Double.valueOf(this.allAdiData.get(key).get("At Call")));
-			financialStatement.put("bsDepositsTerm", Double.valueOf(this.allAdiData.get(key).get("TD/CD")));
+			financialStatement.put("bsDepositsAtCall", Float.valueOf(this.allAdiData.get(key).get("At Call")));
+			financialStatement.put("bsDepositsTerm", Float.valueOf(this.allAdiData.get(key).get("TD/CD")));
 			financialStatement.put("bsDepositsAdiRepoEligible",
-					Double.valueOf(this.allAdiData.get(key).get("Repo/ADI")));
+					Float.valueOf(this.allAdiData.get(key).get("Repo/ADI")));
 			financialStatement.put("bsDerivativeLiabilities",
-					Double.valueOf(this.allAdiData.get(key).get("Derivative Liabilities")));
+					Float.valueOf(this.allAdiData.get(key).get("Derivative Liabilities")));
 			financialStatement.put("bsBondsNotesBorrowings",
-					Double.valueOf(this.allAdiData.get(key).get("Bonds, notes & borrowings")));
+					Float.valueOf(this.allAdiData.get(key).get("Bonds, notes & borrowings")));
 			financialStatement.put("bsOtherLiabilities",
-					Double.valueOf(this.allAdiData.get(key).get("Other liabilities")));
+					Float.valueOf(this.allAdiData.get(key).get("Other liabilities")));
 
 			financialStatement.put("bsRetainedEarnings",
-					Double.valueOf(this.allAdiData.get(key).get("Retained Earnings")));
-			financialStatement.put("bsReserves", Double.valueOf(this.allAdiData.get(key).get("Reserves")));
-			financialStatement.put("bsOtherEquity", Double.valueOf(this.allAdiData.get(key).get("Other")));
+					Float.valueOf(this.allAdiData.get(key).get("Retained Earnings")));
+			financialStatement.put("bsReserves", Float.valueOf(this.allAdiData.get(key).get("Reserves")));
+			financialStatement.put("bsOtherEquity", Float.valueOf(this.allAdiData.get(key).get("Other")));
 
 			// Metrics
-			financialStatement.put("rateCash", Double.valueOf(this.allAdiData.get(key).get("Cash Rate")));
-			financialStatement.put("rateTrading",
-					Double.valueOf(this.allAdiData.get(key).get("Trading Security Rate")));
+			financialStatement.put("rateCash", Float.valueOf(this.allAdiData.get(key).get("Cash Rate")));
+			financialStatement.put("rateTrading", Float.valueOf(this.allAdiData.get(key).get("Trading Security Rate")));
 			financialStatement.put("rateInvestment",
-					Double.valueOf(this.allAdiData.get(key).get("Investment Security Rate")));
-			financialStatement.put("rateAdiLoan", Double.valueOf(this.allAdiData.get(key).get("ADI Loan Rate")));
+					Float.valueOf(this.allAdiData.get(key).get("Investment Security Rate")));
+			financialStatement.put("rateAdiLoan", Float.valueOf(this.allAdiData.get(key).get("ADI Loan Rate")));
 			financialStatement.put("rateGovernmentLoan",
-					Double.valueOf(this.allAdiData.get(key).get("Government Loan Rate")));
-			financialStatement.put("rateTotalLoans", Double.valueOf(this.allAdiData.get(key).get("TOTAL Loan Rate")));
-			financialStatement.put("rateTotalDeposits", Double.valueOf(this.allAdiData.get(key).get("Deposit Rate")));
+					Float.valueOf(this.allAdiData.get(key).get("Government Loan Rate")));
+			financialStatement.put("rateTotalLoans", Float.valueOf(this.allAdiData.get(key).get("TOTAL Loan Rate")));
+			financialStatement.put("rateTotalDeposits", Float.valueOf(this.allAdiData.get(key).get("Deposit Rate")));
 			financialStatement.put("rateBondsNotesBorrowings",
-					Double.valueOf(this.allAdiData.get(key).get("Bonds, notes & borrowings Rate")));
-			financialStatement.put("capitalTotalRatio",
-					Double.valueOf(this.allAdiData.get(key).get("Total Capital %")));
-			financialStatement.put("capitalTotalAmount", Double.valueOf(this.allAdiData.get(key).get("Total Capital")));
-			financialStatement.put("capitalTotalRWA", Double.valueOf(this.allAdiData.get(key).get("Credit RWA")));
-			financialStatement.put("capitalCreditRWA", Double.valueOf(this.allAdiData.get(key).get("RWA")));
+					Float.valueOf(this.allAdiData.get(key).get("Bonds, notes & borrowings Rate")));
+			financialStatement.put("capitalTotalRatio", Float.valueOf(this.allAdiData.get(key).get("Total Capital %")));
+			financialStatement.put("capitalTotalAmount", Float.valueOf(this.allAdiData.get(key).get("Total Capital")));
+			financialStatement.put("capitalTotalRWA", Float.valueOf(this.allAdiData.get(key).get("Credit RWA")));
+			financialStatement.put("capitalCreditRWA", Float.valueOf(this.allAdiData.get(key).get("RWA")));
 
 			// create ADI
 			AuthorisedDepositTakingInstitution adi = null;
@@ -154,7 +151,7 @@ public class CalibrateAdis {
 		}
 
 		this.addAgentsToEconomy();
-		
+
 		// release memory
 		this.data.dropAdiFinancialData();
 	}

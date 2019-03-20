@@ -35,8 +35,8 @@ public class CalibrateEconomy {
 			"Food and non-alcoholic beverages", "Alcoholic beverages", "Tobacco products", "Clothing and footwear",
 			"Household furnishings and equipment", "Medical care and health expenses", "Transport", "Communication",
 			"Recreation", "Education", "Personal care", "Miscellaneous goods and services" };
-	public static final double[] ABS_6530_0_SPEND_AMT = { 40.92d, 236.97d, 31.95d, 12.84d, 43.75d, 57.87d, 44.90d,
-			82.38d, 206.69d, 46.62d, 171.85d, 43.86d, 28.64d, 97.08d };
+	public static final float[] ABS_6530_0_SPEND_AMT = { 40.92f, 236.97f, 31.95f, 12.84f, 43.75f, 57.87f, 44.90f,
+			82.38f, 206.69f, 46.62f, 171.85f, 43.86f, 28.64f, 97.08f };
 	public static final String[] ABS_6530_0_SPEND_DIV_CODE = { "D", "G", "H", "G", "G", "C", "P", "Q", "I", "J", "R",
 			"P", "S", "S" };
 
@@ -159,12 +159,11 @@ public class CalibrateEconomy {
 	 */
 	public void linkHouseholds() {
 		// FIXME: implement me
-		
+
 		// link income-earning adults to employers
-		
+
 		// link Household spending to businesses
-		double[] abs6530SpendRatios = this.calcAbs6530SpendRatios();
-		
+		float[] abs6530SpendRatios = this.calcAbs6530SpendRatios();
 
 	}
 
@@ -173,9 +172,9 @@ public class CalibrateEconomy {
 	 */
 	public void linkBusinesses() {
 // link to banks
-		
+
 		// link to foeign countries
-		
+
 	}
 
 	/**
@@ -193,9 +192,9 @@ public class CalibrateEconomy {
 	 * 
 	 * @return
 	 */
-	private double[] calcAbs6530SpendRatios() {
-		double[] ratios = new double[ABS_6530_0_SPEND_AMT.length];
-		double total = 0d;
+	private float[] calcAbs6530SpendRatios() {
+		float[] ratios = new float[ABS_6530_0_SPEND_AMT.length];
+		float total = 0f;
 		for (int i = 0; i < ABS_6530_0_SPEND_AMT.length; i++) {
 			total += ABS_6530_0_SPEND_AMT[i];
 		}
@@ -211,9 +210,9 @@ public class CalibrateEconomy {
 	 * 
 	 * @return
 	 */
-	private double[] calcAdiIndividualLoanRatios() {
-		double[] ratios = new double[this.adis.length];
-		double total = 0d;
+	private float[] calcAdiIndividualLoanRatios() {
+		float[] ratios = new float[this.adis.length];
+		float total = 0f;
 		for (int i = 0; i < this.adis.length; i++) {
 			total += this.adis[i].getBsLoansHome() + this.adis[i].getBsLoansPersonal();
 		}
@@ -229,9 +228,9 @@ public class CalibrateEconomy {
 	 * 
 	 * @return
 	 */
-	private double[] calcAdiDepositRatios() {
-		double[] ratios = new double[this.adis.length];
-		double total = 0d;
+	private float[] calcAdiDepositRatios() {
+		float[] ratios = new float[this.adis.length];
+		float total = 0f;
 		for (int i = 0; i < this.adis.length; i++) {
 			total += this.adis[i].getBsDepositsAtCall() + this.adis[i].getBsDepositsTerm();
 		}
@@ -249,9 +248,9 @@ public class CalibrateEconomy {
 	 * 
 	 * @return
 	 */
-	private double[] calcAdiBusinessLoanRatios() {
-		double[] ratios = new double[this.adis.length];
-		double total = 0d;
+	private float[] calcAdiBusinessLoanRatios() {
+		float[] ratios = new float[this.adis.length];
+		float total = 0f;
 		for (int i = 0; i < this.adis.length; i++) {
 			total += this.adis[i].getBsLoansBusiness();
 		}
@@ -269,10 +268,10 @@ public class CalibrateEconomy {
 	 * 
 	 * @return
 	 */
-	private List<List<Double>> calcBusinessDivisionWageRatios() {
+	private List<List<Float>> calcBusinessDivisionWageRatios() {
 		// initialise division totals
-		Double[] divTotal = Collections.nCopies(CalibrateIndividuals.DIVISION_CODE_ARRAY.length, 0d)
-				.toArray(Double[]::new);
+		Float[] divTotal = Collections.nCopies(CalibrateIndividuals.DIVISION_CODE_ARRAY.length, 0f)
+				.toArray(Float[]::new);
 		Integer[] divisionBusinessCount = Collections.nCopies(CalibrateIndividuals.DIVISION_CODE_ARRAY.length, 0)
 				.toArray(Integer[]::new);
 
@@ -285,9 +284,9 @@ public class CalibrateEconomy {
 		}
 
 		// initialise ratios
-		List<List<Double>> ratios = new ArrayList<List<Double>>(CalibrateIndividuals.DIVISION_CODE_ARRAY.length);
+		List<List<Float>> ratios = new ArrayList<List<Float>>(CalibrateIndividuals.DIVISION_CODE_ARRAY.length);
 		for (int ratioIdx = 0; ratioIdx < CalibrateIndividuals.DIVISION_CODE_ARRAY.length; ratioIdx++) {
-			ratios.add(new ArrayList<Double>(divisionBusinessCount[ratioIdx]));
+			ratios.add(new ArrayList<Float>(divisionBusinessCount[ratioIdx]));
 		}
 
 		// calculate ratios

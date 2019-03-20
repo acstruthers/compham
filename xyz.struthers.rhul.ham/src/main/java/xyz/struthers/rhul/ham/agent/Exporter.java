@@ -24,10 +24,10 @@ public final class Exporter extends Business {
 	private static final long serialVersionUID = 1L;
 
 	// P&L
-	protected double salesForeign;
+	protected float salesForeign;
 
 	// exporter fields
-	private Map<ForeignCountry, Double> destinationCountryAmounts; // average 2.4 countries per exporter
+	private Map<ForeignCountry, Float> destinationCountryAmounts; // average 2.4 countries per exporter
 	private List<Currency> currencies;
 
 	/**
@@ -46,7 +46,7 @@ public final class Exporter extends Business {
 	public Exporter(Exporter exporter) {
 		super(exporter);
 
-		this.destinationCountryAmounts = new HashMap<ForeignCountry, Double>(exporter.destinationCountryAmounts.size());
+		this.destinationCountryAmounts = new HashMap<ForeignCountry, Float>(exporter.destinationCountryAmounts.size());
 		for (ForeignCountry country : exporter.destinationCountryAmounts.keySet()) {
 			this.destinationCountryAmounts.put(country, exporter.getDestinationCountryAmounts().get(country));
 		}
@@ -60,9 +60,9 @@ public final class Exporter extends Business {
 	@Override
 	public List<NodePayment> getAmountsPayable(int iteration) {
 		List<NodePayment> liabilities = super.getAmountsPayable(iteration);
-		
+
 		// TODO: add import/export liabilities
-		
+
 		return liabilities;
 	}
 
@@ -76,14 +76,14 @@ public final class Exporter extends Business {
 	/**
 	 * @return the destinationCountries
 	 */
-	public Map<ForeignCountry, Double> getDestinationCountryAmounts() {
+	public Map<ForeignCountry, Float> getDestinationCountryAmounts() {
 		return destinationCountryAmounts;
 	}
 
 	/**
 	 * @param destinationCountries the destinationCountries to set
 	 */
-	public void setDestinationCountryAmounts(Map<ForeignCountry, Double> destinationCountryAmounts) {
+	public void setDestinationCountryAmounts(Map<ForeignCountry, Float> destinationCountryAmounts) {
 		this.destinationCountryAmounts = destinationCountryAmounts;
 	}
 

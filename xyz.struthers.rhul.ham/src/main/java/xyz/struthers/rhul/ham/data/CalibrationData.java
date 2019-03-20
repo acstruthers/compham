@@ -39,13 +39,13 @@ import com.opencsv.CSVReader;
 public class CalibrationData {
 
 	// multipliers
-	public static final double BILLION = 1000000000d;
-	public static final double MILLION = 1000000d;
-	public static final double THOUSAND = 1000d;
-	public static final double PERCENT = 0.01d;
+	public static final float BILLION = 1000000000f;
+	public static final float MILLION = 1000000f;
+	public static final float THOUSAND = 1000f;
+	public static final float PERCENT = 0.01f;
 
 	// map implementation optimisation
-	public static final double MAP_LOAD_FACTOR = 0.75d;
+	public static final float MAP_LOAD_FACTOR = 0.75f;
 	public static final int NUM_ADIS = 86;
 	public static final int NUM_CURRENCIES = 51;
 	public static final int NUM_COUNTRIES = 111;
@@ -124,10 +124,10 @@ public class CalibrationData {
 	private Map<String, Map<String, String>> adiData; // banks, building societies & credit unions
 	private Map<String, Map<String, String>> currencyData; // (ISO code, field name, value)
 	private Map<String, Map<String, String>> countryData; // (Country name, field name, value)
-	private Map<String, Double> rbaBalSht;
-	private Map<String, Double> rbaProfitLoss;
-	private Map<String, Double> govtBalSht;
-	private Map<String, Double> govtProfitLoss;
+	private Map<String, Float> rbaBalSht;
+	private Map<String, Float> rbaProfitLoss;
+	private Map<String, Float> govtBalSht;
+	private Map<String, Float> govtProfitLoss;
 
 	/**
 	 * 
@@ -194,12 +194,12 @@ public class CalibrationData {
 
 		// report how much RAM was released
 		long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-		double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+		float megabytesConsumed = (memoryAfter - memoryBefore) / 1024f / 1024f;
 		DecimalFormat decimalFormatter = new DecimalFormat("#,##0.00");
 		System.out.println(">>> Memory released after clearing common calibration data: "
 				+ decimalFormatter.format(megabytesConsumed) + "MB");
 		System.out.println(
-				">>> Current memory consumption: " + decimalFormatter.format(memoryAfter / 1024d / 1024d) + "MB");
+				">>> Current memory consumption: " + decimalFormatter.format(memoryAfter / 1024f / 1024f) + "MB");
 	}
 
 	public void dropRbaE1Data() {
@@ -794,15 +794,15 @@ public class CalibrationData {
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading RBA financial statements");
 		int[] rbaBalShtRows = { 3, 4, 5, 6, 7, 11, 12, 13, 14, 18, 19, 25, 26, 27, 28, 29, 30, 31 };
 		int rbaBalShtMapCapacity = (int) Math.ceil(rbaBalShtRows.length / MAP_LOAD_FACTOR);
-		this.rbaBalSht = new HashMap<String, Double>(rbaBalShtMapCapacity);
+		this.rbaBalSht = new HashMap<String, Float>(rbaBalShtMapCapacity);
 		int rbaBalShtColumn = 2;
-		double rbaMultiplier = 1d;
+		float rbaMultiplier = 1f;
 		this.loadFinancialStatementCsv("/data/RBA/RBA_BalSht.csv", CalibrationData.RBA_BS, rbaBalShtColumn,
 				rbaBalShtRows, this.title, this.rbaBalSht, rbaMultiplier);
 
 		int[] rbaProfitLossRows = { 3, 4, 5, 6, 7, 8, 9, 13, 14, 15, 18, 19 };
 		int rbaProfitLossMapCapacity = (int) Math.ceil(rbaProfitLossRows.length / MAP_LOAD_FACTOR);
-		this.rbaProfitLoss = new HashMap<String, Double>(rbaProfitLossMapCapacity);
+		this.rbaProfitLoss = new HashMap<String, Float>(rbaProfitLossMapCapacity);
 		int rbaProfitLossColumn = 2;
 		this.loadFinancialStatementCsv("/data/RBA/RBA_PnL.csv", CalibrationData.RBA_PL, rbaProfitLossColumn,
 				rbaProfitLossRows, this.title, this.rbaProfitLoss, rbaMultiplier);
@@ -812,15 +812,15 @@ public class CalibrationData {
 				.println(new Date(System.currentTimeMillis()) + ": Loading Australian Government financial statements");
 		int[] govtBalShtRows = { 8, 10, 12, 13, 15, 16, 22, 23, 25, 29 };
 		int govtBalShtMapCapacity = (int) Math.ceil(govtBalShtRows.length / MAP_LOAD_FACTOR);
-		this.govtBalSht = new HashMap<String, Double>(govtBalShtMapCapacity);
+		this.govtBalSht = new HashMap<String, Float>(govtBalShtMapCapacity);
 		int govtBalShtColumn = 10;
-		double govtMultiplier = 1000000d;
+		float govtMultiplier = 1000000f;
 		this.loadFinancialStatementCsv("/data/ABS/5512.0_GovtFinStats/55120DO057_201617 - Table 3 - Bal Sht.csv",
 				CalibrationData.GOVT_PL, govtBalShtColumn, govtBalShtRows, this.title, this.govtBalSht, govtMultiplier);
 
 		int[] govtProfitLossRows = { 7, 9, 10, 12, 17, 18, 22, 23, 37, 48 };
 		int govtProfitLossMapCapacity = (int) Math.ceil(govtProfitLossRows.length / MAP_LOAD_FACTOR);
-		this.govtProfitLoss = new HashMap<String, Double>(govtProfitLossMapCapacity);
+		this.govtProfitLoss = new HashMap<String, Float>(govtProfitLossMapCapacity);
 		int govtProfitLossColumn = 10;
 		this.loadFinancialStatementCsv("/data/ABS/5512.0_GovtFinStats/55120DO057_201617 - Table 1 - P&L.csv",
 				CalibrationData.GOVT_PL, govtProfitLossColumn, govtProfitLossRows, this.title, this.govtProfitLoss,
@@ -1479,7 +1479,7 @@ public class CalibrationData {
 	 *                             $.
 	 */
 	private void loadFinancialStatementCsv(String fileResourceLocation, String dataSourceName, int columnToImport,
-			int[] rowsToImport, Map<String, List<String>> titles, Map<String, Double> data, double multiplier) {
+			int[] rowsToImport, Map<String, List<String>> titles, Map<String, Float> data, float multiplier) {
 
 		CSVReader reader = null;
 		try {
@@ -1499,7 +1499,7 @@ public class CalibrationData {
 
 						// parse the body of the data
 						data.put(seriesId[i],
-								Double.valueOf(line[columnToImport].replaceAll(",", "").replaceAll("$", ""))
+								Float.valueOf(line[columnToImport].replaceAll(",", "").replaceAll("$", ""))
 										* multiplier);
 
 						break rowCheck;
@@ -1846,7 +1846,7 @@ public class CalibrationData {
 	/**
 	 * @return the rbaBalSht
 	 */
-	public Map<String, Double> getRbaBalSht() {
+	public Map<String, Float> getRbaBalSht() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1856,7 +1856,7 @@ public class CalibrationData {
 	/**
 	 * @return the rbaProfitLoss
 	 */
-	public Map<String, Double> getRbaProfitLoss() {
+	public Map<String, Float> getRbaProfitLoss() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1866,7 +1866,7 @@ public class CalibrationData {
 	/**
 	 * @return the govtBalSht
 	 */
-	public Map<String, Double> getGovtBalSht() {
+	public Map<String, Float> getGovtBalSht() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1876,7 +1876,7 @@ public class CalibrationData {
 	/**
 	 * @return the govtProfitLoss
 	 */
-	public Map<String, Double> getGovtProfitLoss() {
+	public Map<String, Float> getGovtProfitLoss() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}

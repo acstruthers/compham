@@ -16,7 +16,7 @@ import xyz.struthers.rhul.ham.process.NodePayment;
  * against the individual businesses that are engaged in international trade
  * with these countries.
  * 
- * Each instance of this class stores 1 pointer, 18 doubles and 17 strings, so
+ * Each instance of this class stores 1 pointer, 18 floats and 17 strings, so
  * will consume approximately 260 bytes of RAM. There are 114 instances of this
  * class in the model, so they will consume approximately 28.95 kB of RAM.
  * 
@@ -26,16 +26,16 @@ import xyz.struthers.rhul.ham.process.NodePayment;
 public final class ForeignCountry extends Agent {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	// agent relationships
 	protected int paymentClearingIndex;
-	
+
 	// field variables
 	private Currency currency;
-	private double totalExportsFromAustralia;
-	private double totalImportsToAustralia;
-	private Map<String, Double> exportsFromAustraliaByState; // 8 states
-	private Map<String, Double> importsToAustraliaByState;
+	private float totalExportsFromAustralia;
+	private float totalImportsToAustralia;
+	private Map<String, Float> exportsFromAustraliaByState; // 8 states
+	private Map<String, Float> importsToAustraliaByState;
 
 	/**
 	 * 
@@ -59,9 +59,9 @@ public final class ForeignCountry extends Agent {
 		this.currency = countryCurrency;
 	}
 
-	public ForeignCountry(String countryName, Currency countryCurrency, double exportsFromAustralia,
-			double importsToAustralia, Map<String, Double> exportsFromAusByState,
-			Map<String, Double> importsToAusByState) {
+	public ForeignCountry(String countryName, Currency countryCurrency, float exportsFromAustralia,
+			float importsToAustralia, Map<String, Float> exportsFromAusByState,
+			Map<String, Float> importsToAusByState) {
 		super();
 		this.init();
 
@@ -72,7 +72,7 @@ public final class ForeignCountry extends Agent {
 		this.exportsFromAustraliaByState = exportsFromAusByState;
 		this.importsToAustraliaByState = importsToAusByState;
 	}
-	
+
 	@Override
 	public int getPaymentClearingIndex() {
 		return this.paymentClearingIndex;
@@ -92,8 +92,8 @@ public final class ForeignCountry extends Agent {
 	protected void init() {
 		super.name = null;
 		this.currency = null;
-		this.totalExportsFromAustralia = 0d;
-		this.totalImportsToAustralia = 0d;
+		this.totalExportsFromAustralia = 0f;
+		this.totalImportsToAustralia = 0f;
 		this.exportsFromAustraliaByState = null;
 		this.importsToAustraliaByState = null;
 	}
@@ -106,8 +106,7 @@ public final class ForeignCountry extends Agent {
 	}
 
 	/**
-	 * @param currency
-	 *            the currency to set
+	 * @param currency the currency to set
 	 */
 	public void setCurrency(Currency currency) {
 		this.currency = currency;
@@ -116,60 +115,56 @@ public final class ForeignCountry extends Agent {
 	/**
 	 * @return the totalExportsFromAustralia
 	 */
-	public double getTotalExportsFromAustralia() {
+	public float getTotalExportsFromAustralia() {
 		return totalExportsFromAustralia;
 	}
 
 	/**
-	 * @param totalExportsFromAustralia
-	 *            the totalExportsFromAustralia to set
+	 * @param totalExportsFromAustralia the totalExportsFromAustralia to set
 	 */
-	public void setTotalExportsFromAustralia(double totalExportsFromAustralia) {
+	public void setTotalExportsFromAustralia(float totalExportsFromAustralia) {
 		this.totalExportsFromAustralia = totalExportsFromAustralia;
 	}
 
 	/**
 	 * @return the totalImportsToAustralia
 	 */
-	public double getTotalImportsToAustralia() {
+	public float getTotalImportsToAustralia() {
 		return totalImportsToAustralia;
 	}
 
 	/**
-	 * @param totalImportsToAustralia
-	 *            the totalImportsToAustralia to set
+	 * @param totalImportsToAustralia the totalImportsToAustralia to set
 	 */
-	public void setTotalImportsToAustralia(double totalImportsToAustralia) {
+	public void setTotalImportsToAustralia(float totalImportsToAustralia) {
 		this.totalImportsToAustralia = totalImportsToAustralia;
 	}
 
 	/**
 	 * @return the exportsFromAustraliaByState
 	 */
-	public Map<String, Double> getExportsFromAustraliaByState() {
+	public Map<String, Float> getExportsFromAustraliaByState() {
 		return exportsFromAustraliaByState;
 	}
 
 	/**
-	 * @param exportsFromAustraliaByState
-	 *            the exportsFromAustraliaByState to set
+	 * @param exportsFromAustraliaByState the exportsFromAustraliaByState to set
 	 */
-	public void setExportsFromAustraliaByState(Map<String, Double> exportsFromAustraliaByState) {
+	public void setExportsFromAustraliaByState(Map<String, Float> exportsFromAustraliaByState) {
 		this.exportsFromAustraliaByState = exportsFromAustraliaByState;
 	}
 
 	/**
 	 * @return the importsToAustraliaByState
 	 */
-	public Map<String, Double> getImportsToAustraliaByState() {
+	public Map<String, Float> getImportsToAustraliaByState() {
 		return importsToAustraliaByState;
 	}
 
 	/**
-	 * @param importsToAustraliaByState
-	 *            the importsToAustraliaByState to set
+	 * @param importsToAustraliaByState the importsToAustraliaByState to set
 	 */
-	public void setImportsToAustraliaByState(Map<String, Double> importsToAustraliaByState) {
+	public void setImportsToAustraliaByState(Map<String, Float> importsToAustraliaByState) {
 		this.importsToAustraliaByState = importsToAustraliaByState;
 	}
 

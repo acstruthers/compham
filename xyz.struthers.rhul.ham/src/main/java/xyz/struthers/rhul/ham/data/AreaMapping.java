@@ -67,7 +67,7 @@ public class AreaMapping {
 	private Map<String, Map<String, String>> poaData;
 
 	private Map<Date, Integer> totalPopulation;
-	private Map<Date, Double> totalPopulationMultiplier; // multiply old data by this to get to 2018
+	private Map<Date, Float> totalPopulationMultiplier; // multiply old data by this to get to 2018
 	private Map<Date, Map<String, Integer>> adjustedPeopleByLga;
 	private Map<Date, Map<String, Integer>> adjustedDwellingsByLga;
 	private Map<String, Integer> abs2074_0indexMap;
@@ -75,10 +75,10 @@ public class AreaMapping {
 	private ArrayList<ArrayList<String>> abs2074_0seriesTitles;
 	private Map<String, Map<Date, String>> abs3222_0; // AU by gender and age (population projections)
 
-	// private Map<String, Double> postCodeLatitude;
-	// private Map<String, Double> postCodeLongitude;
-	// private Map<String, Double> lgaLatitude;
-	// private Map<String, Double> lgaLongitude;
+	// private Map<String, Float> postCodeLatitude;
+	// private Map<String, Float> postCodeLongitude;
+	// private Map<String, Float> lgaLatitude;
+	// private Map<String, Float> lgaLongitude;
 	private Map<String, String> mapLgaToGccsa;
 	private Map<String, String> mapPoaToLga;
 	private Map<String, String> mapLgaToPoa; // there are multiple post codes per LGA, but any one is enough for us to
@@ -124,7 +124,7 @@ public class AreaMapping {
 		return totalPop.intValue();
 	}
 
-	public double getPopulationMultiplier(Date date) {
+	public float getPopulationMultiplier(Date date) {
 		if (this.totalPopulationMultiplier == null || this.totalPopulationMultiplier.get(date) == null) {
 			this.getAdjustedPeopleByLga(date);
 		}
@@ -138,7 +138,7 @@ public class AreaMapping {
 		if (this.adjustedPeopleByLga == null) {
 			// these are always initialised and populated together (by this method)
 			this.adjustedPeopleByLga = new HashMap<Date, Map<String, Integer>>(5);
-			this.totalPopulationMultiplier = new HashMap<Date, Double>(5);
+			this.totalPopulationMultiplier = new HashMap<Date, Float>(5);
 		}
 		Map<String, Integer> result = this.adjustedPeopleByLga.get(date);
 		if (result == null) {
@@ -149,9 +149,9 @@ public class AreaMapping {
 				totalCensusPopulation += censusPeopleByLga.get(lga);
 			}
 			result = new HashMap<String, Integer>(lgaSet.size());
-			double factor = Double.valueOf(this.getTotalPopulation(date)) / Double.valueOf(totalCensusPopulation);
+			float factor = Float.valueOf(this.getTotalPopulation(date)) / Float.valueOf(totalCensusPopulation);
 			for (String lga : lgaSet) {
-				result.put(lga, (int) Math.round(Double.valueOf(censusPeopleByLga.get(lga)) * factor));
+				result.put(lga, (int) Math.round(Float.valueOf(censusPeopleByLga.get(lga)) * factor));
 			}
 			this.adjustedPeopleByLga.put(date, result);
 			this.totalPopulationMultiplier.put(date, factor);
@@ -181,9 +181,9 @@ public class AreaMapping {
 			}
 			int resultMapCapacity = (int) Math.ceil(lgaSet.size() / 0.75d);
 			result = new HashMap<String, Integer>(resultMapCapacity);
-			double factor = Double.valueOf(this.getTotalPopulation(date)) / Double.valueOf(totalCensusPopulation);
+			float factor = Float.valueOf(this.getTotalPopulation(date)) / Float.valueOf(totalCensusPopulation);
 			for (String lga : lgaSet) {
-				result.put(lga, (int) Math.round(Double.valueOf(censusDwellingsByLga.get(lga)) * factor));
+				result.put(lga, (int) Math.round(Float.valueOf(censusDwellingsByLga.get(lga)) * factor));
 			}
 			this.adjustedDwellingsByLga.put(date, result);
 		}
@@ -577,8 +577,8 @@ public class AreaMapping {
 
 		// load postcode latitude and longitude
 		/*
-		 * this.postCodeLatitude = new HashMap<String, Double>(); this.postCodeLongitude
-		 * = new HashMap<String, Double>(); this.readPostCodeLatLongDataCsv(
+		 * this.postCodeLatitude = new HashMap<String, Float>(); this.postCodeLongitude
+		 * = new HashMap<String, Float>(); this.readPostCodeLatLongDataCsv(
 		 * Properties.RESOURCE_DIRECTORY +
 		 * "\\data\\Corra\\Australian_Post_Codes_Lat_Lon.csv");
 		 */
@@ -711,8 +711,8 @@ public class AreaMapping {
 	 * null; try { reader = new CSVReader(new FileReader(fileURI)); String[] line =
 	 * null; line = reader.readNext(); // discard header row while ((line =
 	 * reader.readNext()) != null) { // parse the body of the data
-	 * this.postCodeLatitude.put(line[0], Double.valueOf(line[5]));
-	 * this.postCodeLongitude.put(line[0], Double.valueOf(line[6])); } } catch
+	 * this.postCodeLatitude.put(line[0], float.valueOf(line[5]));
+	 * this.postCodeLongitude.put(line[0], float.valueOf(line[6])); } } catch
 	 * (FileNotFoundException e) { // open file e.printStackTrace(); } catch
 	 * (IOException e) { // read next e.printStackTrace(); } }
 	 */

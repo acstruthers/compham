@@ -30,7 +30,7 @@ public final class ForeignBank extends AuthorisedDepositTakingInstitution {
 	 * @param financialStatementAmounts
 	 */
 	public ForeignBank(String adiAustralianBusinessNumber, String adiShortName, String adiLongName, String adiType,
-			Map<String, Double> financialStatementAmounts) {
+			Map<String, Float> financialStatementAmounts) {
 		super(adiAustralianBusinessNumber, adiShortName, adiLongName, adiType, financialStatementAmounts);
 	}
 }

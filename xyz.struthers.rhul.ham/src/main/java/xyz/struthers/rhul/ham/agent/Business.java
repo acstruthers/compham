@@ -49,49 +49,49 @@ public class Business extends Agent implements Employer {
 	protected ArrayList<Individual> employees; // calculate wages & super
 	protected AuthorisedDepositTakingInstitution adi; // loans & deposits
 	protected ArrayList<Business> domesticSuppliers;
-	protected ArrayList<Double> supplierRatios;
+	protected ArrayList<Float> supplierRatios;
 	protected ArrayList<ForeignCountry> foreignSuppliers;
-	protected ArrayList<Double> foreignSupplierRatios;
+	protected ArrayList<Float> foreignSupplierRatios;
 	protected Business landlord;
 	protected AustralianGovernment govt;
 
 	// P&L (88 bytes)
-	protected double totalIncome;
-	protected double salesDomestic;
-	protected double salesGovernment;
-	protected double salesForeign;
-	protected double interestIncome;
-	protected double rentIncome;
-	protected double otherIncome; // balancing item
+	protected float totalIncome;
+	protected float salesDomestic;
+	protected float salesGovernment;
+	protected float salesForeign;
+	protected float interestIncome;
+	protected float rentIncome;
+	protected float otherIncome; // balancing item
 
-	protected double totalExpenses;
-	protected double wageExpenses; // wages, super, payroll tax ... ignore w/comp & FBT
-	protected double superannuationExpense; // 9.5%
-	protected double payrollTaxExpense; // calculated according to each state's rules
-	protected double foreignExpenses;
-	protected double interestExpense;
-	protected double rentExpense;
-	protected double depreciationExpense;
-	protected double otherExpenses; // balancing item
+	protected float totalExpenses;
+	protected float wageExpenses; // wages, super, payroll tax ... ignore w/comp & FBT
+	protected float superannuationExpense; // 9.5%
+	protected float payrollTaxExpense; // calculated according to each state's rules
+	protected float foreignExpenses;
+	protected float interestExpense;
+	protected float rentExpense;
+	protected float depreciationExpense;
+	protected float otherExpenses; // balancing item
 
 	// Bal Sht (56 bytes)
-	protected double totalAssets;
-	protected double bankDeposits;
-	protected double foreignEquities;
-	protected double otherFinancialAssets;
-	protected double otherNonFinancialAssets; // balancing item
+	protected float totalAssets;
+	protected float bankDeposits;
+	protected float foreignEquities;
+	protected float otherFinancialAssets;
+	protected float otherNonFinancialAssets; // balancing item
 
-	protected double totalLiabilities;
-	protected double tradeCreditors;
-	protected double loans;
-	protected double otherCurrentLiabilities;
-	protected double otherNonCurrentLiabilities; // balancing item
+	protected float totalLiabilities;
+	protected float tradeCreditors;
+	protected float loans;
+	protected float otherCurrentLiabilities;
+	protected float otherNonCurrentLiabilities; // balancing item
 
-	protected double totalEquity;
+	protected float totalEquity;
 
 	// Interest rates (16 bytes)
-	protected double interestRateLoans;
-	protected double interestRateDeposits;
+	protected float interestRateLoans;
+	protected float interestRateDeposits;
 
 	/**
 	 * Default constructor
@@ -215,8 +215,8 @@ public class Business extends Agent implements Employer {
 		if (this.employees != null && this.wageExpenses > 0d) {
 			for (Individual employee : this.employees) {
 				int index = employee.getPaymentClearingIndex();
-				double monthlyWagesIncludingSuper = employee.getPnlWagesSalaries()
-						* (1d + Properties.SUPERANNUATION_RATE);
+				float monthlyWagesIncludingSuper = employee.getPnlWagesSalaries()
+						* (1f + Properties.SUPERANNUATION_RATE);
 				liabilities.add(new NodePayment(index, monthlyWagesIncludingSuper));
 			}
 		}
@@ -225,7 +225,7 @@ public class Business extends Agent implements Employer {
 		if (this.domesticSuppliers != null && this.otherExpenses > 0d) {
 			for (Business supplier : this.domesticSuppliers) {
 				int index = supplier.getPaymentClearingIndex();
-				double expense = this.otherExpenses / this.domesticSuppliers.size();
+				float expense = this.otherExpenses / this.domesticSuppliers.size();
 				liabilities.add(new NodePayment(index, expense));
 			}
 		}
@@ -234,7 +234,7 @@ public class Business extends Agent implements Employer {
 		if (this.foreignSuppliers != null && this.foreignExpenses > 0d) {
 			for (ForeignCountry supplier : this.foreignSuppliers) {
 				int index = supplier.getPaymentClearingIndex();
-				double expense = this.foreignExpenses / this.domesticSuppliers.size();
+				float expense = this.foreignExpenses / this.domesticSuppliers.size();
 				liabilities.add(new NodePayment(index, expense));
 			}
 		}
@@ -244,15 +244,15 @@ public class Business extends Agent implements Employer {
 			liabilities.add(new NodePayment(this.landlord.getPaymentClearingIndex(), this.rentExpense));
 		}
 
-		// calculate tax due to government (payroll & income)
-		double totalTax = this.payrollTaxExpense
-				+ Tax.calculateCompanyTax(this.totalIncome, this.totalIncome - this.totalExpenses);
-		liabilities.add(new NodePayment(govt.getPaymentClearingIndex(), totalTax));
-
 		// calculate interest due to bank
 		if (this.adi != null && this.interestExpense > 0d) {
 			liabilities.add(new NodePayment(this.adi.getPaymentClearingIndex(), this.interestExpense));
 		}
+
+		// calculate tax due to government (payroll & income)
+		float totalTax = this.payrollTaxExpense
+				+ Tax.calculateCompanyTax(this.totalIncome, this.totalIncome - this.totalExpenses);
+		liabilities.add(new NodePayment(govt.getPaymentClearingIndex(), totalTax));
 
 		liabilities.trimToSize();
 		return liabilities;
@@ -275,45 +275,45 @@ public class Business extends Agent implements Employer {
 		this.employees = null;
 
 		// P&L
-		this.totalIncome = 0d;
-		this.salesDomestic = 0d;
-		this.salesGovernment = 0d;
-		this.salesForeign = 0d;
-		this.interestIncome = 0d;
-		this.rentIncome = 0d;
-		this.otherIncome = 0d;
+		this.totalIncome = 0f;
+		this.salesDomestic = 0f;
+		this.salesGovernment = 0f;
+		this.salesForeign = 0f;
+		this.interestIncome = 0f;
+		this.rentIncome = 0f;
+		this.otherIncome = 0f;
 
-		this.totalExpenses = 0d;
-		this.wageExpenses = 0d;
-		this.superannuationExpense = 0d;
-		this.payrollTaxExpense = 0d;
-		this.foreignExpenses = 0d;
-		this.interestExpense = 0d;
-		this.rentExpense = 0d;
-		this.depreciationExpense = 0d;
-		this.otherExpenses = 0d;
+		this.totalExpenses = 0f;
+		this.wageExpenses = 0f;
+		this.superannuationExpense = 0f;
+		this.payrollTaxExpense = 0f;
+		this.foreignExpenses = 0f;
+		this.interestExpense = 0f;
+		this.rentExpense = 0f;
+		this.depreciationExpense = 0f;
+		this.otherExpenses = 0f;
 
 		// Bal Sht
-		this.totalAssets = 0d;
-		this.bankDeposits = 0d;
-		this.foreignEquities = 0d;
-		this.otherFinancialAssets = 0d;
-		this.otherNonFinancialAssets = 0d;
+		this.totalAssets = 0f;
+		this.bankDeposits = 0f;
+		this.foreignEquities = 0f;
+		this.otherFinancialAssets = 0f;
+		this.otherNonFinancialAssets = 0f;
 
-		this.totalLiabilities = 0d;
-		this.tradeCreditors = 0d;
-		this.loans = 0d;
-		this.otherCurrentLiabilities = 0d;
-		this.otherNonCurrentLiabilities = 0d;
+		this.totalLiabilities = 0f;
+		this.tradeCreditors = 0f;
+		this.loans = 0f;
+		this.otherCurrentLiabilities = 0f;
+		this.otherNonCurrentLiabilities = 0f;
 
-		this.totalEquity = 0d;
+		this.totalEquity = 0f;
 
 		// Interest Rates
-		this.interestRateLoans = 0d;
-		this.interestRateDeposits = 0d;
+		this.interestRateLoans = 0f;
+		this.interestRateDeposits = 0f;
 	}
 
-	public double getGrossProfit() {
+	public float getGrossProfit() {
 		return this.getTotalIncome() - this.getTotalExpenses();
 	}
 
@@ -323,11 +323,11 @@ public class Business extends Agent implements Employer {
 	 * 
 	 * @return the tax expense
 	 */
-	public double getTax() {
+	public float getTax() {
 		return this.getGrossProfit() * Tax.calculateCompanyTax(this.totalIncome, this.totalIncome - this.totalExpenses);
 	}
 
-	public double getNetProfit() {
+	public float getNetProfit() {
 		return this.getGrossProfit() - this.getTax();
 	}
 
@@ -491,378 +491,378 @@ public class Business extends Agent implements Employer {
 	/**
 	 * @return the totalIncome
 	 */
-	public double getTotalIncome() {
+	public float getTotalIncome() {
 		return totalIncome;
 	}
 
 	/**
 	 * @param totalIncome the totalIncome to set
 	 */
-	public void setTotalIncome(double totalIncome) {
+	public void setTotalIncome(float totalIncome) {
 		this.totalIncome = totalIncome;
 	}
 
 	/**
 	 * @return the salesDomestic
 	 */
-	public double getSalesDomestic() {
+	public float getSalesDomestic() {
 		return salesDomestic;
 	}
 
 	/**
 	 * @param salesDomestic the salesDomestic to set
 	 */
-	public void setSalesDomestic(double salesDomestic) {
+	public void setSalesDomestic(float salesDomestic) {
 		this.salesDomestic = salesDomestic;
 	}
 
 	/**
 	 * @return the salesGovernment
 	 */
-	public double getSalesGovernment() {
+	public float getSalesGovernment() {
 		return salesGovernment;
 	}
 
 	/**
 	 * @param salesGovernment the salesGovernment to set
 	 */
-	public void setSalesGovernment(double salesGovernment) {
+	public void setSalesGovernment(float salesGovernment) {
 		this.salesGovernment = salesGovernment;
 	}
 
 	/**
 	 * @return the salesForeign
 	 */
-	public double getSalesForeign() {
+	public float getSalesForeign() {
 		return salesForeign;
 	}
 
 	/**
 	 * @param salesForeign the salesForeign to set
 	 */
-	public void setSalesForeign(double salesForeign) {
+	public void setSalesForeign(float salesForeign) {
 		this.salesForeign = salesForeign;
 	}
 
 	/**
 	 * @return the interestIncome
 	 */
-	public double getInterestIncome() {
+	public float getInterestIncome() {
 		return interestIncome;
 	}
 
 	/**
 	 * @param interestIncome the interestIncome to set
 	 */
-	public void setInterestIncome(double interestIncome) {
+	public void setInterestIncome(float interestIncome) {
 		this.interestIncome = interestIncome;
 	}
 
 	/**
 	 * @return the rentIncome
 	 */
-	public double getRentIncome() {
+	public float getRentIncome() {
 		return rentIncome;
 	}
 
 	/**
 	 * @param rentIncome the rentIncome to set
 	 */
-	public void setRentIncome(double rentIncome) {
+	public void setRentIncome(float rentIncome) {
 		this.rentIncome = rentIncome;
 	}
 
 	/**
 	 * @return the otherIncome
 	 */
-	public double getOtherIncome() {
+	public float getOtherIncome() {
 		return otherIncome;
 	}
 
 	/**
 	 * @return the totalExpenses
 	 */
-	public double getTotalExpenses() {
+	public float getTotalExpenses() {
 		return totalExpenses;
 	}
 
 	/**
 	 * @param totalExpenses the totalExpenses to set
 	 */
-	public void setTotalExpenses(double totalExpenses) {
+	public void setTotalExpenses(float totalExpenses) {
 		this.totalExpenses = totalExpenses;
 	}
 
 	/**
 	 * @return the personnelExpenses
 	 */
-	public double getWageExpenses() {
+	public float getWageExpenses() {
 		return wageExpenses;
 	}
 
 	/**
 	 * @param personnelExpenses the personnelExpenses to set
 	 */
-	public void setWageExpenses(double personnelExpenses) {
+	public void setWageExpenses(float personnelExpenses) {
 		this.wageExpenses = personnelExpenses;
 	}
 
 	/**
 	 * @return the superannuationExpense
 	 */
-	public double getSuperannuationExpense() {
+	public float getSuperannuationExpense() {
 		return superannuationExpense;
 	}
 
 	/**
 	 * @param superannuationExpense the superannuationExpense to set
 	 */
-	public void setSuperannuationExpense(double superannuationExpense) {
+	public void setSuperannuationExpense(float superannuationExpense) {
 		this.superannuationExpense = superannuationExpense;
 	}
 
 	/**
 	 * @return the payrollTaxExpense
 	 */
-	public double getPayrollTaxExpense() {
+	public float getPayrollTaxExpense() {
 		return payrollTaxExpense;
 	}
 
 	/**
 	 * @param payrollTaxExpense the payrollTaxExpense to set
 	 */
-	public void setPayrollTaxExpense(double payrollTaxExpense) {
+	public void setPayrollTaxExpense(float payrollTaxExpense) {
 		this.payrollTaxExpense = payrollTaxExpense;
 	}
 
 	/**
 	 * @return the foreignExpenses
 	 */
-	public double getForeignExpenses() {
+	public float getForeignExpenses() {
 		return foreignExpenses;
 	}
 
 	/**
 	 * @param foreignExpenses the foreignExpenses to set
 	 */
-	public void setForeignExpenses(double foreignExpenses) {
+	public void setForeignExpenses(float foreignExpenses) {
 		this.foreignExpenses = foreignExpenses;
 	}
 
 	/**
 	 * @return the interestExpense
 	 */
-	public double getInterestExpense() {
+	public float getInterestExpense() {
 		return interestExpense;
 	}
 
 	/**
 	 * @param interestExpense the interestExpense to set
 	 */
-	public void setInterestExpense(double interestExpense) {
+	public void setInterestExpense(float interestExpense) {
 		this.interestExpense = interestExpense;
 	}
 
 	/**
 	 * @return the rentExpense
 	 */
-	public double getRentExpense() {
+	public float getRentExpense() {
 		return rentExpense;
 	}
 
 	/**
 	 * @param rentExpense the rentExpense to set
 	 */
-	public void setRentExpense(double rentExpense) {
+	public void setRentExpense(float rentExpense) {
 		this.rentExpense = rentExpense;
 	}
 
 	/**
 	 * @return the depreciationExpense
 	 */
-	public double getDepreciationExpense() {
+	public float getDepreciationExpense() {
 		return depreciationExpense;
 	}
 
 	/**
 	 * @param depreciationExpense the depreciationExpense to set
 	 */
-	public void setDepreciationExpense(double depreciationExpense) {
+	public void setDepreciationExpense(float depreciationExpense) {
 		this.depreciationExpense = depreciationExpense;
 	}
 
 	/**
 	 * @return the otherExpenses
 	 */
-	public double getOtherExpenses() {
+	public float getOtherExpenses() {
 		return otherExpenses;
 	}
 
 	/**
 	 * @return the totalAssets
 	 */
-	public double getTotalAssets() {
+	public float getTotalAssets() {
 		return totalAssets;
 	}
 
 	/**
 	 * @param totalAssets the totalAssets to set
 	 */
-	public void setTotalAssets(double totalAssets) {
+	public void setTotalAssets(float totalAssets) {
 		this.totalAssets = totalAssets;
 	}
 
 	/**
 	 * @return the bankDeposits
 	 */
-	public double getBankDeposits() {
+	public float getBankDeposits() {
 		return bankDeposits;
 	}
 
 	/**
 	 * @param bankDeposits the bankDeposits to set
 	 */
-	public void setBankDeposits(double bankDeposits) {
+	public void setBankDeposits(float bankDeposits) {
 		this.bankDeposits = bankDeposits;
 	}
 
 	/**
 	 * @return the foreignEquities
 	 */
-	public double getForeignEquities() {
+	public float getForeignEquities() {
 		return foreignEquities;
 	}
 
 	/**
 	 * @param foreignEquities the foreignEquities to set
 	 */
-	public void setForeignEquities(double foreignEquities) {
+	public void setForeignEquities(float foreignEquities) {
 		this.foreignEquities = foreignEquities;
 	}
 
 	/**
 	 * @return the otherFinancialAssets
 	 */
-	public double getOtherFinancialAssets() {
+	public float getOtherFinancialAssets() {
 		return otherFinancialAssets;
 	}
 
 	/**
 	 * @param otherFinancialAssets the otherFinancialAssets to set
 	 */
-	public void setOtherFinancialAssets(double otherFinancialAssets) {
+	public void setOtherFinancialAssets(float otherFinancialAssets) {
 		this.otherFinancialAssets = otherFinancialAssets;
 	}
 
 	/**
 	 * @return the otherNonFinancialAssets
 	 */
-	public double getOtherNonFinancialAssets() {
+	public float getOtherNonFinancialAssets() {
 		return otherNonFinancialAssets;
 	}
 
 	/**
 	 * @return the totalLiabilities
 	 */
-	public double getTotalLiabilities() {
+	public float getTotalLiabilities() {
 		return totalLiabilities;
 	}
 
 	/**
 	 * @param totalLiabilities the totalLiabilities to set
 	 */
-	public void setTotalLiabilities(double totalLiabilities) {
+	public void setTotalLiabilities(float totalLiabilities) {
 		this.totalLiabilities = totalLiabilities;
 	}
 
 	/**
 	 * @return the tradeCreditors
 	 */
-	public double getTradeCreditors() {
+	public float getTradeCreditors() {
 		return tradeCreditors;
 	}
 
 	/**
 	 * @param tradeCreditors the tradeCreditors to set
 	 */
-	public void setTradeCreditors(double tradeCreditors) {
+	public void setTradeCreditors(float tradeCreditors) {
 		this.tradeCreditors = tradeCreditors;
 	}
 
 	/**
 	 * @return the loans
 	 */
-	public double getLoans() {
+	public float getLoans() {
 		return loans;
 	}
 
 	/**
 	 * @param loans the loans to set
 	 */
-	public void setLoans(double loans) {
+	public void setLoans(float loans) {
 		this.loans = loans;
 	}
 
 	/**
 	 * @return the otherCurrentLiabilities
 	 */
-	public double getOtherCurrentLiabilities() {
+	public float getOtherCurrentLiabilities() {
 		return otherCurrentLiabilities;
 	}
 
 	/**
 	 * @param otherCurrentLiabilities the otherCurrentLiabilities to set
 	 */
-	public void setOtherCurrentLiabilities(double otherCurrentLiabilities) {
+	public void setOtherCurrentLiabilities(float otherCurrentLiabilities) {
 		this.otherCurrentLiabilities = otherCurrentLiabilities;
 	}
 
 	/**
 	 * @return the otherLiabilities
 	 */
-	public double getOtherNonCurrentLiabilities() {
+	public float getOtherNonCurrentLiabilities() {
 		return otherNonCurrentLiabilities;
 	}
 
 	/**
 	 * @return the totalEquity
 	 */
-	public double getTotalEquity() {
+	public float getTotalEquity() {
 		return totalEquity;
 	}
 
 	/**
 	 * @param totalEquity the totalEquity to set
 	 */
-	public void setTotalEquity(double totalEquity) {
+	public void setTotalEquity(float totalEquity) {
 		this.totalEquity = totalEquity;
 	}
 
 	/**
 	 * @return the interestRateLoans
 	 */
-	public double getInterestRateLoans() {
+	public float getInterestRateLoans() {
 		return interestRateLoans;
 	}
 
 	/**
 	 * @param interestRateLoans the interestRateLoans to set
 	 */
-	public void setInterestRateLoans(double interestRateLoans) {
+	public void setInterestRateLoans(float interestRateLoans) {
 		this.interestRateLoans = interestRateLoans;
 	}
 
 	/**
 	 * @return the interestRateDeposits
 	 */
-	public double getInterestRateDeposits() {
+	public float getInterestRateDeposits() {
 		return interestRateDeposits;
 	}
 
 	/**
 	 * @param interestRateDeposits the interestRateDeposits to set
 	 */
-	public void setInterestRateDeposits(double interestRateDeposits) {
+	public void setInterestRateDeposits(float interestRateDeposits) {
 		this.interestRateDeposits = interestRateDeposits;
 	}
 

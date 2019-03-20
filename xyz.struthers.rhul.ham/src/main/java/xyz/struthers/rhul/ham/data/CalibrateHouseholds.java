@@ -44,23 +44,23 @@ public class CalibrateHouseholds {
 	private static final boolean DEBUG = true;
 
 	// CONSTANTS
-	private static final double MILLION = 1000000d;
-	private static final double THOUSAND = 1000d;
-	private static final double PERCENT = 0.01d;
+	private static final float MILLION = 1000000f;
+	private static final float THOUSAND = 1000f;
+	private static final float PERCENT = 0.01f;
 
-	private static final double NUM_MONTHS = 12d;
-	private static final double NUM_WEEKS = 365d / 7d;
+	private static final float NUM_MONTHS = 12f;
+	private static final float NUM_WEEKS = 365f / 7f;
 
 	public static final String ABS_1410_YEAR = "2016";
 	public static final String CALIBRATION_DATE_ABS = "01/06/2018";
 	public static final String CALIBRATION_DATE_RBA = "01/06/2018";
-	public static final double HOUSEHOLD_MULTIPLIER = 4d; // HACK: forces it up to the right number of households
+	public static final float HOUSEHOLD_MULTIPLIER = 4f; // HACK: forces it up to the right number of households
 
 	private static final int AGENT_LIST_INIT_SIZE = 10000000; // 10 million households
 	private static final int AGENT_LIST_CDCF_INIT_SIZE = 5; // initial size of the lists in each cell
 
 	// map optimisation
-	public static final double MAP_LOAD_FACTOR = 0.75d;
+	public static final float MAP_LOAD_FACTOR = 0.75f;
 	public static final int MAP_LGA_INIT_CAPACITY = (int) Math.ceil(540 / MAP_LOAD_FACTOR) + 1;
 
 	// Series Titles
@@ -140,10 +140,10 @@ public class CalibrateHouseholds {
 	// Henderson poverty line amounts based on CDCF
 	// SOURCE: Table 1: Poverty Lines: Australia, June Quarter, 2018
 	// https://melbourneinstitute.unimelb.edu.au/publications/poverty-lines
-	private static final double[] CDCF_HENDERSON_EXCL_HOUSING = { 505.82, 628.75, 751.69, 874.62, 996.2, 1117.78,
-			1239.36, 347.93, 477.85, 600.79, 723.72, 846.66, 969.6, 1092.54 };
-	private static final double HENDERSON_EXCL_HOUSING_LONE_PERSON = CDCF_HENDERSON_EXCL_HOUSING[7];
-	private static final double HENDERSON_EXCL_HOUSING_GROUP = 821.60; // assumes 4 adults, no children
+	private static final float[] CDCF_HENDERSON_EXCL_HOUSING = { 505.82f, 628.75f, 751.69f, 874.62f, 996.2f, 1117.78f,
+			1239.36f, 347.93f, 477.85f, 600.79f, 723.72f, 846.66f, 969.6f, 1092.54f };
+	private static final float HENDERSON_EXCL_HOUSING_LONE_PERSON = CDCF_HENDERSON_EXCL_HOUSING[7];
+	private static final float HENDERSON_EXCL_HOUSING_GROUP = 821.60f; // assumes 4 adults, no children
 
 	// series titles
 	private static final String RBA_E1_SERIESID_CASH = "BSPNSHUFAD"; // Household deposits
@@ -178,7 +178,7 @@ public class CalibrateHouseholds {
 	private Date calibrationDateAbs;
 	private Date calibrationDateRba;
 	private int totalPopulationAU;
-	private double populationMultiplier;
+	private float populationMultiplier;
 	private Map<String, Integer> lgaPeopleCount; // adjusted to 2018
 	private Map<String, Integer> lgaDwellingsCount; // adjusted to 2018
 	private Map<String, Integer> poaIndexMap; // from Individual agent data
@@ -235,7 +235,7 @@ public class CalibrateHouseholds {
 	 * 
 	 * Keys: Year (yyyy), LGA code, Series Title
 	 */
-	private Map<String, Map<String, Map<String, Double>>> abs1410_0Economy;
+	private Map<String, Map<String, Map<String, Float>>> abs1410_0Economy;
 	/**
 	 * Data by LGA: Family
 	 * 
@@ -245,7 +245,7 @@ public class CalibrateHouseholds {
 	 * 
 	 * Keys: Year (yyyy), LGA code, Series Title
 	 */
-	private Map<String, Map<String, Map<String, Double>>> abs1410_0Family;
+	private Map<String, Map<String, Map<String, Float>>> abs1410_0Family;
 	/**
 	 * ABS Census Table Builder data:<br>
 	 * HCFMD by LGA by HIND and RNTRD<br>
@@ -323,7 +323,7 @@ public class CalibrateHouseholds {
 
 		// create list of Individuals with enough initial capacity
 		if (this.individualAgents == null) {
-			// add in a 5% buffer so the List doesn't end up double the size it needs to be
+			// add in a 5% buffer so the List doesn't end up float the size it needs to be
 			int initCapacity = (int) Math.round(this.totalPopulationAU * 1.05d);
 			this.individualAgents = new ArrayList<Individual>(initCapacity);
 		}
@@ -389,9 +389,9 @@ public class CalibrateHouseholds {
 		 */
 
 		// RBA E2 Keys: Series Name, Date
-		double debtToIncomeRatioRbaE2 = Double
+		float debtToIncomeRatioRbaE2 = Float
 				.valueOf(this.rbaE2.get(RBA_E2_SERIESID_DEBT_TO_INCOME).get(this.calibrationDateRba)) * PERCENT;
-		double assetsToIncomeRatioRbaE2 = Double
+		float assetsToIncomeRatioRbaE2 = Float
 				.valueOf(this.rbaE2.get(RBA_E2_SERIESID_ASSETS_TO_INCOME).get(this.calibrationDateRba)) * PERCENT;
 
 		/*
@@ -403,28 +403,28 @@ public class CalibrateHouseholds {
 
 		// RBA E1 Keys: Series Name, Date
 		// get RBA E1 amounts ($ billions)
-		double cashRbaE1 = Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_CASH).get(this.calibrationDateRba));
-		double superRbaE1 = Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_SUPER).get(this.calibrationDateRba));
-		double equitiesRbaE1 = Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_EQUITIES).get(this.calibrationDateRba));
-		double otherFinAssetsRbaE1 = Double
+		float cashRbaE1 = Float.valueOf(this.rbaE1.get(RBA_E1_SERIESID_CASH).get(this.calibrationDateRba));
+		float superRbaE1 = Float.valueOf(this.rbaE1.get(RBA_E1_SERIESID_SUPER).get(this.calibrationDateRba));
+		float equitiesRbaE1 = Float.valueOf(this.rbaE1.get(RBA_E1_SERIESID_EQUITIES).get(this.calibrationDateRba));
+		float otherFinAssetsRbaE1 = Float
 				.valueOf(this.rbaE1.get(RBA_E1_SERIESID_OTHER_FIN_ASSETS).get(this.calibrationDateRba));
-		double totalFinancialAssetsRbaE1 = cashRbaE1 + superRbaE1 + equitiesRbaE1 + otherFinAssetsRbaE1;
-		double dwellingsRbaE1 = Double.valueOf(this.rbaE1.get(RBA_E1_SERIESID_DWELLINGS).get(this.calibrationDateRba));
-		double totalNonFinancialAssetsRbaE1 = Double
+		float totalFinancialAssetsRbaE1 = cashRbaE1 + superRbaE1 + equitiesRbaE1 + otherFinAssetsRbaE1;
+		float dwellingsRbaE1 = Float.valueOf(this.rbaE1.get(RBA_E1_SERIESID_DWELLINGS).get(this.calibrationDateRba));
+		float totalNonFinancialAssetsRbaE1 = Float
 				.valueOf(this.rbaE1.get(RBA_E1_SERIESID_NONFIN_ASSETS).get(this.calibrationDateRba));
-		double otherNonFinancialAssetsRbaE1 = totalNonFinancialAssetsRbaE1 - dwellingsRbaE1;
-		double totalAssetsRbaE1 = totalFinancialAssetsRbaE1 + totalNonFinancialAssetsRbaE1;
-		double totalLiabilitiesRbaE1 = Double
+		float otherNonFinancialAssetsRbaE1 = totalNonFinancialAssetsRbaE1 - dwellingsRbaE1;
+		float totalAssetsRbaE1 = totalFinancialAssetsRbaE1 + totalNonFinancialAssetsRbaE1;
+		float totalLiabilitiesRbaE1 = Float
 				.valueOf(this.rbaE1.get(RBA_E1_SERIESID_TOTAL_LIABILITIES).get(this.calibrationDateRba));
 
 		// calculate ratios within balance sheet
-		double cashToAssetsRbaE1 = cashRbaE1 / totalAssetsRbaE1;
-		double superToAssetsRbaE1 = superRbaE1 / totalAssetsRbaE1;
-		double equitiesToAssetsRbaE1 = equitiesRbaE1 / totalAssetsRbaE1;
-		double otherFinAssetsToAssetsRbaE1 = otherFinAssetsRbaE1 / totalAssetsRbaE1;
-		double dwellingsToAssetsRbaE1 = dwellingsRbaE1 / totalAssetsRbaE1;
-		double otherNonFinAssetsToAssetsRbaE1 = otherNonFinancialAssetsRbaE1 / totalAssetsRbaE1;
-		double totalLiabilitiesToAssetsRbaE1 = totalLiabilitiesRbaE1 / totalAssetsRbaE1;
+		float cashToAssetsRbaE1 = cashRbaE1 / totalAssetsRbaE1;
+		float superToAssetsRbaE1 = superRbaE1 / totalAssetsRbaE1;
+		float equitiesToAssetsRbaE1 = equitiesRbaE1 / totalAssetsRbaE1;
+		float otherFinAssetsToAssetsRbaE1 = otherFinAssetsRbaE1 / totalAssetsRbaE1;
+		float dwellingsToAssetsRbaE1 = dwellingsRbaE1 / totalAssetsRbaE1;
+		float otherNonFinAssetsToAssetsRbaE1 = otherNonFinancialAssetsRbaE1 / totalAssetsRbaE1;
+		float totalLiabilitiesToAssetsRbaE1 = totalLiabilitiesRbaE1 / totalAssetsRbaE1;
 		// use debt-to-income ratio to determine total debt, then subtract from total
 		// liabilities to get other liabilities
 
@@ -459,9 +459,9 @@ public class CalibrateHouseholds {
 		this.individualMap = this.calibrateIndividuals.getIndividualMap();
 
 		// PDF Keys: LGA, HCFMD, HIND, RNTRD/MRERD midpoints
-		double[][][][] pdfRntrd = new double[lgaCodesIntersection.size()][ABS_HCFMF.length
+		float[][][][] pdfRntrd = new float[lgaCodesIntersection.size()][ABS_HCFMF.length
 				+ 1][ABS_HIND_RANGES.length][ABS_RNTRD_MIDPOINT.length];
-		double[][][][] pdfMrerd = new double[lgaCodesIntersection.size()][ABS_HCFMF.length
+		float[][][][] pdfMrerd = new float[lgaCodesIntersection.size()][ABS_HCFMF.length
 				+ 1][ABS_HIND_RANGES.length][ABS_MRERD_MIDPOINT.length];
 		// Map<String, Integer> lgaIndexMap = new HashMap<String, Integer>(
 		// (int) Math.ceil(lgaCodesIntersection.size() / MAP_LOAD_FACTOR) + 1);
@@ -475,13 +475,13 @@ public class CalibrateHouseholds {
 			// create count-weighted probability density functions (PDF)
 
 			// children are <20 years old (indexes 0 to 3)
-			double[] pdfAgeChild = new double[4];
-			double[][] pdfIncpGivenAgeChild = new double[4][CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS.length];
+			float[] pdfAgeChild = new float[4];
+			float[][] pdfIncpGivenAgeChild = new float[4][CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS.length];
 			int divisor = 0;
 			for (int ageIdx = 0; ageIdx < 4; ageIdx++) {
 				// initialise PDF for INCP given AGE5P
 				for (int incpIdx = 0; incpIdx < CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS.length; incpIdx++) {
-					pdfIncpGivenAgeChild[ageIdx][incpIdx] = 0d;
+					pdfIncpGivenAgeChild[ageIdx][incpIdx] = 0f;
 				}
 				// calculate values
 				int numInAge = 0;
@@ -493,30 +493,30 @@ public class CalibrateHouseholds {
 						// add the number of people in this cell, if this cell contains data
 						int numInCell = this.individualMap.get(lgaCode).get(CalibrateIndividuals.AGE_ARRAY_ABS[ageIdx])
 								.get(incp).size();
-						pdfIncpGivenAgeChild[ageIdx][incpIdx] = Double.valueOf(numInCell);
+						pdfIncpGivenAgeChild[ageIdx][incpIdx] = Float.valueOf(numInCell);
 						numInAge += numInCell;
 					}
 				}
 				for (int incpIdx = 0; incpIdx < CalibrateIndividuals.INDIVIDUAL_INCOME_RANGES_ABS.length; incpIdx++) {
 					if (numInAge == 0) {
-						pdfIncpGivenAgeChild[ageIdx][incpIdx] = 0d;
+						pdfIncpGivenAgeChild[ageIdx][incpIdx] = 0f;
 					} else {
 						pdfIncpGivenAgeChild[ageIdx][incpIdx] = pdfIncpGivenAgeChild[ageIdx][incpIdx]
-								/ Double.valueOf(numInAge);
+								/ Float.valueOf(numInAge);
 					}
 				}
-				pdfAgeChild[ageIdx] = Double.valueOf(numInAge);
+				pdfAgeChild[ageIdx] = Float.valueOf(numInAge);
 				divisor += numInAge;
 			}
 			for (int ageIdx = 0; ageIdx < 3; ageIdx++) {
 				// there should always be people under 20 years old in every LGA, so no need to
 				// check that divisor != 0
-				pdfAgeChild[ageIdx] = pdfAgeChild[ageIdx] / (double) divisor;
+				pdfAgeChild[ageIdx] = pdfAgeChild[ageIdx] / (float) divisor;
 			}
-			pdfAgeChild[3] = 1d - pdfAgeChild[0] - pdfAgeChild[1] - pdfAgeChild[2];
+			pdfAgeChild[3] = 1f - pdfAgeChild[0] - pdfAgeChild[1] - pdfAgeChild[2];
 
 			// parents are 20-50 years old (indexes 4 to 9)
-			double[] pdfAgeParent = new double[6];
+			float[] pdfAgeParent = new float[6];
 			divisor = 0;
 			for (int ageIdx = 4; ageIdx < 10; ageIdx++) {
 				int numInAge = 0;
@@ -529,17 +529,17 @@ public class CalibrateHouseholds {
 								.get(incp).size();
 					}
 				}
-				pdfAgeParent[ageIdx - 4] = Double.valueOf(numInAge);
+				pdfAgeParent[ageIdx - 4] = Float.valueOf(numInAge);
 				divisor += numInAge;
 			}
 			for (int ageIdx = 0; ageIdx < 5; ageIdx++) {
-				pdfAgeParent[ageIdx] = pdfAgeParent[ageIdx] / (double) divisor;
+				pdfAgeParent[ageIdx] = pdfAgeParent[ageIdx] / (float) divisor;
 			}
-			pdfAgeParent[5] = 1d - pdfAgeParent[0] - pdfAgeParent[1] - pdfAgeParent[2] - pdfAgeParent[3]
+			pdfAgeParent[5] = 1f - pdfAgeParent[0] - pdfAgeParent[1] - pdfAgeParent[2] - pdfAgeParent[3]
 					- pdfAgeParent[4];
 
 			// adults are >= 20 years old (indexes 4 to 20)
-			double[] pdfAgeAdult = new double[17];
+			float[] pdfAgeAdult = new float[17];
 			divisor = 0;
 			for (int ageIdx = 4; ageIdx < 21; ageIdx++) {
 				int numInAge = 0;
@@ -552,13 +552,13 @@ public class CalibrateHouseholds {
 								.get(incp).size();
 					}
 				}
-				pdfAgeAdult[ageIdx - 4] = Double.valueOf(numInAge);
+				pdfAgeAdult[ageIdx - 4] = Float.valueOf(numInAge);
 				divisor += numInAge;
 			}
 			for (int ageIdx = 0; ageIdx < 16; ageIdx++) {
-				pdfAgeAdult[ageIdx] = pdfAgeAdult[ageIdx] / (double) divisor;
+				pdfAgeAdult[ageIdx] = pdfAgeAdult[ageIdx] / (float) divisor;
 			}
-			pdfAgeAdult[16] = 1d - pdfAgeAdult[0] - pdfAgeAdult[1] - pdfAgeAdult[2] - pdfAgeAdult[3] - pdfAgeAdult[4]
+			pdfAgeAdult[16] = 1f - pdfAgeAdult[0] - pdfAgeAdult[1] - pdfAgeAdult[2] - pdfAgeAdult[3] - pdfAgeAdult[4]
 					- pdfAgeAdult[5] - pdfAgeAdult[6] - pdfAgeAdult[7] - pdfAgeAdult[8] - pdfAgeAdult[9]
 					- pdfAgeAdult[10] - pdfAgeAdult[11] - pdfAgeAdult[12] - pdfAgeAdult[13] - pdfAgeAdult[14]
 					- pdfAgeAdult[15];
@@ -633,7 +633,7 @@ public class CalibrateHouseholds {
 					 * the HCFMF data to ensure that the model ends up with the same total number of
 					 * Households.
 					 */
-					double lonePersonRatio = 0d;
+					float lonePersonRatio = 0f;
 					int lonePersonCountRntrd = 0;
 					int lonePersonCountMrerd = 0;
 					int loneAndGroupCountRntrd = 0;
@@ -657,34 +657,34 @@ public class CalibrateHouseholds {
 						}
 						// "Lone person household" category in the HCFMD data
 						if ((lonePersonCountRntrd + lonePersonCountMrerd) == 0) {
-							lonePersonRatio = 0d;
+							lonePersonRatio = 0f;
 						} else if ((loneAndGroupCountRntrd + loneAndGroupCountMrerd) == 0) {
-							lonePersonRatio = 1d;
+							lonePersonRatio = 1f;
 						} else {
-							lonePersonRatio = ((double) (lonePersonCountRntrd + lonePersonCountMrerd))
-									/ ((double) (loneAndGroupCountRntrd + loneAndGroupCountMrerd));
+							lonePersonRatio = ((float) (lonePersonCountRntrd + lonePersonCountMrerd))
+									/ ((float) (loneAndGroupCountRntrd + loneAndGroupCountMrerd));
 						}
 					} // END IF lone person ratio calc
 
 					// calculate PDF for RNTRD
-					double restOfCell = 0d;
+					float restOfCell = 0f;
 					for (int rntrdIdx = 1; rntrdIdx < ABS_RNTRD_MIDPOINT.length; rntrdIdx++) {
 						String rntrd = ABS_RNTRD_RANGES[rntrdIdx];
-						pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][rntrdIdx] = ((double) this.censusHCFMD_LGA_HIND_RNTRD
-								.get(hind).get(rntrd).get(lgaCode).get(hcfmd)) / (double) totalDwellingsCell;
+						pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][rntrdIdx] = ((float) this.censusHCFMD_LGA_HIND_RNTRD
+								.get(hind).get(rntrd).get(lgaCode).get(hcfmd)) / (float) totalDwellingsCell;
 						restOfCell += pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][rntrdIdx];
 					}
-					pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][0] = 1d - restOfCell; // map "Not stated" and "Not applicable"
+					pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][0] = 1f - restOfCell; // map "Not stated" and "Not applicable"
 																				// into the $0 category
 					// calculate PDF for MRERD
-					restOfCell = 0d;
+					restOfCell = 0f;
 					for (int mrerdIdx = 1; mrerdIdx < ABS_MRERD_MIDPOINT.length; mrerdIdx++) {
 						String mrerd = ABS_MRERD_RANGES[mrerdIdx];
 						pdfMrerd[lgaIdx][hcfmdIdx][hindIdx][mrerdIdx] = this.censusHCFMD_LGA_HIND_MRERD.get(hind)
 								.get(mrerd).get(lgaCode).get(hcfmd);
 						restOfCell += pdfMrerd[lgaIdx][hcfmdIdx][hindIdx][mrerdIdx];
 					}
-					pdfMrerd[lgaIdx][hcfmdIdx][hindIdx][0] = 1d - restOfCell; // map "Not stated" and "Not applicable"
+					pdfMrerd[lgaIdx][hcfmdIdx][hindIdx][0] = 1f - restOfCell; // map "Not stated" and "Not applicable"
 																				// into the $0 category
 
 					// add lone person & group household PDF calcs
@@ -693,45 +693,43 @@ public class CalibrateHouseholds {
 						String hcfmdGroup = ABS_HCFMD[hcfmdIdx + 1];
 
 						// calculate PDF for RNTRD
-						restOfCell = 0d;
+						restOfCell = 0f;
 						for (int rntrdIdx = 1; rntrdIdx < ABS_RNTRD_MIDPOINT.length; rntrdIdx++) {
 							String rntrd = ABS_RNTRD_RANGES[rntrdIdx];
-							pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][rntrdIdx] = ((double) this.censusHCFMD_LGA_HIND_RNTRD
-									.get(hind).get(rntrd).get(lgaCode).get(hcfmdLone)) / (double) totalDwellingsCell;
+							pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][rntrdIdx] = ((float) this.censusHCFMD_LGA_HIND_RNTRD
+									.get(hind).get(rntrd).get(lgaCode).get(hcfmdLone)) / (float) totalDwellingsCell;
 							restOfCell += pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][rntrdIdx];
 						}
-						pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][0] = 1d - restOfCell; // map "Not stated" and "Not
+						pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][0] = 1f - restOfCell; // map "Not stated" and "Not
 																					// applicable"
-						restOfCell = 0d;
+						restOfCell = 0f;
 						for (int rntrdIdx = 1; rntrdIdx < ABS_RNTRD_MIDPOINT.length; rntrdIdx++) {
 							String rntrd = ABS_RNTRD_RANGES[rntrdIdx];
-							pdfRntrd[lgaIdx][hcfmdIdx
-									+ 1][hindIdx][rntrdIdx] = ((double) this.censusHCFMD_LGA_HIND_RNTRD.get(hind)
-											.get(rntrd).get(lgaCode).get(hcfmdGroup)) / (double) totalDwellingsCell;
+							pdfRntrd[lgaIdx][hcfmdIdx + 1][hindIdx][rntrdIdx] = ((float) this.censusHCFMD_LGA_HIND_RNTRD
+									.get(hind).get(rntrd).get(lgaCode).get(hcfmdGroup)) / (float) totalDwellingsCell;
 							restOfCell += pdfRntrd[lgaIdx][hcfmdIdx + 1][hindIdx][rntrdIdx];
 						}
-						pdfRntrd[lgaIdx][hcfmdIdx + 1][hindIdx][0] = 1d - restOfCell; // map "Not stated" and "Not
+						pdfRntrd[lgaIdx][hcfmdIdx + 1][hindIdx][0] = 1f - restOfCell; // map "Not stated" and "Not
 																						// applicable"
 
 						// calculate PDF for MRERD
-						restOfCell = 0d;
+						restOfCell = 0f;
 						for (int mrerdIdx = 1; mrerdIdx < ABS_MRERD_MIDPOINT.length; mrerdIdx++) {
 							String mrerd = ABS_MRERD_RANGES[mrerdIdx];
-							pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][mrerdIdx] = ((double) this.censusHCFMD_LGA_HIND_MRERD
-									.get(hind).get(mrerd).get(lgaCode).get(hcfmdLone)) / (double) totalDwellingsCell;
+							pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][mrerdIdx] = ((float) this.censusHCFMD_LGA_HIND_MRERD
+									.get(hind).get(mrerd).get(lgaCode).get(hcfmdLone)) / (float) totalDwellingsCell;
 							restOfCell += pdfMrerd[lgaIdx][hcfmdIdx][hindIdx][mrerdIdx];
 						}
-						pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][0] = 1d - restOfCell; // map "Not stated" and "Not
+						pdfRntrd[lgaIdx][hcfmdIdx][hindIdx][0] = 1f - restOfCell; // map "Not stated" and "Not
 																					// applicable"
-						restOfCell = 0d;
+						restOfCell = 0f;
 						for (int mrerdIdx = 1; mrerdIdx < ABS_MRERD_MIDPOINT.length; mrerdIdx++) {
 							String mrerd = ABS_MRERD_RANGES[mrerdIdx];
-							pdfMrerd[lgaIdx][hcfmdIdx
-									+ 1][hindIdx][mrerdIdx] = ((double) this.censusHCFMD_LGA_HIND_MRERD.get(hind)
-											.get(mrerd).get(lgaCode).get(hcfmdGroup)) / (double) totalDwellingsCell;
+							pdfMrerd[lgaIdx][hcfmdIdx + 1][hindIdx][mrerdIdx] = ((float) this.censusHCFMD_LGA_HIND_MRERD
+									.get(hind).get(mrerd).get(lgaCode).get(hcfmdGroup)) / (float) totalDwellingsCell;
 							restOfCell += pdfMrerd[lgaIdx][hcfmdIdx + 1][hindIdx][mrerdIdx];
 						}
-						pdfRntrd[lgaIdx][hcfmdIdx + 1][hindIdx][0] = 1d - restOfCell; // map "Not stated" and "Not
+						pdfRntrd[lgaIdx][hcfmdIdx + 1][hindIdx][0] = 1f - restOfCell; // map "Not stated" and "Not
 																						// applicable"
 					} // end lone person & group household special case
 
@@ -773,7 +771,7 @@ public class CalibrateHouseholds {
 								hcfmdSplitIdx.add(hcfmdIdxLone);
 								hcfmdSplitIdx.add(hcfmdIdxGroup);
 								int lonePersonFamilyCount = (int) Math
-										.round(lonePersonRatio * Double.valueOf(numFamiliesInCell));
+										.round(lonePersonRatio * Float.valueOf(numFamiliesInCell));
 								numFamilies.add(lonePersonFamilyCount);
 								numFamilies.add(numFamiliesInCell - lonePersonFamilyCount);
 							} else {
@@ -793,7 +791,7 @@ public class CalibrateHouseholds {
 									household.setNumChildren(numChildren);
 
 									// determine Henderson poverty line based on family composition
-									double henderson = 0d;
+									float henderson = 0f;
 									if (cdcfIdx == ABS_CDCF.length - 1) {
 										if (cdcfSplit == 0) {
 											// lone person household (same as single parent with no children)
@@ -813,12 +811,12 @@ public class CalibrateHouseholds {
 									}
 									household.setPnlLivingExpenses(henderson); // non-discretionary living expenses
 
-									double rand = this.random.nextDouble();
+									float rand = this.random.nextFloat();
 									int attributeIdx = CustomMath
 											.sample(pdfMrerd[lgaIdx][hcfmdSplitIdx.get(cdcfSplit)][hindIdx], rand);
 									household.setPnlMortgageRepayments(ABS_MRERD_MIDPOINT[attributeIdx]);
 									attributeIdx = CustomMath
-											.sample(pdfRntrd[lgaIdx][hcfmdSplitIdx.get(cdcfSplit)][hindIdx], 1d - rand);
+											.sample(pdfRntrd[lgaIdx][hcfmdSplitIdx.get(cdcfSplit)][hindIdx], 1f - rand);
 									household.setPnlRentExpense(ABS_RNTRD_MIDPOINT[attributeIdx]);
 
 									List<Individual> members = new ArrayList<Individual>(numAdults + numChildren);
@@ -1507,19 +1505,19 @@ public class CalibrateHouseholds {
 
 									// calibrate Bal Sht based on RBA data
 									// all ratios are based on gross income from P&L already calibrated
-									double grossIncome = household.getGrossIncome();
+									float grossIncome = household.getGrossIncome();
 
 									// set assets based on RBA ratios
-									double totalAssets = assetsToIncomeRatioRbaE2 * grossIncome;
-									double cash = cashToAssetsRbaE1 * totalAssets;
-									double existingBankDeposits = household.getBsBankDeposits();
-									double calculatedCash = Math.max(cash, existingBankDeposits);
-									double superannuation = superToAssetsRbaE1 * totalAssets;
-									double equities = equitiesToAssetsRbaE1 * totalAssets;
-									double otherFinAssets = otherFinAssetsToAssetsRbaE1 * totalAssets;
-									double dwellings = dwellingsToAssetsRbaE1 * totalAssets;
-									double otherNonFinAssets = otherNonFinAssetsToAssetsRbaE1 * totalAssets;
-									double calculatedTotalAssets = totalAssets - cash + Math.max(cash, calculatedCash);
+									float totalAssets = assetsToIncomeRatioRbaE2 * grossIncome;
+									float cash = cashToAssetsRbaE1 * totalAssets;
+									float existingBankDeposits = household.getBsBankDeposits();
+									float calculatedCash = Math.max(cash, existingBankDeposits);
+									float superannuation = superToAssetsRbaE1 * totalAssets;
+									float equities = equitiesToAssetsRbaE1 * totalAssets;
+									float otherFinAssets = otherFinAssetsToAssetsRbaE1 * totalAssets;
+									float dwellings = dwellingsToAssetsRbaE1 * totalAssets;
+									float otherNonFinAssets = otherNonFinAssetsToAssetsRbaE1 * totalAssets;
+									float calculatedTotalAssets = totalAssets - cash + Math.max(cash, calculatedCash);
 									household.setBsBankDeposits(calculatedCash);
 									household.setBsSuperannuation(superannuation);
 									household.setBsEquities(equities);
@@ -1529,14 +1527,14 @@ public class CalibrateHouseholds {
 									household.setBsTotalAssets(calculatedTotalAssets);
 
 									// set liabilities based on RBA ratios
-									double totalLiabilities = totalLiabilitiesToAssetsRbaE1 * totalAssets;
-									double totalDebt = debtToIncomeRatioRbaE2 * grossIncome;
-									double existingStudentLoans = household.getBsStudentLoans();
-									double calculatedLoanBal = Math.max(totalDebt - existingStudentLoans,
+									float totalLiabilities = totalLiabilitiesToAssetsRbaE1 * totalAssets;
+									float totalDebt = debtToIncomeRatioRbaE2 * grossIncome;
+									float existingStudentLoans = household.getBsStudentLoans();
+									float calculatedLoanBal = Math.max(totalDebt - existingStudentLoans,
 											existingStudentLoans);
-									double calculatedOtherLiabilities = Math
-											.max(totalLiabilities - Math.max(totalDebt, existingStudentLoans), 0d);
-									double calculatedTotalLiabilities = calculatedLoanBal + existingStudentLoans
+									float calculatedOtherLiabilities = Math
+											.max(totalLiabilities - Math.max(totalDebt, existingStudentLoans), 0f);
+									float calculatedTotalLiabilities = calculatedLoanBal + existingStudentLoans
 											+ calculatedOtherLiabilities;
 									household.setBsLoans(calculatedLoanBal);
 									household.setBsOtherLiabilities(calculatedOtherLiabilities);
@@ -1615,7 +1613,7 @@ public class CalibrateHouseholds {
 		if (DEBUG) {
 			System.gc();
 			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			float megabytesConsumed = (memoryAfter - memoryBefore) / 1024f / 1024f;
 			DecimalFormat decimalFormatter = new DecimalFormat("#,##0.00");
 			System.out.println(
 					">>> Memory used creating Household agents: " + decimalFormatter.format(megabytesConsumed) + "MB");
@@ -1644,7 +1642,7 @@ public class CalibrateHouseholds {
 		this.random = null;
 		this.calibrationDateAbs = null;
 		this.calibrationDateRba = null;
-		this.populationMultiplier = 0d;
+		this.populationMultiplier = 0f;
 		this.lgaDwellingsCount = null;
 		this.poaIndexMap = null;
 
@@ -1689,12 +1687,12 @@ public class CalibrateHouseholds {
 
 		// report how much RAM was released
 		long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-		double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+		float megabytesConsumed = (memoryAfter - memoryBefore) / 1024f / 1024f;
 		DecimalFormat decimalFormatter = new DecimalFormat("#,##0.00");
 		System.out.println(">>> Memory released after creating Household agents: "
 				+ decimalFormatter.format(megabytesConsumed) + "MB");
 		System.out.println(
-				">>> Current memory consumption: " + decimalFormatter.format(memoryAfter / 1024d / 1024d) + "MB");
+				">>> Current memory consumption: " + decimalFormatter.format(memoryAfter / 1024f / 1024f) + "MB");
 	}
 
 	/**

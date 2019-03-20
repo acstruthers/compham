@@ -30,7 +30,7 @@ public final class MajorBank extends AuthorisedDepositTakingInstitution {
 	 * @param financialStatementAmounts
 	 */
 	public MajorBank(String adiAustralianBusinessNumber, String adiShortName, String adiLongName, String adiType,
-			Map<String, Double> financialStatementAmounts) {
+			Map<String, Float> financialStatementAmounts) {
 		super(adiAustralianBusinessNumber, adiShortName, adiLongName, adiType, financialStatementAmounts);
 	}
 

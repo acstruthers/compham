@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import xyz.struthers.rhul.ham.util.CollectionTools;
+import xyz.struthers.lang.CollectionTools;
 
 /**
  * Loads population data, and calibrates number and percentage of people in each
@@ -33,10 +33,10 @@ public class CalibratePopulationData {
 	// beans
 	private CalibrationData data;
 	private AreaMapping mapping;
-	
+
 	// field variables
 	Map<String, Integer> peopleByLga;
-	Map<String, Double> peopleByLgaPercent;
+	Map<String, Float> peopleByLgaPercent;
 
 	/**
 	 * 
@@ -49,9 +49,9 @@ public class CalibratePopulationData {
 	/**
 	 * Gets the percentage of all people living in each LGA, per census data.
 	 * 
-	 * @return a map of doubles between 0 and 1.
+	 * @return a map of floats between 0 and 1.
 	 */
-	public Map<String, Double> populationPercentByLga() {
+	public Map<String, Float> populationPercentByLga() {
 		// get people by LGA (per census)
 		Map<String, Integer> peopleByLga = this.mapping.getCensusPeopleByLga();
 
@@ -68,10 +68,10 @@ public class CalibratePopulationData {
 	public Map<String, Integer> populationByLga(Date date) {
 
 		// get percentage of people in each LGA
-		Map<String, Double> lgaPercent = this.populationPercentByLga();
+		Map<String, Float> lgaPercent = this.populationPercentByLga();
 
 		// get total population
-		double totalPop = Double.valueOf(this.mapping.getTotalPopulation(date));
+		float totalPop = Float.valueOf(this.mapping.getTotalPopulation(date));
 
 		// multiply total by percentage to get current number of people in each LGA
 		Set<String> lgaSet = lgaPercent.keySet();
@@ -91,18 +91,17 @@ public class CalibratePopulationData {
 	 * @param date
 	 * @return the number of representative agents per LGA
 	 * 
-	 * deprecated
+	 *         deprecated
 	 */
-	/*public Map<String, Integer> householdAgentsByLga(Date date) {
-		int peoplePerAgent = Properties.getPeoplePerAgent();
-		Map<String, Integer> popByLga = this.populationByLga(date);
-		Set<String> lgaSet = popByLga.keySet();
-		Map<String, Integer> householdAgents = new HashMap<String, Integer>(lgaSet.size());
-		for (String lga : lgaSet) {
-			householdAgents.put(lga, (int) Math.round(popByLga.get(lga) / Double.valueOf(peoplePerAgent)));
-		}
-		return householdAgents;
-	}*/
+	/*
+	 * public Map<String, Integer> householdAgentsByLga(Date date) { int
+	 * peoplePerAgent = Properties.getPeoplePerAgent(); Map<String, Integer>
+	 * popByLga = this.populationByLga(date); Set<String> lgaSet =
+	 * popByLga.keySet(); Map<String, Integer> householdAgents = new HashMap<String,
+	 * Integer>(lgaSet.size()); for (String lga : lgaSet) { householdAgents.put(lga,
+	 * (int) Math.round(popByLga.get(lga) / float.valueOf(peoplePerAgent))); }
+	 * return householdAgents; }
+	 */
 
 	@PostConstruct
 	private void init() {

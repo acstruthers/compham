@@ -10,7 +10,7 @@ import java.util.Map;
 import xyz.struthers.rhul.ham.process.NodePayment;
 
 /**
- * Each instance of this class stores 21 doubles, so will consume approximately
+ * Each instance of this class stores 21 floats, so will consume approximately
  * 168 bytes of RAM. There is only one instance of this class in the model.
  * 
  * @author Adam Struthers
@@ -24,33 +24,33 @@ public final class ReserveBankOfAustralia extends Agent {
 	protected int paymentClearingIndex;
 	
 	// P&L
-	private double pnlInterestIncome;
-	private double pnlInterestExpense;
-	private double pnlCommittedLiquidityFacilityFees;
-	private double pnlForeignExchangeGainsLosses;
-	private double pnlAudSecurities;
-	private double pnlOtherIncome;
+	private float pnlInterestIncome;
+	private float pnlInterestExpense;
+	private float pnlCommittedLiquidityFacilityFees;
+	private float pnlForeignExchangeGainsLosses;
+	private float pnlAudSecurities;
+	private float pnlOtherIncome;
 
-	private double pnlPersonnelExpenses;
-	private double pnlDepreciationAmortisation;
-	private double pnlOtherExpenses;
+	private float pnlPersonnelExpenses;
+	private float pnlDepreciationAmortisation;
+	private float pnlOtherExpenses;
 
-	private double pnlDistributionPayableToCommonwealth;
+	private float pnlDistributionPayableToCommonwealth;
 
 	// Bal Sht
-	private double bsCash;
-	private double bsAudInvestments;
-	private double bsForeignInvestments;
-	private double bsGold;
-	private double bsOtherAssets;
+	private float bsCash;
+	private float bsAudInvestments;
+	private float bsForeignInvestments;
+	private float bsGold;
+	private float bsOtherAssets;
 
-	private double bsDeposits;
-	private double bsDistributionPayableToCommonwealth;
-	private double bsBanknotesOnIssue;
-	private double bsOtherLiabilities;
+	private float bsDeposits;
+	private float bsDistributionPayableToCommonwealth;
+	private float bsBanknotesOnIssue;
+	private float bsOtherLiabilities;
 
-	private double bsCapital;
-	private double bsReserves;
+	private float bsCapital;
+	private float bsReserves;
 
 	/**
 	 * 
@@ -69,7 +69,7 @@ public final class ReserveBankOfAustralia extends Agent {
 	 * @param profitLoss
 	 *            - a map of Profit & Loss Statement fields and values
 	 */
-	public ReserveBankOfAustralia(Map<String, Double> balSht, Map<String, Double> profitLoss) {
+	public ReserveBankOfAustralia(Map<String, Float> balSht, Map<String, Float> profitLoss) {
 		super();
 		this.init();
 
@@ -119,9 +119,9 @@ public final class ReserveBankOfAustralia extends Agent {
 		return null;
 	}
 
-	public Map<String, Double> getFinancialStatements() {
+	public Map<String, Float> getFinancialStatements() {
 		// initialised to the number of fields in this class
-		Map<String, Double> result = new HashMap<String, Double>(21);
+		Map<String, Float> result = new HashMap<String, Float>(21);
 
 		// P&L
 		result.put("Interest income", this.pnlInterestIncome);
@@ -161,33 +161,33 @@ public final class ReserveBankOfAustralia extends Agent {
 		super.name = "RBA";
 
 		// P&L
-		this.pnlInterestIncome = 0d;
-		this.pnlInterestExpense = 0d;
-		this.pnlCommittedLiquidityFacilityFees = 0d;
-		this.pnlForeignExchangeGainsLosses = 0d;
-		this.pnlAudSecurities = 0d;
-		this.pnlOtherIncome = 0d;
+		this.pnlInterestIncome = 0f;
+		this.pnlInterestExpense = 0f;
+		this.pnlCommittedLiquidityFacilityFees = 0f;
+		this.pnlForeignExchangeGainsLosses = 0f;
+		this.pnlAudSecurities = 0f;
+		this.pnlOtherIncome = 0f;
 
-		this.pnlPersonnelExpenses = 0d;
-		this.pnlDepreciationAmortisation = 0d;
-		this.pnlOtherExpenses = 0d;
+		this.pnlPersonnelExpenses = 0f;
+		this.pnlDepreciationAmortisation = 0f;
+		this.pnlOtherExpenses = 0f;
 
-		this.pnlDistributionPayableToCommonwealth = 0d;
+		this.pnlDistributionPayableToCommonwealth = 0f;
 
 		// Bal Sht
-		this.bsCash = 0d;
-		this.bsAudInvestments = 0d;
-		this.bsForeignInvestments = 0d;
-		this.bsGold = 0d;
-		this.bsOtherAssets = 0d;
+		this.bsCash = 0f;
+		this.bsAudInvestments = 0f;
+		this.bsForeignInvestments = 0f;
+		this.bsGold = 0f;
+		this.bsOtherAssets = 0f;
 
-		this.bsDeposits = 0d;
-		this.bsDistributionPayableToCommonwealth = 0d;
-		this.bsBanknotesOnIssue = 0d;
-		this.bsOtherLiabilities = 0d;
+		this.bsDeposits = 0f;
+		this.bsDistributionPayableToCommonwealth = 0f;
+		this.bsBanknotesOnIssue = 0f;
+		this.bsOtherLiabilities = 0f;
 
-		this.bsCapital = 0d;
-		this.bsReserves = 0d;
+		this.bsCapital = 0f;
+		this.bsReserves = 0f;
 	}
 
 }

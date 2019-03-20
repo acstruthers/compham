@@ -45,14 +45,14 @@ public class CalibrateIndividuals {
 	private static final boolean DEBUG_DETAIL = false;
 
 	// CONSTANTS
-	private static final double EPSILON = 0.1d; // to round business counts so the integer sums match
-	public static final double NUM_MONTHS = 12d;
+	private static final float EPSILON = 0.1f; // to round business counts so the integer sums match
+	public static final float NUM_MONTHS = 12f;
 	public static final String CALIBRATION_DATE_ATO = "01/06/2018";
 	public static final String CALIBRATION_DATE_RBA = "30/06/2018";
-	public static final double POPULATION_MULTIPLIER = 1.2d; // HACK: forces it up to the right number of people
+	public static final float POPULATION_MULTIPLIER = 1.2f; // HACK: forces it up to the right number of people
 
 	// map optimisation
-	public static final double MAP_LOAD_FACTOR = 0.75d;
+	public static final float MAP_LOAD_FACTOR = 0.75f;
 	public static final int MAP_LGA_INIT_CAPACITY = (int) Math.ceil(540 / MAP_LOAD_FACTOR) + 1;
 	public static final String[] SEX_ARRAY = { "M", "F" };
 	private static final String[] STATES_ARRAY = { "NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT", "OT" };
@@ -174,7 +174,7 @@ public class CalibrateIndividuals {
 	private Date calibrationDateAto;
 	private Date calibrationDateRba;
 	private int totalPopulationAU;
-	private double populationMultiplier;
+	private float populationMultiplier;
 	private Map<String, Integer> lgaPeopleCount; // adjusted to 2018
 	private Map<String, Integer> lgaDwellingsCount; // adjusted to 2018
 	private Map<String, Integer> poaIndexMap;
@@ -236,7 +236,7 @@ public class CalibrateIndividuals {
 	 * Contains count and taxable income, summarised by industry division.<br>
 	 * Keys: Series Title, Industry Division Code
 	 */
-	private Map<String, Map<String, Double>> atoIndividualTable9DivisionSummary;
+	private Map<String, Map<String, Float>> atoIndividualTable9DivisionSummary;
 	/**
 	 * ABS Census Table Builder data:<br>
 	 * SEXP by POA (UR) by AGE5P, INDP and INCP<br>
@@ -262,7 +262,7 @@ public class CalibrateIndividuals {
 		this.calibrationDateAto = null;
 		this.calibrationDateRba = null;
 		this.totalPopulationAU = 0;
-		this.populationMultiplier = 0d;
+		this.populationMultiplier = 0f;
 		this.lgaPeopleCount = null;
 		this.lgaDwellingsCount = null;
 		this.poaIndexMap = null;
@@ -309,12 +309,12 @@ public class CalibrateIndividuals {
 
 		// report how much RAM was released
 		long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-		double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+		float megabytesConsumed = (memoryAfter - memoryBefore) / 1024f / 1024f;
 		DecimalFormat decimalFormatter = new DecimalFormat("#,##0.00");
 		System.out.println(">>> Memory released after creating Individual agents: "
 				+ decimalFormatter.format(megabytesConsumed) + "MB");
 		System.out.println(
-				">>> Current memory consumption: " + decimalFormatter.format(memoryAfter / 1024d / 1024d) + "MB");
+				">>> Current memory consumption: " + decimalFormatter.format(memoryAfter / 1024f / 1024f) + "MB");
 	}
 
 	/**
@@ -499,33 +499,32 @@ public class CalibrateIndividuals {
 		 */
 		System.out.println(new Date(System.currentTimeMillis()) + ": 1. ATO Individual Table 9 industry multipliers");
 
-		Map<String, Double> divisionTaxableIncomeMultiplier = new HashMap<String, Double>(NUM_DIVISIONS);
-		Map<String, Double> divisionCountMultiplier = new HashMap<String, Double>(NUM_DIVISIONS);
+		Map<String, Float> divisionTaxableIncomeMultiplier = new HashMap<String, Float>(NUM_DIVISIONS);
+		Map<String, Float> divisionCountMultiplier = new HashMap<String, Float>(NUM_DIVISIONS);
 		Set<String> divisionCodeSet = this.atoIndividualTable9DivisionSummary.get(ATO_9_TITLE_TAXABLE_COUNT).keySet();
-		double divTotalCount9A = 0d;
-		double divTotalAmount9A = 0d;
+		float divTotalCount9A = 0f;
+		float divTotalAmount9A = 0f;
 		for (String divCode : divisionCodeSet) {
 			// calculate average income per division, and total of all divisions
-			double divTaxableCount = this.atoIndividualTable9DivisionSummary.get(ATO_9_TITLE_TAXABLE_COUNT)
+			float divTaxableCount = this.atoIndividualTable9DivisionSummary.get(ATO_9_TITLE_TAXABLE_COUNT).get(divCode);
+			float divTaxableAmount = this.atoIndividualTable9DivisionSummary.get(ATO_9_TITLE_TAXABLE_AMOUNT)
 					.get(divCode);
-			double divTaxableAmount = this.atoIndividualTable9DivisionSummary.get(ATO_9_TITLE_TAXABLE_AMOUNT)
-					.get(divCode);
-			double divTaxablePerPerson = divTaxableAmount / divTaxableCount;
+			float divTaxablePerPerson = divTaxableAmount / divTaxableCount;
 			// Just an efficient place to hold this. Will be overwritten in the loop below.
 			divisionTaxableIncomeMultiplier.put(divCode, divTaxablePerPerson);
 			divisionCountMultiplier.put(divCode, divTaxableCount);
 			divTotalCount9A += divTaxableCount;
 			divTotalAmount9A += divTaxableAmount;
 		}
-		double divTotalTaxablePerPerson = divTotalCount9A > 0d ? divTotalAmount9A / divTotalCount9A : 0d;
+		float divTotalTaxablePerPerson = divTotalCount9A > 0f ? divTotalAmount9A / divTotalCount9A : 0f;
 		if (DEBUG_DETAIL) {
 			System.out.println("########################");
 			System.out.println("# DIVISION MULTIPLIERS #");
 			System.out.println("########################");
 		}
 		for (String divCode : divisionCodeSet) {
-			double divTaxableIncomeMultiplier = divisionTaxableIncomeMultiplier.get(divCode) / divTotalTaxablePerPerson;
-			double divCountMultiplier = divisionCountMultiplier.get(divCode) / divTotalCount9A;
+			float divTaxableIncomeMultiplier = divisionTaxableIncomeMultiplier.get(divCode) / divTotalTaxablePerPerson;
+			float divCountMultiplier = divisionCountMultiplier.get(divCode) / divTotalCount9A;
 			divisionTaxableIncomeMultiplier.put(divCode, divTaxableIncomeMultiplier);
 			divisionCountMultiplier.put(divCode, divCountMultiplier);
 			if (DEBUG_DETAIL) {
@@ -552,37 +551,37 @@ public class CalibrateIndividuals {
 		int sexMapCapacity = (int) Math.ceil(SEX_ARRAY.length / MAP_LOAD_FACTOR);
 		int ageMapCapacity = (int) Math.ceil(AGE_ARRAY_ATO.length / MAP_LOAD_FACTOR);
 		int stateMapCapacity = (int) Math.ceil(STATES_ARRAY.length / MAP_LOAD_FACTOR);
-		Map<String, Map<String, Map<String, Double>>> stateTaxableCount = new HashMap<String, Map<String, Map<String, Double>>>(
+		Map<String, Map<String, Map<String, Float>>> stateTaxableCount = new HashMap<String, Map<String, Map<String, Float>>>(
 				sexMapCapacity);
-		Map<String, Map<String, Map<String, Double>>> stateTaxableAmount = new HashMap<String, Map<String, Map<String, Double>>>(
+		Map<String, Map<String, Map<String, Float>>> stateTaxableAmount = new HashMap<String, Map<String, Map<String, Float>>>(
 				sexMapCapacity);
-		Map<String, Map<String, Map<String, Double>>> stateTaxableIncomeMultiplier = new HashMap<String, Map<String, Map<String, Double>>>(
+		Map<String, Map<String, Map<String, Float>>> stateTaxableIncomeMultiplier = new HashMap<String, Map<String, Map<String, Float>>>(
 				sexMapCapacity);
-		Map<String, Map<String, Map<String, Double>>> stateCountMultiplier = new HashMap<String, Map<String, Map<String, Double>>>(
+		Map<String, Map<String, Map<String, Float>>> stateCountMultiplier = new HashMap<String, Map<String, Map<String, Float>>>(
 				sexMapCapacity);
-		Map<String, Map<String, Double>> stateSexAgeNationalTotalCount = new HashMap<String, Map<String, Double>>(
+		Map<String, Map<String, Float>> stateSexAgeNationalTotalCount = new HashMap<String, Map<String, Float>>(
 				sexMapCapacity);
-		Map<String, Map<String, Double>> stateSexAgeNationalTotalAmount = new HashMap<String, Map<String, Double>>(
+		Map<String, Map<String, Float>> stateSexAgeNationalTotalAmount = new HashMap<String, Map<String, Float>>(
 				sexMapCapacity);
 		for (String sex : SEX_ARRAY) {
-			stateTaxableCount.put(sex, new HashMap<String, Map<String, Double>>(ageMapCapacity));
-			stateTaxableAmount.put(sex, new HashMap<String, Map<String, Double>>(ageMapCapacity));
-			stateTaxableIncomeMultiplier.put(sex, new HashMap<String, Map<String, Double>>(ageMapCapacity));
-			stateCountMultiplier.put(sex, new HashMap<String, Map<String, Double>>(ageMapCapacity));
-			stateSexAgeNationalTotalCount.put(sex, new HashMap<String, Double>(ageMapCapacity));
-			stateSexAgeNationalTotalAmount.put(sex, new HashMap<String, Double>(ageMapCapacity));
+			stateTaxableCount.put(sex, new HashMap<String, Map<String, Float>>(ageMapCapacity));
+			stateTaxableAmount.put(sex, new HashMap<String, Map<String, Float>>(ageMapCapacity));
+			stateTaxableIncomeMultiplier.put(sex, new HashMap<String, Map<String, Float>>(ageMapCapacity));
+			stateCountMultiplier.put(sex, new HashMap<String, Map<String, Float>>(ageMapCapacity));
+			stateSexAgeNationalTotalCount.put(sex, new HashMap<String, Float>(ageMapCapacity));
+			stateSexAgeNationalTotalAmount.put(sex, new HashMap<String, Float>(ageMapCapacity));
 			for (String age : AGE_ARRAY_ATO) {
-				stateTaxableCount.get(sex).put(age, new HashMap<String, Double>(stateMapCapacity));
-				stateTaxableAmount.get(sex).put(age, new HashMap<String, Double>(stateMapCapacity));
-				stateTaxableIncomeMultiplier.get(sex).put(age, new HashMap<String, Double>(stateMapCapacity));
-				stateCountMultiplier.get(sex).put(age, new HashMap<String, Double>(stateMapCapacity));
-				stateSexAgeNationalTotalCount.get(sex).put(age, 0d);
-				stateSexAgeNationalTotalAmount.get(sex).put(age, 0d);
+				stateTaxableCount.get(sex).put(age, new HashMap<String, Float>(stateMapCapacity));
+				stateTaxableAmount.get(sex).put(age, new HashMap<String, Float>(stateMapCapacity));
+				stateTaxableIncomeMultiplier.get(sex).put(age, new HashMap<String, Float>(stateMapCapacity));
+				stateCountMultiplier.get(sex).put(age, new HashMap<String, Float>(stateMapCapacity));
+				stateSexAgeNationalTotalCount.get(sex).put(age, 0f);
+				stateSexAgeNationalTotalAmount.get(sex).put(age, 0f);
 				for (String state : STATES_ARRAY) {
-					stateTaxableCount.get(sex).get(age).put(state, 0d);
-					stateTaxableAmount.get(sex).get(age).put(state, 0d);
-					stateTaxableIncomeMultiplier.get(sex).get(age).put(state, 0d);
-					stateCountMultiplier.get(sex).get(age).put(state, 0d);
+					stateTaxableCount.get(sex).get(age).put(state, 0f);
+					stateTaxableAmount.get(sex).get(age).put(state, 0f);
+					stateTaxableIncomeMultiplier.get(sex).get(age).put(state, 0f);
+					stateCountMultiplier.get(sex).get(age).put(state, 0f);
 				}
 			}
 		}
@@ -604,20 +603,20 @@ public class CalibrateIndividuals {
 								.get(ATO_2A_TITLE_TAXABLE_COUNT).get(state).get(age).get(sex).get(taxableStatus)
 								.keySet();
 						for (String lodgmentStatus : ato2aKeySetLodgmentStatus) {
-							double oldCountVal = stateTaxableCount.get(sex).get(age).get(stateCode);
-							double newCountVal = Double
+							float oldCountVal = stateTaxableCount.get(sex).get(age).get(stateCode);
+							float newCountVal = Float
 									.valueOf(this.atoIndividualTable2a.get(ATO_2A_TITLE_TAXABLE_COUNT).get(state)
 											.get(age).get(sex).get(taxableStatus).get(lodgmentStatus).replace(",", ""));
 							stateTaxableCount.get(sex).get(age).put(stateCode, oldCountVal + newCountVal);
-							double oldTotalCount = stateSexAgeNationalTotalCount.get(sex).get(age);
+							float oldTotalCount = stateSexAgeNationalTotalCount.get(sex).get(age);
 							stateSexAgeNationalTotalCount.get(sex).put(age, oldTotalCount + newCountVal);
 
-							double oldAmountVal = stateTaxableAmount.get(sex).get(age).get(stateCode);
-							double newAmountVal = Double
+							float oldAmountVal = stateTaxableAmount.get(sex).get(age).get(stateCode);
+							float newAmountVal = Float
 									.valueOf(this.atoIndividualTable2a.get(ATO_2A_TITLE_TAXABLE_AMOUNT).get(state)
 											.get(age).get(sex).get(taxableStatus).get(lodgmentStatus).replace(",", ""));
 							stateTaxableAmount.get(sex).get(age).put(stateCode, oldAmountVal + newAmountVal);
-							double oldTotalAmount = stateSexAgeNationalTotalAmount.get(sex).get(age);
+							float oldTotalAmount = stateSexAgeNationalTotalAmount.get(sex).get(age);
 							stateSexAgeNationalTotalAmount.get(sex).put(age, oldTotalAmount + newAmountVal);
 						}
 					}
@@ -633,17 +632,17 @@ public class CalibrateIndividuals {
 		// calculate average income per state, and national average
 		for (String sex : SEX_ARRAY) {
 			for (String age : AGE_ARRAY_ATO) {
-				double sexAgeCount = stateSexAgeNationalTotalCount.get(sex).get(age);
-				double sexAgeAmount = stateSexAgeNationalTotalAmount.get(sex).get(age);
-				double sexAgeTaxablePerPerson = sexAgeCount > 0d ? sexAgeAmount / sexAgeCount : 0d;
+				float sexAgeCount = stateSexAgeNationalTotalCount.get(sex).get(age);
+				float sexAgeAmount = stateSexAgeNationalTotalAmount.get(sex).get(age);
+				float sexAgeTaxablePerPerson = sexAgeCount > 0f ? sexAgeAmount / sexAgeCount : 0f;
 				for (String state : STATES_ARRAY) {
-					double stateCount = stateTaxableCount.get(sex).get(age).get(state);
-					double stateAmount = stateTaxableAmount.get(sex).get(age).get(state);
-					double stateTaxablePerPerson = stateAmount / stateCount;
-					double thisStateTaxableIncomeMultiplier = sexAgeTaxablePerPerson > 0d
+					float stateCount = stateTaxableCount.get(sex).get(age).get(state);
+					float stateAmount = stateTaxableAmount.get(sex).get(age).get(state);
+					float stateTaxablePerPerson = stateAmount / stateCount;
+					float thisStateTaxableIncomeMultiplier = sexAgeTaxablePerPerson > 0f
 							? stateTaxablePerPerson / sexAgeTaxablePerPerson
-							: 0d;
-					double thisStateCountMultiplier = sexAgeCount > 0d ? stateCount / sexAgeCount : 0d;
+							: 0f;
+					float thisStateCountMultiplier = sexAgeCount > 0f ? stateCount / sexAgeCount : 0f;
 					stateTaxableIncomeMultiplier.get(sex).get(age).put(state, thisStateTaxableIncomeMultiplier);
 					stateCountMultiplier.get(sex).get(age).put(state, thisStateCountMultiplier);
 
@@ -668,21 +667,21 @@ public class CalibrateIndividuals {
 
 		// ATO 6B Keys: Series Title, Post Code
 		// postcodeMultiplier Keys: State Code, Post Code
-		Map<String, Map<String, Double>> postcodeStateTaxableIncomeMultiplier = new HashMap<String, Map<String, Double>>(
+		Map<String, Map<String, Float>> postcodeStateTaxableIncomeMultiplier = new HashMap<String, Map<String, Float>>(
 				stateMapCapacity);
-		Map<String, Map<String, Double>> postcodeStateCountMultiplier = new HashMap<String, Map<String, Double>>(
+		Map<String, Map<String, Float>> postcodeStateCountMultiplier = new HashMap<String, Map<String, Float>>(
 				stateMapCapacity);
-		Map<String, Double> postcodeStateTotalCount = new HashMap<String, Double>(stateMapCapacity);
-		Map<String, Double> postcodeStateTotalAmount = new HashMap<String, Double>(stateMapCapacity);
-		Map<String, Double> postcodeStateTaxablePerPerson = new HashMap<String, Double>(stateMapCapacity);
+		Map<String, Float> postcodeStateTotalCount = new HashMap<String, Float>(stateMapCapacity);
+		Map<String, Float> postcodeStateTotalAmount = new HashMap<String, Float>(stateMapCapacity);
+		Map<String, Float> postcodeStateTaxablePerPerson = new HashMap<String, Float>(stateMapCapacity);
 
 		// initialise state multiplier map
 		for (int i = 0; i < STATES_ARRAY.length; i++) {
 			String state = STATES_ARRAY[i];
-			postcodeStateTaxableIncomeMultiplier.put(state, new HashMap<String, Double>(MAP_STATE_POA_CAPACITY[i]));
-			postcodeStateCountMultiplier.put(state, new HashMap<String, Double>(MAP_STATE_POA_CAPACITY[i]));
-			postcodeStateTotalCount.put(state, 0d);
-			postcodeStateTotalAmount.put(state, 0d);
+			postcodeStateTaxableIncomeMultiplier.put(state, new HashMap<String, Float>(MAP_STATE_POA_CAPACITY[i]));
+			postcodeStateCountMultiplier.put(state, new HashMap<String, Float>(MAP_STATE_POA_CAPACITY[i]));
+			postcodeStateTotalCount.put(state, 0f);
+			postcodeStateTotalAmount.put(state, 0f);
 		}
 
 		Set<String> postcodeSet = this.atoIndividualTable6b.get(ATO_6B_TITLE_TAXABLE_COUNT).keySet();
@@ -691,27 +690,27 @@ public class CalibrateIndividuals {
 			if (state != null && state != "Other") {
 				// postcode 3694 returns null, so just skip null values for now
 				// calculate average income per postcode, and state totals for all postcodes
-				double postcodeTaxableCount = Double.valueOf(
+				float postcodeTaxableCount = Float.valueOf(
 						this.atoIndividualTable6b.get(ATO_6B_TITLE_TAXABLE_COUNT).get(postcode).replace(",", ""));
-				double postcodeTaxableAmount = Double.valueOf(
+				float postcodeTaxableAmount = Float.valueOf(
 						this.atoIndividualTable6b.get(ATO_6B_TITLE_TAXABLE_AMOUNT).get(postcode).replace(",", ""));
-				double postcodeTaxablePerPerson = postcodeTaxableAmount / postcodeTaxableCount;
+				float postcodeTaxablePerPerson = postcodeTaxableAmount / postcodeTaxableCount;
 
 				// Just an efficient place to hold this. Will be overwritten in the loop below.
 				postcodeStateTaxableIncomeMultiplier.get(state).put(postcode, postcodeTaxablePerPerson);
 				postcodeStateCountMultiplier.get(state).put(postcode, postcodeTaxableCount);
-				double oldStateTotalCount = postcodeStateTotalCount.get(state);
+				float oldStateTotalCount = postcodeStateTotalCount.get(state);
 				postcodeStateTotalCount.put(state, oldStateTotalCount + postcodeTaxableCount);
-				double oldStateTotalAmount = postcodeStateTotalAmount.get(state);
+				float oldStateTotalAmount = postcodeStateTotalAmount.get(state);
 				postcodeStateTotalAmount.put(state, oldStateTotalAmount + postcodeTaxableAmount);
 			}
 		}
 
 		// calculate state averages
 		for (String state : STATES_ARRAY) {
-			double stateCount = postcodeStateTotalCount.containsKey(state) ? postcodeStateTotalCount.get(state) : 0d;
-			double stateAmount = postcodeStateTotalAmount.containsKey(state) ? postcodeStateTotalAmount.get(state) : 0d;
-			postcodeStateTaxablePerPerson.put(state, stateCount > 0d ? stateAmount / stateCount : 0d);
+			float stateCount = postcodeStateTotalCount.containsKey(state) ? postcodeStateTotalCount.get(state) : 0f;
+			float stateAmount = postcodeStateTotalAmount.containsKey(state) ? postcodeStateTotalAmount.get(state) : 0f;
+			postcodeStateTaxablePerPerson.put(state, stateCount > 0f ? stateAmount / stateCount : 0f);
 		}
 
 		if (DEBUG_DETAIL) {
@@ -723,11 +722,11 @@ public class CalibrateIndividuals {
 		for (String postcode : postcodeSet) {
 			String state = this.area.getStateFromPoa(postcode);
 			if (state != null & state != "Other") {
-				double stateTaxablePerPerson = postcodeStateTaxablePerPerson.get(state);
-				double stateCount = postcodeStateTotalCount.get(state);
-				double postcodeTaxableIncomeMultiplier = postcodeStateTaxableIncomeMultiplier.get(state).get(postcode)
+				float stateTaxablePerPerson = postcodeStateTaxablePerPerson.get(state);
+				float stateCount = postcodeStateTotalCount.get(state);
+				float postcodeTaxableIncomeMultiplier = postcodeStateTaxableIncomeMultiplier.get(state).get(postcode)
 						/ stateTaxablePerPerson;
-				double postcodeCountMultiplier = postcodeStateCountMultiplier.get(state).get(postcode) / stateCount;
+				float postcodeCountMultiplier = postcodeStateCountMultiplier.get(state).get(postcode) / stateCount;
 				postcodeStateTaxableIncomeMultiplier.get(state).put(postcode, postcodeTaxableIncomeMultiplier);
 				postcodeStateCountMultiplier.get(state).put(postcode, postcodeCountMultiplier);
 
@@ -819,7 +818,7 @@ public class CalibrateIndividuals {
 							int oldVal = censusMatrixPersonsAdjustedPOA[poaIdx][sexIdx][ageIdx][divIdx][incomeIdx];
 							int adjustedPopulation = 0;
 							try {
-								adjustedPopulation = (int) Math.round(Double
+								adjustedPopulation = (int) Math.round(Float
 										.valueOf(this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(divisionCode)
 												.get(incomeRange).get(poa).get(sex))
 										* this.populationMultiplier * POPULATION_MULTIPLIER);
@@ -882,7 +881,7 @@ public class CalibrateIndividuals {
 
 		/*
 		 * if (this.individualAgents == null) { // add in a 5% buffer so the List
-		 * doesn't end up double the size it needs to be int initCapacity = (int)
+		 * doesn't end up float the size it needs to be int initCapacity = (int)
 		 * Math.round(this.totalPopulationAU * 1.05d); this.individualAgents = new
 		 * ArrayList<Individual>(initCapacity); }
 		 */
@@ -942,12 +941,12 @@ public class CalibrateIndividuals {
 							System.out.println("      sex: " + sex);
 						}
 						// variables to calculate ABS/ATO population multiplier
-						double employedCount = 0d;
-						double unemployedCount = 0d;
-						double pensionCount = 0d;
-						double selfFundedRetireeCount = 0d;
-						double foreignIncomeCount = 0d;
-						double noIncomeCount = 0d;
+						float employedCount = 0f;
+						float unemployedCount = 0f;
+						float pensionCount = 0f;
+						float selfFundedRetireeCount = 0f;
+						float foreignIncomeCount = 0f;
+						float noIncomeCount = 0f;
 
 						// variables to calibrate Individual agents
 						int numAtoIncomeIndices = incomeIndicesAto.size();
@@ -1039,33 +1038,33 @@ public class CalibrateIndividuals {
 												.get(age).get(sex).containsKey(taxableStatus)) {
 
 									employedCount += Math.max(
-											Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT)
+											Float.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
 													.replace(",", "")),
-											Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_ALLOWANCES_COUNT)
+											Float.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_ALLOWANCES_COUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
 													.replace(",", "")));
-									unemployedCount += Double.valueOf(this.atoIndividualTable3a
+									unemployedCount += Float.valueOf(this.atoIndividualTable3a
 											.get(ATO_3A_TITLE_GOVT_ALLOW_COUNT).get(incomeRangeAto).get(age).get(sex)
 											.get(taxableStatus).replace(",", ""));
-									pensionCount += Double.valueOf(this.atoIndividualTable3a
+									pensionCount += Float.valueOf(this.atoIndividualTable3a
 											.get(ATO_3A_TITLE_GOVT_PENSION_COUNT).get(incomeRangeAto).get(age).get(sex)
 											.get(taxableStatus).replace(",", ""));
 									selfFundedRetireeCount += Math.max(
-											Double.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_TAXED_COUNT)
+											Float.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_TAXED_COUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
 													.replace(",", "")),
-											Double.valueOf(this.atoIndividualTable3a
+											Float.valueOf(this.atoIndividualTable3a
 													.get(ATO_3A_TITLE_SUPER_UNTAXED_COUNT).get(incomeRangeAto).get(age)
 													.get(sex).get(taxableStatus).replace(",", "")));
 									foreignIncomeCount += Math.max(
-											Double.valueOf(this.atoIndividualTable3a
+											Float.valueOf(this.atoIndividualTable3a
 													.get(ATO_3A_TITLE_FOREIGN_INCOME_COUNT).get(incomeRangeAto).get(age)
 													.get(sex).get(taxableStatus).replace(",", "")),
-											Double.valueOf(this.atoIndividualTable3a
+											Float.valueOf(this.atoIndividualTable3a
 													.get(ATO_3A_TITLE_FOREIGN_INCOME2_COUNT).get(incomeRangeAto)
 													.get(age).get(sex).get(taxableStatus).replace(",", "")));
-									noIncomeCount += Double.valueOf(this.atoIndividualTable3a
+									noIncomeCount += Float.valueOf(this.atoIndividualTable3a
 											.get(ATO_3A_TITLE_TOTAL_INCOME_COUNT).get(incomeRangeAto).get(age).get(sex)
 											.get(taxableStatus).replace(",", ""));
 
@@ -1210,21 +1209,21 @@ public class CalibrateIndividuals {
 								- selfFundedRetireeCount - foreignIncomeCount;
 
 						// create lists of averages per person
-						List<Double> atoPerPersonEmployed = new ArrayList<Double>(numAtoIncomeIndices);
-						List<Double> atoPerPersonUnemployed = new ArrayList<Double>(numAtoIncomeIndices);
-						List<Double> atoPerPersonPension = new ArrayList<Double>(numAtoIncomeIndices);
-						List<Double> atoPerPersonSelfFundedRetiree = new ArrayList<Double>(numAtoIncomeIndices);
-						List<Double> atoPerPersonForeignIncome = new ArrayList<Double>(numAtoIncomeIndices);
-						List<Double> atoPerPersonAttributeInterestIncome = new ArrayList<Double>(numAtoIncomeIndices);
-						List<Double> atoPerPersonAttributeDividendIncome = new ArrayList<Double>(numAtoIncomeIndices);
-						List<Double> atoPerPersonAttributeWorkRelatedExpenses = new ArrayList<Double>(
+						List<Float> atoPerPersonEmployed = new ArrayList<Float>(numAtoIncomeIndices);
+						List<Float> atoPerPersonUnemployed = new ArrayList<Float>(numAtoIncomeIndices);
+						List<Float> atoPerPersonPension = new ArrayList<Float>(numAtoIncomeIndices);
+						List<Float> atoPerPersonSelfFundedRetiree = new ArrayList<Float>(numAtoIncomeIndices);
+						List<Float> atoPerPersonForeignIncome = new ArrayList<Float>(numAtoIncomeIndices);
+						List<Float> atoPerPersonAttributeInterestIncome = new ArrayList<Float>(numAtoIncomeIndices);
+						List<Float> atoPerPersonAttributeDividendIncome = new ArrayList<Float>(numAtoIncomeIndices);
+						List<Float> atoPerPersonAttributeWorkRelatedExpenses = new ArrayList<Float>(
 								numAtoIncomeIndices);
-						List<Double> atoPerPersonAttributeDonations = new ArrayList<Double>(numAtoIncomeIndices);
-						List<Double> atoPerPersonAttributeRentIncome = new ArrayList<Double>(numAtoIncomeIndices);
-						List<Double> atoPerPersonAttributeRentInterest = new ArrayList<Double>(numAtoIncomeIndices);
-						List<Double> atoPerPersonAttributeOtherIncome = new ArrayList<Double>(numAtoIncomeIndices);
-						List<Double> atoPerPersonAttributeTotalIncome = new ArrayList<Double>(numAtoIncomeIndices);
-						List<Double> atoPerPersonAttributeStudentLoan = new ArrayList<Double>(numAtoIncomeIndices);
+						List<Float> atoPerPersonAttributeDonations = new ArrayList<Float>(numAtoIncomeIndices);
+						List<Float> atoPerPersonAttributeRentIncome = new ArrayList<Float>(numAtoIncomeIndices);
+						List<Float> atoPerPersonAttributeRentInterest = new ArrayList<Float>(numAtoIncomeIndices);
+						List<Float> atoPerPersonAttributeOtherIncome = new ArrayList<Float>(numAtoIncomeIndices);
+						List<Float> atoPerPersonAttributeTotalIncome = new ArrayList<Float>(numAtoIncomeIndices);
+						List<Float> atoPerPersonAttributeStudentLoan = new ArrayList<Float>(numAtoIncomeIndices);
 
 						// for each ATO income category in this iteration
 						for (int incomeMapNum = 0; incomeMapNum < numAtoIncomeIndices; incomeMapNum++) {
@@ -1239,55 +1238,55 @@ public class CalibrateIndividuals {
 									- atoAmountForeignIncome.get(incomeMapNum));
 
 							// calculate averages per person for each main income source and P&L line item
-							atoPerPersonEmployed.add(atoCountEmployed.get(incomeMapNum) == 0 ? 0d
-									: ((double) atoAmountEmployed.get(incomeMapNum))
-											/ (double) atoCountEmployed.get(incomeMapNum));
-							atoPerPersonUnemployed.add(atoCountUnemployed.get(incomeMapNum) == 0 ? 0d
-									: ((double) atoAmountUnemployed.get(incomeMapNum))
-											/ (double) atoCountUnemployed.get(incomeMapNum));
-							atoPerPersonPension.add(atoCountPension.get(incomeMapNum) == 0 ? 0d
-									: ((double) atoAmountPension.get(incomeMapNum))
-											/ (double) atoCountPension.get(incomeMapNum));
-							atoPerPersonSelfFundedRetiree.add(atoCountSelfFundedRetiree.get(incomeMapNum) == 0 ? 0d
-									: ((double) atoAmountSelfFundedRetiree.get(incomeMapNum))
-											/ (double) atoCountSelfFundedRetiree.get(incomeMapNum));
-							atoPerPersonForeignIncome.add(atoCountForeignIncome.get(incomeMapNum) == 0 ? 0d
-									: ((double) atoAmountForeignIncome.get(incomeMapNum))
-											/ (double) atoCountForeignIncome.get(incomeMapNum));
+							atoPerPersonEmployed.add(atoCountEmployed.get(incomeMapNum) == 0 ? 0f
+									: ((float) atoAmountEmployed.get(incomeMapNum))
+											/ (float) atoCountEmployed.get(incomeMapNum));
+							atoPerPersonUnemployed.add(atoCountUnemployed.get(incomeMapNum) == 0 ? 0f
+									: ((float) atoAmountUnemployed.get(incomeMapNum))
+											/ (float) atoCountUnemployed.get(incomeMapNum));
+							atoPerPersonPension.add(atoCountPension.get(incomeMapNum) == 0 ? 0f
+									: ((float) atoAmountPension.get(incomeMapNum))
+											/ (float) atoCountPension.get(incomeMapNum));
+							atoPerPersonSelfFundedRetiree.add(atoCountSelfFundedRetiree.get(incomeMapNum) == 0 ? 0f
+									: ((float) atoAmountSelfFundedRetiree.get(incomeMapNum))
+											/ (float) atoCountSelfFundedRetiree.get(incomeMapNum));
+							atoPerPersonForeignIncome.add(atoCountForeignIncome.get(incomeMapNum) == 0 ? 0f
+									: ((float) atoAmountForeignIncome.get(incomeMapNum))
+											/ (float) atoCountForeignIncome.get(incomeMapNum));
 							atoPerPersonAttributeInterestIncome
-									.add(atoCountAttributeInterestIncome.get(incomeMapNum) == 0 ? 0d
-											: ((double) atoAmountAttributeInterestIncome.get(incomeMapNum))
-													/ (double) atoCountAttributeInterestIncome.get(incomeMapNum));
+									.add(atoCountAttributeInterestIncome.get(incomeMapNum) == 0 ? 0f
+											: ((float) atoAmountAttributeInterestIncome.get(incomeMapNum))
+													/ (float) atoCountAttributeInterestIncome.get(incomeMapNum));
 							atoPerPersonAttributeDividendIncome
-									.add(atoCountAttributeDividendIncome.get(incomeMapNum) == 0 ? 0d
-											: ((double) atoAmountAttributeDividendIncome.get(incomeMapNum))
-													/ (double) atoCountAttributeDividendIncome.get(incomeMapNum));
+									.add(atoCountAttributeDividendIncome.get(incomeMapNum) == 0 ? 0f
+											: ((float) atoAmountAttributeDividendIncome.get(incomeMapNum))
+													/ (float) atoCountAttributeDividendIncome.get(incomeMapNum));
 							atoPerPersonAttributeWorkRelatedExpenses
-									.add(atoCountAttributeWorkRelatedExpenses.get(incomeMapNum) == 0 ? 0d
-											: ((double) atoAmountAttributeWorkRelatedExpenses.get(incomeMapNum))
-													/ (double) atoCountAttributeWorkRelatedExpenses.get(incomeMapNum));
-							atoPerPersonAttributeDonations.add(atoCountAttributeDonations.get(incomeMapNum) == 0 ? 0d
-									: ((double) atoAmountAttributeDonations.get(incomeMapNum))
-											/ (double) atoCountAttributeDonations.get(incomeMapNum));
-							atoPerPersonAttributeRentIncome.add(atoCountAttributeRentIncome.get(incomeMapNum) == 0 ? 0d
-									: ((double) atoAmountAttributeRentIncome.get(incomeMapNum))
-											/ (double) atoCountAttributeRentIncome.get(incomeMapNum));
+									.add(atoCountAttributeWorkRelatedExpenses.get(incomeMapNum) == 0 ? 0f
+											: ((float) atoAmountAttributeWorkRelatedExpenses.get(incomeMapNum))
+													/ (float) atoCountAttributeWorkRelatedExpenses.get(incomeMapNum));
+							atoPerPersonAttributeDonations.add(atoCountAttributeDonations.get(incomeMapNum) == 0 ? 0f
+									: ((float) atoAmountAttributeDonations.get(incomeMapNum))
+											/ (float) atoCountAttributeDonations.get(incomeMapNum));
+							atoPerPersonAttributeRentIncome.add(atoCountAttributeRentIncome.get(incomeMapNum) == 0 ? 0f
+									: ((float) atoAmountAttributeRentIncome.get(incomeMapNum))
+											/ (float) atoCountAttributeRentIncome.get(incomeMapNum));
 							atoPerPersonAttributeRentInterest
-									.add(atoCountAttributeRentInterest.get(incomeMapNum) == 0 ? 0d
-											: ((double) atoAmountAttributeRentInterest.get(incomeMapNum))
-													/ (double) atoCountAttributeRentInterest.get(incomeMapNum));
+									.add(atoCountAttributeRentInterest.get(incomeMapNum) == 0 ? 0f
+											: ((float) atoAmountAttributeRentInterest.get(incomeMapNum))
+													/ (float) atoCountAttributeRentInterest.get(incomeMapNum));
 							atoPerPersonAttributeOtherIncome
-									.add(atoCountAttributeOtherIncome.get(incomeMapNum) == 0 ? 0d
-											: ((double) atoAmountAttributeOtherIncome.get(incomeMapNum))
-													/ (double) atoCountAttributeOtherIncome.get(incomeMapNum));
+									.add(atoCountAttributeOtherIncome.get(incomeMapNum) == 0 ? 0f
+											: ((float) atoAmountAttributeOtherIncome.get(incomeMapNum))
+													/ (float) atoCountAttributeOtherIncome.get(incomeMapNum));
 							atoPerPersonAttributeTotalIncome
-									.add(atoCountAttributeTotalIncome.get(incomeMapNum) == 0 ? 0d
-											: ((double) atoAmountAttributeTotalIncome.get(incomeMapNum))
-													/ (double) atoCountAttributeTotalIncome.get(incomeMapNum));
+									.add(atoCountAttributeTotalIncome.get(incomeMapNum) == 0 ? 0f
+											: ((float) atoAmountAttributeTotalIncome.get(incomeMapNum))
+													/ (float) atoCountAttributeTotalIncome.get(incomeMapNum));
 							atoPerPersonAttributeStudentLoan
-									.add(atoCountAttributeStudentLoan.get(incomeMapNum) == 0 ? 0d
-											: ((double) atoAmountAttributeStudentLoan.get(incomeMapNum))
-													/ (double) atoCountAttributeStudentLoan.get(incomeMapNum));
+									.add(atoCountAttributeStudentLoan.get(incomeMapNum) == 0 ? 0f
+											: ((float) atoAmountAttributeStudentLoan.get(incomeMapNum))
+													/ (float) atoCountAttributeStudentLoan.get(incomeMapNum));
 						}
 
 						for (int divIdx = 0; divIdx < NUM_DIVISIONS; divIdx++) {
@@ -1296,7 +1295,7 @@ public class CalibrateIndividuals {
 								System.out.println("         division: " + division);
 							}
 							// for each industry, multiply by industry count ratio
-							double divAmtMult = divisionTaxableIncomeMultiplier.get(division);
+							float divAmtMult = divisionTaxableIncomeMultiplier.get(division);
 							for (String poa : poaSetIntersection) {
 								if (DEBUG_DETAIL) {
 									System.out.println(" poa: " + poa);
@@ -1306,14 +1305,14 @@ public class CalibrateIndividuals {
 								String state = this.area.getStateFromPoa(poa);
 								if (!state.equals("Other")) { // skip "Other" to solve mapping issues
 									// for each state, sex & age, multiply by state count ratio
-									double stateAmtMult = stateTaxableIncomeMultiplier.get(sex).get(age).get(state);
+									float stateAmtMult = stateTaxableIncomeMultiplier.get(sex).get(age).get(state);
 
 									// get ATO taxable count by income, age, sex, industry, poa (same as ABS)
 									// for each poa, multiply by poa count ratio
-									double poaAmtMult = postcodeStateTaxableIncomeMultiplier.get(state).get(poa);
+									float poaAmtMult = postcodeStateTaxableIncomeMultiplier.get(state).get(poa);
 
 									// divide ABS count by ATO count to get multiplier, and apply to counts
-									double amountMultiplier = divAmtMult * stateAmtMult * poaAmtMult;
+									float amountMultiplier = divAmtMult * stateAmtMult * poaAmtMult;
 
 									// for each ATO income category in this iteration
 									for (int incomeMapNum = 0; incomeMapNum < numAtoIncomeIndices; incomeMapNum++) {
@@ -1359,7 +1358,7 @@ public class CalibrateIndividuals {
 									 * 
 									 * Algorithm:<br>
 									 * 1. Set the flags using percentages so that I can use a pdf lookup then
-									 * generate a random double between 0 and 1.<br>
+									 * generate a random float between 0 and 1.<br>
 									 * 2. Create an Individual based on this index.<br>
 									 * 3. Repeat for as many people as are in the corresponding ABS data.<br>
 									 * 
@@ -1372,57 +1371,57 @@ public class CalibrateIndividuals {
 									 */
 
 									// create probability density functions for the relevant attributes
-									double totalCountDenominator = 0d;
+									float totalCountDenominator = 0f;
 									for (int incomeMapNum = 0; incomeMapNum < numAtoIncomeIndices; incomeMapNum++) {
 										totalCountDenominator += atoCountTotal.get(incomeMapNum);
 									}
-									double[] pdfAtoIncomeRange = new double[numAtoIncomeIndices];
-									double[][] pdfMainIncomeSource = new double[numAtoIncomeIndices][5];
-									double[][] pdfAttributeInterestIncome = new double[numAtoIncomeIndices][2];
-									double[][] pdfAttributeDividendIncome = new double[numAtoIncomeIndices][2];
-									double[][] pdfAttributeDonations = new double[numAtoIncomeIndices][2];
-									double[][] pdfAttributeRentIncomeInterest = new double[numAtoIncomeIndices][3];
-									double[][] pdfAttributeOtherIncome = new double[numAtoIncomeIndices][2];
-									double[][] pdfAttributeStudentLoan = new double[numAtoIncomeIndices][2];
+									float[] pdfAtoIncomeRange = new float[numAtoIncomeIndices];
+									float[][] pdfMainIncomeSource = new float[numAtoIncomeIndices][5];
+									float[][] pdfAttributeInterestIncome = new float[numAtoIncomeIndices][2];
+									float[][] pdfAttributeDividendIncome = new float[numAtoIncomeIndices][2];
+									float[][] pdfAttributeDonations = new float[numAtoIncomeIndices][2];
+									float[][] pdfAttributeRentIncomeInterest = new float[numAtoIncomeIndices][3];
+									float[][] pdfAttributeOtherIncome = new float[numAtoIncomeIndices][2];
+									float[][] pdfAttributeStudentLoan = new float[numAtoIncomeIndices][2];
 									for (int incomeMapNum = 0; incomeMapNum < numAtoIncomeIndices; incomeMapNum++) {
 										// this determines the first index
-										pdfAtoIncomeRange[incomeMapNum] = ((double) atoCountTotal.get(incomeMapNum))
+										pdfAtoIncomeRange[incomeMapNum] = ((float) atoCountTotal.get(incomeMapNum))
 												/ totalCountDenominator;
 
 										// create pdf for the main income source
-										pdfMainIncomeSource[incomeMapNum][0] = ((double) atoCountEmployed
+										pdfMainIncomeSource[incomeMapNum][0] = ((float) atoCountEmployed
 												.get(incomeMapNum)) / totalCountDenominator;
-										pdfMainIncomeSource[incomeMapNum][1] = ((double) atoCountUnemployed
+										pdfMainIncomeSource[incomeMapNum][1] = ((float) atoCountUnemployed
 												.get(incomeMapNum)) / totalCountDenominator;
-										pdfMainIncomeSource[incomeMapNum][2] = ((double) atoCountPension
+										pdfMainIncomeSource[incomeMapNum][2] = ((float) atoCountPension
 												.get(incomeMapNum)) / totalCountDenominator;
-										pdfMainIncomeSource[incomeMapNum][3] = ((double) atoCountSelfFundedRetiree
+										pdfMainIncomeSource[incomeMapNum][3] = ((float) atoCountSelfFundedRetiree
 												.get(incomeMapNum)) / totalCountDenominator;
-										pdfMainIncomeSource[incomeMapNum][4] = 1d - pdfMainIncomeSource[incomeMapNum][0]
+										pdfMainIncomeSource[incomeMapNum][4] = 1f - pdfMainIncomeSource[incomeMapNum][0]
 												- pdfMainIncomeSource[incomeMapNum][1]
 												- pdfMainIncomeSource[incomeMapNum][2]
 												- pdfMainIncomeSource[incomeMapNum][3];
 
 										// create pdfs for the binary attributes
-										pdfAttributeInterestIncome[incomeMapNum][0] = ((double) atoCountAttributeInterestIncome
+										pdfAttributeInterestIncome[incomeMapNum][0] = ((float) atoCountAttributeInterestIncome
 												.get(incomeMapNum)) / totalCountDenominator;
-										pdfAttributeInterestIncome[incomeMapNum][1] = 1d
+										pdfAttributeInterestIncome[incomeMapNum][1] = 1f
 												- pdfAttributeInterestIncome[incomeMapNum][0];
-										pdfAttributeDividendIncome[incomeMapNum][0] = ((double) atoCountAttributeDividendIncome
+										pdfAttributeDividendIncome[incomeMapNum][0] = ((float) atoCountAttributeDividendIncome
 												.get(incomeMapNum)) / totalCountDenominator;
-										pdfAttributeDividendIncome[incomeMapNum][1] = 1d
+										pdfAttributeDividendIncome[incomeMapNum][1] = 1f
 												- pdfAttributeDividendIncome[incomeMapNum][0];
-										pdfAttributeDonations[incomeMapNum][0] = ((double) atoCountAttributeDonations
+										pdfAttributeDonations[incomeMapNum][0] = ((float) atoCountAttributeDonations
 												.get(incomeMapNum)) / totalCountDenominator;
-										pdfAttributeDonations[incomeMapNum][1] = 1d
+										pdfAttributeDonations[incomeMapNum][1] = 1f
 												- pdfAttributeDonations[incomeMapNum][0];
-										pdfAttributeOtherIncome[incomeMapNum][0] = ((double) atoCountAttributeOtherIncome
+										pdfAttributeOtherIncome[incomeMapNum][0] = ((float) atoCountAttributeOtherIncome
 												.get(incomeMapNum)) / totalCountDenominator;
-										pdfAttributeOtherIncome[incomeMapNum][1] = 1d
+										pdfAttributeOtherIncome[incomeMapNum][1] = 1f
 												- pdfAttributeOtherIncome[incomeMapNum][0];
-										pdfAttributeStudentLoan[incomeMapNum][0] = ((double) atoCountAttributeStudentLoan
+										pdfAttributeStudentLoan[incomeMapNum][0] = ((float) atoCountAttributeStudentLoan
 												.get(incomeMapNum)) / totalCountDenominator;
-										pdfAttributeStudentLoan[incomeMapNum][1] = 1d
+										pdfAttributeStudentLoan[incomeMapNum][1] = 1f
 												- pdfAttributeStudentLoan[incomeMapNum][0];
 
 										// create pdf for rental property owners
@@ -1433,11 +1432,11 @@ public class CalibrateIndividuals {
 												.get(incomeMapNum);
 										int propertyInvestorWithoutLoanCount = propertyInvestorCount
 												- propertyInvestorWithLoanCount;
-										pdfAttributeRentIncomeInterest[incomeMapNum][0] = ((double) propertyInvestorWithLoanCount)
+										pdfAttributeRentIncomeInterest[incomeMapNum][0] = ((float) propertyInvestorWithLoanCount)
 												/ totalCountDenominator; // rent & interest
-										pdfAttributeRentIncomeInterest[incomeMapNum][1] = ((double) propertyInvestorWithoutLoanCount)
+										pdfAttributeRentIncomeInterest[incomeMapNum][1] = ((float) propertyInvestorWithoutLoanCount)
 												/ totalCountDenominator; // rent only
-										pdfAttributeRentIncomeInterest[incomeMapNum][2] = 1d
+										pdfAttributeRentIncomeInterest[incomeMapNum][2] = 1f
 												- pdfAttributeRentIncomeInterest[incomeMapNum][0]
 												- pdfAttributeRentIncomeInterest[incomeMapNum][1]; // neither
 									}
@@ -1536,7 +1535,7 @@ public class CalibrateIndividuals {
 												// income
 												/*
 												 * if (individual.getGrossIncome() <
-												 * atoPerPersonAttributeTotalIncome.get(incomeMapNum)) { double
+												 * atoPerPersonAttributeTotalIncome.get(incomeMapNum)) { float
 												 * newOtherIncome = individual.getPnlOtherIncome() +
 												 * (atoPerPersonAttributeTotalIncome.get(incomeMapNum) -
 												 * individual.getGrossIncome());
@@ -1636,7 +1635,7 @@ public class CalibrateIndividuals {
 		if (DEBUG) {
 			System.gc();
 			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			float megabytesConsumed = (memoryAfter - memoryBefore) / 1024f / 1024f;
 			DecimalFormat decimalFormatter = new DecimalFormat("#,##0.00");
 			System.out.println(
 					">>> Memory used creating Individual agents: " + decimalFormatter.format(megabytesConsumed) + "MB");
@@ -1859,7 +1858,7 @@ public class CalibrateIndividuals {
 	/**
 	 * @return the populationMultiplier
 	 */
-	public double getPopulationMultiplier() {
+	public float getPopulationMultiplier() {
 		return populationMultiplier;
 	}
 

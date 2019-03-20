@@ -12,9 +12,9 @@ package xyz.struthers.rhul.ham.process;
  */
 public class NodePayment {
 	final int recipientIndex;
-	final double liabilityAmount;
+	final float liabilityAmount;
 
-	public NodePayment(int recipientIndex, double liabilityAmount) {
+	public NodePayment(int recipientIndex, float liabilityAmount) {
 		super();
 		this.recipientIndex = recipientIndex;
 		this.liabilityAmount = liabilityAmount;
@@ -24,7 +24,7 @@ public class NodePayment {
 		return this.recipientIndex;
 	}
 
-	public double getLiabilityAmount() {
+	public float getLiabilityAmount() {
 		return this.liabilityAmount;
 	}
 }

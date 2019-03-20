@@ -25,8 +25,8 @@ public class CalibrateRba {
 	private AustralianEconomy economy;
 
 	// field variables
-	private Map<String, Double> rbaBalSht;
-	private Map<String, Double> rbaProfitLoss;
+	private Map<String, Float> rbaBalSht;
+	private Map<String, Float> rbaProfitLoss;
 	private ReserveBankOfAustralia rbaAgent;
 
 	/**
@@ -43,7 +43,7 @@ public class CalibrateRba {
 		this.rbaAgent = new ReserveBankOfAustralia(this.rbaBalSht, this.rbaProfitLoss);
 
 		this.addAgentToEconomy();
-		
+
 		// release memory
 		this.data.dropRbaFinancialData();
 	}

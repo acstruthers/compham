@@ -49,17 +49,17 @@ public class CalibrateCurrencies {
 		for (String key : ccyKeySet) {
 			String isoCode = key;
 			String currencyName = this.allCurrencyData.get(key).get("Currency Name");
-			double fxRate = Double.valueOf(this.allCurrencyData.get(key).get("Jun-18"));
-			double average1yr = Double.valueOf(this.allCurrencyData.get(key).get("1-Year Avg"));
-			double standardDeviation1yr = Double.valueOf(this.allCurrencyData.get(key).get("1-Year Std Dev"));
-			double standardDeviation5yr = Double.valueOf(this.allCurrencyData.get(key).get("5-Year Std Dev"));
+			float fxRate = Float.valueOf(this.allCurrencyData.get(key).get("Jun-18"));
+			float average1yr = Float.valueOf(this.allCurrencyData.get(key).get("1-Year Avg"));
+			float standardDeviation1yr = Float.valueOf(this.allCurrencyData.get(key).get("1-Year Std Dev"));
+			float standardDeviation5yr = Float.valueOf(this.allCurrencyData.get(key).get("5-Year Std Dev"));
 			Currency ccy = new Currency(isoCode, currencyName, fxRate, average1yr, standardDeviation1yr,
 					standardDeviation5yr);
 			this.currencies.setCurrency(ccy);
 		}
 
 		this.addAgentsToEconomy();
-		
+
 		// release memory
 		this.data.dropCurrencyData();
 	}

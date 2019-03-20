@@ -32,51 +32,51 @@ public class Household extends Agent {
 	private AuthorisedDepositTakingInstitution depositAdi; // can be null if no deposits (e.g. children)
 	private AuthorisedDepositTakingInstitution loanAdi; // can be null if no loan
 	private ArrayList<Business> suppliers; // household spending goes to these per ABS 6530.0
-	private ArrayList<Double> supplierRatios; // per ABS 6530.0
+	private ArrayList<Float> supplierRatios; // per ABS 6530.0
 	private Business landlord;
 	private AustralianGovernment govt;
 
 	// P&L (72 bytes)
-	private double pnlWagesSalaries;
-	private double pnlUnemploymentBenefits;
-	private double pnlOtherSocialSecurityIncome;
-	private double pnlInvestmentIncome; // other income (including superannuation & dividends)
-	private double pnlInterestIncome;
-	private double pnlRentIncome; // income from investment properties
-	private double pnlForeignIncome;
-	private double pnlOtherIncome;
-	private double pnlIncomeTaxExpense;
+	private float pnlWagesSalaries;
+	private float pnlUnemploymentBenefits;
+	private float pnlOtherSocialSecurityIncome;
+	private float pnlInvestmentIncome; // other income (including superannuation & dividends)
+	private float pnlInterestIncome;
+	private float pnlRentIncome; // income from investment properties
+	private float pnlForeignIncome;
+	private float pnlOtherIncome;
+	private float pnlIncomeTaxExpense;
 
-	private double pnlLivingExpenses; // Henderson poverty line (excl. housing costs)
-	private double pnlRentExpense;
-	private double pnlMortgageRepayments;
-	private double pnlWorkRelatedExpenses;
-	private double pnlRentInterestExpense; // assume interest-only loan
-	private double pnlDonations;
-	private double pnlOtherDiscretionaryExpenses; // TODO: review this ... it might be unnecessary
+	private float pnlLivingExpenses; // Henderson poverty line (excl. housing costs)
+	private float pnlRentExpense;
+	private float pnlMortgageRepayments;
+	private float pnlWorkRelatedExpenses;
+	private float pnlRentInterestExpense; // assume interest-only loan
+	private float pnlDonations;
+	private float pnlOtherDiscretionaryExpenses; // TODO: review this ... it might be unnecessary
 
 	// Bal Sht (48 bytes)
-	private double bsBankDeposits;
-	private double bsSuperannuation;
-	private double bsEquities;
-	private double bsOtherFinancialAssets;
+	private float bsBankDeposits;
+	private float bsSuperannuation;
+	private float bsEquities;
+	private float bsOtherFinancialAssets;
 
-	private double bsResidentialLandAndDwellings;
-	private double bsOtherNonFinancialAssets;
+	private float bsResidentialLandAndDwellings;
+	private float bsOtherNonFinancialAssets;
 
-	private double bsTotalAssets;
+	private float bsTotalAssets;
 
-	private double bsLoans;
-	private double bsStudentLoans; // HELP debt
-	private double bsOtherLiabilities;
-	private double bsTotalLiabilities;
+	private float bsLoans;
+	private float bsStudentLoans; // HELP debt
+	private float bsOtherLiabilities;
+	private float bsTotalLiabilities;
 
-	private double bsNetWorth;
+	private float bsNetWorth;
 
 	// Interest rates (16 bytes)
-	protected double interestRateDeposits;
-	protected double interestRateLoans;
-	protected double interestRateStudentLoans; // in Australia this is always CPI (by law)
+	protected float interestRateDeposits;
+	protected float interestRateLoans;
+	protected float interestRateStudentLoans; // in Australia this is always CPI (by law)
 
 	/**
 	 * 
@@ -124,12 +124,12 @@ public class Household extends Agent {
 
 		// calculate amounts due to domestic suppliers
 		if (this.suppliers != null && this.pnlLivingExpenses > 0d) {
-			double totalExpense = this.pnlLivingExpenses + this.pnlWorkRelatedExpenses
+			float totalExpense = this.pnlLivingExpenses + this.pnlWorkRelatedExpenses
 					+ this.pnlOtherDiscretionaryExpenses;
 			for (int supIdx = 0; supIdx < this.suppliers.size(); supIdx++) {
 				int index = this.suppliers.get(supIdx).getPaymentClearingIndex();
 				// split expenses per the ABS 6530.0 ratios
-				double expense = totalExpense * this.supplierRatios.get(index);
+				float expense = totalExpense * this.supplierRatios.get(index);
 				liabilities.add(new NodePayment(index, expense));
 			}
 		}
@@ -186,7 +186,7 @@ public class Household extends Agent {
 		// TODO: calculate Henderson, Bal Sht ratios, etc.
 	}
 
-	public double getGrossIncome() {
+	public float getGrossIncome() {
 		return this.pnlWagesSalaries + this.pnlUnemploymentBenefits + this.pnlOtherSocialSecurityIncome
 				+ this.pnlInvestmentIncome + this.pnlInterestIncome + this.pnlRentIncome + this.pnlForeignIncome
 				+ this.pnlOtherIncome;
@@ -198,41 +198,41 @@ public class Household extends Agent {
 		this.numChildren = 0;
 
 		// P&L
-		this.pnlWagesSalaries = 0d;
-		this.pnlUnemploymentBenefits = 0d;
-		this.pnlOtherSocialSecurityIncome = 0d;
-		this.pnlInvestmentIncome = 0d;
-		this.pnlInterestIncome = 0d;
-		this.pnlRentIncome = 0d;
-		this.pnlForeignIncome = 0d;
-		this.pnlOtherIncome = 0d;
-		this.pnlIncomeTaxExpense = 0d;
+		this.pnlWagesSalaries = 0f;
+		this.pnlUnemploymentBenefits = 0f;
+		this.pnlOtherSocialSecurityIncome = 0f;
+		this.pnlInvestmentIncome = 0f;
+		this.pnlInterestIncome = 0f;
+		this.pnlRentIncome = 0f;
+		this.pnlForeignIncome = 0f;
+		this.pnlOtherIncome = 0f;
+		this.pnlIncomeTaxExpense = 0f;
 
-		this.pnlLivingExpenses = 0d;
-		this.pnlRentExpense = 0d;
-		this.pnlMortgageRepayments = 0d;
-		this.pnlRentInterestExpense = 0d;
-		this.pnlDonations = 0d;
-		this.pnlOtherDiscretionaryExpenses = 0d;
+		this.pnlLivingExpenses = 0f;
+		this.pnlRentExpense = 0f;
+		this.pnlMortgageRepayments = 0f;
+		this.pnlRentInterestExpense = 0f;
+		this.pnlDonations = 0f;
+		this.pnlOtherDiscretionaryExpenses = 0f;
 
 		// Bal Sht
-		this.bsBankDeposits = 0d;
-		this.bsOtherFinancialAssets = 0d;
-		this.bsResidentialLandAndDwellings = 0d;
-		this.bsOtherNonFinancialAssets = 0d;
-		this.bsTotalAssets = 0d;
+		this.bsBankDeposits = 0f;
+		this.bsOtherFinancialAssets = 0f;
+		this.bsResidentialLandAndDwellings = 0f;
+		this.bsOtherNonFinancialAssets = 0f;
+		this.bsTotalAssets = 0f;
 
-		this.bsLoans = 0d;
-		this.bsStudentLoans = 0d;
-		this.bsOtherLiabilities = 0d;
-		this.bsTotalLiabilities = 0d;
+		this.bsLoans = 0f;
+		this.bsStudentLoans = 0f;
+		this.bsOtherLiabilities = 0f;
+		this.bsTotalLiabilities = 0f;
 
-		this.bsNetWorth = 0d;
+		this.bsNetWorth = 0f;
 
 		// Interest rates
-		this.interestRateDeposits = 0d;
-		this.interestRateLoans = 0d;
-		this.interestRateStudentLoans = 0d;
+		this.interestRateDeposits = 0f;
+		this.interestRateLoans = 0f;
+		this.interestRateStudentLoans = 0f;
 	}
 
 	/**
@@ -280,434 +280,434 @@ public class Household extends Agent {
 	/**
 	 * @return the pnlWagesSalaries
 	 */
-	public double getPnlWagesSalaries() {
+	public float getPnlWagesSalaries() {
 		return pnlWagesSalaries;
 	}
 
 	/**
 	 * @param pnlWagesSalaries the pnlWagesSalaries to set
 	 */
-	public void setPnlWagesSalaries(double pnlWagesSalaries) {
+	public void setPnlWagesSalaries(float pnlWagesSalaries) {
 		this.pnlWagesSalaries = pnlWagesSalaries;
 	}
 
 	/**
 	 * @return the pnlUnemploymentBenefits
 	 */
-	public double getPnlUnemploymentBenefits() {
+	public float getPnlUnemploymentBenefits() {
 		return pnlUnemploymentBenefits;
 	}
 
 	/**
 	 * @param pnlUnemploymentBenefits the pnlUnemploymentBenefits to set
 	 */
-	public void setPnlUnemploymentBenefits(double pnlUnemploymentBenefits) {
+	public void setPnlUnemploymentBenefits(float pnlUnemploymentBenefits) {
 		this.pnlUnemploymentBenefits = pnlUnemploymentBenefits;
 	}
 
 	/**
 	 * @return the pnlOtherSocialSecurityIncome
 	 */
-	public double getPnlOtherSocialSecurityIncome() {
+	public float getPnlOtherSocialSecurityIncome() {
 		return pnlOtherSocialSecurityIncome;
 	}
 
 	/**
 	 * @param pnlOtherSocialSecurityIncome the pnlOtherSocialSecurityIncome to set
 	 */
-	public void setPnlOtherSocialSecurityIncome(double pnlOtherSocialSecurityIncome) {
+	public void setPnlOtherSocialSecurityIncome(float pnlOtherSocialSecurityIncome) {
 		this.pnlOtherSocialSecurityIncome = pnlOtherSocialSecurityIncome;
 	}
 
 	/**
 	 * @return the pnlInvestmentIncome
 	 */
-	public double getPnlInvestmentIncome() {
+	public float getPnlInvestmentIncome() {
 		return pnlInvestmentIncome;
 	}
 
 	/**
 	 * @param pnlInvestmentIncome the pnlInvestmentIncome to set
 	 */
-	public void setPnlInvestmentIncome(double pnlInvestmentIncome) {
+	public void setPnlInvestmentIncome(float pnlInvestmentIncome) {
 		this.pnlInvestmentIncome = pnlInvestmentIncome;
 	}
 
 	/**
 	 * @return the pnlInterestIncome
 	 */
-	public double getPnlInterestIncome() {
+	public float getPnlInterestIncome() {
 		return pnlInterestIncome;
 	}
 
 	/**
 	 * @param pnlInterestIncome the pnlInterestIncome to set
 	 */
-	public void setPnlInterestIncome(double pnlInterestIncome) {
+	public void setPnlInterestIncome(float pnlInterestIncome) {
 		this.pnlInterestIncome = pnlInterestIncome;
 	}
 
 	/**
 	 * @return the pnlRentIncome
 	 */
-	public double getPnlRentIncome() {
+	public float getPnlRentIncome() {
 		return pnlRentIncome;
 	}
 
 	/**
 	 * @param pnlRentIncome the pnlRentIncome to set
 	 */
-	public void setPnlRentIncome(double pnlRentIncome) {
+	public void setPnlRentIncome(float pnlRentIncome) {
 		this.pnlRentIncome = pnlRentIncome;
 	}
 
 	/**
 	 * @return the pnlForeignIncome
 	 */
-	public double getPnlForeignIncome() {
+	public float getPnlForeignIncome() {
 		return pnlForeignIncome;
 	}
 
 	/**
 	 * @param pnlForeignIncome the pnlForeignIncome to set
 	 */
-	public void setPnlForeignIncome(double pnlForeignIncome) {
+	public void setPnlForeignIncome(float pnlForeignIncome) {
 		this.pnlForeignIncome = pnlForeignIncome;
 	}
 
 	/**
 	 * @return the pnlOtherIncome
 	 */
-	public double getPnlOtherIncome() {
+	public float getPnlOtherIncome() {
 		return pnlOtherIncome;
 	}
 
 	/**
 	 * @param pnlOtherIncome the pnlOtherIncome to set
 	 */
-	public void setPnlOtherIncome(double pnlOtherIncome) {
+	public void setPnlOtherIncome(float pnlOtherIncome) {
 		this.pnlOtherIncome = pnlOtherIncome;
 	}
 
 	/**
 	 * @return the pnlIncomeTaxExpense
 	 */
-	public double getPnlIncomeTaxExpense() {
+	public float getPnlIncomeTaxExpense() {
 		return pnlIncomeTaxExpense;
 	}
 
 	/**
 	 * @param pnlIncomeTaxExpense the pnlIncomeTaxExpense to set
 	 */
-	public void setPnlIncomeTaxExpense(double pnlIncomeTaxExpense) {
+	public void setPnlIncomeTaxExpense(float pnlIncomeTaxExpense) {
 		this.pnlIncomeTaxExpense = pnlIncomeTaxExpense;
 	}
 
 	/**
 	 * @return the pnlLivingExpenses
 	 */
-	public double getPnlLivingExpenses() {
+	public float getPnlLivingExpenses() {
 		return pnlLivingExpenses;
 	}
 
 	/**
 	 * @param pnlLivingExpenses the pnlLivingExpenses to set
 	 */
-	public void setPnlLivingExpenses(double pnlLivingExpenses) {
+	public void setPnlLivingExpenses(float pnlLivingExpenses) {
 		this.pnlLivingExpenses = pnlLivingExpenses;
 	}
 
 	/**
 	 * @return the pnlRentExpense
 	 */
-	public double getPnlRentExpense() {
+	public float getPnlRentExpense() {
 		return pnlRentExpense;
 	}
 
 	/**
 	 * @param pnlRentExpense the pnlRentExpense to set
 	 */
-	public void setPnlRentExpense(double pnlRentExpense) {
+	public void setPnlRentExpense(float pnlRentExpense) {
 		this.pnlRentExpense = pnlRentExpense;
 	}
 
 	/**
 	 * @return the pnlMortgageRepayments
 	 */
-	public double getPnlMortgageRepayments() {
+	public float getPnlMortgageRepayments() {
 		return pnlMortgageRepayments;
 	}
 
 	/**
 	 * @param pnlMortgageRepayments the pnlMortgageRepayments to set
 	 */
-	public void setPnlMortgageRepayments(double pnlMortgageRepayments) {
+	public void setPnlMortgageRepayments(float pnlMortgageRepayments) {
 		this.pnlMortgageRepayments = pnlMortgageRepayments;
 	}
 
 	/**
 	 * @return the pnlWorkRelatedExpenses
 	 */
-	public double getPnlWorkRelatedExpenses() {
+	public float getPnlWorkRelatedExpenses() {
 		return pnlWorkRelatedExpenses;
 	}
 
 	/**
 	 * @param pnlWorkRelatedExpenses the pnlWorkRelatedExpenses to set
 	 */
-	public void setPnlWorkRelatedExpenses(double pnlWorkRelatedExpenses) {
+	public void setPnlWorkRelatedExpenses(float pnlWorkRelatedExpenses) {
 		this.pnlWorkRelatedExpenses = pnlWorkRelatedExpenses;
 	}
 
 	/**
 	 * @return the pnlRentInterestExpense
 	 */
-	public double getPnlRentInterestExpense() {
+	public float getPnlRentInterestExpense() {
 		return pnlRentInterestExpense;
 	}
 
 	/**
 	 * @param pnlRentInterestExpense the pnlRentInterestExpense to set
 	 */
-	public void setPnlRentInterestExpense(double pnlRentInterestExpense) {
+	public void setPnlRentInterestExpense(float pnlRentInterestExpense) {
 		this.pnlRentInterestExpense = pnlRentInterestExpense;
 	}
 
 	/**
 	 * @return the pnlDonations
 	 */
-	public double getPnlDonations() {
+	public float getPnlDonations() {
 		return pnlDonations;
 	}
 
 	/**
 	 * @param pnlDonations the pnlDonations to set
 	 */
-	public void setPnlDonations(double pnlDonations) {
+	public void setPnlDonations(float pnlDonations) {
 		this.pnlDonations = pnlDonations;
 	}
 
 	/**
 	 * @return the pnlOtherDiscretionaryExpenses
 	 */
-	public double getPnlOtherDiscretionaryExpenses() {
+	public float getPnlOtherDiscretionaryExpenses() {
 		return pnlOtherDiscretionaryExpenses;
 	}
 
 	/**
 	 * @param pnlOtherDiscretionaryExpenses the pnlOtherDiscretionaryExpenses to set
 	 */
-	public void setPnlOtherDiscretionaryExpenses(double pnlOtherDiscretionaryExpenses) {
+	public void setPnlOtherDiscretionaryExpenses(float pnlOtherDiscretionaryExpenses) {
 		this.pnlOtherDiscretionaryExpenses = pnlOtherDiscretionaryExpenses;
 	}
 
 	/**
 	 * @return the bsBankDeposits
 	 */
-	public double getBsBankDeposits() {
+	public float getBsBankDeposits() {
 		return bsBankDeposits;
 	}
 
 	/**
 	 * @param bsBankDeposits the bsBankDeposits to set
 	 */
-	public void setBsBankDeposits(double bsBankDeposits) {
+	public void setBsBankDeposits(float bsBankDeposits) {
 		this.bsBankDeposits = bsBankDeposits;
 	}
 
 	/**
 	 * @return the bsSuperannuation
 	 */
-	public double getBsSuperannuation() {
+	public float getBsSuperannuation() {
 		return bsSuperannuation;
 	}
 
 	/**
 	 * @param bsSuperannuation the bsSuperannuation to set
 	 */
-	public void setBsSuperannuation(double bsSuperannuation) {
+	public void setBsSuperannuation(float bsSuperannuation) {
 		this.bsSuperannuation = bsSuperannuation;
 	}
 
 	/**
 	 * @return the bsEquities
 	 */
-	public double getBsEquities() {
+	public float getBsEquities() {
 		return bsEquities;
 	}
 
 	/**
 	 * @param bsEquities the bsEquities to set
 	 */
-	public void setBsEquities(double bsEquities) {
+	public void setBsEquities(float bsEquities) {
 		this.bsEquities = bsEquities;
 	}
 
 	/**
 	 * @return the bsOtherFinancialAssets
 	 */
-	public double getBsOtherFinancialAssets() {
+	public float getBsOtherFinancialAssets() {
 		return bsOtherFinancialAssets;
 	}
 
 	/**
 	 * @param bsOtherFinancialAssets the bsOtherFinancialAssets to set
 	 */
-	public void setBsOtherFinancialAssets(double bsOtherFinancialAssets) {
+	public void setBsOtherFinancialAssets(float bsOtherFinancialAssets) {
 		this.bsOtherFinancialAssets = bsOtherFinancialAssets;
 	}
 
 	/**
 	 * @return the bsResidentialLandAndDwellings
 	 */
-	public double getBsResidentialLandAndDwellings() {
+	public float getBsResidentialLandAndDwellings() {
 		return bsResidentialLandAndDwellings;
 	}
 
 	/**
 	 * @param bsResidentialLandAndDwellings the bsResidentialLandAndDwellings to set
 	 */
-	public void setBsResidentialLandAndDwellings(double bsResidentialLandAndDwellings) {
+	public void setBsResidentialLandAndDwellings(float bsResidentialLandAndDwellings) {
 		this.bsResidentialLandAndDwellings = bsResidentialLandAndDwellings;
 	}
 
 	/**
 	 * @return the bsOtherNonFinancialAssets
 	 */
-	public double getBsOtherNonFinancialAssets() {
+	public float getBsOtherNonFinancialAssets() {
 		return bsOtherNonFinancialAssets;
 	}
 
 	/**
 	 * @param bsOtherNonFinancialAssets the bsOtherNonFinancialAssets to set
 	 */
-	public void setBsOtherNonFinancialAssets(double bsOtherNonFinancialAssets) {
+	public void setBsOtherNonFinancialAssets(float bsOtherNonFinancialAssets) {
 		this.bsOtherNonFinancialAssets = bsOtherNonFinancialAssets;
 	}
 
 	/**
 	 * @return the bsTotalAssets
 	 */
-	public double getBsTotalAssets() {
+	public float getBsTotalAssets() {
 		return bsTotalAssets;
 	}
 
 	/**
 	 * @param bsTotalAssets the bsTotalAssets to set
 	 */
-	public void setBsTotalAssets(double bsTotalAssets) {
+	public void setBsTotalAssets(float bsTotalAssets) {
 		this.bsTotalAssets = bsTotalAssets;
 	}
 
 	/**
 	 * @return the bsLoans
 	 */
-	public double getBsLoans() {
+	public float getBsLoans() {
 		return bsLoans;
 	}
 
 	/**
 	 * @param bsLoans the bsLoans to set
 	 */
-	public void setBsLoans(double bsLoans) {
+	public void setBsLoans(float bsLoans) {
 		this.bsLoans = bsLoans;
 	}
 
 	/**
 	 * @return the bsStudentLoans
 	 */
-	public double getBsStudentLoans() {
+	public float getBsStudentLoans() {
 		return bsStudentLoans;
 	}
 
 	/**
 	 * @param bsStudentLoans the bsStudentLoans to set
 	 */
-	public void setBsStudentLoans(double bsStudentLoans) {
+	public void setBsStudentLoans(float bsStudentLoans) {
 		this.bsStudentLoans = bsStudentLoans;
 	}
 
 	/**
 	 * @return the bsOtherLiabilities
 	 */
-	public double getBsOtherLiabilities() {
+	public float getBsOtherLiabilities() {
 		return bsOtherLiabilities;
 	}
 
 	/**
 	 * @param bsOtherLiabilities the bsOtherLiabilities to set
 	 */
-	public void setBsOtherLiabilities(double bsOtherLiabilities) {
+	public void setBsOtherLiabilities(float bsOtherLiabilities) {
 		this.bsOtherLiabilities = bsOtherLiabilities;
 	}
 
 	/**
 	 * @return the bsTotalLiabilities
 	 */
-	public double getBsTotalLiabilities() {
+	public float getBsTotalLiabilities() {
 		return bsTotalLiabilities;
 	}
 
 	/**
 	 * @param bsTotalLiabilities the bsTotalLiabilities to set
 	 */
-	public void setBsTotalLiabilities(double bsTotalLiabilities) {
+	public void setBsTotalLiabilities(float bsTotalLiabilities) {
 		this.bsTotalLiabilities = bsTotalLiabilities;
 	}
 
 	/**
 	 * @return the bsNetWorth
 	 */
-	public double getBsNetWorth() {
+	public float getBsNetWorth() {
 		return bsNetWorth;
 	}
 
 	/**
 	 * @param bsNetWorth the bsNetWorth to set
 	 */
-	public void setBsNetWorth(double bsNetWorth) {
+	public void setBsNetWorth(float bsNetWorth) {
 		this.bsNetWorth = bsNetWorth;
 	}
 
 	/**
 	 * @return the interestRateDeposits
 	 */
-	public double getInterestRateDeposits() {
+	public float getInterestRateDeposits() {
 		return interestRateDeposits;
 	}
 
 	/**
 	 * @param interestRateDeposits the interestRateDeposits to set
 	 */
-	public void setInterestRateDeposits(double interestRateDeposits) {
+	public void setInterestRateDeposits(float interestRateDeposits) {
 		this.interestRateDeposits = interestRateDeposits;
 	}
 
 	/**
 	 * @return the interestRateLoans
 	 */
-	public double getInterestRateLoans() {
+	public float getInterestRateLoans() {
 		return interestRateLoans;
 	}
 
 	/**
 	 * @param interestRateLoans the interestRateLoans to set
 	 */
-	public void setInterestRateLoans(double interestRateLoans) {
+	public void setInterestRateLoans(float interestRateLoans) {
 		this.interestRateLoans = interestRateLoans;
 	}
 
 	/**
 	 * @return the interestRateStudentLoans
 	 */
-	public double getInterestRateStudentLoans() {
+	public float getInterestRateStudentLoans() {
 		return interestRateStudentLoans;
 	}
 
 	/**
 	 * @param interestRateStudentLoans the interestRateStudentLoans to set
 	 */
-	public void setInterestRateStudentLoans(double interestRateStudentLoans) {
+	public void setInterestRateStudentLoans(float interestRateStudentLoans) {
 		this.interestRateStudentLoans = interestRateStudentLoans;
 	}
 

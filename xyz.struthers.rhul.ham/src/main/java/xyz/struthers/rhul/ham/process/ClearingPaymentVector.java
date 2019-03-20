@@ -36,7 +36,7 @@ import java.util.Map;
  * point in time. It does not maintain a history of liabilities, payments,
  * equity, etc.
  * 
- * Each instance of this class stores 5 double lists, 3 double nested lists, 1
+ * Each instance of this class stores 5 float lists, 3 float nested lists, 1
  * integer list, 1 integer nested list, 1 nested NodeLink list, and 1 integer.
  * With 27 million agents and 20 links per node, it will consume approximately
  * 14.7GB of RAM. At 37 million agents this becomes 20.2GB of RAM, and with only
@@ -44,7 +44,7 @@ import java.util.Map;
  * 
  * TODO: If an ADI defaults, apply the govt g'tee rules to customer's deposits.
  * Not just the $250k limit per account, but also the $15Bn limit per ADI
- * (double-check those amounts).
+ * (float-check those amounts).
  * 
  * @author Adam Struthers
  * @version 0.1
@@ -53,11 +53,10 @@ import java.util.Map;
 public class ClearingPaymentVector {
 
 	// We know the size in advance, so can use arrays to improve speed & reduce
-	// memory usage
-	// these don't change
-	private List<Double> exogeneousNominalCashFlow; // Non-negative cash inflows (i.e. income).
-	private List<List<Double>> nominalLiabilitiesAmount; // payments owed in this time period only
-	private List<List<Double>> relativeLiabilitiesAmount;
+	// memory usage because these don't change
+	private List<Float> exogeneousNominalCashFlow; // Non-negative cash inflows (i.e. income).
+	private List<List<Float>> nominalLiabilitiesAmount; // payments owed in this time period only
+	private List<List<Float>> relativeLiabilitiesAmount;
 	/**
 	 * Index of the agent that payments are owed to for nominal liabilities,
 	 * relative liabilities, and clearing payments.
@@ -66,15 +65,15 @@ public class ClearingPaymentVector {
 	 * each of the other lists.
 	 */
 	private List<List<Integer>> liabilitiesIndex;
-	private List<Double> totalLiabilitiesOfNode; // total obligation vector
+	private List<Float> totalLiabilitiesOfNode; // total obligation vector
 	/**
 	 * The node link details to easily identify which nodes owe money to this node.
 	 */
 	private ArrayList<ArrayList<NodeLink>> receivablesIndex;
-	private List<Double> totalOwedToNode; // amount owed to node, assuming no defaults
-	private List<List<Double>> clearingPaymentAmount; // to work out the exact amounts being paid between parties
-	private List<Double> clearingPaymentVector; // sum of the rows in the clearingPaymentMatrix
-	private List<Double> equityOfNode; // surplus cash flow of each node after paying liabilities
+	private List<Float> totalOwedToNode; // amount owed to node, assuming no defaults
+	private List<List<Float>> clearingPaymentAmount; // to work out the exact amounts being paid between parties
+	private List<Float> clearingPaymentVector; // sum of the rows in the clearingPaymentMatrix
+	private List<Float> equityOfNode; // surplus cash flow of each node after paying liabilities
 	/**
 	 * Which round of the clearing vector algorithm caused the node to default.<br>
 	 * (0 = no default)
@@ -110,16 +109,16 @@ public class ClearingPaymentVector {
 	 *                           they relate to
 	 * @param operatingCashFlow  - exogeneous cash inflows to each node
 	 * @return a map containing:<br>
-	 *         List<Double> ClearingPaymentVector,<br>
-	 *         List<List<Double>> ClearingPaymentMatrix,<br>
+	 *         List<Float> ClearingPaymentVector,<br>
+	 *         List<List<Float>> ClearingPaymentMatrix,<br>
 	 *         List<List<Integer>> ClearingPaymentIndices,<br>
-	 *         List<Double> NodeEquity, and<br>
+	 *         List<Float> NodeEquity, and<br>
 	 *         List<Integer> NodeDefaultOrder.
 	 * @author Adam Struthers
 	 * @since 2019-03-18
 	 */
-	public Map<String, Object> calculate(List<List<Double>> liabilitiesAmounts, List<List<Integer>> liabilitiesIndices,
-			List<Double> operatingCashFlow) {
+	public Map<String, Object> calculate(List<List<Float>> liabilitiesAmounts, List<List<Integer>> liabilitiesIndices,
+			List<Float> operatingCashFlow) {
 		Map<String, Object> result = null;
 		if (liabilitiesAmounts.size() == liabilitiesIndices.size()
 				&& liabilitiesAmounts.size() == operatingCashFlow.size()) {
@@ -157,7 +156,7 @@ public class ClearingPaymentVector {
 			// TODO: save output to file for analysis
 
 			// return output to caller
-			result = new HashMap<String, Object>((int) Math.ceil(5d / 0.75d));
+			result = new HashMap<String, Object>((int) Math.ceil(5f / 0.75f));
 			result.put("ClearingPaymentVector", this.clearingPaymentVector);
 			result.put("ClearingPaymentMatrix", this.clearingPaymentAmount);
 			result.put("ClearingPaymentIndices", this.liabilitiesIndex);
@@ -190,8 +189,8 @@ public class ClearingPaymentVector {
 	 */
 	private void calculatePayments() {
 		// initialise variables, making copies so we don't alter the originals
-		List<Double> oldPaymentClearingVector = new ArrayList<Double>(this.totalLiabilitiesOfNode);
-		this.clearingPaymentVector = new ArrayList<Double>(this.totalLiabilitiesOfNode);
+		List<Float> oldPaymentClearingVector = new ArrayList<Float>(this.totalLiabilitiesOfNode);
+		this.clearingPaymentVector = new ArrayList<Float>(this.totalLiabilitiesOfNode);
 		this.defaultOrderOfNode = new ArrayList<Integer>(Collections.nCopies(this.agentCount, 0)); // no default
 
 		// iteratively calculate payment clearing vector
@@ -208,7 +207,7 @@ public class ClearingPaymentVector {
 			systemCleared = true;
 			for (int fromIdx = 0; fromIdx < this.agentCount; fromIdx++) {
 				// use clearing payment vector and rel liab matrix to calc total paid to node
-				double paidToNode = 0d;
+				float paidToNode = 0f;
 				for (int link = 0; link < this.receivablesIndex.get(fromIdx).size(); link++) {
 					int from = this.receivablesIndex.get(fromIdx).get(link).getFromIndex();
 					int to = this.receivablesIndex.get(fromIdx).get(link).getTo();
@@ -228,16 +227,16 @@ public class ClearingPaymentVector {
 			}
 			if (!systemCleared) {
 				// reset old payment clearing vector ready for the next round
-				oldPaymentClearingVector = new ArrayList<Double>(this.clearingPaymentVector);
+				oldPaymentClearingVector = new ArrayList<Float>(this.clearingPaymentVector);
 			}
 		}
 
 		// calculate payment clearing matrix and equity of each node
-		this.clearingPaymentAmount = new ArrayList<List<Double>>(this.agentCount);
+		this.clearingPaymentAmount = new ArrayList<List<Float>>(this.agentCount);
 		for (int fromIdx = 0; fromIdx < this.agentCount; fromIdx++) {
-			this.clearingPaymentAmount.add(new ArrayList<Double>(this.nominalLiabilitiesAmount.get(fromIdx).size()));
+			this.clearingPaymentAmount.add(new ArrayList<Float>(this.nominalLiabilitiesAmount.get(fromIdx).size()));
 		}
-		this.equityOfNode = new ArrayList<Double>(this.agentCount);
+		this.equityOfNode = new ArrayList<Float>(this.agentCount);
 		for (int fromIdx = 0; fromIdx < this.agentCount; fromIdx++) {
 			// amounts paid by this node
 			for (int to = 0; to < this.nominalLiabilitiesAmount.get(fromIdx).size(); to++) {
@@ -246,7 +245,7 @@ public class ClearingPaymentVector {
 			}
 
 			// amounts received by this node
-			double paymentReceived = 0d;
+			float paymentReceived = 0f;
 			for (int link = 0; link < this.receivablesIndex.get(fromIdx).size(); link++) {
 				int from = this.receivablesIndex.get(fromIdx).get(link).getFromIndex();
 				int to = this.receivablesIndex.get(fromIdx).get(link).getTo();
@@ -269,24 +268,24 @@ public class ClearingPaymentVector {
 	 */
 	private void calculateLiabilities() {
 		this.enforceLiabilityMatrixConstraints();
-		this.totalOwedToNode = new ArrayList<Double>(this.agentCount);
-		this.totalLiabilitiesOfNode = new ArrayList<Double>(this.agentCount);
-		this.relativeLiabilitiesAmount = new ArrayList<List<Double>>(this.agentCount);
+		this.totalOwedToNode = new ArrayList<Float>(this.agentCount);
+		this.totalLiabilitiesOfNode = new ArrayList<Float>(this.agentCount);
+		this.relativeLiabilitiesAmount = new ArrayList<List<Float>>(this.agentCount);
 		for (int fromIdx = 0; fromIdx < this.agentCount; fromIdx++) {
 			// initialise array
 			int toSize = this.liabilitiesIndex.get(fromIdx).size();
-			this.relativeLiabilitiesAmount.add(new ArrayList<Double>(toSize));
+			this.relativeLiabilitiesAmount.add(new ArrayList<Float>(toSize));
 		}
 		for (int fromIdx = 0; fromIdx < this.agentCount; fromIdx++) {
 			// calculate contractual liabilities
-			double liabilities = 0d;
+			float liabilities = 0f;
 			for (int to = 0; to < this.nominalLiabilitiesAmount.size(); to++) {
 				liabilities += this.nominalLiabilitiesAmount.get(fromIdx).get(to);
 			}
 			this.totalLiabilitiesOfNode.set(fromIdx, liabilities);
 
 			// calculate contractual receivables
-			double receivables = 0d;
+			float receivables = 0f;
 			for (int link = 0; link < this.receivablesIndex.get(fromIdx).size(); link++) {
 				int from = this.receivablesIndex.get(fromIdx).get(link).getFromIndex();
 				int to = this.receivablesIndex.get(fromIdx).get(link).getTo();
@@ -296,11 +295,11 @@ public class ClearingPaymentVector {
 
 			// calculate relative liabilities
 			for (int to = 0; to < this.nominalLiabilitiesAmount.get(fromIdx).size(); to++) {
-				if (liabilities > 0d) {
+				if (liabilities > 0f) {
 					this.relativeLiabilitiesAmount.get(fromIdx).set(to,
 							this.nominalLiabilitiesAmount.get(fromIdx).get(to) / liabilities);
 				} else {
-					this.relativeLiabilitiesAmount.get(fromIdx).set(to, 0d);
+					this.relativeLiabilitiesAmount.get(fromIdx).set(to, 0f);
 				}
 			}
 		}
@@ -318,9 +317,9 @@ public class ClearingPaymentVector {
 				int toIdx = this.liabilitiesIndex.get(fromIdx).get(to);
 				if (fromIdx == toIdx) {
 					// set diagonal to zero
-					this.nominalLiabilitiesAmount.get(fromIdx).set(to, 0d);
+					this.nominalLiabilitiesAmount.get(fromIdx).set(to, 0f);
 				}
-				if (this.nominalLiabilitiesAmount.get(fromIdx).get(to) < 0d) {
+				if (this.nominalLiabilitiesAmount.get(fromIdx).get(to) < 0f) {
 					// ensure amounts are non-negative
 					this.nominalLiabilitiesAmount.get(fromIdx).set(to,
 							-this.nominalLiabilitiesAmount.get(fromIdx).get(to));

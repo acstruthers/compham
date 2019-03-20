@@ -20,8 +20,8 @@ import xyz.struthers.rhul.ham.data.CalibrateIndividuals;
 
 /**
  * FIXME: Change from Double to Float to halve memory consumption
- * Double.MAX_VALUE = 1.7976931348623157E308 (64 bits)
- * Float.MAX_VALUE = 3.4028235E38 (32 bits)
+ * Double.MAX_VALUE = 1.7976931348623157E308 (64 bits) Float.MAX_VALUE =
+ * 3.4028235E38 (32 bits)
  * 
  * @author Adam Struthers
  *
@@ -35,7 +35,7 @@ public class App {
 	public static void main(String[] args) {
 		DecimalFormat formatter = new DecimalFormat("#,##0.00");
 		long memoryBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-		double megabytesBefore = memoryBefore / 1024d / 1024d;
+		float megabytesBefore = memoryBefore / 1024f / 1024f;
 		System.out.println("MEMORY USAGE BEFORE: " + formatter.format(megabytesBefore) + "MB");
 
 		// load Spring context
@@ -98,7 +98,7 @@ public class App {
 
 			System.gc();
 			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			double megabytesAfter = memoryAfter / 1024d / 1024d;
+			float megabytesAfter = memoryAfter / 1024f / 1024f;
 			System.out.println("MEMORY USAGE AFTER: " + formatter.format(megabytesAfter) + "MB");
 			System.out.println("MEMORY CONSUMED BY BUSINESSES, ETC.: "
 					+ formatter.format(megabytesAfter - megabytesBefore) + "MB");
@@ -110,7 +110,7 @@ public class App {
 
 			System.gc();
 			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			megabytesAfter = memoryAfter / 1024d / 1024d;
+			megabytesAfter = memoryAfter / 1024f / 1024f;
 			System.out.println("MEMORY USAGE AFTER: " + formatter.format(megabytesAfter) + "MB");
 			System.out.println(
 					"MEMORY CONSUMED BY INDIVIDUALS: " + formatter.format(megabytesAfter - megabytesBefore) + "MB");
@@ -121,7 +121,7 @@ public class App {
 
 			System.gc();
 			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			megabytesAfter = memoryAfter / 1024d / 1024d;
+			megabytesAfter = memoryAfter / 1024f / 1024f;
 			System.out.println("MEMORY USAGE AFTER: " + formatter.format(megabytesAfter) + "MB");
 			System.out.println(
 					"MEMORY CONSUMED BY HOUSEHOLDS: " + formatter.format(megabytesAfter - megabytesBefore) + "MB");

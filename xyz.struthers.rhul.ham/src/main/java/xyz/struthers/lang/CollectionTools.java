@@ -1,7 +1,7 @@
 /**
  * 
  */
-package xyz.struthers.rhul.ham.util;
+package xyz.struthers.lang;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Adam
+ * @author Adam Struthers
  *
  */
 public class CollectionTools {
@@ -29,6 +29,14 @@ public class CollectionTools {
 		return data.stream().mapToDouble(Double::doubleValue).sum();
 	}
 
+	static public final float sumFloat(Map<String, Float> data) {
+		return data.values().stream().reduce(0f, Float::sum);
+	}
+
+	static public final float sumFloat(Collection<Float> data) {
+		return data.stream().reduce(0f, Float::sum);
+	}
+
 	static public final int sumInt(Map<String, Integer> data) {
 		return data.values().stream().mapToInt(Integer::intValue).sum();
 	}
@@ -43,12 +51,12 @@ public class CollectionTools {
 	 * @param data
 	 * @return
 	 */
-	static public final Map<String, Double> calculatePercentageFromInteger(Map<String, Integer> data) {
-		double total = Double.valueOf(data.values().stream().mapToInt(Integer::intValue).sum());
+	static public final Map<String, Float> calculatePercentageFromInteger(Map<String, Integer> data) {
+		float total = Float.valueOf(data.values().stream().mapToInt(Integer::intValue).sum());
 		Set<String> keySet = data.keySet();
-		Map<String, Double> percent = new HashMap<String, Double>(keySet.size());
+		Map<String, Float> percent = new HashMap<String, Float>(keySet.size());
 		for (String key : keySet) {
-			percent.put(key, Double.valueOf(data.get(key)) / total);
+			percent.put(key, Float.valueOf(data.get(key)) / total);
 		}
 		return percent;
 	}
@@ -59,12 +67,12 @@ public class CollectionTools {
 	 * @param data
 	 * @return
 	 */
-	static public final Map<String, Double> calculatePercentageFromDouble(Map<String, Double> data) {
-		double total = data.values().stream().mapToDouble(Double::doubleValue).sum();
+	static public final Map<String, Float> calculatePercentageFromDouble(Map<String, Float> data) {
+		float total = (float) data.values().stream().mapToDouble(Float::doubleValue).sum();
 		Set<String> keySet = data.keySet();
-		Map<String, Double> percent = new HashMap<String, Double>(keySet.size());
+		Map<String, Float> percent = new HashMap<String, Float>(keySet.size());
 		for (String key : keySet) {
-			percent.put(key, Double.valueOf(data.get(key)) / total);
+			percent.put(key, Float.valueOf(data.get(key)) / total);
 		}
 		return percent;
 	}

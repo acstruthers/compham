@@ -37,9 +37,9 @@ public class Currencies {
 		// store data
 		this.currencies.put(currency.getIso4217code(), currency);
 	}
-	
-	public void setCurrency(String isoCode, String currencyName, double fxRate, double average1yr,
-			double standardDeviation1yr, double standardDeviation5yr) {
+
+	public void setCurrency(String isoCode, String currencyName, float fxRate, float average1yr,
+			float standardDeviation1yr, float standardDeviation5yr) {
 		// ensure valid state
 		if (this.currencies == null) {
 			this.currencies = new HashMap<String, Currency>();
@@ -56,11 +56,11 @@ public class Currencies {
 	public Map<String, Currency> getAllCurrencies() {
 		return this.currencies;
 	}
-	
+
 	public Currency getCurrency(String isoCode) {
 		return this.currencies.get(isoCode);
 	}
-	
+
 	public String getName(String isoCode) {
 		String result = null;
 		if (this.currencies != null) {
@@ -69,32 +69,32 @@ public class Currencies {
 		return result;
 	}
 
-	public double getExchangeRate(String isoCode) {
-		double result = 0d;
+	public float getExchangeRate(String isoCode) {
+		float result = 0f;
 		if (this.currencies != null) {
 			result = this.currencies.get(isoCode).getExchangeRate();
 		}
 		return result;
 	}
 
-	public double get1yrAvgExchRate(String isoCode) {
-		double result = 0d;
+	public float get1yrAvgExchRate(String isoCode) {
+		float result = 0f;
 		if (this.currencies != null) {
 			result = this.currencies.get(isoCode).getAvg1yr();
 		}
 		return result;
 	}
 
-	public double get1yrStdDevExchRate(String isoCode) {
-		double result = 0d;
+	public float get1yrStdDevExchRate(String isoCode) {
+		float result = 0f;
 		if (this.currencies != null) {
 			result = this.currencies.get(isoCode).getStdev1yr();
 		}
 		return result;
 	}
 
-	public double get5yrStdDevExchRate(String isoCode) {
-		double result = 0d;
+	public float get5yrStdDevExchRate(String isoCode) {
+		float result = 0f;
 		if (this.currencies != null) {
 			result = this.currencies.get(isoCode).getStdev5yr();
 		}

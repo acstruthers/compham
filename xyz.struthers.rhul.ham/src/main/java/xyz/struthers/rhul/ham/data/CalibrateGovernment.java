@@ -23,13 +23,12 @@ public class CalibrateGovernment {
 	// beans
 	private CalibrationData data;
 	private AustralianEconomy economy;
-	
+
 	// field variables
-	private Map<String, Double> govtBalSht;
-	private Map<String, Double> govtProfitLoss;
+	private Map<String, Float> govtBalSht;
+	private Map<String, Float> govtProfitLoss;
 	private AustralianGovernment govtAgent;
-	
-	
+
 	/**
 	 * 
 	 */
@@ -42,13 +41,13 @@ public class CalibrateGovernment {
 		this.govtBalSht = data.getGovtBalSht();
 		this.govtProfitLoss = data.getGovtProfitLoss();
 		this.govtAgent = new AustralianGovernment(this.govtBalSht, this.govtProfitLoss);
-		
+
 		this.addAgentToEconomy();
-		
+
 		// release memory
 		this.data.dropGovtFinancialData();
 	}
-	
+
 	private void addAgentToEconomy() {
 		this.economy.setGovernment(this.govtAgent);
 	}
@@ -60,8 +59,7 @@ public class CalibrateGovernment {
 	}
 
 	/**
-	 * @param data
-	 *            the calibration data to set
+	 * @param data the calibration data to set
 	 */
 	@Autowired
 	public void setData(CalibrationData data) {
@@ -75,7 +73,7 @@ public class CalibrateGovernment {
 	public void setEconomy(AustralianEconomy economy) {
 		this.economy = economy;
 	}
-	
+
 	/**
 	 * @return the govtAgent
 	 */

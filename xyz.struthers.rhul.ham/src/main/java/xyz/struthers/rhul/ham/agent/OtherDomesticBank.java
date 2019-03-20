@@ -19,7 +19,7 @@ public final class OtherDomesticBank extends AuthorisedDepositTakingInstitution 
 	public OtherDomesticBank() {
 		super();
 	}
-	
+
 	/**
 	 * Initialisation constructor
 	 * 
@@ -29,8 +29,8 @@ public final class OtherDomesticBank extends AuthorisedDepositTakingInstitution 
 	 * @param adiType
 	 * @param financialStatementAmounts
 	 */
-	public OtherDomesticBank(String adiAustralianBusinessNumber, String adiShortName, String adiLongName, String adiType,
-			Map<String, Double> financialStatementAmounts) {
+	public OtherDomesticBank(String adiAustralianBusinessNumber, String adiShortName, String adiLongName,
+			String adiType, Map<String, Float> financialStatementAmounts) {
 		super(adiAustralianBusinessNumber, adiShortName, adiLongName, adiType, financialStatementAmounts);
 	}
 

@@ -30,7 +30,7 @@ public final class MutualBank extends AuthorisedDepositTakingInstitution {
 	 * @param financialStatementAmounts
 	 */
 	public MutualBank(String adiAustralianBusinessNumber, String adiShortName, String adiLongName, String adiType,
-			Map<String, Double> financialStatementAmounts) {
+			Map<String, Float> financialStatementAmounts) {
 		super(adiAustralianBusinessNumber, adiShortName, adiLongName, adiType, financialStatementAmounts);
 	}
 

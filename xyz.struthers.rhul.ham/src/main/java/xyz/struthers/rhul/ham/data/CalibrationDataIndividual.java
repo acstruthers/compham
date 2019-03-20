@@ -39,7 +39,7 @@ public class CalibrationDataIndividual {
 	private static final boolean DEBUG = true;
 
 	// map implementation optimisation
-	public static final double MAP_LOAD_FACTOR = 0.75d;
+	public static final float MAP_LOAD_FACTOR = 0.75f;
 
 	public static final int MAP_INIT_SIZE_LGA = (int) Math.ceil(573 / MAP_LOAD_FACTOR); // 572 (UR) including state
 																						// totals (563 Enum)
@@ -94,7 +94,7 @@ public class CalibrationDataIndividual {
 	 * Contains count and taxable income, summarised by industry division.<br>
 	 * Keys: Series Title, Industry Division Code
 	 */
-	private Map<String, Map<String, Double>> atoIndividualTable9DivisionSummary;
+	private Map<String, Map<String, Float>> atoIndividualTable9DivisionSummary;
 	/**
 	 * ABS Census Table Builder data:<br>
 	 * SEXP by POA (UR) by AGE5P, INDP and INCP<br>
@@ -318,7 +318,7 @@ public class CalibrationDataIndividual {
 		if (DEBUG) {
 			System.gc();
 			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			float megabytesConsumed = (memoryAfter - memoryBefore) / 1024f / 1024f;
 			DecimalFormat formatter = new DecimalFormat("#,##0.00");
 			System.out.println(">>> Memory used by ABS Census SEXP by POA (UR) by AGE5P, INDP and INCP: "
 					+ formatter.format(megabytesConsumed) + "MB");
@@ -342,7 +342,7 @@ public class CalibrationDataIndividual {
 		if (DEBUG) {
 			System.gc();
 			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			float megabytesConsumed = (memoryAfter - memoryBefore) / 1024f / 1024f;
 			DecimalFormat formatter = new DecimalFormat("#,##0.00");
 			System.out.println(
 					">>> Memory used by ATO Individuals Table 2A: " + formatter.format(megabytesConsumed) + "MB");
@@ -363,7 +363,7 @@ public class CalibrationDataIndividual {
 		if (DEBUG) {
 			System.gc();
 			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			float megabytesConsumed = (memoryAfter - memoryBefore) / 1024f / 1024f;
 			DecimalFormat formatter = new DecimalFormat("#,##0.00");
 			System.out.println(
 					">>> Memory used by ATO Individuals Table 3A: " + formatter.format(megabytesConsumed) + "MB");
@@ -383,7 +383,7 @@ public class CalibrationDataIndividual {
 		if (DEBUG) {
 			System.gc();
 			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			float megabytesConsumed = (memoryAfter - memoryBefore) / 1024f / 1024f;
 			DecimalFormat formatter = new DecimalFormat("#,##0.00");
 			System.out.println(
 					">>> Memory used by ATO Individuals Table 6B: " + formatter.format(megabytesConsumed) + "MB");
@@ -406,7 +406,7 @@ public class CalibrationDataIndividual {
 		// 37, 38, 39, 40, 43, 44, 93, 94, 95, 96, 99, 100, 101, 102 };
 		int[] atoIndividualTable9Columns = { 2, 3, 4 };
 		int ato9MapCapacity = (int) Math.ceil(atoIndividualTable9Columns.length / MAP_LOAD_FACTOR);
-		this.atoIndividualTable9DivisionSummary = new HashMap<String, Map<String, Double>>(ato9MapCapacity);
+		this.atoIndividualTable9DivisionSummary = new HashMap<String, Map<String, Float>>(ato9MapCapacity);
 		this.loadAtoIndividualsTable9DivisionSummary("/data/ATO/Individual/IndividualsTable9.csv", ATO_INDIVIDUAL_T9,
 				atoIndividualTable9Columns, this.title, this.atoIndividualTable9DivisionSummary);
 		// this.atoIndividualTable9 = new HashMap<String, Map<String,
@@ -418,7 +418,7 @@ public class CalibrationDataIndividual {
 		if (DEBUG) {
 			System.gc();
 			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			double megabytesConsumed = (memoryAfter - memoryBefore) / 1024d / 1024d;
+			float megabytesConsumed = (memoryAfter - memoryBefore) / 1024f / 1024f;
 			DecimalFormat formatter = new DecimalFormat("#,##0.00");
 			System.out.println(
 					">>> Memory used by ATO Individuals Table 9: " + formatter.format(megabytesConsumed) + "MB");
@@ -1073,7 +1073,7 @@ public class CalibrationDataIndividual {
 	 * @param data                 - the data map that the values are returned in
 	 */
 	private void loadAtoIndividualsTable9DivisionSummary(String fileResourceLocation, String tableName,
-			int[] columnsToImport, Map<String, List<String>> titles, Map<String, Map<String, Double>> data) {
+			int[] columnsToImport, Map<String, List<String>> titles, Map<String, Map<String, Float>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -1096,7 +1096,7 @@ public class CalibrationDataIndividual {
 							thesecolumnNames.add(line[columnsToImport[i]].trim());
 
 							// store series ID as key with blank collections to populate with data below
-							data.put(line[columnsToImport[i]].trim(), new HashMap<String, Double>(divisionMapCapacity));
+							data.put(line[columnsToImport[i]].trim(), new HashMap<String, Float>(divisionMapCapacity));
 						}
 						titles.put(tableName, thesecolumnNames);
 						header = false;
@@ -1106,12 +1106,12 @@ public class CalibrationDataIndividual {
 						String divisionCode = line[0].trim().substring(0, 1).toUpperCase();
 						for (int i = 0; i < columnsToImport.length; i++) {
 							// parse the body of the data
-							double oldVal = 0d;
+							float oldVal = 0f;
 							if (data.get(seriesId[i]).get(divisionCode) != null) {
 								oldVal = data.get(seriesId[i]).get(divisionCode);
 							}
 							data.get(seriesId[i]).put(divisionCode,
-									oldVal + Double.valueOf(line[columnsToImport[i]].trim().replace(",", "")));
+									oldVal + Float.valueOf(line[columnsToImport[i]].trim().replace(",", "")));
 						}
 					} else {
 						footer = true;
@@ -1180,7 +1180,7 @@ public class CalibrationDataIndividual {
 	/**
 	 * @return the atoIndividualTable9DivisionSummary
 	 */
-	public Map<String, Map<String, Double>> getAtoIndividualTable9DivisionSummary() {
+	public Map<String, Map<String, Float>> getAtoIndividualTable9DivisionSummary() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
