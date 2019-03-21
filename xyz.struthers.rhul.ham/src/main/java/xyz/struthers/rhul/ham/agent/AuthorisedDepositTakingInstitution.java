@@ -39,11 +39,12 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	protected ArrayList<Individual> employees; // calculate wages & super
 	protected ArrayList<Business> domesticSuppliers;
 	protected ArrayList<Float> domesticSupplierRatios;
-	protected AustralianGovernment govt;
 	protected ArrayList<Household> retailDepositors; // TODO: implement me
 	protected ArrayList<Business> commercialDepositors;// TODO: implement me
 	protected ArrayList<AuthorisedDepositTakingInstitution> adiInvestors;// TODO: implement me
 	protected ArrayList<Float> adiInvestorAmounts;// TODO: implement me
+	protected AustralianGovernment govt;
+	protected ReserveBankOfAustralia rba;
 
 	// P&L (40 bytes)
 	protected float pnlInterestIncome;
@@ -97,10 +98,11 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	protected float capitalCreditRWA;
 
 	// effective interest rates
-	protected ArrayList<Float> retailDepositRate;
-	protected ArrayList<Float> commercialDepositRate;
-	
-	
+	protected ArrayList<Float> depositRate;
+	protected ArrayList<Float> loanRate;
+	protected ArrayList<Float> borrowingsRate;
+	protected ArrayList<Float> govtBondRate;
+
 	/**
 	 * Default constructor
 	 */
@@ -180,13 +182,97 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	}
 
 	public float getTotalIncome() {
-		// FIXME: implement me
-		return 0f;
+		return this.pnlInterestIncome - this.pnlInterestExpense + this.pnlTradingIncome + this.pnlInvestmentIncome
+				+ this.pnlOtherIncome;
 	}
 
-	public float getTotalExpenses() {
-		// FIXME: implement me
-		return 0f;
+	public float getTotalExpensesExcludingTax() {
+		return this.pnlPersonnelExpenses + this.pnlLoanImpairmentExpense + this.pnlDepreciationAmortisation
+				+ this.pnlOtherExpenses;
+	}
+
+	public float getDepositRate(int iteration) {
+		float rate = 0f;
+		if (this.depositRate != null && this.depositRate.size() > iteration) {
+			rate = this.depositRate.get(iteration);
+		}
+		return rate;
+	}
+
+	public float setDepositRate(int iteration) {
+		float rate = 0f;
+		if (this.depositRate != null && this.depositRate.size() > iteration && this.rba != null) {
+			// assume rates can't be negative
+			rate = this.depositRate.get(0) + this.rba.getCashRateChange(iteration);
+			if (!Properties.ALLOW_NEGATIVE_RATES) {
+				rate = Math.max(0f, rate);
+			}
+			this.depositRate.set(iteration, rate);
+		}
+		return rate;
+	}
+
+	public float getLoanRate(int iteration) {
+		float rate = 0f;
+		if (this.loanRate != null && this.loanRate.size() > iteration) {
+			rate = this.loanRate.get(iteration);
+		}
+		return rate;
+	}
+
+	public float setLoanRate(int iteration) {
+		float rate = 0f;
+		if (this.loanRate != null && this.loanRate.size() > iteration && this.rba != null) {
+			// assume rates can't be negative
+			rate = this.loanRate.get(0) + this.rba.getCashRateChange(iteration);
+			if (!Properties.ALLOW_NEGATIVE_RATES) {
+				rate = Math.max(0f, rate);
+			}
+			this.loanRate.set(iteration, rate);
+		}
+		return rate;
+	}
+
+	public float getBorrowingsRate(int iteration) {
+		float rate = 0f;
+		if (this.borrowingsRate != null && this.borrowingsRate.size() > iteration) {
+			rate = this.borrowingsRate.get(iteration);
+		}
+		return rate;
+	}
+
+	public float setBorrowingsRate(int iteration) {
+		float rate = 0f;
+		if (this.borrowingsRate != null && this.borrowingsRate.size() > iteration && this.rba != null) {
+			// assume rates can't be negative
+			rate = this.borrowingsRate.get(0) + this.rba.getCashRateChange(iteration);
+			if (!Properties.ALLOW_NEGATIVE_RATES) {
+				rate = Math.max(0f, rate);
+			}
+			this.borrowingsRate.set(iteration, rate);
+		}
+		return rate;
+	}
+
+	public float getGovtBondRate(int iteration) {
+		float rate = 0f;
+		if (this.govtBondRate != null && this.govtBondRate.size() > iteration) {
+			rate = this.govtBondRate.get(iteration);
+		}
+		return rate;
+	}
+
+	public float setGovtBondRate(int iteration) {
+		float rate = 0f;
+		if (this.govtBondRate != null && this.govtBondRate.size() > iteration && this.rba != null) {
+			// assume rates can't be negative
+			rate = this.govtBondRate.get(0) + this.rba.getCashRateChange(iteration);
+			if (!Properties.ALLOW_NEGATIVE_RATES) {
+				rate = Math.max(0f, rate);
+			}
+			this.govtBondRate.set(iteration, rate);
+		}
+		return rate;
 	}
 
 	@Override
@@ -255,7 +341,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		// calculate amount due to retail depositors
 		for (Household depositor : this.retailDepositors) {
 			int index = depositor.getPaymentClearingIndex();
-			float monthlyInterest = depositor.getBsBankDeposits() * depositor.getInterestRateDeposits() / NUMBER_MONTHS;
+			float monthlyInterest = depositor.getBsBankDeposits() * this.depositRate.get(iteration) / NUMBER_MONTHS;
 			liabilities.add(new NodePayment(index, monthlyInterest));
 		}
 
@@ -263,8 +349,19 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		if (this.commercialDepositors != null) {
 			for (Business depositor : this.commercialDepositors) {
 				int index = depositor.getPaymentClearingIndex();
-				float monthlyInterest = depositor.getBankDeposits() * depositor.getInterestRateDeposits()
-						/ NUMBER_MONTHS;
+				float monthlyInterest = depositor.getBankDeposits() * this.depositRate.get(iteration) / NUMBER_MONTHS;
+				liabilities.add(new NodePayment(index, monthlyInterest));
+			}
+		}
+
+		// calculate amount due to ADI investors
+		if (this.adiInvestors != null) {
+			for (int adiIdx = 0; adiIdx < this.adiInvestors.size(); adiIdx++) {
+				AuthorisedDepositTakingInstitution adi = this.adiInvestors.get(adiIdx);
+				int index = adi.getPaymentClearingIndex();
+				int borrowingsRateMonth = Math.max(iteration - 3, 0); // assumes 90-day funding
+				float monthlyInterest = this.adiInvestorAmounts.get(adiIdx)
+						* this.borrowingsRate.get(borrowingsRateMonth) / NUMBER_MONTHS;
 				liabilities.add(new NodePayment(index, monthlyInterest));
 			}
 		}
@@ -278,20 +375,9 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 			}
 			payrollTax = Tax.calculatePayrollTax(totalWages, this.state, this.isGccsa);
 		}
-		float totalTax = payrollTax
-				+ Tax.calculateCompanyTax(this.getTotalIncome(), this.getTotalIncome() - this.getTotalExpenses());
+		float totalTax = payrollTax + Tax.calculateCompanyTax(this.getTotalIncome(),
+				this.getTotalIncome() - this.getTotalExpensesExcludingTax() - payrollTax);
 		liabilities.add(new NodePayment(govt.getPaymentClearingIndex(), totalTax));
-
-		// calculate amount due to ADI investors
-		if (this.adiInvestors != null) {
-			for (int adiIdx = 0; adiIdx < this.adiInvestors.size(); adiIdx++) {
-				AuthorisedDepositTakingInstitution adi = this.adiInvestors.get(adiIdx);
-				int index = adi.getPaymentClearingIndex();
-				float monthlyInterest = this.adiInvestorAmounts.get(adiIdx) * this.rateBondsNotesBorrowings
-						/ NUMBER_MONTHS;
-				liabilities.add(new NodePayment(index, monthlyInterest));
-			}
-		}
 
 		liabilities.trimToSize();
 		return liabilities;

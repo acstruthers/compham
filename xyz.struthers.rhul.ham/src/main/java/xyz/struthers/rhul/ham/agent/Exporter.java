@@ -55,7 +55,9 @@ public final class Exporter extends Business {
 	public List<NodePayment> getAmountsPayable(int iteration) {
 		List<NodePayment> liabilities = super.getAmountsPayable(iteration);
 
-		// TODO: add import/export liabilities
+		// export generates revenue, not liabilities
+
+		// import is already accounted for in the Business super class
 
 		return liabilities;
 	}

@@ -147,7 +147,10 @@ public class CalibrateEconomy {
 
 		this.linkHouseholds();
 		this.linkBusinesses();
-		this.calibrateAdis();
+		this.linkAdis();
+		this.linkForeignCountries();
+		this.linkGovernment();
+		this.linkRba();
 
 	}
 
@@ -182,7 +185,30 @@ public class CalibrateEconomy {
 	 * re-calibrates the ADI's financials so that they're proportional to the actual
 	 * amount of business that has been assigned to them.
 	 */
-	public void calibrateAdis() {
+	public void linkAdis() {
+
+	}
+
+	/**
+	 * Links the ForeignCountries to their Exporter trading partners.
+	 */
+	public void linkForeignCountries() {
+
+	}
+
+	/**
+	 * Links the AustralianGovernment to their welfare recipients and bond
+	 * investors.
+	 */
+	public void linkGovernment() {
+
+	}
+
+	/**
+	 * Links the RBA to the banks with their cash balances, and the government to
+	 * pay its annual dividends to.
+	 */
+	public void linkRba() {
 
 	}
 

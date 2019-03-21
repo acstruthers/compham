@@ -6,6 +6,7 @@ package xyz.struthers.rhul.ham.agent;
 import java.util.ArrayList;
 import java.util.List;
 
+import xyz.struthers.lang.CustomMath;
 import xyz.struthers.rhul.ham.process.NodePayment;
 import xyz.struthers.rhul.ham.process.Tax;
 
@@ -73,11 +74,8 @@ public class Household extends Agent {
 
 	private float bsNetWorth;
 
-	// FIXME: moving interest rates to ADI and govt will save about 100MB of RAM each
-	// Interest rates (16 bytes)
-	protected float interestRateDeposits;
-	protected float interestRateLoans;
-	protected float interestRateStudentLoans; // in Australia this is always CPI (by law)
+	// Loan details
+	private int loanCurrentMonth; // at calibration
 
 	/**
 	 * 
@@ -141,9 +139,10 @@ public class Household extends Agent {
 		}
 
 		// calculate loan repayment due to bank
-		if (this.loanAdi != null && (this.pnlMortgageRepayments > 0d || this.pnlRentInterestExpense > 0d))
+		if (this.loanAdi != null && (this.pnlMortgageRepayments > 0d || this.pnlRentInterestExpense > 0d)) {
 			liabilities.add(new NodePayment(this.loanAdi.getPaymentClearingIndex(),
 					this.pnlMortgageRepayments + this.pnlRentInterestExpense));
+		}
 
 		// calculate income tax due to government
 		float incomeTax = 0f;
@@ -154,6 +153,25 @@ public class Household extends Agent {
 
 		liabilities.trimToSize();
 		return null;
+	}
+
+	/**
+	 * Calculates the interest component of the loan repayment due to bank. Assumes
+	 * home loans are principal and interest, while investment property loans are
+	 * interest-only.
+	 * 
+	 * @param iteration
+	 * @return interest component of loan repayments
+	 */
+	public float getInterestDueToBank(int iteration) {
+		float interest = 0f;
+		if (this.loanAdi != null && (this.pnlMortgageRepayments > 0d || this.pnlRentInterestExpense > 0d)) {
+			float loanBal = CustomMath.getCurrentLoanBalance(this.pnlMortgageRepayments,
+					this.loanAdi.getLoanRate(iteration), this.bsResidentialLandAndDwellings,
+					this.loanCurrentMonth + iteration);
+			interest = loanBal * this.loanAdi.getLoanRate(iteration) + this.pnlRentInterestExpense;
+		}
+		return interest;
 	}
 
 	/**
@@ -230,11 +248,6 @@ public class Household extends Agent {
 		this.bsTotalLiabilities = 0f;
 
 		this.bsNetWorth = 0f;
-
-		// Interest rates
-		this.interestRateDeposits = 0f;
-		this.interestRateLoans = 0f;
-		this.interestRateStudentLoans = 0f;
 	}
 
 	/**
@@ -669,48 +682,6 @@ public class Household extends Agent {
 	 */
 	public void setBsNetWorth(float bsNetWorth) {
 		this.bsNetWorth = bsNetWorth;
-	}
-
-	/**
-	 * @return the interestRateDeposits
-	 */
-	public float getInterestRateDeposits() {
-		return interestRateDeposits;
-	}
-
-	/**
-	 * @param interestRateDeposits the interestRateDeposits to set
-	 */
-	public void setInterestRateDeposits(float interestRateDeposits) {
-		this.interestRateDeposits = interestRateDeposits;
-	}
-
-	/**
-	 * @return the interestRateLoans
-	 */
-	public float getInterestRateLoans() {
-		return interestRateLoans;
-	}
-
-	/**
-	 * @param interestRateLoans the interestRateLoans to set
-	 */
-	public void setInterestRateLoans(float interestRateLoans) {
-		this.interestRateLoans = interestRateLoans;
-	}
-
-	/**
-	 * @return the interestRateStudentLoans
-	 */
-	public float getInterestRateStudentLoans() {
-		return interestRateStudentLoans;
-	}
-
-	/**
-	 * @param interestRateStudentLoans the interestRateStudentLoans to set
-	 */
-	public void setInterestRateStudentLoans(float interestRateStudentLoans) {
-		this.interestRateStudentLoans = interestRateStudentLoans;
 	}
 
 }

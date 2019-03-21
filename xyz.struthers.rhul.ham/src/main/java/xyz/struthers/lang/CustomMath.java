@@ -98,7 +98,7 @@ public class CustomMath {
 	 * @param termMonths      - the term of the loan, expressed in months
 	 * @return the original purchase price (in original nominal dollars)
 	 */
-	public float getPropertyPurchasePrice(float repaymentAmount, float interestRate, int termMonths) {
+	public static float getPropertyPurchasePrice(float repaymentAmount, float interestRate, int termMonths) {
 		float purchasePrice = 0f;
 		if (Math.abs(interestRate - 0f) < EPSILON_LOAN) { // rate is 0%
 			purchasePrice = repaymentAmount * (float) termMonths;
@@ -120,7 +120,7 @@ public class CustomMath {
 	 * @param purchasePrice
 	 * @return the current loan balance
 	 */
-	public float getCurrentLoanBalance(float repaymentAmount, float interestRate, float purchasePrice,
+	public static float getCurrentLoanBalance(float repaymentAmount, float interestRate, float purchasePrice,
 			int currentMonth) {
 		float currentBalance = 0f;
 		if (Math.abs(interestRate - 0f) < EPSILON_LOAN) { // rate is 0%
@@ -143,7 +143,7 @@ public class CustomMath {
 	 * @param termMonths
 	 * @return the monthly loan repayments due
 	 */
-	public float getRepaymentAmount(Float interestRate, float originalLoanBalance, int termMonths) {
+	public static float getRepaymentAmount(Float interestRate, float originalLoanBalance, int termMonths) {
 		float repaymentAmount = 0f;
 		if (Math.abs(interestRate - 0f) < EPSILON_LOAN) { // rate is 0%
 			repaymentAmount = originalLoanBalance / (float) termMonths;

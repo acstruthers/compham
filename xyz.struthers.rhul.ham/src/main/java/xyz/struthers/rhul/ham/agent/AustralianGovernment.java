@@ -3,10 +3,12 @@
  */
 package xyz.struthers.rhul.ham.agent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.process.NodePayment;
 
 /**
@@ -20,8 +22,12 @@ public final class AustralianGovernment extends Agent {
 
 	private static final long serialVersionUID = 1L;
 
-	// agernt relationships
+	public static final float NUMBER_MONTHS = 12f; // for interest calcs
+
+	// agent relationships
 	protected int paymentClearingIndex;
+	private ArrayList<Household> welfareRecipients;
+	private ArrayList<AuthorisedDepositTakingInstitution> bondInvestors;
 
 	// P&L
 	private float pnlTaxIncome;
@@ -48,6 +54,9 @@ public final class AustralianGovernment extends Agent {
 	private float bsDepositsHeld;
 	private float bsBorrowings;
 	private float bsOtherLiabilities;
+
+	// Interest rates
+	protected float interestRateStudentLoans; // in Australia this is always CPI (by law)
 
 	/**
 	 * Default constructor
@@ -111,8 +120,34 @@ public final class AustralianGovernment extends Agent {
 
 	@Override
 	public List<NodePayment> getAmountsPayable(int iteration) {
-		// TODO Auto-generated method stub
-		return null;
+		int numberOfCreditors = 0;
+		if (this.welfareRecipients != null) {
+			numberOfCreditors += this.welfareRecipients.size();
+		}
+		if (this.bondInvestors != null) {
+			numberOfCreditors += this.bondInvestors.size();
+		}
+		ArrayList<NodePayment> liabilities = new ArrayList<NodePayment>(numberOfCreditors);
+
+		// calculate welfare payments due to recipients
+		if (this.welfareRecipients != null) {
+			for (Household recipient : this.welfareRecipients) {
+				int index = recipient.getPaymentClearingIndex();
+				float welfarePayment = recipient.getPnlUnemploymentBenefits()
+						+ recipient.getPnlOtherSocialSecurityIncome();
+				liabilities.add(new NodePayment(index, welfarePayment));
+			}
+		}
+
+		// calculate bond interest due to ADIs
+		for (AuthorisedDepositTakingInstitution adi : this.bondInvestors) {
+			int index = adi.getPaymentClearingIndex();
+			float monthlyInterest = adi.getBsLoansGovernment() * adi.getGovtBondRate(iteration) / NUMBER_MONTHS;
+			liabilities.add(new NodePayment(index, monthlyInterest));
+		}
+
+		liabilities.trimToSize();
+		return liabilities;
 	}
 
 	public Map<String, Float> getFinancialStatements() {

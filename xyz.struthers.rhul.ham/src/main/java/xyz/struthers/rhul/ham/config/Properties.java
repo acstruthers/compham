@@ -31,6 +31,7 @@ public class Properties {
 	// "D:\\Git\\compham\\xyz.struthers.rhul.ham"; // NUC
 	public static final String RESOURCE_DIRECTORY = HOME_DIRECTORY + "\\src\\main\\resources";
 
+	public static final boolean ALLOW_NEGATIVE_RATES = false; // allow negative interest rates?
 	public static final float SUPERANNUATION_RATE = 0.095f; // 9.5%
 	public static final long RANDOM_SEED = 20190315L;
 
@@ -86,7 +87,7 @@ public class Properties {
 	 */
 	public Random getRandom() {
 		if (this.random == null) {
-			//this.random = new Random(RANDOM_SEED);
+			// this.random = new Random(RANDOM_SEED);
 			this.random = new XoRoShiRo128PlusRandom(RANDOM_SEED);
 		}
 		return random;
