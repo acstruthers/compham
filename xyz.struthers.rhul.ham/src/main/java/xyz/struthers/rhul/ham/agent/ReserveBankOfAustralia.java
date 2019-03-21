@@ -3,6 +3,7 @@
  */
 package xyz.struthers.rhul.ham.agent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,9 +21,15 @@ public final class ReserveBankOfAustralia extends Agent {
 
 	private static final long serialVersionUID = 1L;
 
+	private final float NUMBER_MONTHS = 12f;
+
 	// agent relationships
 	protected int paymentClearingIndex;
-	
+	protected ArrayList<AuthorisedDepositTakingInstitution> adiDepositors; // major and other domestic banks
+
+	// cash rate
+	protected ArrayList<Float> cashRate;
+
 	// P&L
 	private float pnlInterestIncome;
 	private float pnlInterestExpense;
@@ -64,10 +71,8 @@ public final class ReserveBankOfAustralia extends Agent {
 	 * The keys in the data map are the field titles used in the CSV file that the
 	 * data is imported from.
 	 * 
-	 * @param balSht
-	 *            - a map of Balance Sheet fields and values
-	 * @param profitLoss
-	 *            - a map of Profit & Loss Statement fields and values
+	 * @param balSht     - a map of Balance Sheet fields and values
+	 * @param profitLoss - a map of Profit & Loss Statement fields and values
 	 */
 	public ReserveBankOfAustralia(Map<String, Float> balSht, Map<String, Float> profitLoss) {
 		super();
@@ -115,13 +120,72 @@ public final class ReserveBankOfAustralia extends Agent {
 
 	@Override
 	public List<NodePayment> getAmountsPayable(int iteration) {
-		// TODO Auto-generated method stub
-		return null;
+		int numberOfCreditors = 1;
+		if (this.adiDepositors != null) {
+			numberOfCreditors = this.adiDepositors.size();
+		}
+		ArrayList<NodePayment> liabilities = new ArrayList<NodePayment>(numberOfCreditors);
+
+		// bank balances of major and other domestic banks, paid at cash rate
+		for (int adiIdx = 0; adiIdx < this.adiDepositors.size(); adiIdx++) {
+			AuthorisedDepositTakingInstitution adi = this.adiDepositors.get(adiIdx);
+			int index = adi.getPaymentClearingIndex();
+			float balance = adi.getBsCash();
+			float rate = 0f;
+			if (this.cashRate != null && this.cashRate.size() > iteration) {
+				rate = this.cashRate.get(iteration);
+			}
+			liabilities.add(new NodePayment(index, balance * rate / NUMBER_MONTHS));
+		}
+
+		// TODO: RBA pays its net profit to govt annually
+		if (iteration % 12 == 0) {
+			// TODO: we need a current year earnings variable, which is added to monthly
+		}
+
+		liabilities.trimToSize();
+		return liabilities;
+	}
+
+	/**
+	 * Gets the movement in the cash rate since the initial calibration. This can be
+	 * added to the ADI rates to get the current effective rates.
+	 * 
+	 * @param iteration
+	 * @return the movement in the cash rate since calibration
+	 */
+	public float getCashRateChange(int iteration) {
+		float rate = 0f;
+		if (this.cashRate != null && this.cashRate.size() > iteration) {
+			rate = this.cashRate.get(iteration) - this.cashRate.get(0);
+		}
+		return rate;
+	}
+
+	public float getCashRate(int iteration) {
+		float rate = 0f;
+		if (this.cashRate != null && this.cashRate.size() > iteration) {
+			rate = this.cashRate.get(iteration);
+		}
+		return rate;
+	}
+
+	public void setCashRate(int iteration, float rate) {
+		if (this.cashRate == null) {
+			this.cashRate = new ArrayList<Float>(iteration);
+		}
+		if (iteration > this.cashRate.size()) {
+			ArrayList<Float> tmp = this.cashRate;
+			this.cashRate = new ArrayList<Float>(iteration);
+			this.cashRate.addAll(tmp);
+		}
+		this.cashRate.set(iteration, rate);
 	}
 
 	public Map<String, Float> getFinancialStatements() {
 		// initialised to the number of fields in this class
-		Map<String, Float> result = new HashMap<String, Float>(21);
+		final int NUM_LINE_ITEMS = 21;
+		Map<String, Float> result = new HashMap<String, Float>(NUM_LINE_ITEMS);
 
 		// P&L
 		result.put("Interest income", this.pnlInterestIncome);
@@ -159,6 +223,13 @@ public final class ReserveBankOfAustralia extends Agent {
 
 		// Agent details
 		super.name = "RBA";
+
+		// agent relationships
+		this.paymentClearingIndex = 0;
+		this.adiDepositors = null;
+
+		// cash rate
+		this.cashRate = null;
 
 		// P&L
 		this.pnlInterestIncome = 0f;

@@ -3,6 +3,7 @@
  */
 package xyz.struthers.rhul.ham.agent;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,11 +28,22 @@ public final class ForeignCountry extends Agent {
 
 	private static final long serialVersionUID = 1L;
 
+	private final int EXPORTERS_INIT_CAPACITY = 50000;
+
 	// agent relationships
-	protected int paymentClearingIndex;
+	private int paymentClearingIndex;
+	private ArrayList<Exporter> exporters;
 
 	// field variables
 	private Currency currency;
+	/**
+	 * Lists the exchange rates at each iteration. Index 0 is the initially
+	 * calibrated rate, index 1 is at month 1, etc.
+	 * 
+	 * Exchange rates are expressed as 1 AUD = xxx foreign currency<br>
+	 * e.g. 1 AUD = 0.7391 USD
+	 */
+	private ArrayList<Float> exchangeRates;
 	private float totalExportsFromAustralia;
 	private float totalImportsToAustralia;
 	private Map<String, Float> exportsFromAustraliaByState; // 8 states
@@ -59,18 +71,40 @@ public final class ForeignCountry extends Agent {
 		this.currency = countryCurrency;
 	}
 
-	public ForeignCountry(String countryName, Currency countryCurrency, float exportsFromAustralia,
-			float importsToAustralia, Map<String, Float> exportsFromAusByState,
+	public ForeignCountry(String countryName, Currency countryCurrency, float initialExchangeRate,
+			float exportsFromAustralia, float importsToAustralia, Map<String, Float> exportsFromAusByState,
 			Map<String, Float> importsToAusByState) {
 		super();
 		this.init();
 
 		super.name = countryName;
 		this.currency = countryCurrency;
+		this.exchangeRates = new ArrayList<Float>();
+		this.exchangeRates.add(initialExchangeRate);
 		this.totalExportsFromAustralia = exportsFromAustralia;
 		this.totalImportsToAustralia = importsToAustralia;
 		this.exportsFromAustraliaByState = exportsFromAusByState;
 		this.importsToAustraliaByState = importsToAusByState;
+	}
+
+	public void addExporter(Exporter exporter) {
+		if (this.exporters == null) {
+			this.exporters = new ArrayList<Exporter>(EXPORTERS_INIT_CAPACITY);
+		}
+		this.exporters.add(exporter);
+	}
+
+	public void addAllExporters(List<Exporter> exporters) {
+		if (this.exporters == null) {
+			this.exporters = new ArrayList<Exporter>(EXPORTERS_INIT_CAPACITY);
+		}
+		this.exporters.addAll(exporters);
+	}
+
+	public void trimExportersListToSize() {
+		if (this.exporters != null) {
+			this.exporters.trimToSize();
+		}
 	}
 
 	@Override
@@ -85,12 +119,38 @@ public final class ForeignCountry extends Agent {
 
 	@Override
 	public List<NodePayment> getAmountsPayable(int iteration) {
-		// TODO Auto-generated method stub
-		return null;
+		int numberOfCreditors = 1;
+		if (this.exporters != null) {
+			numberOfCreditors = this.exporters.size();
+		}
+		ArrayList<NodePayment> liabilities = new ArrayList<NodePayment>(numberOfCreditors);
+
+		/*
+		 * Assume that Australian businesses export in AUD, but import in the foreign
+		 * country's currency. However, if the value of the AUD increases this will
+		 * decrease foreign demand and result in a drop in sales.
+		 */
+		float currentExchangeRate = this.exchangeRates.get(0);
+		if (this.exchangeRates.size() >= iteration && this.exchangeRates.get(iteration) != null) {
+			currentExchangeRate = this.exchangeRates.get(iteration);
+		}
+		float exchRateAdjustment = this.exchangeRates.get(0) / currentExchangeRate;
+		for (int exporterIdx = 0; exporterIdx < this.exporters.size(); exporterIdx++) {
+			int index = this.exporters.get(exporterIdx).getPaymentClearingIndex();
+			float audAmount = this.exporters.get(exporterIdx).getSalesForeign() * exchRateAdjustment;
+			liabilities.add(new NodePayment(index, audAmount));
+		}
+
+		liabilities.trimToSize();
+		return liabilities;
 	}
 
 	protected void init() {
 		super.name = null;
+
+		this.paymentClearingIndex = 0;
+		this.exporters = null;
+
 		this.currency = null;
 		this.totalExportsFromAustralia = 0f;
 		this.totalImportsToAustralia = 0f;

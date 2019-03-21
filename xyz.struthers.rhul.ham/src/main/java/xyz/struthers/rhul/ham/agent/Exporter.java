@@ -24,11 +24,11 @@ public final class Exporter extends Business {
 	private static final long serialVersionUID = 1L;
 
 	// P&L
-	protected float salesForeign;
+	// protected float salesForeign; // already in Business super class
 
 	// exporter fields
-	private Map<ForeignCountry, Float> destinationCountryAmounts; // average 2.4 countries per exporter
-	private List<Currency> currencies;
+	private ArrayList<ForeignCountry> destinationCountries; // average 2.4 countries per exporter
+	private ArrayList<Float> destinationCountryInitialRatios;
 
 	/**
 	 * Default constructor
@@ -46,15 +46,9 @@ public final class Exporter extends Business {
 	public Exporter(Exporter exporter) {
 		super(exporter);
 
-		this.destinationCountryAmounts = new HashMap<ForeignCountry, Float>(exporter.destinationCountryAmounts.size());
-		for (ForeignCountry country : exporter.destinationCountryAmounts.keySet()) {
-			this.destinationCountryAmounts.put(country, exporter.getDestinationCountryAmounts().get(country));
-		}
-
-		this.currencies = new ArrayList<Currency>(exporter.currencies.size());
-		for (Currency ccy : exporter.currencies) {
-			this.currencies.add(ccy);
-		}
+		// this.salesForeign = exporter.salesForeign;
+		this.destinationCountries = new ArrayList<ForeignCountry>(exporter.destinationCountries);
+		this.destinationCountryInitialRatios = new ArrayList<Float>(exporter.destinationCountryInitialRatios);
 	}
 
 	@Override
@@ -69,36 +63,37 @@ public final class Exporter extends Business {
 	protected void init() {
 		super.init();
 
-		this.destinationCountryAmounts = null;
-		this.currencies = null;
+		this.destinationCountries = null;
+		this.destinationCountryInitialRatios = null;
 	}
 
 	/**
 	 * @return the destinationCountries
 	 */
-	public Map<ForeignCountry, Float> getDestinationCountryAmounts() {
-		return destinationCountryAmounts;
+	public ArrayList<ForeignCountry> getDestinationCountries() {
+		return destinationCountries;
 	}
 
 	/**
 	 * @param destinationCountries the destinationCountries to set
 	 */
-	public void setDestinationCountryAmounts(Map<ForeignCountry, Float> destinationCountryAmounts) {
-		this.destinationCountryAmounts = destinationCountryAmounts;
+	public void setDestinationCountries(ArrayList<ForeignCountry> destinationCountries) {
+		this.destinationCountries = destinationCountries;
 	}
 
 	/**
-	 * @return the currencies
+	 * @return the destinationCountryInitialRatios
 	 */
-	public List<Currency> getCurrencies() {
-		return currencies;
+	public ArrayList<Float> getDestinationCountryInitialRatios() {
+		return destinationCountryInitialRatios;
 	}
 
 	/**
-	 * @param currencies the currencies to set
+	 * @param destinationCountryInitialRatios the destinationCountryInitialRatios to
+	 *                                        set
 	 */
-	public void setCurrencies(List<Currency> currencies) {
-		this.currencies = currencies;
+	public void setDestinationCountryInitialRatios(ArrayList<Float> destinationCountryInitialRatios) {
+		this.destinationCountryInitialRatios = destinationCountryInitialRatios;
 	}
 
 	/**

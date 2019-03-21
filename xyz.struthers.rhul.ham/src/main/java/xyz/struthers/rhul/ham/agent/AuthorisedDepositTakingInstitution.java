@@ -39,14 +39,13 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	protected ArrayList<Individual> employees; // calculate wages & super
 	protected ArrayList<Business> domesticSuppliers;
 	protected ArrayList<Float> domesticSupplierRatios;
-	protected ArrayList<Float> supplierRatios;
 	protected AustralianGovernment govt;
 	protected ArrayList<Household> retailDepositors; // TODO: implement me
 	protected ArrayList<Business> commercialDepositors;// TODO: implement me
 	protected ArrayList<AuthorisedDepositTakingInstitution> adiInvestors;// TODO: implement me
 	protected ArrayList<Float> adiInvestorAmounts;// TODO: implement me
 
-	// P&L (80 bytes)
+	// P&L (40 bytes)
 	protected float pnlInterestIncome;
 	protected float pnlInterestExpense;
 	protected float pnlTradingIncome;
@@ -60,7 +59,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 
 	protected float pnlIncomeTaxExpense;
 
-	// Bal Sht (152 bytes)
+	// Bal Sht (76 bytes)
 	protected float bsCash;
 	protected float bsTradingSecurities;
 	protected float bsDerivativeAssets;
@@ -83,7 +82,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	protected float bsReserves;
 	protected float bsOtherEquity;
 
-	// Metrics (96 bytes)
+	// Metrics (48 bytes)
 	protected float rateCash;
 	protected float rateTrading;
 	protected float rateInvestment;
@@ -97,6 +96,11 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	protected float capitalTotalRWA;
 	protected float capitalCreditRWA;
 
+	// effective interest rates
+	protected ArrayList<Float> retailDepositRate;
+	protected ArrayList<Float> commercialDepositRate;
+	
+	
 	/**
 	 * Default constructor
 	 */

@@ -59,7 +59,7 @@ public class Business extends Agent implements Employer {
 	protected float totalIncome;
 	protected float salesDomestic;
 	protected float salesGovernment;
-	protected float salesForeign;
+	protected float salesForeign; // initial AUD foreign sales during calibration
 	protected float interestIncome;
 	protected float rentIncome;
 	protected float otherIncome; // balancing item
@@ -489,6 +489,104 @@ public class Business extends Agent implements Employer {
 	}
 
 	/**
+	 * @return the adi
+	 */
+	public AuthorisedDepositTakingInstitution getAdi() {
+		return adi;
+	}
+
+	/**
+	 * @param adi the adi to set
+	 */
+	public void setAdi(AuthorisedDepositTakingInstitution adi) {
+		this.adi = adi;
+	}
+
+	/**
+	 * @return the domesticSuppliers
+	 */
+	public ArrayList<Business> getDomesticSuppliers() {
+		return domesticSuppliers;
+	}
+
+	/**
+	 * @param domesticSuppliers the domesticSuppliers to set
+	 */
+	public void setDomesticSuppliers(ArrayList<Business> domesticSuppliers) {
+		this.domesticSuppliers = domesticSuppliers;
+	}
+
+	/**
+	 * @return the supplierRatios
+	 */
+	public ArrayList<Float> getSupplierRatios() {
+		return supplierRatios;
+	}
+
+	/**
+	 * @param supplierRatios the supplierRatios to set
+	 */
+	public void setSupplierRatios(ArrayList<Float> supplierRatios) {
+		this.supplierRatios = supplierRatios;
+	}
+
+	/**
+	 * @return the foreignSuppliers
+	 */
+	public ArrayList<ForeignCountry> getForeignSuppliers() {
+		return foreignSuppliers;
+	}
+
+	/**
+	 * @param foreignSuppliers the foreignSuppliers to set
+	 */
+	public void setForeignSuppliers(ArrayList<ForeignCountry> foreignSuppliers) {
+		this.foreignSuppliers = foreignSuppliers;
+	}
+
+	/**
+	 * @return the foreignSupplierRatios
+	 */
+	public ArrayList<Float> getForeignSupplierRatios() {
+		return foreignSupplierRatios;
+	}
+
+	/**
+	 * @param foreignSupplierRatios the foreignSupplierRatios to set
+	 */
+	public void setForeignSupplierRatios(ArrayList<Float> foreignSupplierRatios) {
+		this.foreignSupplierRatios = foreignSupplierRatios;
+	}
+
+	/**
+	 * @return the landlord
+	 */
+	public Business getLandlord() {
+		return landlord;
+	}
+
+	/**
+	 * @param landlord the landlord to set
+	 */
+	public void setLandlord(Business landlord) {
+		this.landlord = landlord;
+	}
+
+	/**
+	 * @return the govt
+	 */
+	public AustralianGovernment getGovt() {
+		return govt;
+	}
+
+	/**
+	 * @param govt the govt to set
+	 */
+	public void setGovt(AustralianGovernment govt) {
+		this.govt = govt;
+	}
+
+	/**
 	 * @return the totalIncome
 	 */
 	public float getTotalIncome() {
@@ -580,6 +678,13 @@ public class Business extends Agent implements Employer {
 	}
 
 	/**
+	 * @param otherIncome the otherIncome to set
+	 */
+	public void setOtherIncome(float otherIncome) {
+		this.otherIncome = otherIncome;
+	}
+
+	/**
 	 * @return the totalExpenses
 	 */
 	public float getTotalExpenses() {
@@ -594,17 +699,17 @@ public class Business extends Agent implements Employer {
 	}
 
 	/**
-	 * @return the personnelExpenses
+	 * @return the wageExpenses
 	 */
 	public float getWageExpenses() {
 		return wageExpenses;
 	}
 
 	/**
-	 * @param personnelExpenses the personnelExpenses to set
+	 * @param wageExpenses the wageExpenses to set
 	 */
-	public void setWageExpenses(float personnelExpenses) {
-		this.wageExpenses = personnelExpenses;
+	public void setWageExpenses(float wageExpenses) {
+		this.wageExpenses = wageExpenses;
 	}
 
 	/**
@@ -699,6 +804,13 @@ public class Business extends Agent implements Employer {
 	}
 
 	/**
+	 * @param otherExpenses the otherExpenses to set
+	 */
+	public void setOtherExpenses(float otherExpenses) {
+		this.otherExpenses = otherExpenses;
+	}
+
+	/**
 	 * @return the totalAssets
 	 */
 	public float getTotalAssets() {
@@ -762,6 +874,13 @@ public class Business extends Agent implements Employer {
 	}
 
 	/**
+	 * @param otherNonFinancialAssets the otherNonFinancialAssets to set
+	 */
+	public void setOtherNonFinancialAssets(float otherNonFinancialAssets) {
+		this.otherNonFinancialAssets = otherNonFinancialAssets;
+	}
+
+	/**
 	 * @return the totalLiabilities
 	 */
 	public float getTotalLiabilities() {
@@ -818,10 +937,17 @@ public class Business extends Agent implements Employer {
 	}
 
 	/**
-	 * @return the otherLiabilities
+	 * @return the otherNonCurrentLiabilities
 	 */
 	public float getOtherNonCurrentLiabilities() {
 		return otherNonCurrentLiabilities;
+	}
+
+	/**
+	 * @param otherNonCurrentLiabilities the otherNonCurrentLiabilities to set
+	 */
+	public void setOtherNonCurrentLiabilities(float otherNonCurrentLiabilities) {
+		this.otherNonCurrentLiabilities = otherNonCurrentLiabilities;
 	}
 
 	/**
@@ -864,6 +990,13 @@ public class Business extends Agent implements Employer {
 	 */
 	public void setInterestRateDeposits(float interestRateDeposits) {
 		this.interestRateDeposits = interestRateDeposits;
+	}
+
+	/**
+	 * @param employees the employees to set
+	 */
+	public void setEmployees(ArrayList<Individual> employees) {
+		this.employees = employees;
 	}
 
 }
