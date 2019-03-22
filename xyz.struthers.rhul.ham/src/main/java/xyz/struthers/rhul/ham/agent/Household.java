@@ -30,7 +30,6 @@ public class Household extends Agent {
 	private int numAdults;
 	private int numChildren;
 
-	private AuthorisedDepositTakingInstitution depositAdi; // can be null if no deposits (e.g. children)
 	private AuthorisedDepositTakingInstitution loanAdi; // can be null if no loan
 	private ArrayList<Business> suppliers; // household spending goes to these per ABS 6530.0
 	private ArrayList<Float> supplierRatios; // per ABS 6530.0
@@ -216,6 +215,11 @@ public class Household extends Agent {
 		this.individuals = null;
 		this.numAdults = 0;
 		this.numChildren = 0;
+		this.loanAdi = null;
+		this.suppliers = null;
+		this.supplierRatios = null;
+		this.landlord = null;
+		this.govt = null;
 
 		// P&L
 		this.pnlWagesSalaries = 0f;
@@ -290,20 +294,6 @@ public class Household extends Agent {
 	 */
 	public void setNumChildren(int numChildren) {
 		this.numChildren = numChildren;
-	}
-
-	/**
-	 * @return the depositAdi
-	 */
-	public AuthorisedDepositTakingInstitution getDepositAdi() {
-		return depositAdi;
-	}
-
-	/**
-	 * @param depositAdi the depositAdi to set
-	 */
-	public void setDepositAdi(AuthorisedDepositTakingInstitution depositAdi) {
-		this.depositAdi = depositAdi;
 	}
 
 	/**

@@ -6,12 +6,17 @@ package xyz.struthers.rhul.ham.data;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import xyz.struthers.lang.CollectionTools;
+import com.google.common.collect.Lists;
+
 import xyz.struthers.rhul.ham.agent.AustralianGovernment;
 import xyz.struthers.rhul.ham.agent.AuthorisedDepositTakingInstitution;
 import xyz.struthers.rhul.ham.agent.Business;
@@ -201,23 +206,76 @@ public class CalibrateEconomy {
 	 * This includes linking Individuals to their employers, though they will only
 	 * be included in the payment clearing vector at a Household level.
 	 */
-	public void linkHouseholds() {
-		// FIXME: implement me
+	private void linkHouseholds() {
 		if (!this.indicesAssigned) {
 			this.assignPaymentClearingIndices();
 		}
 
 		// link Household spending to businesses (domestic suppliers)
-		float[] abs6530SpendRatios = this.calcAbs6530SpendRatios();
-		ArrayList<Integer> shuffledIndices = null;
-		int nextShuffledIdx = 0;
-		
+		Set<String> spendingDivisions = new HashSet<String>(Arrays.asList(ABS_6530_0_SPEND_DIV_CODE));
+		Map<String, Float> industryTotals = new HashMap<String, Float>(
+				(int) Math.ceil(DIVISION_CODE_INDICES.length / 0.75f));
+		// calculate total domestic sales per industry
+		for (int i = 0; i < this.businesses.length; i++) {
+			String div = String.valueOf(this.businesses[i].getIndustryDivisionCode());
+			if (spendingDivisions.contains(div) && !industryTotals.containsKey(div)) {
+				industryTotals.put(div, 0f);
+			}
+			industryTotals.put(div, industryTotals.get(div) + this.businesses[i].getSalesDomestic());
+		}
 		// make a list of businesses in each industry, with relative weights
-		
-		// landlord
+		Map<String, ArrayList<Integer>> businessIndices = new HashMap<String, ArrayList<Integer>>(
+				(int) Math.ceil(spendingDivisions.size() / 0.75f));
+		for (String div : spendingDivisions) {
+			businessIndices.put(div, new ArrayList<Integer>(this.households.length));
+		}
+		for (int i = 0; i < this.businesses.length; i++) {
+			String div = String.valueOf(this.businesses[i].getIndustryDivisionCode());
+			float domesticSales = this.businesses[i].getSalesDomestic();
+			int businessCount = (int) Math.ceil(domesticSales / industryTotals.get(div) * this.households.length);
+			businessIndices.get(div)
+					.addAll(Collections.nCopies(businessCount, this.businesses[i].getPaymentClearingIndex()));
+		}
+		// shuffle indices and assign household spending per ABS 6530.0 ratios
+		Map<String, Integer> nextBusinessIndex = new HashMap<String, Integer>(
+				(int) Math.ceil(spendingDivisions.size() / 0.75f));
+		ArrayList<Float> abs6530SpendRatios = this.calcAbs6530SpendRatios();
+		for (String div : spendingDivisions) {
+			Collections.shuffle(businessIndices.get(div), this.random);
+			nextBusinessIndex.put(div, 0);
+		}
+		for (int i = 0; i < this.households.length; i++) {
+			String div = String.valueOf(this.businesses[i].getIndustryDivisionCode());
+			ArrayList<Business> suppliers = new ArrayList<Business>(ABS_6530_0_SPEND_DIV_CODE.length);
+			for (int j = 0; j < ABS_6530_0_SPEND_DIV_CODE.length; j++) {
+				// assign next random business for that Division
+				int nextShuffledIndex = nextBusinessIndex.get(div);
+				suppliers.add(this.businesses[businessIndices.get(div).get(nextShuffledIndex)]);
+				// increment the index, but stay within the array bounds
+				nextBusinessIndex.put(div, (nextShuffledIndex + 1) % businessIndices.get(div).size());
+			}
+			this.households[i].setSuppliers(suppliers);
+			this.households[i].setSupplierRatios(abs6530SpendRatios);
+		}
+		// release memory
+		for (String div : spendingDivisions) {
+			businessIndices.get(div).clear();
+			businessIndices.put(div, null);
+		}
+		businessIndices.clear();
+		businessIndices = null;
+		nextBusinessIndex.clear();
+		nextBusinessIndex = null;
+		industryTotals.clear();
+		industryTotals = null;
+		spendingDivisions.clear();
+		spendingDivisions = null;
+		abs6530SpendRatios = null; // don't clear it because the Households still point to it
+
+		// Landlord
 		float totalRent = (float) Arrays.asList(this.households).stream().mapToDouble(o -> o.getPnlRentIncome()).sum();
 		// populate indices with relative amounts of each landlord
-		shuffledIndices = new ArrayList<Integer>(this.households.length);
+		ArrayList<Integer> shuffledIndices = new ArrayList<Integer>(this.households.length);
 		for (int i = 0; i < this.households.length; i++) {
 			// calculate ratio of landlord to total
 			float landlordRent = this.households[i].getPnlRentIncome();
@@ -230,17 +288,18 @@ public class CalibrateEconomy {
 		}
 		// shuffle indices, and assign landlords to renting Households
 		Collections.shuffle(shuffledIndices, this.random);
-		nextShuffledIdx = 0;
+		int nextShuffledIdx = 0;
 		for (int i = 0; i < this.households.length; i++) {
 			if (this.households[i].getPnlRentExpense() > 0f) {
 				// assign landlord to Household
 				this.households[i].setLandlord(this.households[shuffledIndices.get(nextShuffledIdx++)]);
 			}
 		}
+		// release memory
 		shuffledIndices.clear();
 		shuffledIndices = null;
 
-		// loan ADI
+		// Loan ADI
 		// get total loans for entire ADI industry
 		float totalLoanBal = (float) Arrays.asList(this.adis).stream().mapToDouble(o -> o.getBsLoansHome()).sum();
 		totalLoanBal += (float) Arrays.asList(this.adis).stream().mapToDouble(o -> o.getBsLoansPersonal()).sum();
@@ -257,13 +316,14 @@ public class CalibrateEconomy {
 		}
 		// shuffle indices, and assign ADIs to Households
 		Collections.shuffle(shuffledIndices, this.random);
-		nextShuffledIdx=0;
+		nextShuffledIdx = 0;
 		for (int i = 0; i < this.households.length; i++) {
 			if (this.households[i].getBsLoans() > 0f) {
 				// assign loan ADI to Household
 				this.households[i].setLoanAdi(this.adis[shuffledIndices.get(nextShuffledIdx++)]);
 			}
 		}
+		// release memory
 		shuffledIndices.clear();
 		shuffledIndices = null;
 
@@ -292,14 +352,23 @@ public class CalibrateEconomy {
 	 * relative revenue (foreign revenue?), by state. Assign foreign countries to
 	 * the businesses based on the given probabilities.
 	 */
-	public void linkBusinesses() {
+	void linkBusinesses() {
+		// FIXME: implement me
 		if (!this.indicesAssigned) {
 			this.assignPaymentClearingIndices();
 		}
 
-		// link to banks
+		// link to employees
 
-		// link to foeign countries
+		// link to domestic suppliers
+
+		// link to foreign suppliers (i.e. foreign countries)
+
+		// link to landlord (rent)
+
+		// link to bank (loans)
+
+		// link to Australian Government (payroll & income tax)
 
 	}
 
@@ -308,20 +377,33 @@ public class CalibrateEconomy {
 	 * re-calibrates the ADI's financials so that they're proportional to the actual
 	 * amount of business that has been assigned to them.
 	 */
-	public void linkAdis() {
+	void linkAdis() {
 		if (!this.indicesAssigned) {
 			this.assignPaymentClearingIndices();
 		}
 
+		// link to employees
+
+		// link to domestic suppliers
+
+		// link to retail depositors (Households)
+
+		// link to commercial depositors (Businesses)
+
+		// link to ADI investors
+
+		// link to Australian Government (payroll & income tax)
 	}
 
 	/**
 	 * Links the ForeignCountries to their Exporter trading partners.
 	 */
-	public void linkForeignCountries() {
+	void linkForeignCountries() {
 		if (!this.indicesAssigned) {
 			this.assignPaymentClearingIndices();
 		}
+
+		// link to exporters
 
 	}
 
@@ -329,10 +411,14 @@ public class CalibrateEconomy {
 	 * Links the AustralianGovernment to their welfare recipients and bond
 	 * investors.
 	 */
-	public void linkGovernment() {
+	void linkGovernment() {
 		if (!this.indicesAssigned) {
 			this.assignPaymentClearingIndices();
 		}
+
+		// link to welfare recipients
+
+		// link to bond investors (ADIs)
 
 	}
 
@@ -340,10 +426,14 @@ public class CalibrateEconomy {
 	 * Links the RBA to the banks with their cash balances, and the government to
 	 * pay its annual dividends to.
 	 */
-	public void linkRba() {
+	void linkRba() {
 		if (!this.indicesAssigned) {
 			this.assignPaymentClearingIndices();
 		}
+
+		// link to major and regional banks
+
+		// link to Australian Government (annual dividends)
 
 	}
 
@@ -353,14 +443,14 @@ public class CalibrateEconomy {
 	 * 
 	 * @return
 	 */
-	private float[] calcAbs6530SpendRatios() {
-		float[] ratios = new float[ABS_6530_0_SPEND_AMT.length];
+	private ArrayList<Float> calcAbs6530SpendRatios() {
+		ArrayList<Float> ratios = new ArrayList<Float>(ABS_6530_0_SPEND_AMT.length);
 		float total = 0f;
 		for (int i = 0; i < ABS_6530_0_SPEND_AMT.length; i++) {
 			total += ABS_6530_0_SPEND_AMT[i];
 		}
 		for (int i = 0; i < ABS_6530_0_SPEND_AMT.length; i++) {
-			ratios[i] = ABS_6530_0_SPEND_AMT[i] / total;
+			ratios.set(i, ABS_6530_0_SPEND_AMT[i] / total);
 		}
 		return ratios;
 	}
