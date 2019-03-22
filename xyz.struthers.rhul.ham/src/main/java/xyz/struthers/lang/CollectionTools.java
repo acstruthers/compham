@@ -3,8 +3,10 @@
  */
 package xyz.struthers.lang;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,6 +31,11 @@ public class CollectionTools {
 		return data.stream().mapToDouble(Double::doubleValue).sum();
 	}
 
+	static public final double sumDouble(Double[] data) {
+		List<Double> list = Arrays.asList(data);
+		return list.stream().mapToDouble(Double::doubleValue).sum();
+	}
+
 	static public final float sumFloat(Map<String, Float> data) {
 		return data.values().stream().reduce(0f, Float::sum);
 	}
@@ -37,12 +44,22 @@ public class CollectionTools {
 		return data.stream().reduce(0f, Float::sum);
 	}
 
+	static public final float sumFloat(Float[] data) {
+		List<Float> list = Arrays.asList(data);
+		return list.stream().reduce(0f, Float::sum);
+	}
+
 	static public final int sumInt(Map<String, Integer> data) {
 		return data.values().stream().mapToInt(Integer::intValue).sum();
 	}
 
 	static public final int sumInt(Collection<Integer> data) {
 		return data.stream().mapToInt(Integer::intValue).sum();
+	}
+
+	static public final int sumInt(Integer[] data) {
+		List<Integer> list = Arrays.asList(data);
+		return list.stream().mapToInt(Integer::intValue).sum();
 	}
 
 	/**

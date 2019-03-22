@@ -819,7 +819,7 @@ public class CalibrateHouseholds {
 											.sample(pdfRntrd[lgaIdx][hcfmdSplitIdx.get(cdcfSplit)][hindIdx], 1f - rand);
 									household.setPnlRentExpense(ABS_RNTRD_MIDPOINT[attributeIdx]);
 
-									List<Individual> members = new ArrayList<Individual>(numAdults + numChildren);
+									ArrayList<Individual> members = new ArrayList<Individual>(numAdults + numChildren);
 									int firstAdultIncpIdx = 0;
 									// assign adults
 									if (numAdults == 1) {
@@ -1498,6 +1498,18 @@ public class CalibrateHouseholds {
 									}
 
 									// add family members to Household
+									members.trimToSize();
+									numAdults = 0;
+									numChildren = 0;
+									for (Individual assignedMember : members) {
+										if (assignedMember.getAge() < 20) {
+											numChildren++;
+										} else {
+											numAdults++;
+										}
+									}
+									household.setNumAdults(numAdults);
+									household.setNumChildren(numChildren);
 									household.setIndividuals(members.toArray(Individual[]::new));
 
 									// consolidate Individual financials into Household financials

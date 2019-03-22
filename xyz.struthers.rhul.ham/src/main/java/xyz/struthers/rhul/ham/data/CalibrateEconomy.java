@@ -4,17 +4,21 @@
 package xyz.struthers.rhul.ham.data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import xyz.struthers.lang.CollectionTools;
+import xyz.struthers.rhul.ham.agent.AustralianGovernment;
 import xyz.struthers.rhul.ham.agent.AuthorisedDepositTakingInstitution;
 import xyz.struthers.rhul.ham.agent.Business;
 import xyz.struthers.rhul.ham.agent.ForeignCountry;
 import xyz.struthers.rhul.ham.agent.Household;
 import xyz.struthers.rhul.ham.agent.Individual;
+import xyz.struthers.rhul.ham.agent.ReserveBankOfAustralia;
 import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
 
@@ -56,9 +60,12 @@ public class CalibrateEconomy {
 	private AuthorisedDepositTakingInstitution[] adis;
 	private ForeignCountry[] countries;
 	private Currencies currencies;
+	private AustralianGovernment govt;
+	private ReserveBankOfAustralia rba;
 
 	// field variables
 	private Random random;
+	private boolean indicesAssigned;
 
 	/**
 	 * 
@@ -76,9 +83,12 @@ public class CalibrateEconomy {
 		this.adis = null;
 		this.countries = null;
 		this.currencies = null;
+		this.govt = null;
+		this.rba = null;
 
 		// field variables
 		this.random = null;
+		this.indicesAssigned = false;
 	}
 
 	/**
@@ -101,6 +111,8 @@ public class CalibrateEconomy {
 		this.adis = null;
 		this.countries = null;
 		this.currencies = null;
+		this.govt = null;
+		this.rba = null;
 
 		// field variables
 		this.random = null;
@@ -116,7 +128,153 @@ public class CalibrateEconomy {
 	 * Payments Clearing Vector calculations. This saves RAM, time, and recognises
 	 * that families support each other.
 	 * 
-	 * ROUGH ALGORITHM:
+	 * Links are stored in the agent who has the liability. I would like to store
+	 * pointers in both agents involved in the link(to make reporting easier), but
+	 * it would consume a lot of unnecessary memory.
+	 */
+	public void linkAllAgents() {
+		// get agents
+		this.govt = this.economy.getGovernment();
+		this.rba = this.economy.getRba();
+		this.households = this.economy.getHouseholds();
+		this.individuals = this.economy.getIndividuals();
+		this.businesses = this.economy.getBusinesses();
+		this.adis = this.economy.getAdis();
+		this.countries = this.economy.getCountries();
+		this.currencies = this.economy.getCurrencies();
+
+		/*
+		 * To ensure that every agent has other agents linked to it, use the shuffled
+		 * index approach rather than just sampling from a PDF to assign links. Could
+		 * even populate the indices with relative counts per the PDF so that they get
+		 * the right weighting during the sampling process. It would be much harder to
+		 * weight by balance too, so I would probably just use "head count" to assign
+		 * links.
+		 * 
+		 * An alternative but similar approach would be to re-calculate the PDF between
+		 * each assignment so it's more akin to sampling without replacement. That would
+		 * be better than the pure PDF approach, but still not as robust as the shuffled
+		 * index approach. The biggest issue I've had in the calibration process has
+		 * been mis-matches where cells have data in some sources but not others, so the
+		 * cross-product results in lots more empty cells and ultimately a loss of data.
+		 */
+		this.assignPaymentClearingIndices();
+		this.random = this.properties.getRandom();
+		this.linkHouseholds();
+		this.linkBusinesses();
+		this.linkAdis();
+		this.linkForeignCountries();
+		this.linkGovernment();
+		this.linkRba();
+
+	}
+
+	/**
+	 * Assign unique Payment Clearing Indices to every participating agent.
+	 * 
+	 * N.B. This is the order they MUST be in the Payment Clearing Vector arguments
+	 */
+	private void assignPaymentClearingIndices() {
+		if (!this.indicesAssigned) {
+			int paymentClearingIdx = 0;
+			this.govt.setPaymentClearingIndex(paymentClearingIdx++);
+			this.rba.setPaymentClearingIndex(paymentClearingIdx++);
+			for (int i = 0; i < this.households.length; i++) {
+				this.households[i].setPaymentClearingIndex(paymentClearingIdx++);
+			}
+			for (int i = 0; i < this.businesses.length; i++) {
+				this.businesses[i].setPaymentClearingIndex(paymentClearingIdx++);
+			}
+			for (int i = 0; i < this.adis.length; i++) {
+				this.adis[i].setPaymentClearingIndex(paymentClearingIdx++);
+			}
+			for (int i = 0; i < this.countries.length; i++) {
+				this.countries[i].setPaymentClearingIndex(paymentClearingIdx++);
+			}
+			this.indicesAssigned = true;
+		}
+	}
+
+	/**
+	 * Links the Households to their banks, employers and suppliers.
+	 * 
+	 * This includes linking Individuals to their employers, though they will only
+	 * be included in the payment clearing vector at a Household level.
+	 */
+	public void linkHouseholds() {
+		// FIXME: implement me
+		if (!this.indicesAssigned) {
+			this.assignPaymentClearingIndices();
+		}
+
+		// link Household spending to businesses (domestic suppliers)
+		float[] abs6530SpendRatios = this.calcAbs6530SpendRatios();
+		ArrayList<Integer> shuffledIndices = null;
+		int nextShuffledIdx = 0;
+		
+		// make a list of businesses in each industry, with relative weights
+		
+		// landlord
+		float totalRent = (float) Arrays.asList(this.households).stream().mapToDouble(o -> o.getPnlRentIncome()).sum();
+		// populate indices with relative amounts of each landlord
+		shuffledIndices = new ArrayList<Integer>(this.households.length);
+		for (int i = 0; i < this.households.length; i++) {
+			// calculate ratio of landlord to total
+			float landlordRent = this.households[i].getPnlRentIncome();
+			if (landlordRent > 0f) {
+				// convert to indices, rounding up so we have at least enough
+				int landlordTenantCount = (int) Math.ceil(landlordRent / totalRent * this.households.length);
+				shuffledIndices
+						.addAll(Collections.nCopies(landlordTenantCount, this.households[i].getPaymentClearingIndex()));
+			}
+		}
+		// shuffle indices, and assign landlords to renting Households
+		Collections.shuffle(shuffledIndices, this.random);
+		nextShuffledIdx = 0;
+		for (int i = 0; i < this.households.length; i++) {
+			if (this.households[i].getPnlRentExpense() > 0f) {
+				// assign landlord to Household
+				this.households[i].setLandlord(this.households[shuffledIndices.get(nextShuffledIdx++)]);
+			}
+		}
+		shuffledIndices.clear();
+		shuffledIndices = null;
+
+		// loan ADI
+		// get total loans for entire ADI industry
+		float totalLoanBal = (float) Arrays.asList(this.adis).stream().mapToDouble(o -> o.getBsLoansHome()).sum();
+		totalLoanBal += (float) Arrays.asList(this.adis).stream().mapToDouble(o -> o.getBsLoansPersonal()).sum();
+		// populate indices with relative amounts of each ADI
+		shuffledIndices = new ArrayList<Integer>(this.households.length);
+		for (int i = 0; i < this.adis.length; i++) {
+			// calculate ratio of ADI to total
+			float adiLoanBal = this.adis[i].getBsLoansHome() + this.adis[i].getBsLoansPersonal();
+			if (adiLoanBal > 0f) {
+				// convert to indices, rounding up so we have at least enough
+				int adiCustomerCount = (int) Math.ceil(adiLoanBal / totalLoanBal * this.households.length);
+				shuffledIndices.addAll(Collections.nCopies(adiCustomerCount, this.adis[i].getPaymentClearingIndex()));
+			}
+		}
+		// shuffle indices, and assign ADIs to Households
+		Collections.shuffle(shuffledIndices, this.random);
+		nextShuffledIdx=0;
+		for (int i = 0; i < this.households.length; i++) {
+			if (this.households[i].getBsLoans() > 0f) {
+				// assign loan ADI to Household
+				this.households[i].setLoanAdi(this.adis[shuffledIndices.get(nextShuffledIdx++)]);
+			}
+		}
+		shuffledIndices.clear();
+		shuffledIndices = null;
+
+		// Australian Government
+		for (int i = 0; i < this.households.length; i++) {
+			this.households[i].setGovt(this.govt);
+		}
+	}
+
+	/**
+	 * Links the Businesses to their banks and foreign trading parties.
 	 * 
 	 * ---------------------------------------------<br>
 	 * - PART A: Assigning employees to businesses -<br>
@@ -134,47 +292,12 @@ public class CalibrateEconomy {
 	 * relative revenue (foreign revenue?), by state. Assign foreign countries to
 	 * the businesses based on the given probabilities.
 	 */
-	public void linkAllAgents() {
-		// get agents
-		this.households = this.economy.getHouseholds();
-		this.individuals = this.economy.getIndividuals();
-		this.businesses = this.economy.getBusinesses();
-		this.adis = this.economy.getAdis();
-		this.countries = this.economy.getCountries();
-		this.currencies = this.economy.getCurrencies();
-
-		this.random = this.properties.getRandom();
-
-		this.linkHouseholds();
-		this.linkBusinesses();
-		this.linkAdis();
-		this.linkForeignCountries();
-		this.linkGovernment();
-		this.linkRba();
-
-	}
-
-	/**
-	 * Links the Households to their banks, employers and suppliers.
-	 * 
-	 * This includes linking Individuals to their employers, though they will only
-	 * be included in the payment clearing vector at a Household level.
-	 */
-	public void linkHouseholds() {
-		// FIXME: implement me
-
-		// link income-earning adults to employers
-
-		// link Household spending to businesses
-		float[] abs6530SpendRatios = this.calcAbs6530SpendRatios();
-
-	}
-
-	/**
-	 * Links the Businesses to their banks and foreign trading parties.
-	 */
 	public void linkBusinesses() {
-// link to banks
+		if (!this.indicesAssigned) {
+			this.assignPaymentClearingIndices();
+		}
+
+		// link to banks
 
 		// link to foeign countries
 
@@ -186,6 +309,9 @@ public class CalibrateEconomy {
 	 * amount of business that has been assigned to them.
 	 */
 	public void linkAdis() {
+		if (!this.indicesAssigned) {
+			this.assignPaymentClearingIndices();
+		}
 
 	}
 
@@ -193,6 +319,9 @@ public class CalibrateEconomy {
 	 * Links the ForeignCountries to their Exporter trading partners.
 	 */
 	public void linkForeignCountries() {
+		if (!this.indicesAssigned) {
+			this.assignPaymentClearingIndices();
+		}
 
 	}
 
@@ -201,6 +330,9 @@ public class CalibrateEconomy {
 	 * investors.
 	 */
 	public void linkGovernment() {
+		if (!this.indicesAssigned) {
+			this.assignPaymentClearingIndices();
+		}
 
 	}
 
@@ -209,6 +341,9 @@ public class CalibrateEconomy {
 	 * pay its annual dividends to.
 	 */
 	public void linkRba() {
+		if (!this.indicesAssigned) {
+			this.assignPaymentClearingIndices();
+		}
 
 	}
 

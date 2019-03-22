@@ -34,7 +34,7 @@ public class Household extends Agent {
 	private AuthorisedDepositTakingInstitution loanAdi; // can be null if no loan
 	private ArrayList<Business> suppliers; // household spending goes to these per ABS 6530.0
 	private ArrayList<Float> supplierRatios; // per ABS 6530.0
-	private Business landlord;
+	private Household landlord;
 	private AustralianGovernment govt;
 
 	// P&L (72 bytes)
@@ -290,6 +290,104 @@ public class Household extends Agent {
 	 */
 	public void setNumChildren(int numChildren) {
 		this.numChildren = numChildren;
+	}
+
+	/**
+	 * @return the depositAdi
+	 */
+	public AuthorisedDepositTakingInstitution getDepositAdi() {
+		return depositAdi;
+	}
+
+	/**
+	 * @param depositAdi the depositAdi to set
+	 */
+	public void setDepositAdi(AuthorisedDepositTakingInstitution depositAdi) {
+		this.depositAdi = depositAdi;
+	}
+
+	/**
+	 * @return the loanAdi
+	 */
+	public AuthorisedDepositTakingInstitution getLoanAdi() {
+		return loanAdi;
+	}
+
+	/**
+	 * @param loanAdi the loanAdi to set
+	 */
+	public void setLoanAdi(AuthorisedDepositTakingInstitution loanAdi) {
+		this.loanAdi = loanAdi;
+	}
+
+	/**
+	 * @return the suppliers
+	 */
+	public ArrayList<Business> getSuppliers() {
+		return suppliers;
+	}
+
+	/**
+	 * @param suppliers the suppliers to set
+	 */
+	public void setSuppliers(ArrayList<Business> suppliers) {
+		this.suppliers = suppliers;
+	}
+
+	/**
+	 * @return the supplierRatios
+	 */
+	public ArrayList<Float> getSupplierRatios() {
+		return supplierRatios;
+	}
+
+	/**
+	 * @param supplierRatios the supplierRatios to set
+	 */
+	public void setSupplierRatios(ArrayList<Float> supplierRatios) {
+		this.supplierRatios = supplierRatios;
+	}
+
+	/**
+	 * @return the landlord
+	 */
+	public Household getLandlord() {
+		return landlord;
+	}
+
+	/**
+	 * @param landlord the landlord to set
+	 */
+	public void setLandlord(Household landlord) {
+		this.landlord = landlord;
+	}
+
+	/**
+	 * @return the govt
+	 */
+	public AustralianGovernment getGovt() {
+		return govt;
+	}
+
+	/**
+	 * @param govt the govt to set
+	 */
+	public void setGovt(AustralianGovernment govt) {
+		this.govt = govt;
+	}
+
+	/**
+	 * @return the loanCurrentMonth
+	 */
+	public int getLoanCurrentMonth() {
+		return loanCurrentMonth;
+	}
+
+	/**
+	 * @param loanCurrentMonth the loanCurrentMonth to set
+	 */
+	public void setLoanCurrentMonth(int loanCurrentMonth) {
+		this.loanCurrentMonth = loanCurrentMonth;
 	}
 
 	/**
