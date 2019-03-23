@@ -35,6 +35,10 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
 @Scope(value = "singleton")
 public class CalibrateBusinesses {
 
+	private static final boolean DEBUG = true;
+	private static final boolean DEBUG_ZEROS = false;
+	private static final boolean DEBUG_ZEROS_INFINITY = false;
+
 	// constants
 	public static final String RBA_E1_DATE_STRING = "Jun-2018";
 	public static final String RBA_E1_BUSINESS_BANK_DEPOSITS = "BSPNSPNFAD";
@@ -75,7 +79,7 @@ public class CalibrateBusinesses {
 	 * AU Bal Sht totals<br>
 	 * Keys: Series, Date
 	 */
-	private Map<String, Map<Date, String>> rbaE1;
+	private Map<String, Map<Date, Float>> rbaE1;
 	/**
 	 * ANZSIC industry code mapping<br>
 	 * Key 1 is mapping per the titles (e.g. "Class Code to Division")<br>
@@ -111,32 +115,32 @@ public class CalibrateBusinesses {
 	 * Business size by division<br>
 	 * Keys: year, column title, size, industry
 	 */
-	private Map<String, Map<String, Map<String, Map<String, String>>>> abs8155_0Table5;
+	private Map<String, Map<String, Map<String, Map<String, Float>>>> abs8155_0Table5;
 	/**
 	 * States by division<br>
 	 * Keys: year, column title, state, industry
 	 */
-	private Map<String, Map<String, Map<String, Map<String, String>>>> abs8155_0Table6;
+	private Map<String, Map<String, Map<String, Map<String, Float>>>> abs8155_0Table6;
 	/**
 	 * Count by state, industry & employment range<br>
 	 * Keys: employment range, state, industry class code
 	 */
-	private Map<String, Map<String, Map<String, String>>> abs8165_0StateEmployment;
+	private Map<String, Map<String, Map<String, Float>>> abs8165_0StateEmployment;
 	/**
 	 * Count by LGA, industry & employment range<br>
 	 * Keys: employment range, state acronym, LGA code, industry division code
 	 */
-	private Map<String, Map<String, Map<String, Map<String, String>>>> abs8165_0LgaEmployment;
+	private Map<String, Map<String, Map<String, Map<String, Float>>>> abs8165_0LgaEmployment;
 	/**
 	 * ATO Fine Industry Detailed P&L and Bal Sht<br>
 	 * Keys: column title, fine industry code
 	 */
-	private Map<String, Map<String, String>> atoCompanyTable4a;
+	private Map<String, Map<String, Float>> atoCompanyTable4a;
 	/**
 	 * Industry Code Total P&L<br>
 	 * Keys: column title, business industry code
 	 */
-	private Map<String, Map<String, String>> atoCompanyTable4b;
+	private Map<String, Map<String, Float>> atoCompanyTable4b;
 
 	/**
 	 * 
@@ -363,96 +367,87 @@ public class CalibrateBusinesses {
 			fineIndustryKeyIndex.put(key, i); // so we can look up the index cheaply in the next step of the algorithm
 
 			// TOTAL INCOME
-			count = Integer.valueOf(this.atoCompanyTable4a.get("Total Income3 no.").get(key).replace(",", ""));
-			amount = Float.valueOf(this.atoCompanyTable4a.get("Total Income3 $").get(key).replace(",", ""));
+			count = Math.round(this.atoCompanyTable4a.get("Total Income3 no.").get(key));
+			amount = this.atoCompanyTable4a.get("Total Income3 $").get(key);
 			totalIncomePerCompany[i] = count == 0 ? 0f : amount / count;
 
+			if (DEBUG_ZEROS) {
+				System.out.println("totalIncomePerCompany[" + i + "]: " + totalIncomePerCompany[i]);
+			}
+
 			// Sales
-			count = Integer.valueOf(
-					this.atoCompanyTable4a.get("Other sales of goods and services no.").get(key).replace(",", ""));
-			amount = Float.valueOf(
-					this.atoCompanyTable4a.get("Other sales of goods and services $").get(key).replace(",", ""));
+			count = Math.round(this.atoCompanyTable4a.get("Other sales of goods and services no.").get(key));
+			amount = this.atoCompanyTable4a.get("Other sales of goods and services $").get(key);
 			amountPerCompany = count == 0 ? 0f : amount / count;
 			salesRatio[i] = totalIncomePerCompany[i] == 0 ? 0f : amountPerCompany / totalIncomePerCompany[i];
 
 			// Interest Income
-			count = Integer.valueOf(this.atoCompanyTable4a.get("Gross Interest no.").get(key).replace(",", ""));
-			amount = Float.valueOf(this.atoCompanyTable4a.get("Gross Interest $").get(key).replace(",", ""));
+			count = Math.round(this.atoCompanyTable4a.get("Gross Interest no.").get(key));
+			amount = this.atoCompanyTable4a.get("Gross Interest $").get(key);
 			amountPerCompany = count == 0 ? 0f : amount / count;
 			interestIncomeRatio[i] = totalIncomePerCompany[i] == 0 ? 0f : amountPerCompany / totalIncomePerCompany[i];
 
 			// Rent Income
-			count = Integer.valueOf(this.atoCompanyTable4a.get("Gross rent and other leasing and hiring income no.")
-					.get(key).replace(",", ""));
-			amount = Float.valueOf(this.atoCompanyTable4a.get("Gross rent and other leasing and hiring income $")
-					.get(key).replace(",", ""));
+			count = Math
+					.round(this.atoCompanyTable4a.get("Gross rent and other leasing and hiring income no.").get(key));
+			amount = this.atoCompanyTable4a.get("Gross rent and other leasing and hiring income $").get(key);
 			amountPerCompany = count == 0 ? 0f : amount / count;
 			rentIncomeRatio[i] = totalIncomePerCompany[i] == 0 ? 0f : amountPerCompany / totalIncomePerCompany[i];
 
 			// Government Income
-			count = Integer.valueOf(this.atoCompanyTable4a.get("Assessable government industry payments no.").get(key)
-					.replace(",", ""));
-			amount = Float.valueOf(
-					this.atoCompanyTable4a.get("Assessable government industry payments $").get(key).replace(",", ""));
+			count = Math.round(this.atoCompanyTable4a.get("Assessable government industry payments no.").get(key));
+			amount = this.atoCompanyTable4a.get("Assessable government industry payments $").get(key);
 			amountPerCompany = count == 0 ? 0f : amount / count;
 			governmentIncomeRatio[i] = totalIncomePerCompany[i] == 0 ? 0f : amountPerCompany / totalIncomePerCompany[i];
 
 			// Foreign Income
-			count = Integer.valueOf(this.atoCompanyTable4a.get("Gross foreign income no.").get(key).replace(",", ""));
-			amount = Float.valueOf(this.atoCompanyTable4a.get("Gross foreign income $").get(key).replace(",", ""));
+			count = Math.round(this.atoCompanyTable4a.get("Gross foreign income no.").get(key));
+			amount = this.atoCompanyTable4a.get("Gross foreign income $").get(key);
 			amountPerCompany = count == 0 ? 0f : amount / count;
 			foreignIncomeRatio[i] = totalIncomePerCompany[i] == 0 ? 0f : amountPerCompany / totalIncomePerCompany[i];
 
 			// TOTAL EXPENSES
-			count = Integer.valueOf(this.atoCompanyTable4a.get("Total expenses no.").get(key).replace(",", ""));
-			amount = Float.valueOf(this.atoCompanyTable4a.get("Total expenses $").get(key).replace(",", ""));
+			count = Math.round(this.atoCompanyTable4a.get("Total expenses no.").get(key));
+			amount = this.atoCompanyTable4a.get("Total expenses $").get(key);
 			totalExpensePerCompany[i] = count == 0 ? 0f : amount / count;
 
 			// Cost of Sales
-			count = Integer.valueOf(this.atoCompanyTable4a.get("Cost of sales no.").get(key).replace(",", ""));
-			amount = Float.valueOf(this.atoCompanyTable4a.get("Cost of sales $").get(key).replace(",", ""));
+			count = Math.round(this.atoCompanyTable4a.get("Cost of sales no.").get(key));
+			amount = this.atoCompanyTable4a.get("Cost of sales $").get(key);
 			amountPerCompany = count == 0 ? 0f : amount / count;
 			costOfSalesRatio[i] = totalIncomePerCompany[i] == 0 ? 0f : amountPerCompany / totalIncomePerCompany[i];
 
 			// Rent and Lease Expense
-			count = Integer.valueOf(
-					this.atoCompanyTable4a.get("Lease expenses within Australia no.").get(key).replace(",", ""))
-					+ Integer.valueOf(this.atoCompanyTable4a.get("Rent expenses no.").get(key).replace(",", ""));
-			amount = Float
-					.valueOf(this.atoCompanyTable4a.get("Lease expenses within Australia $").get(key).replace(",", ""))
-					+ Float.valueOf(this.atoCompanyTable4a.get("Rent expenses $").get(key).replace(",", ""));
+			count = Math.round(this.atoCompanyTable4a.get("Lease expenses within Australia no.").get(key))
+					+ Math.round(this.atoCompanyTable4a.get("Rent expenses no.").get(key));
+			amount = this.atoCompanyTable4a.get("Lease expenses within Australia $").get(key)
+					+ this.atoCompanyTable4a.get("Rent expenses $").get(key);
 			amountPerCompany = count == 0 ? 0f : amount / count;
 			rentLeaseExpenseRatio[i] = totalIncomePerCompany[i] == 0 ? 0f : amountPerCompany / totalIncomePerCompany[i];
 
 			// Interest Expense
-			count = Integer.valueOf(
-					this.atoCompanyTable4a.get("Interest expenses within Australia no.").get(key).replace(",", ""));
-			amount = Float.valueOf(
-					this.atoCompanyTable4a.get("Interest expenses within Australia $").get(key).replace(",", ""));
+			count = Math.round(this.atoCompanyTable4a.get("Interest expenses within Australia no.").get(key));
+			amount = this.atoCompanyTable4a.get("Interest expenses within Australia $").get(key);
 			amountPerCompany = count == 0 ? 0f : amount / count;
 			interestExpenseRatio[i] = totalIncomePerCompany[i] == 0 ? 0f : amountPerCompany / totalIncomePerCompany[i];
 
 			// Foreign Interest Expense
-			count = Integer
-					.valueOf(this.atoCompanyTable4a.get("Interest expenses overseas no.").get(key).replace(",", ""));
-			amount = Float
-					.valueOf(this.atoCompanyTable4a.get("Interest expenses overseas $").get(key).replace(",", ""));
+			count = Math.round(this.atoCompanyTable4a.get("Interest expenses overseas no.").get(key));
+			amount = this.atoCompanyTable4a.get("Interest expenses overseas $").get(key);
 			amountPerCompany = count == 0 ? 0f : amount / count;
 			foreignInterestExpenseRatio[i] = totalIncomePerCompany[i] == 0 ? 0f
 					: amountPerCompany / totalIncomePerCompany[i];
 
 			// Depreciation Expense
-			count = Integer.valueOf(this.atoCompanyTable4a.get("Depreciation expenses no.").get(key).replace(",", ""));
-			amount = Float.valueOf(this.atoCompanyTable4a.get("Depreciation expenses $").get(key).replace(",", ""));
+			count = Math.round(this.atoCompanyTable4a.get("Depreciation expenses no.").get(key));
+			amount = this.atoCompanyTable4a.get("Depreciation expenses $").get(key);
 			amountPerCompany = count == 0 ? 0f : amount / count;
 			depreciationExpenseRatio[i] = totalIncomePerCompany[i] == 0 ? 0f
 					: amountPerCompany / totalIncomePerCompany[i];
 
 			// Salaries and Wages
-			count = Integer.valueOf(
-					this.atoCompanyTable4a.get("Total salary and wage expenses no.").get(key).replace(",", ""));
-			amount = Float
-					.valueOf(this.atoCompanyTable4a.get("Total salary and wage expenses $").get(key).replace(",", ""));
+			count = Math.round(this.atoCompanyTable4a.get("Total salary and wage expenses no.").get(key));
+			amount = this.atoCompanyTable4a.get("Total salary and wage expenses $").get(key);
 			amountPerCompany = count == 0 ? 0f : amount / count;
 			salaryWagePerGroup[i] = amountPerCompany;
 			salaryWageRatio[i] = totalIncomePerCompany[i] == 0 ? 0f : amountPerCompany / totalIncomePerCompany[i];
@@ -463,42 +458,41 @@ public class CalibrateBusinesses {
 			wagesPerIndustryDivision.put(thisDivision, wagesPerIndustryDivision.get(thisDivision) + amountPerCompany);
 
 			// TOTAL ASSETS
-			count = Integer.valueOf(this.atoCompanyTable4a.get("Total assets no.").get(key).replace(",", ""));
-			amount = Float.valueOf(this.atoCompanyTable4a.get("Total assets $").get(key).replace(",", ""));
+			count = Math.round(this.atoCompanyTable4a.get("Total assets no.").get(key));
+			amount = this.atoCompanyTable4a.get("Total assets $").get(key);
 			totalAssetsPerCompany[i] = count == 0 ? 0f : amount / count;
 			totalAssetsToIncomeRatio[i] = totalIncomePerCompany[i] == 0 ? 0f
 					: totalAssetsPerCompany[i] / totalIncomePerCompany[i];
 
 			// Current Assets
-			count = Integer.valueOf(this.atoCompanyTable4a.get("All current assets no.").get(key).replace(",", ""));
-			amount = Float.valueOf(this.atoCompanyTable4a.get("All current assets $").get(key).replace(",", ""));
+			count = Math.round(this.atoCompanyTable4a.get("All current assets no.").get(key));
+			amount = this.atoCompanyTable4a.get("All current assets $").get(key);
 			amountPerCompany = count == 0 ? 0f : amount / count;
 			currentAssetsRatio[i] = totalIncomePerCompany[i] == 0 ? 0f : amountPerCompany / totalIncomePerCompany[i];
 
 			// TOTAL LIABILITIES
-			count = Integer.valueOf(this.atoCompanyTable4a.get("Total liabilities no.").get(key).replace(",", ""));
-			amount = Float.valueOf(this.atoCompanyTable4a.get("Total liabilities $").get(key).replace(",", ""));
+			count = Math.round(this.atoCompanyTable4a.get("Total liabilities no.").get(key));
+			amount = this.atoCompanyTable4a.get("Total liabilities $").get(key);
 			totalLiabilitiesPerCompany[i] = count == 0 ? 0f : amount / count;
 			totalLiabilitiesToIncomeRatio[i] = totalIncomePerCompany[i] == 0 ? 0f
 					: totalLiabilitiesPerCompany[i] / totalIncomePerCompany[i];
 
 			// Trade Creditors
-			count = Integer.valueOf(this.atoCompanyTable4a.get("Trade creditors no.").get(key).replace(",", ""));
-			amount = Float.valueOf(this.atoCompanyTable4a.get("Trade creditors $").get(key).replace(",", ""));
+			count = Math.round(this.atoCompanyTable4a.get("Trade creditors no.").get(key));
+			amount = this.atoCompanyTable4a.get("Trade creditors $").get(key);
 			amountPerCompany = count == 0 ? 0f : amount / count;
 			tradeCreditorsRatio[i] = totalIncomePerCompany[i] == 0 ? 0f : amountPerCompany / totalIncomePerCompany[i];
 
 			// Current Liabilities
-			count = Integer
-					.valueOf(this.atoCompanyTable4a.get("All current liabilities no.").get(key).replace(",", ""));
-			amount = Float.valueOf(this.atoCompanyTable4a.get("All current liabilities $").get(key).replace(",", ""));
+			count = Math.round(this.atoCompanyTable4a.get("All current liabilities no.").get(key));
+			amount = this.atoCompanyTable4a.get("All current liabilities $").get(key);
 			amountPerCompany = count == 0 ? 0f : amount / count;
 			currentLiabilitiesRatio[i] = totalIncomePerCompany[i] == 0 ? 0f
 					: amountPerCompany / totalIncomePerCompany[i];
 
 			// Debt
-			count = Integer.valueOf(this.atoCompanyTable4a.get("Total debt no.").get(key).replace(",", ""));
-			amount = Float.valueOf(this.atoCompanyTable4a.get("Total debt $").get(key).replace(",", ""));
+			count = Math.round(this.atoCompanyTable4a.get("Total debt no.").get(key));
+			amount = this.atoCompanyTable4a.get("Total debt $").get(key);
 			amountPerCompany = count == 0 ? 0f : amount / count;
 			debtRatio[i] = totalIncomePerCompany[i] == 0 ? 0f : amountPerCompany / totalIncomePerCompany[i];
 
@@ -510,6 +504,10 @@ public class CalibrateBusinesses {
 			float meanWagesPerDivision = wagesPerIndustryDivision.get(thisDivision)
 					/ numberOfGroupsInDivision.get(thisDivision);
 			wagesDivisionMultiplierPerGroup[i] = salaryWagePerGroup[i] / meanWagesPerDivision;
+
+			if (DEBUG_ZEROS) {
+				System.out.println("wagesDivisionMultiplierPerGroup[" + i + "]: " + wagesDivisionMultiplierPerGroup[i]);
+			}
 		}
 
 		/*
@@ -561,21 +559,12 @@ public class CalibrateBusinesses {
 			int fineIndustryIndex = fineIndustryKeyIndex.get(key.substring(0, 3));
 
 			// NUMBER OF COMPANIES
-			String tmp = this.atoCompanyTable4b.get("Number of companies").get(key).replace(",", "");
-			// change all "<10" values into 5b
-			numberOfCompanies[i] = Integer.valueOf(tmp.substring(0, 1).equals("<") ? "5" : tmp);
+			// all "<10" values have been changed into 5
+			numberOfCompanies[i] = Math.round(this.atoCompanyTable4b.get("Number of companies").get(key));
 
 			// TOTAL INCOME
-			try {
-				count = Integer.valueOf(this.atoCompanyTable4b.get("Total income no.").get(key).replace(",", ""));
-			} catch (NumberFormatException e) {
-				count = 0;
-			}
-			try {
-				amount = Float.valueOf(this.atoCompanyTable4b.get("Total income $").get(key).replace(",", ""));
-			} catch (NumberFormatException e) {
-				amount = 0f;
-			}
+			count = Math.round(this.atoCompanyTable4b.get("Total income no.").get(key));
+			amount = this.atoCompanyTable4b.get("Total income $").get(key);
 			totalIncome[i] = count == 0 ? 0f : amount / count;
 
 			// Calculate income line items
@@ -585,17 +574,20 @@ public class CalibrateBusinesses {
 			governmentIncome[i] = governmentIncomeRatio[fineIndustryIndex] * totalIncome[i];
 			foreignIncome[i] = foreignIncomeRatio[fineIndustryIndex] * totalIncome[i];
 
+			if (DEBUG_ZEROS) {
+				if (i < 5) {
+					System.out.println("totalIncome[" + i + "]: " + totalIncome[i]);
+					System.out.println("sales[" + i + "]: " + sales[i]);
+					System.out.println("interestIncome[" + i + "]: " + interestIncome[i]);
+					System.out.println("rentIncome[" + i + "]: " + rentIncome[i]);
+					System.out.println("governmentIncome[" + i + "]: " + governmentIncome[i]);
+					System.out.println("foreignIncome[" + i + "]: " + foreignIncome[i]);
+				}
+			}
+
 			// TOTAL EXPENSES
-			try {
-				count = Integer.valueOf(this.atoCompanyTable4b.get("Total expenses no.").get(key).replace(",", ""));
-			} catch (NumberFormatException e) {
-				count = 0;
-			}
-			try {
-				amount = Float.valueOf(this.atoCompanyTable4b.get("Total expenses $").get(key).replace(",", ""));
-			} catch (NumberFormatException e) {
-				amount = 0f;
-			}
+			count = Math.round(this.atoCompanyTable4b.get("Total expenses no.").get(key));
+			amount = this.atoCompanyTable4b.get("Total expenses $").get(key);
 			totalExpense[i] = count == 0 ? 0f : amount / count;
 
 			// Calculate expense line items
@@ -652,32 +644,36 @@ public class CalibrateBusinesses {
 		// calculate totals first so the ratios can be calculated
 		for (String thisState : states) {
 			for (int i = 0; i < industries8155.length; i++) {
-				totalStateEmploymentByIndustry[i] += Float.valueOf(this.abs8155_0Table6.get(ABS8155_YEAR)
-						.get(ABS8155_TITLE_EMPLOYMENT).get(thisState).get(industries8155[i]).replace(",", ""))
-						* THOUSAND;
-				totalStateWagesByIndustry[i] += Float.valueOf(this.abs8155_0Table6.get(ABS8155_YEAR)
-						.get(ABS8155_TITLE_WAGES).get(thisState).get(industries8155[i]).replace(",", "")) * MILLION;
-				totalStateSalesByIndustry[i] += Float.valueOf(this.abs8155_0Table6.get(ABS8155_YEAR)
-						.get(ABS8155_TITLE_SALES).get(thisState).get(industries8155[i]).replace(",", "")) * MILLION;
+				totalStateEmploymentByIndustry[i] += this.abs8155_0Table6.get(ABS8155_YEAR)
+						.get(ABS8155_TITLE_EMPLOYMENT).get(thisState).get(industries8155[i]) * THOUSAND;
+				totalStateWagesByIndustry[i] += this.abs8155_0Table6.get(ABS8155_YEAR).get(ABS8155_TITLE_WAGES)
+						.get(thisState).get(industries8155[i]) * MILLION;
+				totalStateSalesByIndustry[i] += this.abs8155_0Table6.get(ABS8155_YEAR).get(ABS8155_TITLE_SALES)
+						.get(thisState).get(industries8155[i]) * MILLION;
 			}
 		}
 		// calculate ratios between states for each industry
 		for (int i = 0; i < industries8155.length; i++) {
 			for (int j = 0; j < states.length; j++) {
-				float cellValue = Float.valueOf(this.abs8155_0Table6.get(ABS8155_YEAR).get(ABS8155_TITLE_EMPLOYMENT)
-						.get(states[j]).get(industries8155[i]).replace(",", "")) * THOUSAND;
+				float cellValue = this.abs8155_0Table6.get(ABS8155_YEAR).get(ABS8155_TITLE_EMPLOYMENT).get(states[j])
+						.get(industries8155[i]) * THOUSAND;
 				stateRatioEmploymentCount[i][j] = totalStateEmploymentByIndustry[i] > 0f
 						? cellValue / totalStateEmploymentByIndustry[i]
 						: 0f;
-				cellValue = Float.valueOf(this.abs8155_0Table6.get(ABS8155_YEAR).get(ABS8155_TITLE_WAGES).get(states[j])
-						.get(industries8155[i]).replace(",", "")) * MILLION;
+				cellValue = this.abs8155_0Table6.get(ABS8155_YEAR).get(ABS8155_TITLE_WAGES).get(states[j])
+						.get(industries8155[i]) * MILLION;
 				stateRatioWages[i][j] = totalStateWagesByIndustry[i] > 0f ? cellValue / totalStateWagesByIndustry[i]
 						: 0f;
-				cellValue = Float.valueOf(this.abs8155_0Table6.get(ABS8155_YEAR).get(ABS8155_TITLE_SALES).get(states[j])
-						.get(industries8155[i]).replace(",", "")) * MILLION;
+				cellValue = this.abs8155_0Table6.get(ABS8155_YEAR).get(ABS8155_TITLE_SALES).get(states[j])
+						.get(industries8155[i]) * MILLION;
 				stateRatioSales[i][j] = totalStateSalesByIndustry[i] > 0f ? cellValue / totalStateSalesByIndustry[i]
 						: 0f;
 
+				if (DEBUG_ZEROS) {
+					if (i < 5) {
+						System.out.println("stateRatioSales[" + i + "][" + j + "]: " + stateRatioSales[i][j]);
+					}
+				}
 			}
 		}
 
@@ -706,38 +702,31 @@ public class CalibrateBusinesses {
 		// calculate totals first so the ratios can be calculated
 		for (String thisSize : sizes) {
 			for (int i = 0; i < industries8155.length; i++) {
-				totalSizeEmploymentByIndustry[i] += Float.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR)
-						.get(ABS8155_TITLE_EMPLOYMENT).get(thisSize).get(industries8155[i]).replace(",", ""))
-						* THOUSAND;
-				totalSizeWagesByIndustry[i] += Float.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR)
-						.get(ABS8155_TITLE_WAGES).get(thisSize).get(industries8155[i]).replace(",", "")) * MILLION;
-				totalSizeSalesByIndustry[i] += Float.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR)
-						.get(ABS8155_TITLE_SALES).get(thisSize).get(industries8155[i]).replace(",", "")) * MILLION;
-				totalIncomeByIndustry[i] += Float.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR)
-						.get(ABS8155_TITLE_INCOME).get(thisSize).get(industries8155[i]).replace(",", "")) * MILLION;
-				totalExpensesByIndustry[i] += Float.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR)
-						.get(ABS8155_TITLE_EXPENSES).get(thisSize).get(industries8155[i]).replace(",", "")) * MILLION;
+				totalSizeEmploymentByIndustry[i] += this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_EMPLOYMENT)
+						.get(thisSize).get(industries8155[i]) * THOUSAND;
+				totalSizeWagesByIndustry[i] += this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_WAGES)
+						.get(thisSize).get(industries8155[i]) * MILLION;
+				totalSizeSalesByIndustry[i] += this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_SALES)
+						.get(thisSize).get(industries8155[i]) * MILLION;
+				totalIncomeByIndustry[i] += this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_INCOME)
+						.get(thisSize).get(industries8155[i]) * MILLION;
+				totalExpensesByIndustry[i] += this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_EXPENSES)
+						.get(thisSize).get(industries8155[i]) * MILLION;
 			}
 		}
 		// apply state ratios to sizes, joining on industry
 		for (int idxIndustry = 0; idxIndustry < industries8155.length; idxIndustry++) {
 			for (int idxSize = 0; idxSize < sizes.length; idxSize++) {
-				float industrySizeEmployment = Float
-						.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_EMPLOYMENT)
-								.get(sizes[idxSize]).get(industries8155[idxIndustry]).replace(",", ""))
-						* THOUSAND;
-				float industrySizeWages = Float.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_WAGES)
-						.get(sizes[idxSize]).get(industries8155[idxIndustry]).replace(",", "")) * MILLION;
-				float industrySizeSales = Float.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_SALES)
-						.get(sizes[idxSize]).get(industries8155[idxIndustry]).replace(",", "")) * MILLION;
-				float industrySizeTotalIncome = Float
-						.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_INCOME).get(sizes[idxSize])
-								.get(industries8155[idxIndustry]).replace(",", ""))
-						* MILLION;
-				float industrySizeTotalExpenses = Float
-						.valueOf(this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_EXPENSES).get(sizes[idxSize])
-								.get(industries8155[idxIndustry]).replace(",", ""))
-						* MILLION;
+				float industrySizeEmployment = this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_EMPLOYMENT)
+						.get(sizes[idxSize]).get(industries8155[idxIndustry]) * THOUSAND;
+				float industrySizeWages = this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_WAGES)
+						.get(sizes[idxSize]).get(industries8155[idxIndustry]) * MILLION;
+				float industrySizeSales = this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_SALES)
+						.get(sizes[idxSize]).get(industries8155[idxIndustry]) * MILLION;
+				float industrySizeTotalIncome = this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_INCOME)
+						.get(sizes[idxSize]).get(industries8155[idxIndustry]) * MILLION;
+				float industrySizeTotalExpenses = this.abs8155_0Table5.get(ABS8155_YEAR).get(ABS8155_TITLE_EXPENSES)
+						.get(sizes[idxSize]).get(industries8155[idxIndustry]) * MILLION;
 				for (int idxState = 0; idxState < states.length; idxState++) {
 					employmentCountByStateIndustrySize[idxState][idxIndustry][idxSize] = industrySizeEmployment
 							* stateRatioEmploymentCount[idxIndustry][idxState];
@@ -749,6 +738,23 @@ public class CalibrateBusinesses {
 							* stateRatioSales[idxIndustry][idxState];
 					totalExpensesByStateIndustrySize[idxState][idxIndustry][idxSize] = industrySizeTotalExpenses
 							* stateRatioWages[idxIndustry][idxState];
+
+					if (DEBUG_ZEROS) {
+						if (idxIndustry < 5) {
+							System.out.println("industrySizeEmployment: " + industrySizeEmployment);
+							System.out.println("stateRatioEmploymentCount[" + idxIndustry + "][" + idxState + "]: "
+									+ stateRatioEmploymentCount[idxIndustry][idxState]);
+							System.out.println("employmentCountByStateIndustrySize[" + idxIndustry + "][" + idxSize
+									+ "][" + idxState + "]: "
+									+ employmentCountByStateIndustrySize[idxState][idxIndustry][idxSize]);
+							System.out.println("industrySizeTotalIncome: " + industrySizeTotalIncome);
+							System.out.println("stateRatioSales[" + idxIndustry + "][" + idxState + "]: "
+									+ stateRatioSales[idxIndustry][idxState]);
+							System.out.println(
+									"totalIncomeByStateIndustrySize[" + idxIndustry + "][" + idxSize + "][" + idxState
+											+ "]: " + totalIncomeByStateIndustrySize[idxState][idxIndustry][idxSize]);
+						}
+					}
 				}
 			}
 		}
@@ -791,15 +797,37 @@ public class CalibrateBusinesses {
 				for (String lgaCode : lgaCodes8165) {
 					// It loops over all LGA codes, but they don't all exist in every state. Adding
 					// this if statement is inefficient but the fastest way to fix the bug for now.
-					if (lgaCode.equals(states[idxState])) {
-						smallCount += Float.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
-								.get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]).replace(",", ""));
-						smallCount += Float.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_2)
-								.get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]).replace(",", ""));
-						mediumCount += Float.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_3)
-								.get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]).replace(",", ""));
-						largeCount += Float.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_4)
-								.get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]).replace(",", ""));
+					String lgaState = this.area.getStateFromLgaCode(lgaCode);
+					if (DEBUG_ZEROS_INFINITY) {
+						System.out.println("lgaCode: " + lgaCode);
+						System.out.println("lgaState: " + lgaState);
+						System.out.println("states[idxState]: " + states[idxState]);
+					}
+					
+					if (lgaState != null && lgaState.equals(states[idxState])) {
+						smallCount += this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[idxState])
+								.get(lgaCode).get(industries8155[idxIndustry]);
+						smallCount += this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_2).get(states[idxState])
+								.get(lgaCode).get(industries8155[idxIndustry]);
+						mediumCount += this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_3).get(states[idxState])
+								.get(lgaCode).get(industries8155[idxIndustry]);
+						largeCount += this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_4).get(states[idxState])
+								.get(lgaCode).get(industries8155[idxIndustry]);
+
+						if (DEBUG_ZEROS_INFINITY) {
+							System.out.println("smallCount: " + smallCount);
+							System.out.println("mediumCount: " + mediumCount);
+							System.out.println("largeCount: " + largeCount);
+							System.out.println("ABS8165_TITLE_EMPLOYMENT_1: " + ABS8165_TITLE_EMPLOYMENT_1);
+							System.out.println("states[idxState]: " + states[idxState]);
+							System.out.println("lgaCode: " + lgaCode);
+							System.out.println("industries8155[idxIndustry]: " + industries8155[idxIndustry]);
+							System.out.println(
+									"this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[idxState]).get(lgaCode).get(industries8155[idxIndustry]): "
+											+ this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
+													.get(states[idxState]).get(lgaCode)
+													.get(industries8155[idxIndustry]));
+						}
 					}
 				}
 				businessCountAU += smallCount + mediumCount + largeCount;
@@ -860,6 +888,15 @@ public class CalibrateBusinesses {
 		float totalIncomePerBusinessAU = totalIncomeAU / businessCountAU;
 		float totalExpensesPerBusinessAU = totalExpensesAU / businessCountAU;
 
+		if (DEBUG_ZEROS) {
+			System.out.println("businessCountAU: " + businessCountAU);
+			System.out.println("employmentCountPerBusinessAU: " + employmentCountPerBusinessAU);
+			System.out.println("wagesPerBusinessAU: " + wagesPerBusinessAU);
+			System.out.println("salesPerBusinessAU: " + salesPerBusinessAU);
+			System.out.println("totalIncomePerBusinessAU: " + totalIncomePerBusinessAU);
+			System.out.println("totalExpensesPerBusinessAU: " + totalExpensesPerBusinessAU);
+		}
+
 		/*
 		 * 6. Divide each state / industry / size's figures by the national average to
 		 * produce a multiplier for each category combination.
@@ -884,6 +921,21 @@ public class CalibrateBusinesses {
 							/ totalIncomePerBusinessAU;
 					totalExpensesMultiplier[idxState][idxIndustry][idxSize] = totalExpensesPerBusiness[idxState][idxIndustry][idxSize]
 							/ totalExpensesPerBusinessAU;
+
+					if (DEBUG_ZEROS) {
+						if (idxState < 2 && idxIndustry < 2 && idxSize < 2) {
+							System.out.println("employmentCountPerBusinessAU: " + employmentCountPerBusinessAU);
+							System.out.println("employmentCountPerBusiness[" + idxState + "][" + idxIndustry + "]["
+									+ idxSize + "]: " + employmentCountPerBusiness[idxState][idxIndustry][idxSize]);
+							System.out.println("employmentCountMultiplier[" + idxState + "][" + idxIndustry + "]["
+									+ idxSize + "]: " + employmentCountMultiplier[idxState][idxIndustry][idxSize]);
+							System.out.println("totalIncomePerBusinessAU: " + totalIncomePerBusinessAU);
+							System.out.println("totalIncomePerBusiness[" + idxState + "][" + idxIndustry + "]["
+									+ idxSize + "]: " + totalIncomePerBusiness[idxState][idxIndustry][idxSize]);
+							System.out.println("totalIncomeMultiplier[" + idxState + "][" + idxIndustry + "][" + idxSize
+									+ "]: " + totalIncomeMultiplier[idxState][idxIndustry][idxSize]);
+						}
+					}
 				}
 			}
 		}
@@ -977,6 +1029,20 @@ public class CalibrateBusinesses {
 						float agentCurrentLiabilities = currentLiabilities[idxIndustryCode] * incMult;
 						float agentDebt = debt[idxIndustryCode] * incMult;
 
+						if (DEBUG_ZEROS) {
+							if (idxState < 2 && idxIndustryCode < 2 && idxSize < 2) {
+								System.out.println("incMult: " + incMult);
+								System.out.println(
+										"totalIncome[" + idxIndustryCode + "]: " + totalIncome[idxIndustryCode]);
+								System.out.println("agentTotalIncome: " + agentTotalIncome);
+
+								System.out.println("incMult: " + incMult);
+								System.out
+										.println("rentIncome[" + idxIndustryCode + "]: " + rentIncome[idxIndustryCode]);
+								System.out.println("agentRentIncome: " + agentRentIncome);
+							}
+						}
+
 						// create representative agent
 						Business agent = new Business();
 						agent.setName("Type " + businessTypeId + " business");
@@ -1028,6 +1094,17 @@ public class CalibrateBusinesses {
 
 						// store agent in a multi-dimensional array
 						agentMatrix[idxState][idxIndustryCode][idxSize] = agent; // i == industry code index
+
+						if (DEBUG_ZEROS) {
+							if (idxState < 2 && idxIndustryCode < 2 && idxSize < 2) {
+								System.out.println("agentMatrix[" + idxState + "][" + idxIndustryCode + "][" + idxSize
+										+ "].getTotalIncome(): "
+										+ agentMatrix[idxState][idxIndustryCode][idxSize].getTotalIncome());
+								System.out.println("agentMatrix[" + idxState + "][" + idxIndustryCode + "][" + idxSize
+										+ "].getRentIncome(): "
+										+ agentMatrix[idxState][idxIndustryCode][idxSize].getRentIncome());
+							}
+						}
 					}
 				}
 			}
@@ -1084,14 +1161,14 @@ public class CalibrateBusinesses {
 				String div = this.abs1292_0_55_002ANZSIC.get("Class Code to Division Code").get(industryClassCode8165);
 				if (div != null) {
 					int idxDiv = divisionIndexMap8165.get(div);
-					float smallValue = Float.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
-							.get(states[idxState]).get(industryClassCode8165).replace(",", ""));
-					smallValue += Float.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_2)
-							.get(states[idxState]).get(industryClassCode8165).replace(",", ""));
-					float mediumValue = Float.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_3)
-							.get(states[idxState]).get(industryClassCode8165).replace(",", ""));
-					float largeValue = Float.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_4)
-							.get(states[idxState]).get(industryClassCode8165).replace(",", ""));
+					float smallValue = this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
+							.get(states[idxState]).get(industryClassCode8165);
+					smallValue += this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_2).get(states[idxState])
+							.get(industryClassCode8165);
+					float mediumValue = this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_3)
+							.get(states[idxState]).get(industryClassCode8165);
+					float largeValue = this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_4)
+							.get(states[idxState]).get(industryClassCode8165);
 					industryDivisionTotals[idxState][0][idxDiv] += smallValue;
 					industryDivisionTotals[idxState][1][idxDiv] += mediumValue;
 					industryDivisionTotals[idxState][2][idxDiv] += largeValue;
@@ -1108,14 +1185,14 @@ public class CalibrateBusinesses {
 					float smallTotal = industryDivisionTotals[idxState][0][idxDiv];
 					float mediumTotal = industryDivisionTotals[idxState][1][idxDiv];
 					float largeTotal = industryDivisionTotals[idxState][2][idxDiv];
-					float smallValue = Float.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
-							.get(states[idxState]).get(industryClassCodes8165[idxClass]).replace(",", ""));
-					smallValue += Float.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_2)
-							.get(states[idxState]).get(industryClassCodes8165[idxClass]).replace(",", ""));
-					float mediumValue = Float.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_3)
-							.get(states[idxState]).get(industryClassCodes8165[idxClass]).replace(",", ""));
-					float largeValue = Float.valueOf(this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_4)
-							.get(states[idxState]).get(industryClassCodes8165[idxClass]).replace(",", ""));
+					float smallValue = this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
+							.get(states[idxState]).get(industryClassCodes8165[idxClass]);
+					smallValue += this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_2).get(states[idxState])
+							.get(industryClassCodes8165[idxClass]);
+					float mediumValue = this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_3)
+							.get(states[idxState]).get(industryClassCodes8165[idxClass]);
+					float largeValue = this.abs8165_0StateEmployment.get(ABS8165_TITLE_EMPLOYMENT_4)
+							.get(states[idxState]).get(industryClassCodes8165[idxClass]);
 					industryDivisionRatios[idxState][0][idxDiv][idxClass] = smallTotal > 0f ? smallValue / smallTotal
 							: 0f;
 					industryDivisionRatios[idxState][1][idxDiv][idxClass] = mediumTotal > 0f ? mediumValue / mediumTotal
@@ -1159,8 +1236,7 @@ public class CalibrateBusinesses {
 			}
 			int industryCodeCount = 0;
 			try {
-				industryCodeCount = Integer
-						.valueOf(this.atoCompanyTable4b.get("Number of companies").get(industryCode).replace(",", ""));
+				industryCodeCount = Math.round(this.atoCompanyTable4b.get("Number of companies").get(industryCode));
 			} catch (NumberFormatException e) {
 				if (this.atoCompanyTable4b.get("Number of companies").get(industryCode).equals("<10")) {
 					industryCodeCount = 5;
@@ -1176,8 +1252,7 @@ public class CalibrateBusinesses {
 			float total = industryClassCompanyCount4B.get(classCode);
 			float value = 0f;
 			try {
-				value = Float
-						.valueOf(this.atoCompanyTable4b.get("Number of companies").get(industryCode).replace(",", ""));
+				value = this.atoCompanyTable4b.get("Number of companies").get(industryCode);
 			} catch (NumberFormatException e) {
 				if (this.atoCompanyTable4b.get("Number of companies").get(industryCode).equals("<10")) {
 					value = 5f;
@@ -1210,26 +1285,26 @@ public class CalibrateBusinesses {
 						float largeTotal = 0f;
 						// One of the values is a char, so need to make it 0f.
 						try {
-							smallTotal += Float.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
-									.get(states[idxState]).get(lgaCode).get(divCode).replace(",", ""));
+							smallTotal += this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1)
+									.get(states[idxState]).get(lgaCode).get(divCode);
 						} catch (NumberFormatException e) {
 							// do nothing - which is the same as making the invalid "number" 0f
 						}
 						try {
-							smallTotal += Float.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_2)
-									.get(states[idxState]).get(lgaCode).get(divCode).replace(",", ""));
+							smallTotal += this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_2)
+									.get(states[idxState]).get(lgaCode).get(divCode);
 						} catch (NumberFormatException e) {
 							// do nothing - which is the same as making the invalid "number" 0f
 						}
 						try {
-							mediumTotal += Float.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_3)
-									.get(states[idxState]).get(lgaCode).get(divCode).replace(",", ""));
+							mediumTotal += this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_3)
+									.get(states[idxState]).get(lgaCode).get(divCode);
 						} catch (NumberFormatException e) {
 							// do nothing - which is the same as making the invalid "number" 0f
 						}
 						try {
-							largeTotal += Float.valueOf(this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_4)
-									.get(states[idxState]).get(lgaCode).get(divCode).replace(",", ""));
+							largeTotal += this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_4)
+									.get(states[idxState]).get(lgaCode).get(divCode);
 						} catch (NumberFormatException e) {
 							// do nothing - which is the same as making the invalid "number" 0f
 						}
@@ -1286,6 +1361,65 @@ public class CalibrateBusinesses {
 					}
 				}
 			}
+		}
+		if (DEBUG) {
+			int exporterCount = 0;
+			int importerCount = 0;
+			int rentExpenseCount = 0;
+			int rentIncomeCount = 0;
+			for (int i = 0; i < this.businessAgents.size(); i++) {
+				if (this.businessAgents.get(i).getSalesForeign() > 0f) {
+					exporterCount++;
+				}
+				if (this.businessAgents.get(i).getForeignExpenses() > 0f) {
+					importerCount++;
+				}
+				if (this.businessAgents.get(i).getRentExpense() > 0f) {
+					rentExpenseCount++;
+				}
+				if (this.businessAgents.get(i).getRentIncome() > 0f) {
+					rentIncomeCount++;
+				}
+			}
+			System.out.println("Created  " + exporterCount + " exporters.");
+			System.out.println("Created  " + importerCount + " importers.");
+			System.out.println("Created  " + rentExpenseCount + " renters.");
+			System.out.println("Created  " + rentIncomeCount + " landlords.");
+			Business tmp = this.businessAgents.get(1000000);
+			System.out.println("FIRST BUSINESS CONFIG:");
+			System.out.println("industryDivisionCode: " + tmp.getIndustryDivisionCode());
+			System.out.println("state: " + tmp.getState());
+			System.out.println("lgaCode: " + tmp.getLgaCode());
+			System.out.println("size: " + tmp.getSize());
+			System.out.println("isExporter: " + tmp.isExporter());
+			System.out.println("totalIncome: " + tmp.getTotalIncome());
+			System.out.println("salesDomestic: " + tmp.getSalesDomestic());
+			System.out.println("salesGovernment: " + tmp.getSalesGovernment());
+			System.out.println("salesForeign: " + tmp.getSalesForeign());
+			System.out.println("interestIncome: " + tmp.getInterestIncome());
+			System.out.println("rentIncome: " + tmp.getRentIncome());
+			System.out.println("otherIncome: " + tmp.getOtherIncome());
+			System.out.println("totalExpenses: " + tmp.getTotalExpenses());
+			System.out.println("wageExpenses: " + tmp.getWageExpenses());
+			System.out.println("superannuationExpense: " + tmp.getSuperannuationExpense());
+			System.out.println("payrollTaxExpense: " + tmp.getPayrollTaxExpense());
+			System.out.println("foreignExpenses: " + tmp.getForeignExpenses());
+			System.out.println("interestExpense: " + tmp.getInterestExpense());
+			System.out.println("rentExpense: " + tmp.getRentExpense());
+			System.out.println("depreciationExpense: " + tmp.getDepreciationExpense());
+			System.out.println("otherExpenses: " + tmp.getOtherExpenses());
+			System.out.println("totalAssets: " + tmp.getTotalAssets());
+			System.out.println("bankDeposits: " + tmp.getBankDeposits());
+			System.out.println("foreignEquities: " + tmp.getForeignEquities());
+			System.out.println("otherFinancialAssets: " + tmp.getOtherFinancialAssets());
+			System.out.println("otherNonFinancialAssets: " + tmp.getOtherNonFinancialAssets());
+			System.out.println("totalLiabilities: " + tmp.getTotalLiabilities());
+			System.out.println("tradeCreditors: " + tmp.getTradeCreditors());
+			System.out.println("loans: " + tmp.getLoans());
+			System.out.println("otherCurrentLiabilities: " + tmp.getOtherCurrentLiabilities());
+			System.out.println("otherNonCurrentLiabilities: " + tmp.getOtherNonCurrentLiabilities());
+			System.out.println("totalEquity: " + tmp.getTotalEquity());
+
 		}
 
 		System.out.println("Adding business agents to economy: " + new Date(System.currentTimeMillis()));

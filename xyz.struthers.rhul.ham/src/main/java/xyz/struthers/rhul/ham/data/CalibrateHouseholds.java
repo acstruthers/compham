@@ -215,7 +215,7 @@ public class CalibrateHouseholds {
 	 * 
 	 * Keys: Series ID, Date
 	 */
-	private Map<String, Map<Date, String>> rbaE1;
+	private Map<String, Map<Date, Float>> rbaE1;
 	/**
 	 * RBA E2 Household Finances - Selected Ratios<br>
 	 * 
@@ -403,19 +403,16 @@ public class CalibrateHouseholds {
 
 		// RBA E1 Keys: Series Name, Date
 		// get RBA E1 amounts ($ billions)
-		float cashRbaE1 = Float.valueOf(this.rbaE1.get(RBA_E1_SERIESID_CASH).get(this.calibrationDateRba));
-		float superRbaE1 = Float.valueOf(this.rbaE1.get(RBA_E1_SERIESID_SUPER).get(this.calibrationDateRba));
-		float equitiesRbaE1 = Float.valueOf(this.rbaE1.get(RBA_E1_SERIESID_EQUITIES).get(this.calibrationDateRba));
-		float otherFinAssetsRbaE1 = Float
-				.valueOf(this.rbaE1.get(RBA_E1_SERIESID_OTHER_FIN_ASSETS).get(this.calibrationDateRba));
+		float cashRbaE1 = this.rbaE1.get(RBA_E1_SERIESID_CASH).get(this.calibrationDateRba);
+		float superRbaE1 = this.rbaE1.get(RBA_E1_SERIESID_SUPER).get(this.calibrationDateRba);
+		float equitiesRbaE1 = this.rbaE1.get(RBA_E1_SERIESID_EQUITIES).get(this.calibrationDateRba);
+		float otherFinAssetsRbaE1 = this.rbaE1.get(RBA_E1_SERIESID_OTHER_FIN_ASSETS).get(this.calibrationDateRba);
 		float totalFinancialAssetsRbaE1 = cashRbaE1 + superRbaE1 + equitiesRbaE1 + otherFinAssetsRbaE1;
-		float dwellingsRbaE1 = Float.valueOf(this.rbaE1.get(RBA_E1_SERIESID_DWELLINGS).get(this.calibrationDateRba));
-		float totalNonFinancialAssetsRbaE1 = Float
-				.valueOf(this.rbaE1.get(RBA_E1_SERIESID_NONFIN_ASSETS).get(this.calibrationDateRba));
+		float dwellingsRbaE1 = this.rbaE1.get(RBA_E1_SERIESID_DWELLINGS).get(this.calibrationDateRba);
+		float totalNonFinancialAssetsRbaE1 = this.rbaE1.get(RBA_E1_SERIESID_NONFIN_ASSETS).get(this.calibrationDateRba);
 		float otherNonFinancialAssetsRbaE1 = totalNonFinancialAssetsRbaE1 - dwellingsRbaE1;
 		float totalAssetsRbaE1 = totalFinancialAssetsRbaE1 + totalNonFinancialAssetsRbaE1;
-		float totalLiabilitiesRbaE1 = Float
-				.valueOf(this.rbaE1.get(RBA_E1_SERIESID_TOTAL_LIABILITIES).get(this.calibrationDateRba));
+		float totalLiabilitiesRbaE1 = this.rbaE1.get(RBA_E1_SERIESID_TOTAL_LIABILITIES).get(this.calibrationDateRba);
 
 		// calculate ratios within balance sheet
 		float cashToAssetsRbaE1 = cashRbaE1 / totalAssetsRbaE1;

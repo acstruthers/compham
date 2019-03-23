@@ -150,6 +150,48 @@ public final class AustralianGovernment extends Agent {
 		return liabilities;
 	}
 
+	/**
+	 * @return the welfareRecipients
+	 */
+	public ArrayList<Household> getWelfareRecipients() {
+		return welfareRecipients;
+	}
+
+	/**
+	 * @param welfareRecipients the welfareRecipients to set
+	 */
+	public void setWelfareRecipients(ArrayList<Household> welfareRecipients) {
+		this.welfareRecipients = welfareRecipients;
+	}
+
+	/**
+	 * @return the bondInvestors
+	 */
+	public ArrayList<AuthorisedDepositTakingInstitution> getBondInvestors() {
+		return bondInvestors;
+	}
+
+	/**
+	 * @param bondInvestors the bondInvestors to set
+	 */
+	public void setBondInvestors(ArrayList<AuthorisedDepositTakingInstitution> bondInvestors) {
+		this.bondInvestors = bondInvestors;
+	}
+
+	/**
+	 * @return the interestRateStudentLoans
+	 */
+	public float getInterestRateStudentLoans() {
+		return interestRateStudentLoans;
+	}
+
+	/**
+	 * @param interestRateStudentLoans the interestRateStudentLoans to set
+	 */
+	public void setInterestRateStudentLoans(float interestRateStudentLoans) {
+		this.interestRateStudentLoans = interestRateStudentLoans;
+	}
+
 	public Map<String, Float> getFinancialStatements() {
 		// initialised to the number of fields in this class
 		Map<String, Float> result = new HashMap<String, Float>(19);
@@ -213,6 +255,274 @@ public final class AustralianGovernment extends Agent {
 		this.bsDepositsHeld = 0f;
 		this.bsBorrowings = 0f;
 		this.bsOtherLiabilities = 0f;
+	}
+
+	/**
+	 * @return the pnlTaxIncome
+	 */
+	public float getPnlTaxIncome() {
+		return pnlTaxIncome;
+	}
+
+	/**
+	 * @param pnlTaxIncome the pnlTaxIncome to set
+	 */
+	public void setPnlTaxIncome(float pnlTaxIncome) {
+		this.pnlTaxIncome = pnlTaxIncome;
+	}
+
+	/**
+	 * @return the pnlSaleOfGoodsAndServices
+	 */
+	public float getPnlSaleOfGoodsAndServices() {
+		return pnlSaleOfGoodsAndServices;
+	}
+
+	/**
+	 * @param pnlSaleOfGoodsAndServices the pnlSaleOfGoodsAndServices to set
+	 */
+	public void setPnlSaleOfGoodsAndServices(float pnlSaleOfGoodsAndServices) {
+		this.pnlSaleOfGoodsAndServices = pnlSaleOfGoodsAndServices;
+	}
+
+	/**
+	 * @return the pnlInterestIncome
+	 */
+	public float getPnlInterestIncome() {
+		return pnlInterestIncome;
+	}
+
+	/**
+	 * @param pnlInterestIncome the pnlInterestIncome to set
+	 */
+	public void setPnlInterestIncome(float pnlInterestIncome) {
+		this.pnlInterestIncome = pnlInterestIncome;
+	}
+
+	/**
+	 * @return the pnlOtherIncome
+	 */
+	public float getPnlOtherIncome() {
+		return pnlOtherIncome;
+	}
+
+	/**
+	 * @param pnlOtherIncome the pnlOtherIncome to set
+	 */
+	public void setPnlOtherIncome(float pnlOtherIncome) {
+		this.pnlOtherIncome = pnlOtherIncome;
+	}
+
+	/**
+	 * @return the pnlPersonnelExpenses
+	 */
+	public float getPnlPersonnelExpenses() {
+		return pnlPersonnelExpenses;
+	}
+
+	/**
+	 * @param pnlPersonnelExpenses the pnlPersonnelExpenses to set
+	 */
+	public void setPnlPersonnelExpenses(float pnlPersonnelExpenses) {
+		this.pnlPersonnelExpenses = pnlPersonnelExpenses;
+	}
+
+	/**
+	 * @return the pnlInterestExpense
+	 */
+	public float getPnlInterestExpense() {
+		return pnlInterestExpense;
+	}
+
+	/**
+	 * @param pnlInterestExpense the pnlInterestExpense to set
+	 */
+	public void setPnlInterestExpense(float pnlInterestExpense) {
+		this.pnlInterestExpense = pnlInterestExpense;
+	}
+
+	/**
+	 * @return the pnlDepreciationAmortisation
+	 */
+	public float getPnlDepreciationAmortisation() {
+		return pnlDepreciationAmortisation;
+	}
+
+	/**
+	 * @param pnlDepreciationAmortisation the pnlDepreciationAmortisation to set
+	 */
+	public void setPnlDepreciationAmortisation(float pnlDepreciationAmortisation) {
+		this.pnlDepreciationAmortisation = pnlDepreciationAmortisation;
+	}
+
+	/**
+	 * @return the pnlOtherExpenses
+	 */
+	public float getPnlOtherExpenses() {
+		return pnlOtherExpenses;
+	}
+
+	/**
+	 * @param pnlOtherExpenses the pnlOtherExpenses to set
+	 */
+	public void setPnlOtherExpenses(float pnlOtherExpenses) {
+		this.pnlOtherExpenses = pnlOtherExpenses;
+	}
+
+	/**
+	 * @return the pnlNetAcquisitionOfNonFinancialAssets
+	 */
+	public float getPnlNetAcquisitionOfNonFinancialAssets() {
+		return pnlNetAcquisitionOfNonFinancialAssets;
+	}
+
+	/**
+	 * @param pnlNetAcquisitionOfNonFinancialAssets the
+	 *                                              pnlNetAcquisitionOfNonFinancialAssets
+	 *                                              to set
+	 */
+	public void setPnlNetAcquisitionOfNonFinancialAssets(float pnlNetAcquisitionOfNonFinancialAssets) {
+		this.pnlNetAcquisitionOfNonFinancialAssets = pnlNetAcquisitionOfNonFinancialAssets;
+	}
+
+	/**
+	 * @return the bsCash
+	 */
+	public float getBsCash() {
+		return bsCash;
+	}
+
+	/**
+	 * @param bsCash the bsCash to set
+	 */
+	public void setBsCash(float bsCash) {
+		this.bsCash = bsCash;
+	}
+
+	/**
+	 * @return the bsInvestmentsLoansPlacements
+	 */
+	public float getBsInvestmentsLoansPlacements() {
+		return bsInvestmentsLoansPlacements;
+	}
+
+	/**
+	 * @param bsInvestmentsLoansPlacements the bsInvestmentsLoansPlacements to set
+	 */
+	public void setBsInvestmentsLoansPlacements(float bsInvestmentsLoansPlacements) {
+		this.bsInvestmentsLoansPlacements = bsInvestmentsLoansPlacements;
+	}
+
+	/**
+	 * @return the bsEquityAssets
+	 */
+	public float getBsEquityAssets() {
+		return bsEquityAssets;
+	}
+
+	/**
+	 * @param bsEquityAssets the bsEquityAssets to set
+	 */
+	public void setBsEquityAssets(float bsEquityAssets) {
+		this.bsEquityAssets = bsEquityAssets;
+	}
+
+	/**
+	 * @return the bsOtherFinancialAssets
+	 */
+	public float getBsOtherFinancialAssets() {
+		return bsOtherFinancialAssets;
+	}
+
+	/**
+	 * @param bsOtherFinancialAssets the bsOtherFinancialAssets to set
+	 */
+	public void setBsOtherFinancialAssets(float bsOtherFinancialAssets) {
+		this.bsOtherFinancialAssets = bsOtherFinancialAssets;
+	}
+
+	/**
+	 * @return the bsLandAndFixedAssets
+	 */
+	public float getBsLandAndFixedAssets() {
+		return bsLandAndFixedAssets;
+	}
+
+	/**
+	 * @param bsLandAndFixedAssets the bsLandAndFixedAssets to set
+	 */
+	public void setBsLandAndFixedAssets(float bsLandAndFixedAssets) {
+		this.bsLandAndFixedAssets = bsLandAndFixedAssets;
+	}
+
+	/**
+	 * @return the bsOtherNonFinancialAssets
+	 */
+	public float getBsOtherNonFinancialAssets() {
+		return bsOtherNonFinancialAssets;
+	}
+
+	/**
+	 * @param bsOtherNonFinancialAssets the bsOtherNonFinancialAssets to set
+	 */
+	public void setBsOtherNonFinancialAssets(float bsOtherNonFinancialAssets) {
+		this.bsOtherNonFinancialAssets = bsOtherNonFinancialAssets;
+	}
+
+	/**
+	 * @return the bsCurrencyOnIssue
+	 */
+	public float getBsCurrencyOnIssue() {
+		return bsCurrencyOnIssue;
+	}
+
+	/**
+	 * @param bsCurrencyOnIssue the bsCurrencyOnIssue to set
+	 */
+	public void setBsCurrencyOnIssue(float bsCurrencyOnIssue) {
+		this.bsCurrencyOnIssue = bsCurrencyOnIssue;
+	}
+
+	/**
+	 * @return the bsDepositsHeld
+	 */
+	public float getBsDepositsHeld() {
+		return bsDepositsHeld;
+	}
+
+	/**
+	 * @param bsDepositsHeld the bsDepositsHeld to set
+	 */
+	public void setBsDepositsHeld(float bsDepositsHeld) {
+		this.bsDepositsHeld = bsDepositsHeld;
+	}
+
+	/**
+	 * @return the bsBorrowings
+	 */
+	public float getBsBorrowings() {
+		return bsBorrowings;
+	}
+
+	/**
+	 * @param bsBorrowings the bsBorrowings to set
+	 */
+	public void setBsBorrowings(float bsBorrowings) {
+		this.bsBorrowings = bsBorrowings;
+	}
+
+	/**
+	 * @return the bsOtherLiabilities
+	 */
+	public float getBsOtherLiabilities() {
+		return bsOtherLiabilities;
+	}
+
+	/**
+	 * @param bsOtherLiabilities the bsOtherLiabilities to set
+	 */
+	public void setBsOtherLiabilities(float bsOtherLiabilities) {
+		this.bsOtherLiabilities = bsOtherLiabilities;
 	}
 
 }

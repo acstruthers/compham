@@ -55,7 +55,7 @@ public class Business extends Agent implements Employer {
 	protected Business landlord;
 	protected AustralianGovernment govt;
 
-	// P&L (88 bytes)
+	// P&L (64 bytes)
 	protected float totalIncome;
 	protected float salesDomestic;
 	protected float salesGovernment;
@@ -74,7 +74,7 @@ public class Business extends Agent implements Employer {
 	protected float depreciationExpense;
 	protected float otherExpenses; // balancing item
 
-	// Bal Sht (56 bytes)
+	// Bal Sht (44 bytes)
 	protected float totalAssets;
 	protected float bankDeposits;
 	protected float foreignEquities;
@@ -89,7 +89,7 @@ public class Business extends Agent implements Employer {
 
 	protected float totalEquity;
 
-	// Interest rates (16 bytes)
+	// Interest rates (8 bytes)
 	protected float interestRateLoans;
 	protected float interestRateDeposits;
 

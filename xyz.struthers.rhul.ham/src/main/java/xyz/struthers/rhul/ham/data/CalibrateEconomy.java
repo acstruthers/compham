@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -48,7 +49,8 @@ public class CalibrateEconomy {
 			82.38f, 206.69f, 46.62f, 171.85f, 43.86f, 28.64f, 97.08f };
 	public static final String[] ABS_6530_0_SPEND_DIV_CODE = { "D", "G", "H", "G", "G", "C", "P", "Q", "I", "J", "R",
 			"P", "S", "S" };
-
+	public static final String[] BUSINESS_SUPPLIER_DIV_CODE = { "A", "B", "C", "D", "E", "F", "I", "J", "K", "L", "M",
+			"N", "O" };
 	public static final int[] DIVISION_CODE_INDICES = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
 			18 };
 
@@ -233,8 +235,7 @@ public class CalibrateEconomy {
 			String div = String.valueOf(this.businesses[i].getIndustryDivisionCode());
 			float domesticSales = this.businesses[i].getSalesDomestic();
 			int businessCount = (int) Math.ceil(domesticSales / industryTotals.get(div) * this.households.length);
-			businessIndices.get(div)
-					.addAll(Collections.nCopies(businessCount, this.businesses[i].getPaymentClearingIndex()));
+			businessIndices.get(div).addAll(Collections.nCopies(businessCount, i));
 		}
 		// shuffle indices and assign household spending per ABS 6530.0 ratios
 		Map<String, Integer> nextBusinessIndex = new HashMap<String, Integer>(
@@ -282,8 +283,7 @@ public class CalibrateEconomy {
 			if (landlordRent > 0f) {
 				// convert to indices, rounding up so we have at least enough
 				int landlordTenantCount = (int) Math.ceil(landlordRent / totalRent * this.households.length);
-				shuffledIndices
-						.addAll(Collections.nCopies(landlordTenantCount, this.households[i].getPaymentClearingIndex()));
+				shuffledIndices.addAll(Collections.nCopies(landlordTenantCount, i));
 			}
 		}
 		// shuffle indices, and assign landlords to renting Households
@@ -311,7 +311,7 @@ public class CalibrateEconomy {
 			if (adiLoanBal > 0f) {
 				// convert to indices, rounding up so we have at least enough
 				int adiCustomerCount = (int) Math.ceil(adiLoanBal / totalLoanBal * this.households.length);
-				shuffledIndices.addAll(Collections.nCopies(adiCustomerCount, this.adis[i].getPaymentClearingIndex()));
+				shuffledIndices.addAll(Collections.nCopies(adiCustomerCount, i));
 			}
 		}
 		// shuffle indices, and assign ADIs to Households
@@ -331,6 +331,60 @@ public class CalibrateEconomy {
 		for (int i = 0; i < this.households.length; i++) {
 			this.households[i].setGovt(this.govt);
 		}
+	}
+
+	/**
+	 * FIXME: Assigns employees to employers. Recognises that employers can be
+	 * either Business, ADIs, the RBA or the Australian Government.
+	 * 
+	 * FIXME: Individuals are already assigned to Industry Divisions, so should
+	 * drill through the Household to get the relevant Individuals and link the
+	 * employer to the Household based on the Individual's Division and wages or
+	 * salary.
+	 */
+	void linkEmployees() {
+		if (!this.indicesAssigned) {
+			this.assignPaymentClearingIndices();
+		}
+
+		// link to employees
+		// combine ADI and Business employers when calculating relative size of
+		// employers
+		float totalWagesExpense = (float) Arrays.asList(this.businesses).stream().filter(o -> o.getWageExpenses() > 0f)
+				.mapToDouble(o -> o.getWageExpenses()).sum();
+		totalWagesExpense += (float) Arrays.asList(this.adis).stream().filter(o -> o.getPnlPersonnelExpenses() > 0f)
+				.mapToDouble(o -> o.getPnlPersonnelExpenses()).sum();
+		List<Business> businessEmployers = Arrays.asList(this.businesses).stream().filter(o -> o.getWageExpenses() > 0f)
+				.collect(Collectors.toList());
+		List<AuthorisedDepositTakingInstitution> adiEmployers = Arrays.asList(this.adis).stream()
+				.filter(o -> o.getPnlPersonnelExpenses() > 0f).collect(Collectors.toList());
+		List<Household> employees = Arrays.asList(this.households).stream().filter(o -> o.getPnlWagesSalaries() > 0f)
+				.collect(Collectors.toList());
+		ArrayList<String> typeOfEmployer = new ArrayList<String>((int) (employees.size() * 1.05f));
+		ArrayList<Integer> shuffledBusinessIndices = new ArrayList<Integer>((int) (employees.size() * 1.05f
+				* businessEmployers.size() / (businessEmployers.size() + adiEmployers.size())));
+		ArrayList<Integer> shuffledAdiIndices = new ArrayList<Integer>((int) (employees.size() * 1.05f
+				* adiEmployers.size() / (businessEmployers.size() + adiEmployers.size())));
+		for (int i = 0; i < businessEmployers.size(); i++) {
+			// calculate ratio of business wages to total wages
+			float businessWages = businessEmployers.get(i).getWageExpenses();
+			int businessEmployeeCount = (int) Math.ceil(businessWages / totalWagesExpense * employees.size());
+			shuffledBusinessIndices.addAll(Collections.nCopies(businessEmployeeCount, i));
+			typeOfEmployer.addAll(Collections.nCopies(businessEmployeeCount, "B"));
+		}
+		for (int i = 0; i < adiEmployers.size(); i++) {
+			// calculate ratio of ADI wages to total wages
+			float adiWages = adiEmployers.get(i).getPnlPersonnelExpenses();
+			int adiEmployeeCount = (int) Math.ceil(adiWages / totalWagesExpense * employees.size());
+			shuffledAdiIndices.addAll(Collections.nCopies(adiEmployeeCount, i));
+			typeOfEmployer.addAll(Collections.nCopies(adiEmployeeCount, "A"));
+		}
+		Collections.shuffle(typeOfEmployer, this.random);
+		Collections.shuffle(shuffledBusinessIndices, this.random);
+		Collections.shuffle(shuffledAdiIndices, this.random);
+		int nextShuffledBusinessIdx = 0;
+		int nextShuffledAdiIdx = 0;
+
 	}
 
 	/**
@@ -358,18 +412,97 @@ public class CalibrateEconomy {
 			this.assignPaymentClearingIndices();
 		}
 
-		// link to employees
+		// TODO link to domestic suppliers
+		/*
+		 * Get the ratio of domestic sales between industries, and use that to split
+		 * each business's spending to various suppliers by industry. Shuffle the
+		 * indices within each industry. For each business, for each of the supplier
+		 * divisions in the static array, pick the next random supplier and assign it to
+		 * this business.
+		 * 
+		 * N.B. This is similar to the logic used to assign employees to businesses in
+		 * the same industry division.
+		 */
+		Set<String> domesticSupplierDivs = new HashSet<String>(Arrays.asList(BUSINESS_SUPPLIER_DIV_CODE));
+		float totalDomesticRevenue = (float) Arrays.asList(this.businesses).stream()
+				.filter(o -> domesticSupplierDivs.contains(String.valueOf(o.getIndustryDivisionCode())))
+				.mapToDouble(o -> o.getSalesDomestic()).sum();
+		List<Business> domesticSuppliers = Arrays.asList(this.businesses).stream()
+				.filter(o -> domesticSupplierDivs.contains(String.valueOf(o.getIndustryDivisionCode())))
+				.collect(Collectors.toList());
+		ArrayList<Integer> shuffledIndices = new ArrayList<Integer>(this.businesses.length);
+		for (int i = 0; i < domesticSuppliers.size(); i++) {
+			// calculate ratio of supplier domestic sales to total domestic sales
+			float domesticSales = domesticSuppliers.get(i).getSalesDomestic();
+			int customerCount = (int) Math.ceil(domesticSales / totalDomesticRevenue * this.businesses.length);
+			shuffledIndices.addAll(Collections.nCopies(customerCount, i));
+		}
+		// shuffle indices, and assign suppliers to businesses
+		Collections.shuffle(shuffledIndices, this.random);
+		int nextShuffledIdx = 0;
+		for (int i = 0; i < this.businesses.length; i++) {
+			// (landlords.get(shuffledIndices.get(nextShuffledIdx++)));
+			ArrayList<Business> businessSuppliers = new ArrayList<Business>(BUSINESS_SUPPLIER_DIV_CODE.length);
+			for (int j = 0; j < BUSINESS_SUPPLIER_DIV_CODE.length; j++) {
+				// get a supplier from each industry, with the relevant amount weighting
+			}
+			this.businesses[i].setDomesticSuppliers(businessSuppliers);
+		}
 
-		// link to domestic suppliers
-
-		// link to foreign suppliers (i.e. foreign countries)
+		// TODO link to foreign suppliers (i.e. foreign countries)
 
 		// link to landlord (rent)
+		// get list of businesses with rental income
+		float totalRentIncome = (float) Arrays.asList(this.businesses).stream().filter(o -> o.getRentIncome() > 0f)
+				.mapToDouble(o -> o.getRentIncome()).sum();
+		List<Business> landlords = Arrays.asList(this.businesses).stream().filter(o -> o.getRentIncome() > 0f)
+				.collect(Collectors.toList());
+		List<Business> renters = Arrays.asList(this.businesses).stream().filter(o -> o.getRentExpense() > 0f)
+				.collect(Collectors.toList());
+		shuffledIndices = new ArrayList<Integer>(renters.size());
+		for (int i = 0; i < landlords.size(); i++) {
+			// calculate ratio of landlord to total rent
+			float landlordRentIncome = landlords.get(i).getRentIncome();
+			int landlordRenterCount = (int) Math.ceil(landlordRentIncome / totalRentIncome * renters.size());
+			shuffledIndices.addAll(Collections.nCopies(landlordRenterCount, i));
+		}
+		// shuffle indices, and assign landlords to renters
+		Collections.shuffle(shuffledIndices, this.random);
+		nextShuffledIdx = 0;
+		for (int i = 0; i < renters.size(); i++) {
+			renters.get(i).setLandlord(landlords.get(shuffledIndices.get(nextShuffledIdx++)));
+		}
 
-		// link to bank (loans)
+		// link to ADI (loans & deposits with same ADI)
+		// get total business loans for entire ADI industry
+		float totalLoanBal = (float) Arrays.asList(this.adis).stream().mapToDouble(o -> o.getBsLoansBusiness()).sum();
+		// populate indices with relative amounts of each ADI
+		shuffledIndices = new ArrayList<Integer>(this.businesses.length);
+		for (int i = 0; i < this.adis.length; i++) {
+			// calculate ratio of ADI to total
+			float adiLoanBal = this.adis[i].getBsLoansBusiness();
+			if (adiLoanBal > 0f) {
+				// convert to indices, rounding up so we have at least enough
+				int adiCustomerCount = (int) Math.ceil(adiLoanBal / totalLoanBal * this.businesses.length);
+				shuffledIndices.addAll(Collections.nCopies(adiCustomerCount, i));
+			}
+		}
+		// shuffle indices, and assign ADIs to Businesses
+		Collections.shuffle(shuffledIndices, this.random);
+		nextShuffledIdx = 0;
+		for (int i = 0; i < this.businesses.length; i++) {
+			// Assign loan ADI to Business. It doesn't matter if the Business doesn't have a
+			// loan. We assume businesses only bank with ADIs who have business loans.
+			this.businesses[i].setAdi(this.adis[shuffledIndices.get(nextShuffledIdx++)]);
+		}
+		// release memory
+		shuffledIndices.clear();
+		shuffledIndices = null;
 
 		// link to Australian Government (payroll & income tax)
-
+		for (int i = 0; i < this.households.length; i++) {
+			this.businesses[i].setGovt(this.govt);
+		}
 	}
 
 	/**
@@ -382,8 +515,6 @@ public class CalibrateEconomy {
 			this.assignPaymentClearingIndices();
 		}
 
-		// link to employees
-
 		// link to domestic suppliers
 
 		// link to retail depositors (Households)
@@ -393,10 +524,16 @@ public class CalibrateEconomy {
 		// link to ADI investors
 
 		// link to Australian Government (payroll & income tax)
+		for (int i = 0; i < this.households.length; i++) {
+			this.adis[i].setGovt(this.govt);
+		}
 	}
 
 	/**
 	 * Links the ForeignCountries to their Exporter trading partners.
+	 * 
+	 * The Business calibration stage didn't create any exporters, so we need to do
+	 * that at this stage while linking them to countries.
 	 */
 	void linkForeignCountries() {
 		if (!this.indicesAssigned) {
@@ -411,30 +548,60 @@ public class CalibrateEconomy {
 	 * Links the AustralianGovernment to their welfare recipients and bond
 	 * investors.
 	 */
-	void linkGovernment() {
+	private void linkGovernment() {
 		if (!this.indicesAssigned) {
 			this.assignPaymentClearingIndices();
 		}
 
 		// link to welfare recipients
+		ArrayList<Household> welfareRecipients = new ArrayList<Household>(this.households.length);
+		for (int i = 0; i < this.households.length; i++) {
+			if (this.households[i].getPnlUnemploymentBenefits() > 0f
+					|| this.households[i].getPnlOtherSocialSecurityIncome() > 0f) {
+				welfareRecipients.add(this.households[i]);
+			}
+		}
+		welfareRecipients.trimToSize();
+		this.govt.setWelfareRecipients(welfareRecipients);
 
 		// link to bond investors (ADIs)
-
+		ArrayList<AuthorisedDepositTakingInstitution> bondInvestors = new ArrayList<AuthorisedDepositTakingInstitution>(
+				this.adis.length);
+		for (int i = 0; i < this.adis.length; i++) {
+			if (this.adis[i].getBsLoansGovernment() > 0f) {
+				// ADI is a government investor
+				bondInvestors.add(adis[i]);
+			}
+		}
+		bondInvestors.trimToSize();
+		this.govt.setBondInvestors(bondInvestors);
 	}
 
 	/**
 	 * Links the RBA to the banks with their cash balances, and the government to
 	 * pay its annual dividends to.
 	 */
-	void linkRba() {
+	private void linkRba() {
 		if (!this.indicesAssigned) {
 			this.assignPaymentClearingIndices();
 		}
 
 		// link to major and regional banks
+		ArrayList<AuthorisedDepositTakingInstitution> adiDepositors = new ArrayList<AuthorisedDepositTakingInstitution>(
+				this.adis.length);
+		for (int i = 0; i < this.adis.length; i++) {
+			if (this.adis[i].getAdiCategory().equalsIgnoreCase("Major Bank")
+					|| this.adis[i].getAdiCategory().equalsIgnoreCase("Other Domestic Bank")
+					|| this.adis[i].getAdiCategory().equalsIgnoreCase("Foreign Bank")) {
+				// ADI holds their cash in an ESA account with the RBA
+				adiDepositors.add(this.adis[i]);
+			}
+		}
+		adiDepositors.trimToSize();
+		this.rba.setAdiDepositors(adiDepositors);
 
 		// link to Australian Government (annual dividends)
-
+		this.rba.setGovt(this.govt);
 	}
 
 	/**

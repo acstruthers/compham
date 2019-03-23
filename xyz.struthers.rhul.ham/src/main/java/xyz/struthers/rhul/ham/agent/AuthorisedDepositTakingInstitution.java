@@ -384,6 +384,125 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	}
 
 	/**
+	 * @return the domesticSuppliers
+	 */
+	public ArrayList<Business> getDomesticSuppliers() {
+		return domesticSuppliers;
+	}
+
+	/**
+	 * @param domesticSuppliers the domesticSuppliers to set
+	 */
+	public void setDomesticSuppliers(ArrayList<Business> domesticSuppliers) {
+		this.domesticSuppliers = domesticSuppliers;
+	}
+
+	/**
+	 * @return the domesticSupplierRatios
+	 */
+	public ArrayList<Float> getDomesticSupplierRatios() {
+		return domesticSupplierRatios;
+	}
+
+	/**
+	 * @param domesticSupplierRatios the domesticSupplierRatios to set
+	 */
+	public void setDomesticSupplierRatios(ArrayList<Float> domesticSupplierRatios) {
+		this.domesticSupplierRatios = domesticSupplierRatios;
+	}
+
+	/**
+	 * @return the retailDepositors
+	 */
+	public ArrayList<Household> getRetailDepositors() {
+		return retailDepositors;
+	}
+
+	/**
+	 * @param retailDepositors the retailDepositors to set
+	 */
+	public void setRetailDepositors(ArrayList<Household> retailDepositors) {
+		this.retailDepositors = retailDepositors;
+	}
+
+	/**
+	 * @return the commercialDepositors
+	 */
+	public ArrayList<Business> getCommercialDepositors() {
+		return commercialDepositors;
+	}
+
+	/**
+	 * @param commercialDepositors the commercialDepositors to set
+	 */
+	public void setCommercialDepositors(ArrayList<Business> commercialDepositors) {
+		this.commercialDepositors = commercialDepositors;
+	}
+
+	/**
+	 * @return the adiInvestors
+	 */
+	public ArrayList<AuthorisedDepositTakingInstitution> getAdiInvestors() {
+		return adiInvestors;
+	}
+
+	/**
+	 * @param adiInvestors the adiInvestors to set
+	 */
+	public void setAdiInvestors(ArrayList<AuthorisedDepositTakingInstitution> adiInvestors) {
+		this.adiInvestors = adiInvestors;
+	}
+
+	/**
+	 * @return the adiInvestorAmounts
+	 */
+	public ArrayList<Float> getAdiInvestorAmounts() {
+		return adiInvestorAmounts;
+	}
+
+	/**
+	 * @param adiInvestorAmounts the adiInvestorAmounts to set
+	 */
+	public void setAdiInvestorAmounts(ArrayList<Float> adiInvestorAmounts) {
+		this.adiInvestorAmounts = adiInvestorAmounts;
+	}
+
+	/**
+	 * @return the govt
+	 */
+	public AustralianGovernment getGovt() {
+		return govt;
+	}
+
+	/**
+	 * @param govt the govt to set
+	 */
+	public void setGovt(AustralianGovernment govt) {
+		this.govt = govt;
+	}
+
+	/**
+	 * @return the rba
+	 */
+	public ReserveBankOfAustralia getRba() {
+		return rba;
+	}
+
+	/**
+	 * @param rba the rba to set
+	 */
+	public void setRba(ReserveBankOfAustralia rba) {
+		this.rba = rba;
+	}
+
+	/**
+	 * @param employees the employees to set
+	 */
+	public void setEmployees(ArrayList<Individual> employees) {
+		this.employees = employees;
+	}
+
+	/**
 	 * @return the australianBusinessNumber
 	 */
 	public String getAustralianBusinessNumber() {
@@ -423,6 +542,34 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	 */
 	public void setAdiCategory(String adiCategory) {
 		this.adiCategory = adiCategory;
+	}
+
+	/**
+	 * @return the state
+	 */
+	public String getState() {
+		return state;
+	}
+
+	/**
+	 * @param state the state to set
+	 */
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	/**
+	 * @return the isGccsa
+	 */
+	public boolean isGccsa() {
+		return isGccsa;
+	}
+
+	/**
+	 * @param isGccsa the isGccsa to set
+	 */
+	public void setGccsa(boolean isGccsa) {
+		this.isGccsa = isGccsa;
 	}
 
 	/**

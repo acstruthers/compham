@@ -76,19 +76,19 @@ public class CalibrationDataIndividual {
 	 * Contains P&L and people count by sex, 5-year age range, and state.<br>
 	 * Keys: Series Title, State, Age, Gender, Taxable Status, Lodgment Method
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>>> atoIndividualTable2a;
+	private Map<String, Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>>> atoIndividualTable2a;
 	/**
 	 * ATO Individuals Table 3A<br>
 	 * Contains P&L and people count by sex, 5-year age range, and income range.<br>
 	 * Keys: Series Title, Income Range, Age, Gender, Taxable Status
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> atoIndividualTable3a;
+	private Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>> atoIndividualTable3a;
 	/**
 	 * ATO Individuals Table 6B<br>
 	 * Contains P&L and people count by post code.<br>
 	 * Keys: Series Title, Post Code
 	 */
-	private Map<String, Map<String, String>> atoIndividualTable6b;
+	private Map<String, Map<String, Float>> atoIndividualTable6b;
 	/**
 	 * ATO Individuals Table 9 (Industry Division summary)<br>
 	 * Contains count and taxable income, summarised by industry division.<br>
@@ -103,7 +103,7 @@ public class CalibrationDataIndividual {
 	 * Keys: Age5, Industry Division, Personal Income, POA, Sex<br>
 	 * Values: Number of persons
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> censusSEXP_POA_AGE5P_INDP_INCP;
+	private Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>> censusSEXP_POA_AGE5P_INDP_INCP;
 	private boolean initialisedCensusSEXP_POA_AGE5P_INDP_INCP;
 
 	/**
@@ -264,7 +264,7 @@ public class CalibrationDataIndividual {
 		// ABS Census SEXP by POA (UR) by AGE5P, INDP and INCP
 		System.out.print(new Date(System.currentTimeMillis())
 				+ ": Loading ABS Census SEXP by POA (UR) by AGE5P, INDP and INCP data");
-		this.censusSEXP_POA_AGE5P_INDP_INCP = new HashMap<String, Map<String, Map<String, Map<String, Map<String, String>>>>>(
+		this.censusSEXP_POA_AGE5P_INDP_INCP = new HashMap<String, Map<String, Map<String, Map<String, Map<String, Float>>>>>(
 				MAP_INIT_SIZE_AGE5P);
 		int fromColumnSEXP_POA_AGE5P_INDP_INCP = 1;
 		int toColumnSEXP_POA_AGE5P_INDP_INCP = 8229;
@@ -334,7 +334,7 @@ public class CalibrationDataIndividual {
 		// 145 };
 		int[] atoIndividualTable2aColumns = { 5, 6, 7 };
 		int ato2aMapCapacity = (int) Math.ceil(atoIndividualTable2aColumns.length / MAP_LOAD_FACTOR);
-		this.atoIndividualTable2a = new HashMap<String, Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>>>(
+		this.atoIndividualTable2a = new HashMap<String, Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>>>(
 				ato2aMapCapacity);
 		this.loadAtoIndividualsTable2a("/data/ATO/Individual/IndividualsTable2A.csv", ATO_INDIVIDUAL_T2A,
 				atoIndividualTable2aColumns, this.title, this.atoIndividualTable2a);
@@ -355,7 +355,7 @@ public class CalibrationDataIndividual {
 				42, 43, 46, 47, 58, 59, 62, 63, 66, 67, 96, 97, 98, 99, 102, 103, 104, 105, 140, 141, 142, 143, 144,
 				145 };
 		int ato3aMapCapacity = (int) Math.ceil(atoIndividualTable3aColumns.length / MAP_LOAD_FACTOR);
-		this.atoIndividualTable3a = new HashMap<String, Map<String, Map<String, Map<String, Map<String, String>>>>>(
+		this.atoIndividualTable3a = new HashMap<String, Map<String, Map<String, Map<String, Map<String, Float>>>>>(
 				ato3aMapCapacity);
 		this.loadAtoIndividualsTable3a("/data/ATO/Individual/IndividualsTable3A.csv", ATO_INDIVIDUAL_T3A,
 				atoIndividualTable3aColumns, this.title, this.atoIndividualTable3a);
@@ -376,7 +376,7 @@ public class CalibrationDataIndividual {
 		// 38, 39, 40, 41, 44, 45, 59, 60, 63, 64, 93, 94, 95, 96, 99, 100, 101, 102 };
 		int[] atoIndividualTable6bColumns = { 2, 3, 4 };
 		int ato6bMapCapacity = (int) Math.ceil(atoIndividualTable6bColumns.length / MAP_LOAD_FACTOR);
-		this.atoIndividualTable6b = new HashMap<String, Map<String, String>>(ato6bMapCapacity);
+		this.atoIndividualTable6b = new HashMap<String, Map<String, Float>>(ato6bMapCapacity);
 		this.loadAtoIndividualsTable6("/data/ATO/Individual/IndividualsTable6B.csv", ATO_INDIVIDUAL_T6B,
 				atoIndividualTable6bColumns, this.title, this.atoIndividualTable6b);
 
@@ -565,7 +565,7 @@ public class CalibrationDataIndividual {
 	 */
 	private void loadAbsCensusTableCsv3Columns1Wafer(String fileResourceLocation, boolean isInitialised,
 			int fromColumnIndex, int toColumnIndex,
-			Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> data, String lgaOrPoa) {
+			Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>> data, String lgaOrPoa) {
 
 		CSVReader reader = null;
 		try {
@@ -616,7 +616,7 @@ public class CalibrationDataIndividual {
 										if (!columnTitles[0][i].isBlank() && !data.containsKey(columnTitles[0][i])) {
 											// add column series 1 key
 											data.put(columnTitles[0][i],
-													new HashMap<String, Map<String, Map<String, Map<String, String>>>>(
+													new HashMap<String, Map<String, Map<String, Map<String, Float>>>>(
 															MAP_INIT_SIZE_INDP));
 										}
 										String divCode = this.abs1292_0_55_002ANZSIC.get("Division to Division Code")
@@ -626,14 +626,14 @@ public class CalibrationDataIndividual {
 											// add column series 2 key
 											// convert Industry Division Description to Code
 											data.get(columnTitles[0][i]).put(divCode,
-													new HashMap<String, Map<String, Map<String, String>>>(
+													new HashMap<String, Map<String, Map<String, Float>>>(
 															MAP_INIT_SIZE_INCP));
 										}
 										if (!columnTitles[2][i].isBlank() && !data.get(columnTitles[0][i]).get(divCode)
 												.containsKey(columnTitles[2][i])) {
 											// add column series 3 key
 											data.get(columnTitles[0][i]).get(divCode).put(columnTitles[2][i],
-													new HashMap<String, Map<String, String>>(MAP_INIT_SIZE_LGA));
+													new HashMap<String, Map<String, Float>>(MAP_INIT_SIZE_LGA));
 										}
 									}
 								}
@@ -656,10 +656,16 @@ public class CalibrationDataIndividual {
 												.get(columnTitles[1][i].toUpperCase());
 										if (waferNumber == 1) {
 											data.get(columnTitles[0][i]).get(divCode).get(columnTitles[2][i])
-													.put(areaCode, new HashMap<String, String>(MAP_INIT_SIZE_SEXP));
+													.put(areaCode, new HashMap<String, Float>(MAP_INIT_SIZE_SEXP));
+										}
+										float value = 0f;
+										try {
+											value = Float.valueOf(line[i + fromColumnIndex].trim().replace(",", ""));
+										} catch (NumberFormatException e) {
+											// do nothing and leave it as zero.
 										}
 										data.get(columnTitles[0][i]).get(divCode).get(columnTitles[2][i]).get(areaCode)
-												.put(waferName, line[i + fromColumnIndex]);
+												.put(waferName, value);
 									}
 								}
 							} else if (line[0].isBlank()) {
@@ -779,7 +785,7 @@ public class CalibrationDataIndividual {
 	 */
 	private void loadAtoIndividualsTable2a(String fileResourceLocation, String tableName, int[] columnsToImport,
 			Map<String, List<String>> titles,
-			Map<String, Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>>> data) {
+			Map<String, Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -802,7 +808,7 @@ public class CalibrationDataIndividual {
 
 							// store series ID as key with blank collections to populate with data below
 							data.put(line[columnsToImport[i]].trim(),
-									new HashMap<String, Map<String, Map<String, Map<String, Map<String, String>>>>>());
+									new HashMap<String, Map<String, Map<String, Map<String, Map<String, Float>>>>>());
 						}
 						titles.put(tableName, thesecolumnNames);
 						header = false;
@@ -820,25 +826,31 @@ public class CalibrationDataIndividual {
 							// create nested maps for new data categories
 							if (!data.get(seriesId[i]).containsKey(thisState)) {
 								data.get(seriesId[i]).put(thisState,
-										new HashMap<String, Map<String, Map<String, Map<String, String>>>>());
+										new HashMap<String, Map<String, Map<String, Map<String, Float>>>>());
 							}
 							if (!data.get(seriesId[i]).get(thisState).containsKey(thisAge)) {
 								data.get(seriesId[i]).get(thisState).put(thisAge,
-										new HashMap<String, Map<String, Map<String, String>>>());
+										new HashMap<String, Map<String, Map<String, Float>>>());
 							}
 							if (!data.get(seriesId[i]).get(thisState).get(thisAge).containsKey(thisSex)) {
 								data.get(seriesId[i]).get(thisState).get(thisAge).put(thisSex,
-										new HashMap<String, Map<String, String>>());
+										new HashMap<String, Map<String, Float>>());
 							}
 							if (!data.get(seriesId[i]).get(thisState).get(thisAge).get(thisSex)
 									.containsKey(thisTaxableStatus)) {
 								data.get(seriesId[i]).get(thisState).get(thisAge).get(thisSex).put(thisTaxableStatus,
-										new HashMap<String, String>());
+										new HashMap<String, Float>());
 							}
 
 							// parse the body of the data
+							float value = 0f;
+							try {
+								value = Float.valueOf(line[columnsToImport[i]].trim().replace(",", ""));
+							} catch (NumberFormatException e) {
+								// do nothing and leave it as zero.
+							}
 							data.get(seriesId[i]).get(thisState).get(thisAge).get(thisSex).get(thisTaxableStatus)
-									.put(thisLodgmentMethod, line[columnsToImport[i]]);
+									.put(thisLodgmentMethod, value);
 						}
 					} else {
 						footer = true;
@@ -875,7 +887,7 @@ public class CalibrationDataIndividual {
 	 */
 	private void loadAtoIndividualsTable3a(String fileResourceLocation, String tableName, int[] columnsToImport,
 			Map<String, List<String>> titles,
-			Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> data) {
+			Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -898,7 +910,7 @@ public class CalibrationDataIndividual {
 
 							// store series ID as key with blank collections to populate with data below
 							data.put(line[columnsToImport[i]].trim(),
-									new HashMap<String, Map<String, Map<String, Map<String, String>>>>());
+									new HashMap<String, Map<String, Map<String, Map<String, Float>>>>());
 						}
 						titles.put(tableName, theseColumnNames);
 						header = false;
@@ -915,20 +927,26 @@ public class CalibrationDataIndividual {
 							// create nested maps for new data categories
 							if (!data.get(seriesId[i]).containsKey(thisIncomeRange)) {
 								data.get(seriesId[i]).put(thisIncomeRange,
-										new HashMap<String, Map<String, Map<String, String>>>());
+										new HashMap<String, Map<String, Map<String, Float>>>());
 							}
 							if (!data.get(seriesId[i]).get(thisIncomeRange).containsKey(thisAge)) {
 								data.get(seriesId[i]).get(thisIncomeRange).put(thisAge,
-										new HashMap<String, Map<String, String>>());
+										new HashMap<String, Map<String, Float>>());
 							}
 							if (!data.get(seriesId[i]).get(thisIncomeRange).get(thisAge).containsKey(thisSex)) {
 								data.get(seriesId[i]).get(thisIncomeRange).get(thisAge).put(thisSex,
-										new HashMap<String, String>());
+										new HashMap<String, Float>());
 							}
 
 							// parse the body of the data
+							float value = 0f;
+							try {
+								value = Float.valueOf(line[columnsToImport[i]].trim().replace(",", ""));
+							} catch (NumberFormatException e) {
+								// do nothing and leave it as zero.
+							}
 							data.get(seriesId[i]).get(thisIncomeRange).get(thisAge).get(thisSex).put(thisTaxableStatus,
-									line[columnsToImport[i]]);
+									value);
 						}
 					} else {
 						footer = true;
@@ -961,7 +979,7 @@ public class CalibrationDataIndividual {
 	 * @param data                 - the data map that the values are returned in
 	 */
 	private void loadAtoIndividualsTable6(String fileResourceLocation, String tableName, int[] columnsToImport,
-			Map<String, List<String>> titles, Map<String, Map<String, String>> data) {
+			Map<String, List<String>> titles, Map<String, Map<String, Float>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -983,7 +1001,7 @@ public class CalibrationDataIndividual {
 							thesecolumnNames.add(line[columnsToImport[i]].trim());
 
 							// store series ID as key with blank collections to populate with data below
-							data.put(line[columnsToImport[i]].trim(), new HashMap<String, String>());
+							data.put(line[columnsToImport[i]].trim(), new HashMap<String, Float>());
 						}
 						titles.put(tableName, thesecolumnNames);
 						header = false;
@@ -995,7 +1013,13 @@ public class CalibrationDataIndividual {
 						if (NumberUtils.isCreatable(line[1])) {
 							for (int i = 0; i < columnsToImport.length; i++) {
 								// parse the body of the data
-								data.get(seriesId[i]).put(line[1].trim(), line[columnsToImport[i]].trim());
+								float value = 0f;
+								try {
+									value = Float.valueOf(line[columnsToImport[i]].trim().replace(",", ""));
+								} catch (NumberFormatException e) {
+									// do nothing and leave it as zero.
+								}
+								data.get(seriesId[i]).put(line[1].trim(), value);
 							}
 						}
 					} else {
@@ -1110,8 +1134,13 @@ public class CalibrationDataIndividual {
 							if (data.get(seriesId[i]).get(divisionCode) != null) {
 								oldVal = data.get(seriesId[i]).get(divisionCode);
 							}
-							data.get(seriesId[i]).put(divisionCode,
-									oldVal + Float.valueOf(line[columnsToImport[i]].trim().replace(",", "")));
+							float value = 0f;
+							try {
+								value = Float.valueOf(line[columnsToImport[i]].trim().replace(",", ""));
+							} catch (NumberFormatException e) {
+								// do nothing and leave it as zero.
+							}
+							data.get(seriesId[i]).put(divisionCode, oldVal + value);
 						}
 					} else {
 						footer = true;
@@ -1150,7 +1179,7 @@ public class CalibrationDataIndividual {
 	/**
 	 * @return the atoIndividualTable2a
 	 */
-	public Map<String, Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>>> getAtoIndividualTable2a() {
+	public Map<String, Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>>> getAtoIndividualTable2a() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1160,7 +1189,7 @@ public class CalibrationDataIndividual {
 	/**
 	 * @return the atoIndividualTable3a
 	 */
-	public Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> getAtoIndividualTable3a() {
+	public Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>> getAtoIndividualTable3a() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1170,7 +1199,7 @@ public class CalibrationDataIndividual {
 	/**
 	 * @return the atoIndividualTable6b
 	 */
-	public Map<String, Map<String, String>> getAtoIndividualTable6b() {
+	public Map<String, Map<String, Float>> getAtoIndividualTable6b() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1190,7 +1219,7 @@ public class CalibrationDataIndividual {
 	/**
 	 * @return the censusSEXP_POA_AGE5P_INDP_INCP
 	 */
-	public Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> getCensusSEXP_POA_AGE5P_INDP_INCP() {
+	public Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>> getCensusSEXP_POA_AGE5P_INDP_INCP() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}

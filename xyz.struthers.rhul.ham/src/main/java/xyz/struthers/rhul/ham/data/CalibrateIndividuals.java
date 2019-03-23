@@ -218,19 +218,19 @@ public class CalibrateIndividuals {
 	 * Contains P&L and people count by sex and 5-year age range.<br>
 	 * Keys: Series Title, State, Age, Gender, Taxable Status, Lodgment Method
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>>> atoIndividualTable2a;
+	private Map<String, Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>>> atoIndividualTable2a;
 	/**
 	 * ATO Individuals Table 3A<br>
 	 * Contains P&L and people count by sex, 5-year age range, and income range.<br>
 	 * Keys: Series Title, Income Range, Age, Gender, Taxable Status
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> atoIndividualTable3a;
+	private Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>> atoIndividualTable3a;
 	/**
 	 * ATO Individuals Table 6B<br>
 	 * Contains P&L and people count by post code.<br>
 	 * Keys: Series Title, Post Code
 	 */
-	private Map<String, Map<String, String>> atoIndividualTable6b;
+	private Map<String, Map<String, Float>> atoIndividualTable6b;
 	/**
 	 * ATO Individuals Table 9 (Industry Division summary)<br>
 	 * Contains count and taxable income, summarised by industry division.<br>
@@ -245,7 +245,7 @@ public class CalibrateIndividuals {
 	 * Keys: Age5, Industry Division, Personal Income, POA, Sex<br>
 	 * Values: Number of persons
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Map<String, String>>>>> censusSEXP_POA_AGE5P_INDP_INCP;
+	private Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>> censusSEXP_POA_AGE5P_INDP_INCP;
 
 	/**
 	 * 
@@ -604,17 +604,15 @@ public class CalibrateIndividuals {
 								.keySet();
 						for (String lodgmentStatus : ato2aKeySetLodgmentStatus) {
 							float oldCountVal = stateTaxableCount.get(sex).get(age).get(stateCode);
-							float newCountVal = Float
-									.valueOf(this.atoIndividualTable2a.get(ATO_2A_TITLE_TAXABLE_COUNT).get(state)
-											.get(age).get(sex).get(taxableStatus).get(lodgmentStatus).replace(",", ""));
+							float newCountVal = this.atoIndividualTable2a.get(ATO_2A_TITLE_TAXABLE_COUNT).get(state)
+									.get(age).get(sex).get(taxableStatus).get(lodgmentStatus);
 							stateTaxableCount.get(sex).get(age).put(stateCode, oldCountVal + newCountVal);
 							float oldTotalCount = stateSexAgeNationalTotalCount.get(sex).get(age);
 							stateSexAgeNationalTotalCount.get(sex).put(age, oldTotalCount + newCountVal);
 
 							float oldAmountVal = stateTaxableAmount.get(sex).get(age).get(stateCode);
-							float newAmountVal = Float
-									.valueOf(this.atoIndividualTable2a.get(ATO_2A_TITLE_TAXABLE_AMOUNT).get(state)
-											.get(age).get(sex).get(taxableStatus).get(lodgmentStatus).replace(",", ""));
+							float newAmountVal = this.atoIndividualTable2a.get(ATO_2A_TITLE_TAXABLE_AMOUNT).get(state)
+									.get(age).get(sex).get(taxableStatus).get(lodgmentStatus);
 							stateTaxableAmount.get(sex).get(age).put(stateCode, oldAmountVal + newAmountVal);
 							float oldTotalAmount = stateSexAgeNationalTotalAmount.get(sex).get(age);
 							stateSexAgeNationalTotalAmount.get(sex).put(age, oldTotalAmount + newAmountVal);
@@ -690,10 +688,8 @@ public class CalibrateIndividuals {
 			if (state != null && state != "Other") {
 				// postcode 3694 returns null, so just skip null values for now
 				// calculate average income per postcode, and state totals for all postcodes
-				float postcodeTaxableCount = Float.valueOf(
-						this.atoIndividualTable6b.get(ATO_6B_TITLE_TAXABLE_COUNT).get(postcode).replace(",", ""));
-				float postcodeTaxableAmount = Float.valueOf(
-						this.atoIndividualTable6b.get(ATO_6B_TITLE_TAXABLE_AMOUNT).get(postcode).replace(",", ""));
+				float postcodeTaxableCount = this.atoIndividualTable6b.get(ATO_6B_TITLE_TAXABLE_COUNT).get(postcode);
+				float postcodeTaxableAmount = this.atoIndividualTable6b.get(ATO_6B_TITLE_TAXABLE_AMOUNT).get(postcode);
 				float postcodeTaxablePerPerson = postcodeTaxableAmount / postcodeTaxableCount;
 
 				// Just an efficient place to hold this. Will be overwritten in the loop below.
@@ -1038,170 +1034,152 @@ public class CalibrateIndividuals {
 												.get(age).get(sex).containsKey(taxableStatus)) {
 
 									employedCount += Math.max(
-											Float.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT)
-													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
-													.replace(",", "")),
-											Float.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_ALLOWANCES_COUNT)
-													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
-													.replace(",", "")));
-									unemployedCount += Float.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_GOVT_ALLOW_COUNT).get(incomeRangeAto).get(age).get(sex)
-											.get(taxableStatus).replace(",", ""));
-									pensionCount += Float.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_GOVT_PENSION_COUNT).get(incomeRangeAto).get(age).get(sex)
-											.get(taxableStatus).replace(",", ""));
+											this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT).get(incomeRangeAto)
+													.get(age).get(sex).get(taxableStatus),
+											this.atoIndividualTable3a.get(ATO_3A_TITLE_ALLOWANCES_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus));
+									unemployedCount += this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_ALLOW_COUNT)
+											.get(incomeRangeAto).get(age).get(sex).get(taxableStatus);
+									pensionCount += this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_PENSION_COUNT)
+											.get(incomeRangeAto).get(age).get(sex).get(taxableStatus);
 									selfFundedRetireeCount += Math.max(
-											Float.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_TAXED_COUNT)
-													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
-													.replace(",", "")),
-											Float.valueOf(this.atoIndividualTable3a
-													.get(ATO_3A_TITLE_SUPER_UNTAXED_COUNT).get(incomeRangeAto).get(age)
-													.get(sex).get(taxableStatus).replace(",", "")));
+											this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_TAXED_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus),
+											this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_UNTAXED_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus));
 									foreignIncomeCount += Math.max(
-											Float.valueOf(this.atoIndividualTable3a
-													.get(ATO_3A_TITLE_FOREIGN_INCOME_COUNT).get(incomeRangeAto).get(age)
-													.get(sex).get(taxableStatus).replace(",", "")),
-											Float.valueOf(this.atoIndividualTable3a
-													.get(ATO_3A_TITLE_FOREIGN_INCOME2_COUNT).get(incomeRangeAto)
-													.get(age).get(sex).get(taxableStatus).replace(",", "")));
-									noIncomeCount += Float.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_TOTAL_INCOME_COUNT).get(incomeRangeAto).get(age).get(sex)
-											.get(taxableStatus).replace(",", ""));
+											this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus),
+											this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME2_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus));
+									noIncomeCount += this.atoIndividualTable3a.get(ATO_3A_TITLE_TOTAL_INCOME_COUNT)
+											.get(incomeRangeAto).get(age).get(sex).get(taxableStatus);
 
 									// variables to calibrate Individual agents
-									atoCountEmployed.add(Math.max(
-											Integer.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT)
-													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
-													.replace(",", "")),
-											Integer.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_ALLOWANCES_COUNT)
-													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
-													.replace(",", ""))));
-									atoCountUnemployed.add(Integer.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_GOVT_ALLOW_COUNT).get(incomeRangeAto).get(age).get(sex)
-											.get(taxableStatus).replace(",", "")));
-									atoCountPension.add(Integer.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_GOVT_PENSION_COUNT).get(incomeRangeAto).get(age).get(sex)
-											.get(taxableStatus).replace(",", "")));
-									atoCountSelfFundedRetiree.add(Math.max(
-											Integer.valueOf(this.atoIndividualTable3a
-													.get(ATO_3A_TITLE_SUPER_TAXED_COUNT).get(incomeRangeAto).get(age)
-													.get(sex).get(taxableStatus).replace(",", "")),
-											Integer.valueOf(this.atoIndividualTable3a
-													.get(ATO_3A_TITLE_SUPER_UNTAXED_COUNT).get(incomeRangeAto).get(age)
-													.get(sex).get(taxableStatus).replace(",", ""))));
-									atoCountForeignIncome.add(Math.max(
-											Integer.valueOf(this.atoIndividualTable3a
-													.get(ATO_3A_TITLE_FOREIGN_INCOME_COUNT).get(incomeRangeAto).get(age)
-													.get(sex).get(taxableStatus).replace(",", "")),
-											Integer.valueOf(this.atoIndividualTable3a
-													.get(ATO_3A_TITLE_FOREIGN_INCOME2_COUNT).get(incomeRangeAto)
-													.get(age).get(sex).get(taxableStatus).replace(",", ""))));
+									atoCountEmployed.add(Math.round(Math.max(
+											this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT).get(incomeRangeAto)
+													.get(age).get(sex).get(taxableStatus),
+											this.atoIndividualTable3a.get(ATO_3A_TITLE_ALLOWANCES_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))));
+									atoCountUnemployed
+											.add(Math.round(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_ALLOW_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
+									atoCountPension.add(
+											Math.round(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_PENSION_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
+									atoCountSelfFundedRetiree.add(Math.round(Math.max(
+											this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_TAXED_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus),
+											this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_UNTAXED_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))));
+									atoCountForeignIncome.add(Math.round(Math.max(
+											this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus),
+											this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME2_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))));
 									atoCountTotal.add(atoCountEmployed.get(incomeMapNum)
 											+ atoCountUnemployed.get(incomeMapNum) + atoCountPension.get(incomeMapNum)
 											+ atoCountSelfFundedRetiree.get(incomeMapNum)
 											+ atoCountForeignIncome.get(incomeMapNum));
 
-									atoCountAttributeInterestIncome.add(Integer.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_INTEREST_INCOME_COUNT).get(incomeRangeAto).get(age)
-											.get(sex).get(taxableStatus).replace(",", "")));
+									atoCountAttributeInterestIncome.add(
+											Math.round(this.atoIndividualTable3a.get(ATO_3A_TITLE_INTEREST_INCOME_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
 									// 36% of Australian adults own shares, so sum these counts rather than just
 									// taking the maximum
 									// SOURCE: ASX (2014), 'The Australian Share Ownership Study': Sydney, NSW.
-									atoCountAttributeDividendIncome.add(Integer
-											.valueOf(this.atoIndividualTable3a
-													.get(ATO_3A_TITLE_DIVIDENDS_UNFRANKED_COUNT).get(incomeRangeAto)
-													.get(age).get(sex).get(taxableStatus).replace(",", ""))
-											+ Integer.valueOf(this.atoIndividualTable3a
-													.get(ATO_3A_TITLE_DIVIDENDS_FRANKED_COUNT).get(incomeRangeAto)
-													.get(age).get(sex).get(taxableStatus).replace(",", "")));
-									atoCountAttributeWorkRelatedExpenses.add(Integer.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_WORK_RELATED_EXP_COUNT).get(incomeRangeAto).get(age)
-											.get(sex).get(taxableStatus).replace(",", "")));
-									atoCountAttributeDonations.add(Integer.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_DONATIONS_COUNT).get(incomeRangeAto).get(age).get(sex)
-											.get(taxableStatus).replace(",", "")));
-									atoCountAttributeRentIncome.add(Integer.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_RENT_INCOME_COUNT).get(incomeRangeAto).get(age).get(sex)
-											.get(taxableStatus).replace(",", "")));
-									atoCountAttributeRentInterest.add(Integer.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_RENT_INTEREST_COUNT).get(incomeRangeAto).get(age).get(sex)
-											.get(taxableStatus).replace(",", "")));
-									atoCountAttributeTotalIncome.add(Integer.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_TOTAL_INCOME_COUNT).get(incomeRangeAto).get(age).get(sex)
-											.get(taxableStatus).replace(",", "")));
+									atoCountAttributeDividendIncome.add(Math.round(this.atoIndividualTable3a
+											.get(ATO_3A_TITLE_DIVIDENDS_UNFRANKED_COUNT).get(incomeRangeAto).get(age)
+											.get(sex).get(taxableStatus)
+											+ this.atoIndividualTable3a.get(ATO_3A_TITLE_DIVIDENDS_FRANKED_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
+									atoCountAttributeWorkRelatedExpenses.add(Math
+											.round(this.atoIndividualTable3a.get(ATO_3A_TITLE_WORK_RELATED_EXP_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
+									atoCountAttributeDonations
+											.add(Math.round(this.atoIndividualTable3a.get(ATO_3A_TITLE_DONATIONS_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
+									atoCountAttributeRentIncome.add(
+											Math.round(this.atoIndividualTable3a.get(ATO_3A_TITLE_RENT_INCOME_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
+									atoCountAttributeRentInterest.add(
+											Math.round(this.atoIndividualTable3a.get(ATO_3A_TITLE_RENT_INTEREST_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
+									atoCountAttributeTotalIncome.add(
+											Math.round(this.atoIndividualTable3a.get(ATO_3A_TITLE_TOTAL_INCOME_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
 									// SFSS is on top of other loans, so count is max (HELP + TSL, SFSS)
-									atoCountAttributeStudentLoan.add(Math.max(
-											Integer.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_HELP_DEBT_COUNT)
+									atoCountAttributeStudentLoan.add(Math.round(Math.max(
+											this.atoIndividualTable3a.get(ATO_3A_TITLE_HELP_DEBT_COUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
-													.replace(",", ""))
-													+ Integer.valueOf(this.atoIndividualTable3a
-															.get(ATO_3A_TITLE_TSL_DEBT_COUNT).get(incomeRangeAto)
-															.get(age).get(sex).get(taxableStatus).replace(",", "")),
-											Integer.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SFSS_DEBT_COUNT)
-													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
-													.replace(",", ""))));
-									atoAmountEmployed.add(Long
+													+ this.atoIndividualTable3a.get(ATO_3A_TITLE_TSL_DEBT_COUNT)
+															.get(incomeRangeAto).get(age).get(sex).get(taxableStatus),
+											this.atoIndividualTable3a.get(ATO_3A_TITLE_SFSS_DEBT_COUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))));
+									atoAmountEmployed.add(Float
 											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_AMOUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
-													.replace(",", ""))
-											+ Long.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_ALLOWANCES_AMOUNT)
-													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
-													.replace(",", "")));
-									atoAmountUnemployed.add(Long.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_GOVT_ALLOW_AMOUNT).get(incomeRangeAto).get(age).get(sex)
-											.get(taxableStatus).replace(",", "")));
-									atoAmountPension.add(Long.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_GOVT_PENSION_AMOUNT).get(incomeRangeAto).get(age).get(sex)
-											.get(taxableStatus).replace(",", "")));
-									atoAmountSelfFundedRetiree.add(Long
+													+ this.atoIndividualTable3a.get(ATO_3A_TITLE_ALLOWANCES_AMOUNT)
+															.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
+											.longValue());
+									atoAmountUnemployed.add(Float
+											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_ALLOW_AMOUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
+											.longValue());
+									atoAmountPension.add(Float
+											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_PENSION_AMOUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
+											.longValue());
+									atoAmountSelfFundedRetiree.add(Float
 											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_TAXED_AMOUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
-													.replace(",", ""))
-											+ Long.valueOf(this.atoIndividualTable3a
-													.get(ATO_3A_TITLE_SUPER_UNTAXED_AMOUNT).get(incomeRangeAto).get(age)
-													.get(sex).get(taxableStatus).replace(",", "")));
-									atoAmountForeignIncome.add(Long
+													+ this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_UNTAXED_AMOUNT)
+															.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
+											.longValue());
+									atoAmountForeignIncome.add(Float
 											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME_AMOUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
-													.replace(",", ""))
-											+ Long.valueOf(this.atoIndividualTable3a
-													.get(ATO_3A_TITLE_FOREIGN_INCOME2_AMOUNT).get(incomeRangeAto)
-													.get(age).get(sex).get(taxableStatus).replace(",", "")));
-									atoAmountAttributeInterestIncome.add(Long.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_INTEREST_INCOME_AMOUNT).get(incomeRangeAto).get(age)
-											.get(sex).get(taxableStatus).replace(",", "")));
-									atoAmountAttributeDividendIncome.add(Long
-											.valueOf(this.atoIndividualTable3a
-													.get(ATO_3A_TITLE_DIVIDENDS_UNFRANKED_AMOUNT).get(incomeRangeAto)
-													.get(age).get(sex).get(taxableStatus).replace(",", ""))
-											+ Long.valueOf(this.atoIndividualTable3a
-													.get(ATO_3A_TITLE_DIVIDENDS_FRANKED_AMOUNT).get(incomeRangeAto)
-													.get(age).get(sex).get(taxableStatus).replace(",", "")));
-									atoAmountAttributeWorkRelatedExpenses.add(Long.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_WORK_RELATED_EXP_AMOUNT).get(incomeRangeAto).get(age)
-											.get(sex).get(taxableStatus).replace(",", "")));
-									atoAmountAttributeDonations.add(Long.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_DONATIONS_AMOUNT).get(incomeRangeAto).get(age).get(sex)
-											.get(taxableStatus).replace(",", "")));
-									atoAmountAttributeRentIncome.add(Long.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_RENT_INCOME_AMOUNT).get(incomeRangeAto).get(age).get(sex)
-											.get(taxableStatus).replace(",", "")));
-									atoAmountAttributeRentInterest.add(Long.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_RENT_INTEREST_AMOUNT).get(incomeRangeAto).get(age)
-											.get(sex).get(taxableStatus).replace(",", "")));
-									atoAmountAttributeTotalIncome.add(Long.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_TOTAL_INCOME_AMOUNT).get(incomeRangeAto).get(age).get(sex)
-											.get(taxableStatus).replace(",", "")));
-									atoAmountAttributeStudentLoan.add(Long
+													+ this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME2_AMOUNT)
+															.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
+											.longValue());
+									atoAmountAttributeInterestIncome.add(Float
+											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_INTEREST_INCOME_AMOUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
+											.longValue());
+									atoAmountAttributeDividendIncome.add(Float.valueOf(this.atoIndividualTable3a
+											.get(ATO_3A_TITLE_DIVIDENDS_UNFRANKED_AMOUNT).get(incomeRangeAto).get(age)
+											.get(sex).get(taxableStatus)
+											+ this.atoIndividualTable3a.get(ATO_3A_TITLE_DIVIDENDS_FRANKED_AMOUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
+											.longValue());
+									atoAmountAttributeWorkRelatedExpenses.add(Float
+											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_WORK_RELATED_EXP_AMOUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
+											.longValue());
+									atoAmountAttributeDonations.add(Float
+											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_DONATIONS_AMOUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
+											.longValue());
+									atoAmountAttributeRentIncome.add(Float
+											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_RENT_INCOME_AMOUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
+											.longValue());
+									atoAmountAttributeRentInterest.add(Float
+											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_RENT_INTEREST_AMOUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
+											.longValue());
+									atoAmountAttributeTotalIncome.add(Float
+											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_TOTAL_INCOME_AMOUNT)
+													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
+											.longValue());
+									atoAmountAttributeStudentLoan.add(Float
 											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_HELP_DEBT_AMOUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
-													.replace(",", ""))
-											+ Long.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_TSL_DEBT_AMOUNT)
-													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
-													.replace(",", ""))
-											+ Long.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SFSS_DEBT_AMOUNT)
-													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
-													.replace(",", "")));
+													+ this.atoIndividualTable3a.get(ATO_3A_TITLE_TSL_DEBT_AMOUNT)
+															.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
+													+ this.atoIndividualTable3a.get(ATO_3A_TITLE_SFSS_DEBT_AMOUNT)
+															.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
+											.longValue());
 								}
 							} // end for income map number
 						} // end for taxable status
