@@ -3,6 +3,8 @@
  */
 package xyz.struthers.rhul.ham.config;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Random;
 
 import org.springframework.context.annotation.Scope;
@@ -30,6 +32,8 @@ public class Properties {
 	// public static final String HOME_DIRECTORY =
 	// "D:\\Git\\compham\\xyz.struthers.rhul.ham"; // NUC
 	public static final String RESOURCE_DIRECTORY = HOME_DIRECTORY + "\\src\\main\\resources";
+	public static final String OUTPUT_DIRECTORY = "C:\\tmp\\";
+	public static final String CSV_SEPARATOR = ",";
 
 	public static final boolean ALLOW_NEGATIVE_RATES = false; // allow negative interest rates?
 	public static final float SUPERANNUATION_RATE = 0.095f; // 9.5%
@@ -38,12 +42,15 @@ public class Properties {
 	// static data fields
 	public static int peoplePerAgent = 1; // change to 1000 if 1 is too slow.
 	public static int totalPopulationAU = 25000000;
+	public static String timestamp;
 
 	// data fields
 	public Random random;
 
 	private Properties() {
 		super();
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd_HHmm");
+		timestamp = simpleDateFormat.format(new Date(System.currentTimeMillis()));
 	}
 
 	/**

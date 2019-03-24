@@ -41,6 +41,7 @@ public class CalibrateRba {
 		this.rbaBalSht = data.getRbaBalSht();
 		this.rbaProfitLoss = data.getRbaProfitLoss();
 		this.rbaAgent = new ReserveBankOfAustralia(this.rbaBalSht, this.rbaProfitLoss);
+		this.rbaAgent.setIndustryDivisionCode('K'); // Financial and Insurance Services
 
 		this.addAgentToEconomy();
 

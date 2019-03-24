@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.process.Employer;
 import xyz.struthers.rhul.ham.process.NodePayment;
 
 /**
@@ -18,14 +19,18 @@ import xyz.struthers.rhul.ham.process.NodePayment;
  * @author Adam Struthers
  * @since 25-Jan-2019
  */
-public final class AustralianGovernment extends Agent {
+public final class AustralianGovernment extends Agent implements Employer {
 
 	private static final long serialVersionUID = 1L;
 
 	public static final float NUMBER_MONTHS = 12f; // for interest calcs
 
+	// Government details
+	protected char industryDivisionCode;
+
 	// agent relationships
 	protected int paymentClearingIndex;
+	protected ArrayList<Individual> employees; // calculate wages & super
 	private ArrayList<Household> welfareRecipients;
 	private ArrayList<AuthorisedDepositTakingInstitution> bondInvestors;
 
@@ -78,7 +83,7 @@ public final class AustralianGovernment extends Agent {
 
 		// P&L
 		this.pnlTaxIncome = profitLoss.get("Taxation revenue");
-		this.pnlSaleOfGoodsAndServices = profitLoss.get("Sale of goods and services");
+		this.pnlSaleOfGoodsAndServices = profitLoss.get("Sales of goods and services");
 		this.pnlInterestIncome = profitLoss.get("Interest income");
 		this.pnlOtherIncome = profitLoss.get("Total GFS revenue") - this.pnlTaxIncome - this.pnlSaleOfGoodsAndServices
 				- this.pnlInterestIncome;
@@ -96,7 +101,7 @@ public final class AustralianGovernment extends Agent {
 		this.bsCash = balSht.get("Cash and deposits");
 		this.bsInvestmentsLoansPlacements = balSht.get("Investments, loans and placements");
 		this.bsEquityAssets = balSht.get("Equity");
-		this.bsOtherFinancialAssets = balSht.get("Total finanical assets") - this.bsCash
+		this.bsOtherFinancialAssets = balSht.get("Total financial assets") - this.bsCash
 				- this.bsInvestmentsLoansPlacements - this.bsEquityAssets;
 		this.bsLandAndFixedAssets = balSht.get("Land and fixed assets");
 		this.bsOtherNonFinancialAssets = balSht.get("Other non-financial assets");
@@ -106,6 +111,30 @@ public final class AustralianGovernment extends Agent {
 		this.bsBorrowings = balSht.get("Borrowing");
 		this.bsOtherLiabilities = balSht.get("Total liabilities") - this.bsCurrencyOnIssue - this.bsDepositsHeld
 				- this.bsBorrowings;
+	}
+
+	@Override
+	public ArrayList<Individual> getEmployees() {
+		return this.employees;
+	}
+
+	@Override
+	public void addEmployee(Individual employee) {
+		if (this.employees == null) {
+			this.employees = new ArrayList<Individual>(1);
+		}
+		this.employees.add(employee);
+		this.employees.trimToSize();
+	}
+
+	@Override
+	public float getInitialWagesExpense() {
+		return this.pnlPersonnelExpenses / Properties.SUPERANNUATION_RATE;
+	}
+
+	@Override
+	public float getActualWagesExpense() {
+		return (float) this.employees.stream().mapToDouble(o -> o.getPnlWagesSalaries()).sum();
 	}
 
 	@Override
@@ -148,6 +177,22 @@ public final class AustralianGovernment extends Agent {
 
 		liabilities.trimToSize();
 		return liabilities;
+	}
+
+	/**
+	 * @return the industryDivisionCode
+	 */
+	@Override
+	public char getIndustryDivisionCode() {
+		return industryDivisionCode;
+	}
+
+	/**
+	 * @param industryDivisionCode the industryDivisionCode to set
+	 */
+	@Override
+	public void setIndustryDivisionCode(char industryDivisionCode) {
+		this.industryDivisionCode = industryDivisionCode;
 	}
 
 	/**
@@ -228,7 +273,8 @@ public final class AustralianGovernment extends Agent {
 	protected void init() {
 
 		// Agent details
-		super.name = "Australian Government";
+		super.init();
+		this.name = "Australian Government";
 
 		// P&L
 		this.pnlTaxIncome = 0f;

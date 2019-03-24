@@ -20,6 +20,8 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
 @Scope(value = "singleton")
 public class CalibrateGovernment {
 
+	private static boolean DEBUG = false;
+
 	// beans
 	private CalibrationData data;
 	private AustralianEconomy economy;
@@ -40,7 +42,15 @@ public class CalibrateGovernment {
 	public void createGovernmentAgent() {
 		this.govtBalSht = data.getGovtBalSht();
 		this.govtProfitLoss = data.getGovtProfitLoss();
+
+		if (DEBUG) {
+			System.out.println("this.govtAgent: " + this.govtAgent);
+			System.out.println("this.govtBalSht: " + this.govtBalSht);
+			System.out.println("this.govtProfitLoss: " + this.govtProfitLoss);
+		}
+
 		this.govtAgent = new AustralianGovernment(this.govtBalSht, this.govtProfitLoss);
+		this.govtAgent.setIndustryDivisionCode('O'); // Public Administration and Safety
 
 		this.addAgentToEconomy();
 

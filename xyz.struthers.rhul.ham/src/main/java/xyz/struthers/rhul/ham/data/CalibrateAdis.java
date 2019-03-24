@@ -29,6 +29,8 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
 @Scope(value = "singleton")
 public class CalibrateAdis {
 
+	private static final boolean DEBUG = true;
+
 	// beans
 	private CalibrationData data;
 	private AustralianEconomy economy;
@@ -57,6 +59,18 @@ public class CalibrateAdis {
 		this.adiAgents = new ArrayList<AuthorisedDepositTakingInstitution>();
 
 		Set<String> adiKeySet = new HashSet<String>(this.allAdiData.keySet());
+
+		if (DEBUG) {
+			System.out.println("adiKeySet: " + adiKeySet);
+			boolean first = true;
+			for (String key : adiKeySet) {
+				if (first) {
+					first = false;
+					System.out.println("this.allAdiData.get(key).keySet(): " + this.allAdiData.get(key).keySet());
+				}
+			}
+		}
+
 		for (String key : adiKeySet) {
 			// Company details
 			String australianBusinessNumber = key;
@@ -116,7 +130,7 @@ public class CalibrateAdis {
 			financialStatement.put("bsRetainedEarnings",
 					Float.valueOf(this.allAdiData.get(key).get("Retained Earnings")));
 			financialStatement.put("bsReserves", Float.valueOf(this.allAdiData.get(key).get("Reserves")));
-			financialStatement.put("bsOtherEquity", Float.valueOf(this.allAdiData.get(key).get("Other")));
+			financialStatement.put("bsOtherEquity", Float.valueOf(this.allAdiData.get(key).get("Other Equity")));
 
 			// Metrics
 			financialStatement.put("rateCash", Float.valueOf(this.allAdiData.get(key).get("Cash Rate")));
@@ -147,6 +161,7 @@ public class CalibrateAdis {
 			} else { // Major Bank
 				adi = new MajorBank(australianBusinessNumber, shortName, longName, adiCategory, financialStatement);
 			}
+			adi.setIndustryDivisionCode('K'); // Financial and Insurance Services
 			this.adiAgents.add(adi);
 		}
 

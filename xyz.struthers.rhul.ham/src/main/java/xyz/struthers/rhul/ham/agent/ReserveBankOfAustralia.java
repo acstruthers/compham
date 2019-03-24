@@ -3,11 +3,16 @@
  */
 package xyz.struthers.rhul.ham.agent;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.aspectj.org.eclipse.jdt.core.dom.ThisExpression;
+
+import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.process.Employer;
 import xyz.struthers.rhul.ham.process.NodePayment;
 
 /**
@@ -17,14 +22,18 @@ import xyz.struthers.rhul.ham.process.NodePayment;
  * @author Adam Struthers
  * @since 25-Jan-2019
  */
-public final class ReserveBankOfAustralia extends Agent {
+public final class ReserveBankOfAustralia extends Agent implements Employer {
 
 	private static final long serialVersionUID = 1L;
 
 	private final float NUMBER_MONTHS = 12f;
 
+	// RBA details
+	protected char industryDivisionCode;
+
 	// agent relationships
 	protected int paymentClearingIndex;
+	protected ArrayList<Individual> employees; // calculate wages & super
 	protected ArrayList<AuthorisedDepositTakingInstitution> adiDepositors; // major and other domestic banks
 	private AustralianGovernment govt;
 
@@ -109,6 +118,114 @@ public final class ReserveBankOfAustralia extends Agent {
 		this.bsReserves = balSht.get("Reserves");
 	}
 
+	/**
+	 * Gets the column headings, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the column headings
+	 */
+	public String toCsvStringHeaders(String separator) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Name" + separator);
+		sb.append("Division" + separator);
+		sb.append("PaymentClearingIndex" + separator);
+		sb.append("EmployeeCount" + separator);
+		sb.append("AdiDepositorCount" + separator);
+		sb.append("CashRate" + separator);
+		sb.append("InterestIncome" + separator);
+		sb.append("InterestExpense" + separator);
+		sb.append("ClfFees" + separator);
+		sb.append("FxGainOrLoss" + separator);
+		sb.append("AudSecurities" + separator);
+		sb.append("OtherIncome" + separator);
+		sb.append("PersonnelExpenses" + separator);
+		sb.append("Depreciation" + separator);
+		sb.append("OtherExpenses" + separator);
+		sb.append("PnlDistributionToCommonwealth" + separator);
+		sb.append("Cash" + separator);
+		sb.append("AudInvestments" + separator);
+		sb.append("ForeignInvestments" + separator);
+		sb.append("Gold" + separator);
+		sb.append("OtherAssets" + separator);
+		sb.append("Deposits" + separator);
+		sb.append("BalShtDistributionToCommonwealth" + separator);
+		sb.append("BanknotesOnIssue" + separator);
+		sb.append("OtherLiabilities" + separator);
+		sb.append("Capital" + separator);
+		sb.append("Reserves");
+
+		return sb.toString();
+	}
+
+	/**
+	 * Gets the data, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the data
+	 */
+	public String toCsvString(String separator, int iteration) {
+		StringBuilder sb = new StringBuilder();
+
+		DecimalFormat decimal = new DecimalFormat("###0.00");
+		DecimalFormat wholeNumber = new DecimalFormat("###0");
+		DecimalFormat percent = new DecimalFormat("###0.0000");
+
+		sb.append(this.name + separator);
+		sb.append(this.industryDivisionCode + separator);
+		sb.append(this.paymentClearingIndex + separator);
+		sb.append(wholeNumber.format(this.employees != null ? this.employees.size() : 0) + separator);
+		sb.append(wholeNumber.format(this.adiDepositors != null ? this.adiDepositors.size() : 0) + separator);
+		sb.append(percent.format(this.cashRate != null ? this.cashRate.get(iteration) : 0) + separator);
+		sb.append(decimal.format(this.pnlInterestIncome) + separator);
+		sb.append(decimal.format(this.pnlInterestExpense) + separator);
+		sb.append(decimal.format(this.pnlCommittedLiquidityFacilityFees) + separator);
+		sb.append(decimal.format(this.pnlForeignExchangeGainsLosses) + separator);
+		sb.append(decimal.format(this.pnlAudSecurities) + separator);
+		sb.append(decimal.format(this.pnlOtherIncome) + separator);
+		sb.append(decimal.format(this.pnlPersonnelExpenses) + separator);
+		sb.append(decimal.format(this.pnlDepreciationAmortisation) + separator);
+		sb.append(decimal.format(this.pnlOtherExpenses) + separator);
+		sb.append(decimal.format(this.pnlDistributionPayableToCommonwealth) + separator);
+		sb.append(decimal.format(this.bsCash) + separator);
+		sb.append(decimal.format(this.bsAudInvestments) + separator);
+		sb.append(decimal.format(this.bsForeignInvestments) + separator);
+		sb.append(decimal.format(this.bsGold) + separator);
+		sb.append(decimal.format(this.bsOtherAssets) + separator);
+		sb.append(decimal.format(this.bsDeposits) + separator);
+		sb.append(decimal.format(this.bsDistributionPayableToCommonwealth) + separator);
+		sb.append(decimal.format(this.bsBanknotesOnIssue) + separator);
+		sb.append(decimal.format(this.bsOtherLiabilities) + separator);
+		sb.append(decimal.format(this.bsCapital) + separator);
+		sb.append(decimal.format(this.bsReserves));
+
+		return sb.toString();
+	}
+
+	@Override
+	public ArrayList<Individual> getEmployees() {
+		return this.employees;
+	}
+
+	@Override
+	public void addEmployee(Individual employee) {
+		if (this.employees == null) {
+			this.employees = new ArrayList<Individual>(1);
+		}
+		this.employees.add(employee);
+		this.employees.trimToSize();
+	}
+
+	@Override
+	public float getInitialWagesExpense() {
+		return this.pnlPersonnelExpenses / Properties.SUPERANNUATION_RATE;
+	}
+
+	@Override
+	public float getActualWagesExpense() {
+		return (float) this.employees.stream().mapToDouble(o -> o.getPnlWagesSalaries()).sum();
+	}
+
 	@Override
 	public int getPaymentClearingIndex() {
 		return this.paymentClearingIndex;
@@ -146,6 +263,22 @@ public final class ReserveBankOfAustralia extends Agent {
 
 		liabilities.trimToSize();
 		return liabilities;
+	}
+
+	/**
+	 * @return the industryDivisionCode
+	 */
+	@Override
+	public char getIndustryDivisionCode() {
+		return industryDivisionCode;
+	}
+
+	/**
+	 * @param industryDivisionCode the industryDivisionCode to set
+	 */
+	@Override
+	public void setIndustryDivisionCode(char industryDivisionCode) {
+		this.industryDivisionCode = industryDivisionCode;
 	}
 
 	/**
@@ -251,7 +384,8 @@ public final class ReserveBankOfAustralia extends Agent {
 	protected void init() {
 
 		// Agent details
-		super.name = "RBA";
+		super.init();
+		this.name = "RBA";
 
 		// agent relationships
 		this.paymentClearingIndex = 0;
@@ -326,7 +460,9 @@ public final class ReserveBankOfAustralia extends Agent {
 	}
 
 	/**
-	 * @param pnlCommittedLiquidityFacilityFees the pnlCommittedLiquidityFacilityFees to set
+	 * @param pnlCommittedLiquidityFacilityFees the
+	 *                                          pnlCommittedLiquidityFacilityFees to
+	 *                                          set
 	 */
 	public void setPnlCommittedLiquidityFacilityFees(float pnlCommittedLiquidityFacilityFees) {
 		this.pnlCommittedLiquidityFacilityFees = pnlCommittedLiquidityFacilityFees;
@@ -424,7 +560,9 @@ public final class ReserveBankOfAustralia extends Agent {
 	}
 
 	/**
-	 * @param pnlDistributionPayableToCommonwealth the pnlDistributionPayableToCommonwealth to set
+	 * @param pnlDistributionPayableToCommonwealth the
+	 *                                             pnlDistributionPayableToCommonwealth
+	 *                                             to set
 	 */
 	public void setPnlDistributionPayableToCommonwealth(float pnlDistributionPayableToCommonwealth) {
 		this.pnlDistributionPayableToCommonwealth = pnlDistributionPayableToCommonwealth;
@@ -522,7 +660,9 @@ public final class ReserveBankOfAustralia extends Agent {
 	}
 
 	/**
-	 * @param bsDistributionPayableToCommonwealth the bsDistributionPayableToCommonwealth to set
+	 * @param bsDistributionPayableToCommonwealth the
+	 *                                            bsDistributionPayableToCommonwealth
+	 *                                            to set
 	 */
 	public void setBsDistributionPayableToCommonwealth(float bsDistributionPayableToCommonwealth) {
 		this.bsDistributionPayableToCommonwealth = bsDistributionPayableToCommonwealth;

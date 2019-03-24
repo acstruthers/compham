@@ -16,11 +16,10 @@ import org.apache.commons.collections.ListUtils;
 public class Foobar {
 
 	public Foobar() {
-		// TODO Auto-generated constructor stub
+		super();
 	}
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		String foo = "Total Australia";
 		System.out.println("==>" + foo.substring(6) + ".");
 
@@ -63,6 +62,7 @@ public class Foobar {
 		listTwo.add(1);
 		listTwo.add(2);
 		listTwo.add(3);
+		@SuppressWarnings("unchecked")
 		List<Integer> listThree = ListUtils.union(listOne, listTwo);
 		System.out.println("listThree: " + listThree);
 

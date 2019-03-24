@@ -5,6 +5,7 @@ package xyz.struthers.rhul.ham.agent;
 
 import java.util.List;
 
+import xyz.struthers.rhul.ham.process.Employer;
 import xyz.struthers.rhul.ham.process.NodePayment;
 
 /**
@@ -22,7 +23,7 @@ public final class Individual extends Agent {
 	// Agent relationships (3 pointers = 24 bytes)
 	protected int paymentClearingIndex;
 	private Household household;
-	private Business employer; // can be null if not employed
+	private Employer employer; // can be null if not employed
 
 	// "Personal" Details (8 bytes + approx. 7 bytes of Strings = 15 bytes)
 	private int age;
@@ -171,14 +172,14 @@ public final class Individual extends Agent {
 	/**
 	 * @return the employer
 	 */
-	public Business getEmployer() {
+	public Employer getEmployer() {
 		return employer;
 	}
 
 	/**
 	 * @param employer the employer to set
 	 */
-	public void setEmployer(Business employer) {
+	public void setEmployer(Employer employer) {
 		this.employer = employer;
 	}
 

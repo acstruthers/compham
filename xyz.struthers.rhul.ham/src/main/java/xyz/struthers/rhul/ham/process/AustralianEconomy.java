@@ -3,14 +3,28 @@
  */
 package xyz.struthers.rhul.ham.process;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Serializable;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import com.opencsv.CSVWriterBuilder;
+import com.opencsv.ICSVWriter;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
 import xyz.struthers.rhul.ham.agent.AustralianGovernment;
 import xyz.struthers.rhul.ham.agent.AuthorisedDepositTakingInstitution;
@@ -19,6 +33,7 @@ import xyz.struthers.rhul.ham.agent.ForeignCountry;
 import xyz.struthers.rhul.ham.agent.Household;
 import xyz.struthers.rhul.ham.agent.Individual;
 import xyz.struthers.rhul.ham.agent.ReserveBankOfAustralia;
+import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.data.Currencies;
 
 /**
@@ -51,6 +66,7 @@ public class AustralianEconomy implements Serializable {
 
 	// Analytics
 	int[] businessTypeCount;
+
 	/**
 	 * 
 	 */
@@ -70,7 +86,7 @@ public class AustralianEconomy implements Serializable {
 		this.currencies = null;
 		this.rba = null;
 		this.government = null;
-		
+
 		// Analytics
 		this.businessTypeCount = null;
 	}
@@ -84,6 +100,264 @@ public class AustralianEconomy implements Serializable {
 	}
 
 	/**
+	 * Saves every single Agent to file.
+	 * 
+	 * @return a Set of the filenames for each Agent class
+	 */
+	public Set<String> saveDetailsToFile(int iteration) {
+		Set<String> filenames = new HashSet<String>((int) Math.ceil(8 / 0.75) + 1);
+
+		/*
+		 * String filename = this.saveAdiDetailsToFile(); filenames.add(filename);
+		 * filename = this.saveForeignCountryDetailsToFile(); filenames.add(filename);
+		 * filename = this.saveCurrencyDetailsToFile(); filenames.add(filename);
+		 */
+		String filename = this.saveRbaDetailsToFile(iteration);
+		filenames.add(filename);
+		filename = this.saveGovernmentDetailsToFile();
+		filenames.add(filename);
+
+		return filenames;
+	}
+
+	/**
+	 * Save Individual to CSV.
+	 * 
+	 * @return the output filename
+	 */
+	public String saveHouseholdDetailsToFile() {
+		List<Household> beans = Arrays.asList(this.households);
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_Household.csv";
+		Writer writer;
+		try {
+			writer = new FileWriter(filename);
+			StatefulBeanToCsv<Household> beanToCsv = new StatefulBeanToCsvBuilder<Household>(writer).build();
+			beanToCsv.write(beans);
+			writer.close();
+		} catch (IOException e) {
+			// new FileWriter
+			e.printStackTrace();
+		} catch (CsvDataTypeMismatchException e) {
+			// write beans
+			e.printStackTrace();
+		} catch (CsvRequiredFieldEmptyException e) {
+			// write beans
+			e.printStackTrace();
+		} finally {
+			writer = null;
+		}
+		return filename;
+	}
+
+	/**
+	 * Save Individual to CSV.
+	 * 
+	 * @return the output filename
+	 */
+	public String saveIndividualDetailsToFile() {
+		List<Individual> beans = Arrays.asList(this.individuals);
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_Individual.csv";
+		Writer writer;
+		try {
+			writer = new FileWriter(filename);
+			StatefulBeanToCsv<Individual> beanToCsv = new StatefulBeanToCsvBuilder<Individual>(writer).build();
+			beanToCsv.write(beans);
+			writer.close();
+		} catch (IOException e) {
+			// new FileWriter
+			e.printStackTrace();
+		} catch (CsvDataTypeMismatchException e) {
+			// write beans
+			e.printStackTrace();
+		} catch (CsvRequiredFieldEmptyException e) {
+			// write beans
+			e.printStackTrace();
+		} finally {
+			writer = null;
+		}
+		return filename;
+	}
+
+	/**
+	 * Save Business to CSV.
+	 * 
+	 * @return the output filename
+	 */
+	public String saveBusinessDetailsToFile() {
+		List<Business> beans = Arrays.asList(this.businesses);
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_Business.csv";
+		Writer writer;
+		try {
+			writer = new FileWriter(filename);
+			StatefulBeanToCsv<Business> beanToCsv = new StatefulBeanToCsvBuilder<Business>(writer).build();
+			beanToCsv.write(beans);
+			writer.close();
+		} catch (IOException e) {
+			// new FileWriter
+			e.printStackTrace();
+		} catch (CsvDataTypeMismatchException e) {
+			// write beans
+			e.printStackTrace();
+		} catch (CsvRequiredFieldEmptyException e) {
+			// write beans
+			e.printStackTrace();
+		} finally {
+			writer = null;
+		}
+		return filename;
+	}
+
+	/**
+	 * Save AuthorisedDepositTakingInstitution to CSV.
+	 * 
+	 * @return the output filename
+	 */
+	public String saveAdiDetailsToFile() {
+		List<AuthorisedDepositTakingInstitution> beans = Arrays.asList(this.adis);
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_ADI.csv";
+		Writer writer;
+		try {
+			writer = new FileWriter(filename);
+			StatefulBeanToCsv<AuthorisedDepositTakingInstitution> beanToCsv = new StatefulBeanToCsvBuilder<AuthorisedDepositTakingInstitution>(
+					writer).build();
+			beanToCsv.write(beans);
+			writer.close();
+		} catch (IOException e) {
+			// new FileWriter
+			e.printStackTrace();
+		} catch (CsvDataTypeMismatchException e) {
+			// write beans
+			e.printStackTrace();
+		} catch (CsvRequiredFieldEmptyException e) {
+			// write beans
+			e.printStackTrace();
+		} finally {
+			writer = null;
+		}
+		return filename;
+	}
+
+	/**
+	 * Save ForeignCountry to CSV.
+	 * 
+	 * @return the output filename
+	 */
+	public String saveForeignCountryDetailsToFile() {
+		List<ForeignCountry> beans = Arrays.asList(this.countries);
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_ForeignCountry.csv";
+		Writer writer;
+		try {
+			writer = new FileWriter(filename);
+			StatefulBeanToCsv<ForeignCountry> beanToCsv = new StatefulBeanToCsvBuilder<ForeignCountry>(writer).build();
+			beanToCsv.write(beans);
+			writer.close();
+		} catch (IOException e) {
+			// new FileWriter
+			e.printStackTrace();
+		} catch (CsvDataTypeMismatchException e) {
+			// write beans
+			e.printStackTrace();
+		} catch (CsvRequiredFieldEmptyException e) {
+			// write beans
+			e.printStackTrace();
+		} finally {
+			writer = null;
+		}
+		return filename;
+	}
+
+	/**
+	 * Save Currencies to CSV.
+	 * 
+	 * @return the output filename
+	 */
+	public String saveCurrencyDetailsToFile() {
+		List<Currencies> beans = Arrays.asList(this.currencies);
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_Currencies.csv";
+		Writer writer;
+		try {
+			writer = new FileWriter(filename);
+			StatefulBeanToCsv<Currencies> beanToCsv = new StatefulBeanToCsvBuilder<Currencies>(writer).build();
+			beanToCsv.write(beans);
+			writer.close();
+		} catch (IOException e) {
+			// new FileWriter
+			e.printStackTrace();
+		} catch (CsvDataTypeMismatchException e) {
+			// write beans
+			e.printStackTrace();
+		} catch (CsvRequiredFieldEmptyException e) {
+			// write beans
+			e.printStackTrace();
+		} finally {
+			writer = null;
+		}
+		return filename;
+	}
+
+	/**
+	 * Save ReserveBankOfAustralia to CSV.
+	 * 
+	 * @return the output filename
+	 */
+	public String saveRbaDetailsToFile(int iteration) {
+		// get data
+		String[] entries = this.rba.toCsvStringHeaders(Properties.CSV_SEPARATOR).split(Properties.CSV_SEPARATOR);
+
+		// save CSV file
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_RBA.csv";
+		Writer writer;
+		try {
+			writer = new FileWriter(filename);
+			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
+			csvWriter.writeNext(entries);
+			entries = this.rba.toCsvString(Properties.CSV_SEPARATOR, iteration).split(Properties.CSV_SEPARATOR);
+			csvWriter.writeNext(entries);
+			writer.close();
+		} catch (IOException e) {
+			// new FileWriter
+			e.printStackTrace();
+		} finally {
+			writer = null;
+		}
+		return filename;
+	}
+
+	/**
+	 * Save AustralianGovernment to CSV.
+	 * 
+	 * @return the output filename
+	 */
+	public String saveGovernmentDetailsToFile() {
+		// get data
+		List<AustralianGovernment> beans = new ArrayList<AustralianGovernment>(1);
+		beans.add(this.government);
+
+		// save CSV file
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_Govt.csv";
+		Writer writer;
+		try {
+			writer = new FileWriter(filename);
+			StatefulBeanToCsv<AustralianGovernment> beanToCsv = new StatefulBeanToCsvBuilder<AustralianGovernment>(
+					writer).build();
+			beanToCsv.write(beans);
+			writer.close();
+		} catch (IOException e) {
+			// new FileWriter
+			e.printStackTrace();
+		} catch (CsvDataTypeMismatchException e) {
+			// write beans
+			e.printStackTrace();
+		} catch (CsvRequiredFieldEmptyException e) {
+			// write beans
+			e.printStackTrace();
+		} finally {
+			writer = null;
+		}
+		return filename;
+	}
+
+	/**
 	 * @return the households
 	 */
 	public Household[] getHouseholds() {
@@ -91,8 +365,7 @@ public class AustralianEconomy implements Serializable {
 	}
 
 	/**
-	 * @param households
-	 *            the households to set
+	 * @param households the households to set
 	 */
 	public void setHouseholds(List<Household> households) {
 		this.households = households.toArray(new Household[households.size()]);
@@ -106,8 +379,7 @@ public class AustralianEconomy implements Serializable {
 	}
 
 	/**
-	 * @param individuals
-	 *            the individuals to set
+	 * @param individuals the individuals to set
 	 */
 	public void setIndividuals(List<Individual> individuals) {
 		this.individuals = individuals.toArray(new Individual[individuals.size()]);
@@ -121,8 +393,7 @@ public class AustralianEconomy implements Serializable {
 	}
 
 	/**
-	 * @param businesses
-	 *            the businesses to set
+	 * @param businesses the businesses to set
 	 */
 	public void setBusinesses(List<Business> businesses) {
 		this.businesses = businesses.toArray(new Business[businesses.size()]);
@@ -136,8 +407,7 @@ public class AustralianEconomy implements Serializable {
 	}
 
 	/**
-	 * @param adis
-	 *            the adis to set
+	 * @param adis the adis to set
 	 */
 	public void setAdis(List<AuthorisedDepositTakingInstitution> adis) {
 		this.adis = adis.toArray(new AuthorisedDepositTakingInstitution[adis.size()]);
@@ -151,8 +421,7 @@ public class AustralianEconomy implements Serializable {
 	}
 
 	/**
-	 * @param countries
-	 *            the countries to set
+	 * @param countries the countries to set
 	 */
 	public void setCountries(List<ForeignCountry> countries) {
 		this.countries = countries.toArray(new ForeignCountry[countries.size()]);
@@ -166,8 +435,7 @@ public class AustralianEconomy implements Serializable {
 	}
 
 	/**
-	 * @param currencies
-	 *            the currencies to set
+	 * @param currencies the currencies to set
 	 */
 	public void setCurrencies(Currencies currencies) {
 		this.currencies = currencies;
@@ -181,8 +449,7 @@ public class AustralianEconomy implements Serializable {
 	}
 
 	/**
-	 * @param rba
-	 *            the rba to set
+	 * @param rba the rba to set
 	 */
 	public void setRba(ReserveBankOfAustralia rba) {
 		this.rba = rba;
@@ -196,8 +463,7 @@ public class AustralianEconomy implements Serializable {
 	}
 
 	/**
-	 * @param government
-	 *            the government to set
+	 * @param government the government to set
 	 */
 	public void setGovernment(AustralianGovernment government) {
 		this.government = government;
@@ -216,5 +482,5 @@ public class AustralianEconomy implements Serializable {
 	public void setBusinessTypeCount(int[] businessTypeCount) {
 		this.businessTypeCount = businessTypeCount;
 	}
-	
+
 }

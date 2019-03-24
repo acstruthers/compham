@@ -3,7 +3,7 @@
  */
 package xyz.struthers.rhul.ham.process;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import xyz.struthers.rhul.ham.agent.Individual;
 
@@ -20,7 +20,7 @@ public interface Employer {
 	 * 
 	 * @return a List<Individual> of the employees.
 	 */
-	public List<Individual> getEmployees();
+	public ArrayList<Individual> getEmployees();
 
 	/**
 	 * Adds a single Individual as an employee of the organisation.
@@ -28,4 +28,23 @@ public interface Employer {
 	 * @param employee
 	 */
 	public void addEmployee(Individual employee);
+
+	/**
+	 * Gets the wages expense that was set during the Agent calibration process.
+	 * 
+	 * @return wages expense, per calibration data
+	 */
+	public float getInitialWagesExpense();
+
+	/**
+	 * Gets the actual wages expense according to the linked employees' salaries and
+	 * wages incomes.
+	 * 
+	 * @return wages expense, per linked employees' incomes
+	 */
+	public float getActualWagesExpense();
+	
+	public char getIndustryDivisionCode();
+	
+	public void setIndustryDivisionCode(char industryDivisionCode);
 }

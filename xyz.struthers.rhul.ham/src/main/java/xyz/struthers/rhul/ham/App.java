@@ -9,14 +9,22 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Set;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import xyz.struthers.rhul.ham.config.SpringConfiguration;
 import xyz.struthers.rhul.ham.data.AreaMapping;
+import xyz.struthers.rhul.ham.data.CalibrateAdis;
 import xyz.struthers.rhul.ham.data.CalibrateBusinesses;
+import xyz.struthers.rhul.ham.data.CalibrateCountries;
+import xyz.struthers.rhul.ham.data.CalibrateCurrencies;
+import xyz.struthers.rhul.ham.data.CalibrateEconomy;
+import xyz.struthers.rhul.ham.data.CalibrateGovernment;
 import xyz.struthers.rhul.ham.data.CalibrateHouseholds;
 import xyz.struthers.rhul.ham.data.CalibrateIndividuals;
+import xyz.struthers.rhul.ham.data.CalibrateRba;
+import xyz.struthers.rhul.ham.process.AustralianEconomy;
 
 /**
  * FIXME: Change from Double to Float to halve memory consumption
@@ -57,8 +65,10 @@ public class App {
 
 		if (true) {
 
-			System.out.println(
-					"MEMORY USAGE BEFORE: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
+			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			float megabytesAfter = memoryAfter / 1024f / 1024f;
+			System.out.println("MEMORY USAGE BEFORE: " + formatter.format(megabytesAfter) + "MB");
+			memoryBefore = memoryAfter;
 
 			System.out.println("Started MeshblockMapping: " + new Date(System.currentTimeMillis()));
 			AreaMapping mb = ctx.getBean(AreaMapping.class);
@@ -87,6 +97,43 @@ public class App {
 				e.printStackTrace();
 			}
 
+			System.gc();
+			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			megabytesAfter = memoryAfter / 1024f / 1024f;
+			megabytesBefore = memoryBefore / 1024f / 1024f;
+			System.out.println("MEMORY CONSUMED BY AREA MAPPING: " + formatter.format(megabytesAfter - megabytesBefore)
+					+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
+			memoryBefore = memoryAfter;
+
+			CalibrateGovernment calGov = ctx.getBean(CalibrateGovernment.class);
+			calGov.createGovernmentAgent();
+			CalibrateRba calRba = ctx.getBean(CalibrateRba.class);
+			calRba.createRbaAgent();
+			CalibrateAdis calAdi = ctx.getBean(CalibrateAdis.class);
+			calAdi.createAdiAgents();
+			CalibrateCurrencies calCcy = ctx.getBean(CalibrateCurrencies.class);
+			calCcy.createExchangeRates();
+			CalibrateCountries calCountry = ctx.getBean(CalibrateCountries.class);
+			calCountry.createCountryAgents();
+
+			AustralianEconomy auEconomy = ctx.getBean(AustralianEconomy.class);
+			int iteration = 0;
+			Set<String> filenames = auEconomy.saveDetailsToFile(iteration);
+			System.out.println(filenames.size() + " DETAILED FILES SAVED TO:");
+			for (String file : filenames) {
+				System.out.println(file);
+			}
+			System.exit(0);
+
+			System.gc();
+			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			megabytesAfter = memoryAfter / 1024f / 1024f;
+			megabytesBefore = memoryBefore / 1024f / 1024f;
+			System.out.println("MEMORY CONSUMED BY RBA, ADI, GOVT, CCY AND COUNTRY: "
+					+ formatter.format(megabytesAfter - megabytesBefore) + "MB (CURRENT TOTAL IS: "
+					+ formatter.format(megabytesAfter) + "MB)");
+			memoryBefore = memoryAfter;
+
 			// System.out.println("Finished Calibration Data Load: " + new
 			// Date(System.currentTimeMillis()));
 
@@ -97,11 +144,12 @@ public class App {
 			System.out.println("Finished Business agent calibration: " + new Date(System.currentTimeMillis()));
 
 			System.gc();
-			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			float megabytesAfter = memoryAfter / 1024f / 1024f;
-			System.out.println("MEMORY USAGE AFTER: " + formatter.format(megabytesAfter) + "MB");
-			System.out.println("MEMORY CONSUMED BY BUSINESSES, ETC.: "
-					+ formatter.format(megabytesAfter - megabytesBefore) + "MB");
+			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			megabytesAfter = memoryAfter / 1024f / 1024f;
+			megabytesBefore = memoryBefore / 1024f / 1024f;
+			System.out.println(
+					"MEMORY CONSUMED BY BUSINESSES, ETC.: " + formatter.format(megabytesAfter - megabytesBefore)
+							+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
 
 			memoryBefore = memoryAfter;
 
@@ -111,9 +159,9 @@ public class App {
 			System.gc();
 			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 			megabytesAfter = memoryAfter / 1024f / 1024f;
-			System.out.println("MEMORY USAGE AFTER: " + formatter.format(megabytesAfter) + "MB");
-			System.out.println(
-					"MEMORY CONSUMED BY INDIVIDUALS: " + formatter.format(megabytesAfter - megabytesBefore) + "MB");
+			megabytesBefore = memoryBefore / 1024f / 1024f;
+			System.out.println("MEMORY CONSUMED BY INDIVIDUALS: " + formatter.format(megabytesAfter - megabytesBefore)
+					+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
 			memoryBefore = memoryAfter;
 
 			CalibrateHouseholds calHouse = ctx.getBean(CalibrateHouseholds.class);
@@ -122,14 +170,26 @@ public class App {
 			System.gc();
 			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 			megabytesAfter = memoryAfter / 1024f / 1024f;
-			System.out.println("MEMORY USAGE AFTER: " + formatter.format(megabytesAfter) + "MB");
-			System.out.println(
-					"MEMORY CONSUMED BY HOUSEHOLDS: " + formatter.format(megabytesAfter - megabytesBefore) + "MB");
+			megabytesBefore = memoryBefore / 1024f / 1024f;
+			System.out.println("MEMORY CONSUMED BY HOUSEHOLDS: " + formatter.format(megabytesAfter - megabytesBefore)
+					+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
+			memoryBefore = memoryAfter;
 
-			while (true) {
-			}
+			CalibrateEconomy economy = ctx.getBean(CalibrateEconomy.class);
+			economy.linkAllAgents();
+
+			System.gc();
+			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			megabytesAfter = memoryAfter / 1024f / 1024f;
+			megabytesBefore = memoryBefore / 1024f / 1024f;
+			System.out
+					.println("MEMORY CONSUMED BY LINKING ECONOMY: " + formatter.format(megabytesAfter - megabytesBefore)
+							+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
+			memoryBefore = memoryAfter;
+
+			// while (true) {}
 		}
-		// ctx.close();
+		ctx.close();
 	}
 
 	public void areaMappingTestHarness() {

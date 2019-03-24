@@ -1518,8 +1518,8 @@ public class CalibrationData {
 				rowCheck: while (i < rowsToImport.length) {
 					if (currentRow == rowsToImport[i]) {
 						// store title & series ID
-						titles.get(dataSourceName).add(line[columnToImport]);
-						seriesId[i] = line[columnToImport];
+						titles.get(dataSourceName).add(line[0].trim());
+						seriesId[i] = line[0].trim();
 
 						// parse the body of the data
 						data.put(seriesId[i],

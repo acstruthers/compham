@@ -32,7 +32,7 @@ public final class ForeignCountry extends Agent {
 
 	// agent relationships
 	private int paymentClearingIndex;
-	private ArrayList<Exporter> exporters;
+	private ArrayList<Business> exporters;
 
 	// field variables
 	private Currency currency;
@@ -87,16 +87,16 @@ public final class ForeignCountry extends Agent {
 		this.importsToAustraliaByState = importsToAusByState;
 	}
 
-	public void addExporter(Exporter exporter) {
+	public void addExporter(Business exporter) {
 		if (this.exporters == null) {
-			this.exporters = new ArrayList<Exporter>(EXPORTERS_INIT_CAPACITY);
+			this.exporters = new ArrayList<Business>(EXPORTERS_INIT_CAPACITY);
 		}
 		this.exporters.add(exporter);
 	}
 
-	public void addAllExporters(List<Exporter> exporters) {
+	public void addAllExporters(List<Business> exporters) {
 		if (this.exporters == null) {
-			this.exporters = new ArrayList<Exporter>(EXPORTERS_INIT_CAPACITY);
+			this.exporters = new ArrayList<Business>(EXPORTERS_INIT_CAPACITY);
 		}
 		this.exporters.addAll(exporters);
 	}

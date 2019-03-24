@@ -1378,11 +1378,12 @@ public class CalibrationDataBusiness {
 							// parse the body of the data
 							float value = 0f;
 							try {
-								String tmp = line[columnsToImport[i]].replace(",", "");
 								// change all "<10" values into 5
+								String tmp = line[columnsToImport[i]].replace(",", "");
 								value = Float.valueOf(tmp.substring(0, 1).trim().equals("<") ? "5" : tmp);
 							} catch (NumberFormatException e) {
 								// do nothing and leave it as zero.
+								value = 0f;
 							}
 							String fineIndustryCode = line[1].substring(0, 3);
 							data.get(seriesId[i]).put(fineIndustryCode, value);
@@ -1451,9 +1452,12 @@ public class CalibrationDataBusiness {
 							// parse the body of the data
 							float value = 0f;
 							try {
-								value = Float.valueOf(line[columnsToImport[i]].replace(",", ""));
+								// change all "<10" values into 5
+								String tmp = line[columnsToImport[i]].replace(",", "");
+								value = Float.valueOf(tmp.substring(0, 1).trim().equals("<") ? "5" : tmp);
 							} catch (NumberFormatException e) {
 								// do nothing and leave it as zero.
+								value = 0f;
 							}
 							data.get(seriesId[i]).put(line[0], value);
 						}

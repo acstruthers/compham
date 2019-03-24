@@ -35,7 +35,7 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
 @Scope(value = "singleton")
 public class CalibrateBusinesses {
 
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	private static final boolean DEBUG_ZEROS = false;
 	private static final boolean DEBUG_ZEROS_INFINITY = false;
 
@@ -803,7 +803,7 @@ public class CalibrateBusinesses {
 						System.out.println("lgaState: " + lgaState);
 						System.out.println("states[idxState]: " + states[idxState]);
 					}
-					
+
 					if (lgaState != null && lgaState.equals(states[idxState])) {
 						smallCount += this.abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[idxState])
 								.get(lgaCode).get(industries8155[idxIndustry]);
@@ -1234,32 +1234,14 @@ public class CalibrateBusinesses {
 			if (!industryClassCompanyCount4B.containsKey(classCode)) {
 				industryClassCompanyCount4B.put(classCode, 0);
 			}
-			int industryCodeCount = 0;
-			try {
-				industryCodeCount = Math.round(this.atoCompanyTable4b.get("Number of companies").get(industryCode));
-			} catch (NumberFormatException e) {
-				if (this.atoCompanyTable4b.get("Number of companies").get(industryCode).equals("<10")) {
-					industryCodeCount = 5;
-				} else {
-					industryCodeCount = 0;
-				}
-			}
+			int industryCodeCount = Math.round(this.atoCompanyTable4b.get("Number of companies").get(industryCode));
 			industryClassCompanyCount4B.put(classCode, industryClassCompanyCount4B.get(classCode) + industryCodeCount);
 		}
 		// calculate ratios per Industry Code
 		for (String industryCode : industryCodes) {
 			String classCode = this.abs1292_0_55_002ANZSIC.get("Industry Code to Class Code").get(industryCode);
 			float total = industryClassCompanyCount4B.get(classCode);
-			float value = 0f;
-			try {
-				value = this.atoCompanyTable4b.get("Number of companies").get(industryCode);
-			} catch (NumberFormatException e) {
-				if (this.atoCompanyTable4b.get("Number of companies").get(industryCode).equals("<10")) {
-					value = 5f;
-				} else {
-					value = 0f;
-				}
-			}
+			float value = this.atoCompanyTable4b.get("Number of companies").get(industryCode);
 			industryCodeClassRatio4B.put(industryCode, total > 0f ? value / total : 0f);
 		}
 

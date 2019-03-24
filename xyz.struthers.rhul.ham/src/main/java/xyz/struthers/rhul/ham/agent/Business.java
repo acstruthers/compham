@@ -39,9 +39,12 @@ public class Business extends Agent implements Employer {
 
 	protected String state; // 2 or 3 chars
 	protected String lgaCode; // 5 chars
-
 	protected char size; // S = small, M = medium, L = large
+
+	// exporter fields
 	protected boolean isExporter;
+	private ArrayList<ForeignCountry> destinationCountries; // average 2.4 countries per exporter
+	private ArrayList<Float> destinationCountryInitialRatios;
 
 	// agent relationships
 	protected int paymentClearingIndex;
@@ -119,9 +122,16 @@ public class Business extends Agent implements Employer {
 
 		this.state = business.state;
 		this.lgaCode = business.lgaCode;
-
 		this.size = business.size;
+
 		this.isExporter = business.isExporter;
+		if (business.isExporter) {
+			this.destinationCountries = new ArrayList<ForeignCountry>(business.destinationCountries);
+			this.destinationCountryInitialRatios = new ArrayList<Float>(business.destinationCountryInitialRatios);
+		} else {
+			this.destinationCountries = null;
+			this.destinationCountryInitialRatios = null;
+		}
 
 		this.employeeCountTarget = business.employeeCountTarget;
 		// N.B. Don't copy the employeeWages because they're unique to each business.
@@ -166,7 +176,7 @@ public class Business extends Agent implements Employer {
 	}
 
 	@Override
-	public List<Individual> getEmployees() {
+	public ArrayList<Individual> getEmployees() {
 		return this.employees;
 	}
 
@@ -179,6 +189,16 @@ public class Business extends Agent implements Employer {
 		this.employees.trimToSize();
 
 		// FIXME: re-calc wage exp, super exp, payroll tax (and total exp)
+	}
+
+	@Override
+	public float getInitialWagesExpense() {
+		return this.wageExpenses;
+	}
+
+	@Override
+	public float getActualWagesExpense() {
+		return (float) this.employees.stream().mapToDouble(o -> o.getPnlWagesSalaries()).sum();
 	}
 
 	@Override
@@ -258,7 +278,25 @@ public class Business extends Agent implements Employer {
 		return liabilities;
 	}
 
+	/**
+	 * @return the industryDivisionCode
+	 */
+	@Override
+	public char getIndustryDivisionCode() {
+		return industryDivisionCode;
+	}
+
+	/**
+	 * @param industryDivisionCode the industryDivisionCode to set
+	 */
+	@Override
+	public void setIndustryDivisionCode(char industryDivisionCode) {
+		this.industryDivisionCode = industryDivisionCode;
+	}
+
 	protected void init() {
+		super.init();
+		
 		this.industryDivisionCode = '\0'; // unicode zero
 		this.industrySubdivisionCode = null;
 		this.industryGroupCode = null;
@@ -267,9 +305,11 @@ public class Business extends Agent implements Employer {
 
 		this.state = null;
 		this.lgaCode = null;
-
 		this.size = '\0';
+
 		this.isExporter = false;
+		this.destinationCountries = null;
+		this.destinationCountryInitialRatios = null;
 
 		this.employeeCountTarget = 0;
 		this.employees = null;
@@ -343,20 +383,6 @@ public class Business extends Agent implements Employer {
 	 */
 	public void setBusinessTypeId(int businessTypeId) {
 		this.businessTypeId = businessTypeId;
-	}
-
-	/**
-	 * @return the industryDivisionCode
-	 */
-	public char getIndustryDivisionCode() {
-		return industryDivisionCode;
-	}
-
-	/**
-	 * @param industryDivisionCode the industryDivisionCode to set
-	 */
-	public void setIndustryDivisionCode(char industryDivisionCode) {
-		this.industryDivisionCode = industryDivisionCode;
 	}
 
 	/**
@@ -472,6 +498,35 @@ public class Business extends Agent implements Employer {
 	 */
 	public void setExporter(boolean isExporter) {
 		this.isExporter = isExporter;
+	}
+
+	/**
+	 * @return the destinationCountries
+	 */
+	public ArrayList<ForeignCountry> getDestinationCountries() {
+		return destinationCountries;
+	}
+
+	/**
+	 * @param destinationCountries the destinationCountries to set
+	 */
+	public void setDestinationCountries(ArrayList<ForeignCountry> destinationCountries) {
+		this.destinationCountries = destinationCountries;
+	}
+
+	/**
+	 * @return the destinationCountryInitialRatios
+	 */
+	public ArrayList<Float> getDestinationCountryInitialRatios() {
+		return destinationCountryInitialRatios;
+	}
+
+	/**
+	 * @param destinationCountryInitialRatios the destinationCountryInitialRatios to
+	 *                                        set
+	 */
+	public void setDestinationCountryInitialRatios(ArrayList<Float> destinationCountryInitialRatios) {
+		this.destinationCountryInitialRatios = destinationCountryInitialRatios;
 	}
 
 	/**

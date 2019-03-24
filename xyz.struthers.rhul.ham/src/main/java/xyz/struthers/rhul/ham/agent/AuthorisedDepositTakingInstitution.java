@@ -31,6 +31,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	protected String australianBusinessNumber;
 	protected String shortName;
 	protected String adiCategory;
+	protected char industryDivisionCode;
 	protected String state; // FIXME: implement state
 	protected boolean isGccsa; // FIXME: implement capital city
 
@@ -276,7 +277,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	}
 
 	@Override
-	public List<Individual> getEmployees() {
+	public ArrayList<Individual> getEmployees() {
 		return this.employees;
 	}
 
@@ -287,6 +288,16 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		}
 		this.employees.add(employee);
 		this.employees.trimToSize();
+	}
+
+	@Override
+	public float getInitialWagesExpense() {
+		return this.pnlPersonnelExpenses / Properties.SUPERANNUATION_RATE;
+	}
+
+	@Override
+	public float getActualWagesExpense() {
+		return (float) this.employees.stream().mapToDouble(o -> o.getPnlWagesSalaries()).sum();
 	}
 
 	@Override
@@ -383,6 +394,22 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		return liabilities;
 	}
 
+	/**
+	 * @return the industryDivisionCode
+	 */
+	@Override
+	public char getIndustryDivisionCode() {
+		return industryDivisionCode;
+	}
+
+	/**
+	 * @param industryDivisionCode the industryDivisionCode to set
+	 */
+	@Override
+	public void setIndustryDivisionCode(char industryDivisionCode) {
+		this.industryDivisionCode = industryDivisionCode;
+	}
+	
 	/**
 	 * @return the domesticSuppliers
 	 */
