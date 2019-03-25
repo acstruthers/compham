@@ -7,7 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
-import java.util.ArrayList;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -107,15 +107,23 @@ public class AustralianEconomy implements Serializable {
 	public Set<String> saveDetailsToFile(int iteration) {
 		Set<String> filenames = new HashSet<String>((int) Math.ceil(8 / 0.75) + 1);
 
-		/*
-		 * String filename = this.saveAdiDetailsToFile(); filenames.add(filename);
-		 * filename = this.saveForeignCountryDetailsToFile(); filenames.add(filename);
-		 * filename = this.saveCurrencyDetailsToFile(); filenames.add(filename);
-		 */
-		String filename = this.saveRbaDetailsToFile(iteration);
+		String filename = this.saveGovernmentDetailsToFile(iteration);
 		filenames.add(filename);
-		filename = this.saveGovernmentDetailsToFile();
+		filename = this.saveRbaDetailsToFile(iteration);
 		filenames.add(filename);
+		filename = this.saveAdiDetailsToFile(iteration);
+		filenames.add(filename);
+		filename = this.saveForeignCountryDetailsToFile(iteration);
+		filenames.add(filename);
+		filename = this.saveBusinessDetailsToFile(iteration);
+		filenames.add(filename);
+		filename = this.saveHouseholdDetailsToFile(iteration);
+		filenames.add(filename);
+		filename = this.saveIndividualDetailsToFile(iteration);
+		filenames.add(filename);
+
+		// filename = this.saveCurrencyDetailsToFile(iteration);
+		// filenames.add(filename);
 
 		return filenames;
 	}
@@ -125,23 +133,29 @@ public class AustralianEconomy implements Serializable {
 	 * 
 	 * @return the output filename
 	 */
-	public String saveHouseholdDetailsToFile() {
-		List<Household> beans = Arrays.asList(this.households);
-		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_Household.csv";
+	public String saveHouseholdDetailsToFile(int iteration) {
+		// get data
+		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
+				+ this.households[0].toCsvStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
+
+		// save CSV file
+		DecimalFormat wholeNumber = new DecimalFormat("000");
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_Household_"
+				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
 			writer = new FileWriter(filename);
-			StatefulBeanToCsv<Household> beanToCsv = new StatefulBeanToCsvBuilder<Household>(writer).build();
-			beanToCsv.write(beans);
+			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
+			csvWriter.writeNext(entries);
+			for (int row = 0; row < this.households.length; row++) {
+				entries = (iteration + Properties.CSV_SEPARATOR
+						+ this.households[row].toCsvString(Properties.CSV_SEPARATOR, iteration))
+								.split(Properties.CSV_SEPARATOR);
+				csvWriter.writeNext(entries);
+			}
 			writer.close();
 		} catch (IOException e) {
 			// new FileWriter
-			e.printStackTrace();
-		} catch (CsvDataTypeMismatchException e) {
-			// write beans
-			e.printStackTrace();
-		} catch (CsvRequiredFieldEmptyException e) {
-			// write beans
 			e.printStackTrace();
 		} finally {
 			writer = null;
@@ -154,23 +168,29 @@ public class AustralianEconomy implements Serializable {
 	 * 
 	 * @return the output filename
 	 */
-	public String saveIndividualDetailsToFile() {
-		List<Individual> beans = Arrays.asList(this.individuals);
-		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_Individual.csv";
+	public String saveIndividualDetailsToFile(int iteration) {
+		// get data
+		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
+				+ this.individuals[0].toCsvStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
+
+		// save CSV file
+		DecimalFormat wholeNumber = new DecimalFormat("000");
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_Individual_"
+				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
 			writer = new FileWriter(filename);
-			StatefulBeanToCsv<Individual> beanToCsv = new StatefulBeanToCsvBuilder<Individual>(writer).build();
-			beanToCsv.write(beans);
+			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
+			csvWriter.writeNext(entries);
+			for (int row = 0; row < this.individuals.length; row++) {
+				entries = (iteration + Properties.CSV_SEPARATOR
+						+ this.individuals[row].toCsvString(Properties.CSV_SEPARATOR, iteration))
+								.split(Properties.CSV_SEPARATOR);
+				csvWriter.writeNext(entries);
+			}
 			writer.close();
 		} catch (IOException e) {
 			// new FileWriter
-			e.printStackTrace();
-		} catch (CsvDataTypeMismatchException e) {
-			// write beans
-			e.printStackTrace();
-		} catch (CsvRequiredFieldEmptyException e) {
-			// write beans
 			e.printStackTrace();
 		} finally {
 			writer = null;
@@ -183,23 +203,29 @@ public class AustralianEconomy implements Serializable {
 	 * 
 	 * @return the output filename
 	 */
-	public String saveBusinessDetailsToFile() {
-		List<Business> beans = Arrays.asList(this.businesses);
-		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_Business.csv";
+	public String saveBusinessDetailsToFile(int iteration) {
+		// get data
+		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
+				+ this.businesses[0].toCsvStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
+
+		// save CSV file
+		DecimalFormat wholeNumber = new DecimalFormat("000");
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_Business_"
+				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
 			writer = new FileWriter(filename);
-			StatefulBeanToCsv<Business> beanToCsv = new StatefulBeanToCsvBuilder<Business>(writer).build();
-			beanToCsv.write(beans);
+			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
+			csvWriter.writeNext(entries);
+			for (int row = 0; row < this.businesses.length; row++) {
+				entries = (iteration + Properties.CSV_SEPARATOR
+						+ this.businesses[row].toCsvString(Properties.CSV_SEPARATOR, iteration))
+								.split(Properties.CSV_SEPARATOR);
+				csvWriter.writeNext(entries);
+			}
 			writer.close();
 		} catch (IOException e) {
 			// new FileWriter
-			e.printStackTrace();
-		} catch (CsvDataTypeMismatchException e) {
-			// write beans
-			e.printStackTrace();
-		} catch (CsvRequiredFieldEmptyException e) {
-			// write beans
 			e.printStackTrace();
 		} finally {
 			writer = null;
@@ -212,24 +238,29 @@ public class AustralianEconomy implements Serializable {
 	 * 
 	 * @return the output filename
 	 */
-	public String saveAdiDetailsToFile() {
-		List<AuthorisedDepositTakingInstitution> beans = Arrays.asList(this.adis);
-		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_ADI.csv";
+	public String saveAdiDetailsToFile(int iteration) {
+		// get data
+		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
+				+ this.adis[0].toCsvStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
+
+		// save CSV file
+		DecimalFormat wholeNumber = new DecimalFormat("000");
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_ADI_"
+				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
 			writer = new FileWriter(filename);
-			StatefulBeanToCsv<AuthorisedDepositTakingInstitution> beanToCsv = new StatefulBeanToCsvBuilder<AuthorisedDepositTakingInstitution>(
-					writer).build();
-			beanToCsv.write(beans);
+			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
+			csvWriter.writeNext(entries);
+			for (int row = 0; row < this.adis.length; row++) {
+				entries = (iteration + Properties.CSV_SEPARATOR
+						+ this.adis[row].toCsvString(Properties.CSV_SEPARATOR, iteration))
+								.split(Properties.CSV_SEPARATOR);
+				csvWriter.writeNext(entries);
+			}
 			writer.close();
 		} catch (IOException e) {
 			// new FileWriter
-			e.printStackTrace();
-		} catch (CsvDataTypeMismatchException e) {
-			// write beans
-			e.printStackTrace();
-		} catch (CsvRequiredFieldEmptyException e) {
-			// write beans
 			e.printStackTrace();
 		} finally {
 			writer = null;
@@ -242,23 +273,29 @@ public class AustralianEconomy implements Serializable {
 	 * 
 	 * @return the output filename
 	 */
-	public String saveForeignCountryDetailsToFile() {
-		List<ForeignCountry> beans = Arrays.asList(this.countries);
-		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_ForeignCountry.csv";
+	public String saveForeignCountryDetailsToFile(int iteration) {
+		// get data
+		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
+				+ this.countries[0].toCsvStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
+
+		// save CSV file
+		DecimalFormat wholeNumber = new DecimalFormat("000");
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_ForeignCountry_"
+				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
 			writer = new FileWriter(filename);
-			StatefulBeanToCsv<ForeignCountry> beanToCsv = new StatefulBeanToCsvBuilder<ForeignCountry>(writer).build();
-			beanToCsv.write(beans);
+			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
+			csvWriter.writeNext(entries);
+			for (int row = 0; row < this.countries.length; row++) {
+				entries = (iteration + Properties.CSV_SEPARATOR
+						+ this.countries[row].toCsvString(Properties.CSV_SEPARATOR, iteration))
+								.split(Properties.CSV_SEPARATOR);
+				csvWriter.writeNext(entries);
+			}
 			writer.close();
 		} catch (IOException e) {
 			// new FileWriter
-			e.printStackTrace();
-		} catch (CsvDataTypeMismatchException e) {
-			// write beans
-			e.printStackTrace();
-		} catch (CsvRequiredFieldEmptyException e) {
-			// write beans
 			e.printStackTrace();
 		} finally {
 			writer = null;
@@ -271,9 +308,11 @@ public class AustralianEconomy implements Serializable {
 	 * 
 	 * @return the output filename
 	 */
-	public String saveCurrencyDetailsToFile() {
+	public String saveCurrencyDetailsToFile(int iteration) {
 		List<Currencies> beans = Arrays.asList(this.currencies);
-		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_Currencies.csv";
+		DecimalFormat wholeNumber = new DecimalFormat("000");
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_Currencies_"
+				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
 			writer = new FileWriter(filename);
@@ -302,16 +341,20 @@ public class AustralianEconomy implements Serializable {
 	 */
 	public String saveRbaDetailsToFile(int iteration) {
 		// get data
-		String[] entries = this.rba.toCsvStringHeaders(Properties.CSV_SEPARATOR).split(Properties.CSV_SEPARATOR);
+		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
+				+ this.rba.toCsvStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
 
 		// save CSV file
-		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_RBA.csv";
+		DecimalFormat wholeNumber = new DecimalFormat("000");
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_RBA_"
+				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
 			writer = new FileWriter(filename);
 			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
 			csvWriter.writeNext(entries);
-			entries = this.rba.toCsvString(Properties.CSV_SEPARATOR, iteration).split(Properties.CSV_SEPARATOR);
+			entries = (iteration + Properties.CSV_SEPARATOR + this.rba.toCsvString(Properties.CSV_SEPARATOR, iteration))
+					.split(Properties.CSV_SEPARATOR);
 			csvWriter.writeNext(entries);
 			writer.close();
 		} catch (IOException e) {
@@ -328,28 +371,26 @@ public class AustralianEconomy implements Serializable {
 	 * 
 	 * @return the output filename
 	 */
-	public String saveGovernmentDetailsToFile() {
+	public String saveGovernmentDetailsToFile(int iteration) {
 		// get data
-		List<AustralianGovernment> beans = new ArrayList<AustralianGovernment>(1);
-		beans.add(this.government);
+		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
+				+ this.government.toCsvStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
 
 		// save CSV file
-		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_Govt.csv";
+		DecimalFormat wholeNumber = new DecimalFormat("000");
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_Agents_Govt_"
+				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
 			writer = new FileWriter(filename);
-			StatefulBeanToCsv<AustralianGovernment> beanToCsv = new StatefulBeanToCsvBuilder<AustralianGovernment>(
-					writer).build();
-			beanToCsv.write(beans);
+			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
+			csvWriter.writeNext(entries);
+			entries = (iteration + Properties.CSV_SEPARATOR
+					+ this.government.toCsvString(Properties.CSV_SEPARATOR, iteration)).split(Properties.CSV_SEPARATOR);
+			csvWriter.writeNext(entries);
 			writer.close();
 		} catch (IOException e) {
 			// new FileWriter
-			e.printStackTrace();
-		} catch (CsvDataTypeMismatchException e) {
-			// write beans
-			e.printStackTrace();
-		} catch (CsvRequiredFieldEmptyException e) {
-			// write beans
 			e.printStackTrace();
 		} finally {
 			writer = null;

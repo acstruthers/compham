@@ -3,6 +3,7 @@
  */
 package xyz.struthers.rhul.ham.agent;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -276,6 +277,165 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		return rate;
 	}
 
+	/**
+	 * Gets the column headings, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the column headings
+	 */
+	public String toCsvStringHeaders(String separator) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Name" + separator);
+		sb.append("PaymentClearingIndex" + separator);
+		sb.append("ABN" + separator);
+		sb.append("ShortName" + separator);
+		sb.append("AdiCategory" + separator);
+		sb.append("IndustryDivisionCode" + separator);
+		sb.append("State" + separator);
+		sb.append("IsGccsa" + separator);
+		sb.append("EmployeeCount" + separator);
+		sb.append("DomesticSupplierCount" + separator);
+		sb.append("RetailDepositorCount" + separator);
+		sb.append("CommercialDepositorCount" + separator);
+		sb.append("AdiInvestorCount" + separator);
+		sb.append("AdiInvestorAmount" + separator);
+		sb.append("GovernmentID" + separator);
+		sb.append("RbaID" + separator);
+		sb.append("InterestIncome" + separator);
+		sb.append("InterestExpense" + separator);
+		sb.append("TradingIncome" + separator);
+		sb.append("InvestmentIncome" + separator);
+		sb.append("OtherIncome" + separator);
+		sb.append("PersonnelExpenses" + separator);
+		sb.append("LoanImpairmentExpense" + separator);
+		sb.append("Depreciation" + separator);
+		sb.append("OtherExpenses" + separator);
+		sb.append("IncomeTaxExpense" + separator);
+		sb.append("Cash" + separator);
+		sb.append("TradingSecurities" + separator);
+		sb.append("DerivativeAssets" + separator);
+		sb.append("Investments" + separator);
+		sb.append("LoansPersonal" + separator);
+		sb.append("LoansHome" + separator);
+		sb.append("LoansBusiness" + separator);
+		sb.append("LoansADI" + separator);
+		sb.append("LoansGovernment" + separator);
+		sb.append("OtherNonFinancialAssets" + separator);
+		sb.append("DepositsAtCall" + separator);
+		sb.append("DepositsTerm" + separator);
+		sb.append("DepositsAdiRepoEligible" + separator);
+		sb.append("DerivativeLiabilities" + separator);
+		sb.append("BondsNotesBorrowings" + separator);
+		sb.append("OtherLiabilities" + separator);
+		sb.append("RetainedEarnings" + separator);
+		sb.append("Reserves" + separator);
+		sb.append("OtherEquity" + separator);
+		sb.append("RateCash" + separator);
+		sb.append("RateTrading" + separator);
+		sb.append("RateInvestment" + separator);
+		sb.append("RateAdiLoan" + separator);
+		sb.append("RateGovernmentLoan" + separator);
+		sb.append("RateTotalLoans" + separator);
+		sb.append("RateTotalDeposits" + separator);
+		sb.append("RateBondsNotesBorrowings" + separator);
+		sb.append("CapitalTotalRatio" + separator);
+		sb.append("CapitalTotalAmount" + separator);
+		sb.append("CapitalTotalRWA" + separator);
+		sb.append("CapitalCreditRWA" + separator);
+		sb.append("CurrentDepositRate" + separator);
+		sb.append("CurrentLoanRate" + separator);
+		sb.append("CurrentBorrowingsRate" + separator);
+		sb.append("CurrentGovtBondRate");
+
+		return sb.toString();
+	}
+
+	/**
+	 * Gets the data, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the data
+	 */
+	public String toCsvString(String separator, int iteration) {
+		StringBuilder sb = new StringBuilder();
+
+		DecimalFormat decimal = new DecimalFormat("###0.00");
+		DecimalFormat wholeNumber = new DecimalFormat("###0");
+		DecimalFormat percent = new DecimalFormat("###0.0000");
+
+		sb.append(this.name.replace(",", " ") + separator);
+		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
+		sb.append(this.australianBusinessNumber + separator);
+		sb.append(this.shortName.replace(",", " ") + separator);
+		sb.append(this.adiCategory + separator);
+		sb.append(this.industryDivisionCode + separator);
+		sb.append(this.state + separator);
+		sb.append((this.isGccsa ? "Y" : "N") + separator);
+		sb.append(wholeNumber.format(this.employees != null ? this.employees.size() : 0) + separator);
+		sb.append(wholeNumber.format(this.domesticSuppliers != null ? this.domesticSuppliers.size() : 0) + separator);
+		sb.append(wholeNumber.format(this.retailDepositors != null ? this.retailDepositors.size() : 0) + separator);
+		sb.append(wholeNumber.format(this.commercialDepositors != null ? this.commercialDepositors.size() : 0)
+				+ separator);
+		sb.append(wholeNumber.format(this.adiInvestors != null ? this.adiInvestors.size() : 0) + separator);
+		if (this.adiInvestorAmounts != null) {
+			float sum = this.adiInvestorAmounts.stream().reduce(0f, Float::sum);
+			sb.append(decimal.format(sum) + separator);
+		} else {
+			sb.append(decimal.format(0) + separator);
+		}
+		sb.append(wholeNumber.format(this.govt != null ? this.govt.getPaymentClearingIndex() : 0) + separator);
+		sb.append(wholeNumber.format(this.rba != null ? this.rba.getPaymentClearingIndex() : 0) + separator);
+		sb.append(decimal.format(this.pnlInterestIncome) + separator);
+		sb.append(decimal.format(this.pnlInterestExpense) + separator);
+		sb.append(decimal.format(this.pnlTradingIncome) + separator);
+		sb.append(decimal.format(this.pnlInvestmentIncome) + separator);
+		sb.append(decimal.format(this.pnlOtherIncome) + separator);
+		sb.append(decimal.format(this.pnlPersonnelExpenses) + separator);
+		sb.append(decimal.format(this.pnlLoanImpairmentExpense) + separator);
+		sb.append(decimal.format(this.pnlDepreciationAmortisation) + separator);
+		sb.append(decimal.format(this.pnlOtherExpenses) + separator);
+		sb.append(decimal.format(this.pnlIncomeTaxExpense) + separator);
+		sb.append(decimal.format(this.bsCash) + separator);
+		sb.append(decimal.format(this.bsCash) + separator);
+		sb.append(decimal.format(this.bsTradingSecurities) + separator);
+		sb.append(decimal.format(this.bsDerivativeAssets) + separator);
+		sb.append(decimal.format(this.bsInvestments) + separator);
+		sb.append(decimal.format(this.bsLoansPersonal) + separator);
+		sb.append(decimal.format(this.bsLoansHome) + separator);
+		sb.append(decimal.format(this.bsLoansBusiness) + separator);
+		sb.append(decimal.format(this.bsLoansADI) + separator);
+		sb.append(decimal.format(this.bsLoansGovernment) + separator);
+		sb.append(decimal.format(this.bsOtherNonFinancialAssets) + separator);
+		sb.append(decimal.format(this.bsDepositsAtCall) + separator);
+		sb.append(decimal.format(this.bsDepositsTerm) + separator);
+		sb.append(decimal.format(this.bsDepositsAdiRepoEligible) + separator);
+		sb.append(decimal.format(this.bsDerivativeLiabilities) + separator);
+		sb.append(decimal.format(this.bsBondsNotesBorrowings) + separator);
+		sb.append(decimal.format(this.bsOtherLiabilities) + separator);
+		sb.append(decimal.format(this.bsRetainedEarnings) + separator);
+		sb.append(decimal.format(this.bsReserves) + separator);
+		sb.append(decimal.format(this.bsOtherEquity) + separator);
+		sb.append(percent.format(this.rateCash) + separator);
+		sb.append(percent.format(this.rateTrading) + separator);
+		sb.append(percent.format(this.rateInvestment) + separator);
+		sb.append(percent.format(this.rateAdiLoan) + separator);
+		sb.append(percent.format(this.rateGovernmentLoan) + separator);
+		sb.append(percent.format(this.rateTotalLoans) + separator);
+		sb.append(percent.format(this.rateTotalDeposits) + separator);
+		sb.append(percent.format(this.rateBondsNotesBorrowings) + separator);
+		sb.append(percent.format(this.capitalTotalRatio) + separator);
+		sb.append(decimal.format(this.capitalTotalAmount) + separator);
+		sb.append(decimal.format(this.capitalTotalRWA) + separator);
+		sb.append(decimal.format(this.capitalCreditRWA) + separator);
+		sb.append(percent.format(this.depositRate != null ? this.depositRate.get(iteration) : 0) + separator);
+		sb.append(percent.format(this.loanRate != null ? this.loanRate.get(iteration) : 0) + separator);
+		sb.append(percent.format(this.borrowingsRate != null ? this.borrowingsRate.get(iteration) : 0) + separator);
+		sb.append(percent.format(this.govtBondRate != null ? this.govtBondRate.get(iteration) : 0));
+
+		return sb.toString();
+	}
+
 	@Override
 	public ArrayList<Individual> getEmployees() {
 		return this.employees;
@@ -409,7 +569,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	public void setIndustryDivisionCode(char industryDivisionCode) {
 		this.industryDivisionCode = industryDivisionCode;
 	}
-	
+
 	/**
 	 * @return the domesticSuppliers
 	 */

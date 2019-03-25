@@ -15,6 +15,9 @@ import xyz.struthers.rhul.ham.agent.Individual;
  */
 public interface Employer {
 
+	// HACK so I can convert to CSV easily
+	public int getPaymentClearingIndex();
+	
 	/**
 	 * Gets a list of the employer's employees.
 	 * 

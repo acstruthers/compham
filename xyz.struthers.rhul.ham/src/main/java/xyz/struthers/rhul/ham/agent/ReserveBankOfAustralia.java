@@ -173,7 +173,7 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 
 		sb.append(this.name + separator);
 		sb.append(this.industryDivisionCode + separator);
-		sb.append(this.paymentClearingIndex + separator);
+		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
 		sb.append(wholeNumber.format(this.employees != null ? this.employees.size() : 0) + separator);
 		sb.append(wholeNumber.format(this.adiDepositors != null ? this.adiDepositors.size() : 0) + separator);
 		sb.append(percent.format(this.cashRate != null ? this.cashRate.get(iteration) : 0) + separator);

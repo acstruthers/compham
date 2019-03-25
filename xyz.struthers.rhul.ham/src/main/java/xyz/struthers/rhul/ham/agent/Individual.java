@@ -3,6 +3,7 @@
  */
 package xyz.struthers.rhul.ham.agent;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import xyz.struthers.rhul.ham.process.Employer;
@@ -102,6 +103,83 @@ public final class Individual extends Agent {
 		return this.pnlWagesSalaries + this.pnlUnemploymentBenefits + this.pnlOtherSocialSecurityIncome
 				+ this.pnlInvestmentIncome + this.pnlInterestIncome + this.pnlRentIncome + this.pnlForeignIncome
 				+ this.pnlOtherIncome;
+	}
+
+	/**
+	 * Gets the column headings, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the column headings
+	 */
+	public String toCsvStringHeaders(String separator) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Name" + separator);
+		sb.append("PaymentClearingIndex" + separator);
+		sb.append("HouseholdID" + separator);
+		sb.append("EmployerID" + separator);
+		sb.append("Age" + separator);
+		sb.append("Sex" + separator);
+		sb.append("EmploymentIndustry" + separator);
+		sb.append("LGA" + separator);
+		sb.append("MainIncomeSource" + separator);
+		sb.append("WagesSalaries" + separator);
+		sb.append("UnemploymentBenefits" + separator);
+		sb.append("OtherSocialSecurityIncome" + separator);
+		sb.append("InvestmentIncome" + separator);
+		sb.append("InterestIncome" + separator);
+		sb.append("RentIncome" + separator);
+		sb.append("ForeignIncome" + separator);
+		sb.append("OtherIncome" + separator);
+		sb.append("IncomeTaxExpense" + separator);
+		sb.append("WorkRelatedExpenses" + separator);
+		sb.append("RentInterestExpense" + separator);
+		sb.append("Donations" + separator);
+		sb.append("BankDeposits" + separator);
+		sb.append("StudentLoans");
+
+		return sb.toString();
+	}
+
+	/**
+	 * Gets the data, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the data
+	 */
+	public String toCsvString(String separator, int iteration) {
+		StringBuilder sb = new StringBuilder();
+
+		DecimalFormat decimal = new DecimalFormat("###0.00");
+		DecimalFormat wholeNumber = new DecimalFormat("###0");
+		DecimalFormat percent = new DecimalFormat("###0.0000");
+
+		sb.append(this.name + separator);
+		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
+		sb.append(
+				wholeNumber.format(this.household != null ? this.household.getPaymentClearingIndex() : 0) + separator);
+		sb.append(wholeNumber.format(this.employer != null ? this.employer.getPaymentClearingIndex() : 0) + separator);
+		sb.append(wholeNumber.format(this.age) + separator);
+		sb.append(this.sex + separator);
+		sb.append(this.employmentIndustry + separator);
+		sb.append(this.localGovernmentAreaCode + separator);
+		sb.append(wholeNumber.format(this.mainIncomeSource) + separator);
+		sb.append(decimal.format(this.pnlWagesSalaries) + separator);
+		sb.append(decimal.format(this.pnlUnemploymentBenefits) + separator);
+		sb.append(decimal.format(this.pnlOtherSocialSecurityIncome) + separator);
+		sb.append(decimal.format(this.pnlInvestmentIncome) + separator);
+		sb.append(decimal.format(this.pnlInterestIncome) + separator);
+		sb.append(decimal.format(this.pnlRentIncome) + separator);
+		sb.append(decimal.format(this.pnlForeignIncome) + separator);
+		sb.append(decimal.format(this.pnlOtherIncome) + separator);
+		sb.append(decimal.format(this.pnlIncomeTaxExpense) + separator);
+		sb.append(decimal.format(this.pnlWorkRelatedExpenses) + separator);
+		sb.append(decimal.format(this.pnlRentInterestExpense) + separator);
+		sb.append(decimal.format(this.pnlDonations) + separator);
+		sb.append(decimal.format(this.bsBankDeposits) + separator);
+		sb.append(decimal.format(this.bsStudentLoans));
+
+		return sb.toString();
 	}
 
 	@Override

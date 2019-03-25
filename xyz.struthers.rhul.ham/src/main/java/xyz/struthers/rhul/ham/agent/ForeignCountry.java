@@ -3,6 +3,7 @@
  */
 package xyz.struthers.rhul.ham.agent;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -105,6 +106,146 @@ public final class ForeignCountry extends Agent {
 		if (this.exporters != null) {
 			this.exporters.trimToSize();
 		}
+	}
+
+	/**
+	 * Gets the column headings, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the column headings
+	 */
+	public String toCsvStringHeaders(String separator) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Name" + separator);
+		sb.append("PaymentClearingIndex" + separator);
+		sb.append("ExporterCount" + separator);
+		sb.append("Currency" + separator);
+		sb.append("ExchangeRate" + separator);
+		sb.append("TotalExportsFromAustralia" + separator);
+		sb.append("TotalImportsToAustralia" + separator);
+		sb.append("ExportsFromAustraliaByStateNSW" + separator);
+		sb.append("ExportsFromAustraliaByStateVIC" + separator);
+		sb.append("ExportsFromAustraliaByStateQLD" + separator);
+		sb.append("ExportsFromAustraliaByStateSA" + separator);
+		sb.append("ExportsFromAustraliaByStateWA" + separator);
+		sb.append("ExportsFromAustraliaByStateTAS" + separator);
+		sb.append("ExportsFromAustraliaByStateNT" + separator);
+		sb.append("ExportsFromAustraliaByStateACT" + separator);
+		sb.append("ImportsToAustraliaByStateNSW" + separator);
+		sb.append("ImportsToAustraliaByStateVIC" + separator);
+		sb.append("ImportsToAustraliaByStateQLD" + separator);
+		sb.append("ImportsToAustraliaByStateSA" + separator);
+		sb.append("ImportsToAustraliaByStateWA" + separator);
+		sb.append("ImportsToAustraliaByStateTAS" + separator);
+		sb.append("ImportsToAustraliaByStateNT" + separator);
+		sb.append("ImportsToAustraliaByStateACT");
+
+		return sb.toString();
+	}
+
+	/**
+	 * Gets the data, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the data
+	 */
+	public String toCsvString(String separator, int iteration) {
+		StringBuilder sb = new StringBuilder();
+
+		DecimalFormat decimal = new DecimalFormat("###0.00");
+		DecimalFormat rate = new DecimalFormat("###0.000000");
+		DecimalFormat wholeNumber = new DecimalFormat("###0");
+		DecimalFormat percent = new DecimalFormat("###0.0000");
+
+		sb.append(this.name.replace(",", " ") + separator);
+		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
+		sb.append(wholeNumber.format(this.exporters != null ? this.exporters.size() : 0) + separator);
+		sb.append((this.currency != null ? this.currency.getIso4217code() : "NA") + separator);
+		sb.append(rate.format(this.exchangeRates != null ? this.exchangeRates.get(iteration) : 0) + separator);
+		sb.append(decimal.format(this.totalExportsFromAustralia) + separator);
+		sb.append(decimal.format(this.totalImportsToAustralia) + separator);
+		sb.append(decimal
+				.format(this.exportsFromAustraliaByState != null && this.exportsFromAustraliaByState.containsKey("NSW")
+						? this.exportsFromAustraliaByState.get("NSW")
+						: 0)
+				+ separator);
+		sb.append(decimal
+				.format(this.exportsFromAustraliaByState != null && this.exportsFromAustraliaByState.containsKey("VIC")
+						? this.exportsFromAustraliaByState.get("VIC")
+						: 0)
+				+ separator);
+		sb.append(decimal
+				.format(this.exportsFromAustraliaByState != null && this.exportsFromAustraliaByState.containsKey("QLD")
+						? this.exportsFromAustraliaByState.get("QLD")
+						: 0)
+				+ separator);
+		sb.append(decimal
+				.format(this.exportsFromAustraliaByState != null && this.exportsFromAustraliaByState.containsKey("SA")
+						? this.exportsFromAustraliaByState.get("SA")
+						: 0)
+				+ separator);
+		sb.append(decimal
+				.format(this.exportsFromAustraliaByState != null && this.exportsFromAustraliaByState.containsKey("WA")
+						? this.exportsFromAustraliaByState.get("WA")
+						: 0)
+				+ separator);
+		sb.append(decimal
+				.format(this.exportsFromAustraliaByState != null && this.exportsFromAustraliaByState.containsKey("TAS")
+						? this.exportsFromAustraliaByState.get("TAS")
+						: 0)
+				+ separator);
+		sb.append(decimal
+				.format(this.exportsFromAustraliaByState != null && this.exportsFromAustraliaByState.containsKey("NT")
+						? this.exportsFromAustraliaByState.get("NT")
+						: 0)
+				+ separator);
+		sb.append(decimal
+				.format(this.exportsFromAustraliaByState != null && this.exportsFromAustraliaByState.containsKey("ACT")
+						? this.exportsFromAustraliaByState.get("ACT")
+						: 0)
+				+ separator);
+		sb.append(decimal
+				.format(this.importsToAustraliaByState != null && this.importsToAustraliaByState.containsKey("NSW")
+						? this.importsToAustraliaByState.get("NSW")
+						: 0)
+				+ separator);
+		sb.append(decimal
+				.format(this.importsToAustraliaByState != null && this.importsToAustraliaByState.containsKey("VIC")
+						? this.importsToAustraliaByState.get("VIC")
+						: 0)
+				+ separator);
+		sb.append(decimal
+				.format(this.importsToAustraliaByState != null && this.importsToAustraliaByState.containsKey("QLD")
+						? this.importsToAustraliaByState.get("QLD")
+						: 0)
+				+ separator);
+		sb.append(decimal
+				.format(this.importsToAustraliaByState != null && this.importsToAustraliaByState.containsKey("SA")
+						? this.importsToAustraliaByState.get("SA")
+						: 0)
+				+ separator);
+		sb.append(decimal
+				.format(this.importsToAustraliaByState != null && this.importsToAustraliaByState.containsKey("WA")
+						? this.importsToAustraliaByState.get("WA")
+						: 0)
+				+ separator);
+		sb.append(decimal
+				.format(this.importsToAustraliaByState != null && this.importsToAustraliaByState.containsKey("TAS")
+						? this.importsToAustraliaByState.get("TAS")
+						: 0)
+				+ separator);
+		sb.append(decimal
+				.format(this.importsToAustraliaByState != null && this.importsToAustraliaByState.containsKey("NT")
+						? this.importsToAustraliaByState.get("NT")
+						: 0)
+				+ separator);
+		sb.append(decimal
+				.format(this.importsToAustraliaByState != null && this.importsToAustraliaByState.containsKey("ACT")
+						? this.importsToAustraliaByState.get("ACT")
+						: 0));
+
+		return sb.toString();
 	}
 
 	@Override

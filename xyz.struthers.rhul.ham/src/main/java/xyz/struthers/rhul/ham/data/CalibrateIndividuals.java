@@ -43,6 +43,13 @@ public class CalibrateIndividuals {
 
 	private static final boolean DEBUG = true;
 	private static final boolean DEBUG_DETAIL = false;
+	private static final boolean DEBUG_ZEROS = false;
+	private static final boolean DEBUG_ZEROS2 = false;
+	private static final boolean DEBUG_ZEROS1129 = false;
+	private static final boolean DEBUG_ZEROS1241 = false;
+	private static final boolean DEBUG_ZEROS1328 = false;
+	private static final boolean DEBUG_BIG_NUM = false;
+	private static final boolean DEBUG_BIG_NUM2 = false;
 
 	// CONSTANTS
 	private static final float EPSILON = 0.1f; // to round business counts so the integer sums match
@@ -1056,130 +1063,194 @@ public class CalibrateIndividuals {
 											.get(incomeRangeAto).get(age).get(sex).get(taxableStatus);
 
 									// variables to calibrate Individual agents
-									atoCountEmployed.add(Math.round(Math.max(
+									atoCountEmployed.set(incomeMapNum, Math.round(Math.max(
 											this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT).get(incomeRangeAto)
 													.get(age).get(sex).get(taxableStatus),
 											this.atoIndividualTable3a.get(ATO_3A_TITLE_ALLOWANCES_COUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))));
-									atoCountUnemployed
-											.add(Math.round(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_ALLOW_COUNT)
+									atoCountUnemployed.set(incomeMapNum,
+											Math.round(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_ALLOW_COUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
-									atoCountPension.add(
+									atoCountPension.set(incomeMapNum,
 											Math.round(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_PENSION_COUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
-									atoCountSelfFundedRetiree.add(Math.round(Math.max(
+									atoCountSelfFundedRetiree.set(incomeMapNum, Math.round(Math.max(
 											this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_TAXED_COUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus),
 											this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_UNTAXED_COUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))));
-									atoCountForeignIncome.add(Math.round(Math.max(
+									atoCountForeignIncome.set(incomeMapNum, Math.round(Math.max(
 											this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME_COUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus),
 											this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME2_COUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))));
-									atoCountTotal.add(atoCountEmployed.get(incomeMapNum)
-											+ atoCountUnemployed.get(incomeMapNum) + atoCountPension.get(incomeMapNum)
-											+ atoCountSelfFundedRetiree.get(incomeMapNum)
-											+ atoCountForeignIncome.get(incomeMapNum));
+									atoCountTotal.set(incomeMapNum,
+											atoCountEmployed.get(incomeMapNum) + atoCountUnemployed.get(incomeMapNum)
+													+ atoCountPension.get(incomeMapNum)
+													+ atoCountSelfFundedRetiree.get(incomeMapNum)
+													+ atoCountForeignIncome.get(incomeMapNum));
 
-									atoCountAttributeInterestIncome.add(
+									atoCountAttributeInterestIncome.set(incomeMapNum,
 											Math.round(this.atoIndividualTable3a.get(ATO_3A_TITLE_INTEREST_INCOME_COUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
 									// 36% of Australian adults own shares, so sum these counts rather than just
 									// taking the maximum
 									// SOURCE: ASX (2014), 'The Australian Share Ownership Study': Sydney, NSW.
-									atoCountAttributeDividendIncome.add(Math.round(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_DIVIDENDS_UNFRANKED_COUNT).get(incomeRangeAto).get(age)
-											.get(sex).get(taxableStatus)
-											+ this.atoIndividualTable3a.get(ATO_3A_TITLE_DIVIDENDS_FRANKED_COUNT)
+									atoCountAttributeDividendIncome.set(incomeMapNum,
+											Math.round(this.atoIndividualTable3a
+													.get(ATO_3A_TITLE_DIVIDENDS_UNFRANKED_COUNT).get(incomeRangeAto)
+													.get(age).get(sex).get(taxableStatus)
+													+ this.atoIndividualTable3a
+															.get(ATO_3A_TITLE_DIVIDENDS_FRANKED_COUNT)
+															.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
+									atoCountAttributeWorkRelatedExpenses.set(incomeMapNum,
+											Math.round(
+													this.atoIndividualTable3a.get(ATO_3A_TITLE_WORK_RELATED_EXP_COUNT)
+															.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
+									atoCountAttributeDonations.set(incomeMapNum,
+											Math.round(this.atoIndividualTable3a.get(ATO_3A_TITLE_DONATIONS_COUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
-									atoCountAttributeWorkRelatedExpenses.add(Math
-											.round(this.atoIndividualTable3a.get(ATO_3A_TITLE_WORK_RELATED_EXP_COUNT)
-													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
-									atoCountAttributeDonations
-											.add(Math.round(this.atoIndividualTable3a.get(ATO_3A_TITLE_DONATIONS_COUNT)
-													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
-									atoCountAttributeRentIncome.add(
+									atoCountAttributeRentIncome.set(incomeMapNum,
 											Math.round(this.atoIndividualTable3a.get(ATO_3A_TITLE_RENT_INCOME_COUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
-									atoCountAttributeRentInterest.add(
+									atoCountAttributeRentInterest.set(incomeMapNum,
 											Math.round(this.atoIndividualTable3a.get(ATO_3A_TITLE_RENT_INTEREST_COUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
-									atoCountAttributeTotalIncome.add(
+									atoCountAttributeTotalIncome.set(incomeMapNum,
 											Math.round(this.atoIndividualTable3a.get(ATO_3A_TITLE_TOTAL_INCOME_COUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)));
 									// SFSS is on top of other loans, so count is max (HELP + TSL, SFSS)
-									atoCountAttributeStudentLoan.add(Math.round(Math.max(
+									atoCountAttributeStudentLoan.set(incomeMapNum, Math.round(Math.max(
 											this.atoIndividualTable3a.get(ATO_3A_TITLE_HELP_DEBT_COUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
 													+ this.atoIndividualTable3a.get(ATO_3A_TITLE_TSL_DEBT_COUNT)
 															.get(incomeRangeAto).get(age).get(sex).get(taxableStatus),
 											this.atoIndividualTable3a.get(ATO_3A_TITLE_SFSS_DEBT_COUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))));
-									atoAmountEmployed.add(Float
-											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_AMOUNT)
+									atoAmountEmployed.set(incomeMapNum,
+											Float.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_AMOUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
 													+ this.atoIndividualTable3a.get(ATO_3A_TITLE_ALLOWANCES_AMOUNT)
 															.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
-											.longValue());
-									atoAmountUnemployed.add(Float
-											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_ALLOW_AMOUNT)
+													.longValue());
+									if (DEBUG_ZEROS1129) {
+										if (this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT).get(incomeRangeAto)
+												.get(age).get(sex).get(taxableStatus) > 0f) {
+											System.out.println("1127: incomeMapNum: " + incomeMapNum);
+											System.out.println("1128: atoCountEmployed.get(incomeMapNum): "
+													+ atoCountEmployed.get(incomeMapNum));
+											System.out.println("1130: atoAmountEmployed.get(incomeMapNum): "
+													+ atoAmountEmployed.get(incomeMapNum));
+											System.out.println(
+													"1132: ATO_3A_TITLE_SALARY_AMOUNT: " + ATO_3A_TITLE_SALARY_AMOUNT);
+											System.out.println("1134: incomeRangeAto: " + incomeRangeAto);
+											System.out.println("1135: age: " + age);
+											System.out.println("1136: sex: " + sex);
+											System.out.println("1137: taxableStatus: " + taxableStatus);
+											System.out.println(
+													"1138: this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_AMOUNT).get(incomeRangeAto).get(age).get(sex).get(taxableStatus): "
+															+ this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_AMOUNT)
+																	.get(incomeRangeAto).get(age).get(sex)
+																	.get(taxableStatus));
+											System.out.println(
+													"1148: this.atoIndividualTable3a.get(ATO_3A_TITLE_ALLOWANCES_AMOUNT).get(incomeRangeAto).get(age).get(sex).get(taxableStatus): "
+															+ this.atoIndividualTable3a
+																	.get(ATO_3A_TITLE_ALLOWANCES_AMOUNT)
+																	.get(incomeRangeAto).get(age).get(sex)
+																	.get(taxableStatus));
+											System.out.println(
+													"1156: this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT).get(incomeRangeAto).get(age).get(sex).get(taxableStatus): "
+															+ this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT)
+																	.get(incomeRangeAto).get(age).get(sex)
+																	.get(taxableStatus));
+											System.out.println(
+													"1161: this.atoIndividualTable3a.get(ATO_3A_TITLE_ALLOWANCES_COUNT).get(incomeRangeAto).get(age).get(sex).get(taxableStatus): "
+															+ this.atoIndividualTable3a
+																	.get(ATO_3A_TITLE_ALLOWANCES_COUNT)
+																	.get(incomeRangeAto).get(age).get(sex)
+																	.get(taxableStatus));
+											System.out.println(
+													"1166: atoCountEmployed.size(): " + atoCountEmployed.size());
+											System.out.println(
+													"1168: Math.max(this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT).get(incomeRangeAto).get(age).get(sex).get(taxableStatus),this.atoIndividualTable3a.get(ATO_3A_TITLE_ALLOWANCES_COUNT).get(incomeRangeAto).get(age).get(sex).get(taxableStatus)): "
+															+ Math.max(this.atoIndividualTable3a
+																	.get(ATO_3A_TITLE_SALARY_COUNT).get(incomeRangeAto)
+																	.get(age).get(sex).get(taxableStatus),
+																	this.atoIndividualTable3a
+																			.get(ATO_3A_TITLE_ALLOWANCES_COUNT)
+																			.get(incomeRangeAto).get(age).get(sex)
+																			.get(taxableStatus)));
+											System.out.println(
+													"1177: Math.round(Math.max(this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT).get(incomeRangeAto).get(age).get(sex).get(taxableStatus),this.atoIndividualTable3a.get(ATO_3A_TITLE_ALLOWANCES_COUNT).get(incomeRangeAto).get(age).get(sex).get(taxableStatus))): "
+															+ Math.round(Math.max(this.atoIndividualTable3a
+																	.get(ATO_3A_TITLE_SALARY_COUNT).get(incomeRangeAto)
+																	.get(age).get(sex).get(taxableStatus),
+																	this.atoIndividualTable3a
+																			.get(ATO_3A_TITLE_ALLOWANCES_COUNT)
+																			.get(incomeRangeAto).get(age).get(sex)
+																			.get(taxableStatus))));
+										}
+									}
+									atoAmountUnemployed.set(incomeMapNum,
+											Float.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_ALLOW_AMOUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
-											.longValue());
-									atoAmountPension.add(Float
+													.longValue());
+									atoAmountPension.set(incomeMapNum, Float
 											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_PENSION_AMOUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
 											.longValue());
-									atoAmountSelfFundedRetiree.add(Float
-											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_TAXED_AMOUNT)
+									atoAmountSelfFundedRetiree.set(incomeMapNum,
+											Float.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_TAXED_AMOUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
 													+ this.atoIndividualTable3a.get(ATO_3A_TITLE_SUPER_UNTAXED_AMOUNT)
 															.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
-											.longValue());
-									atoAmountForeignIncome.add(Float
+													.longValue());
+									atoAmountForeignIncome.set(incomeMapNum, Float
 											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME_AMOUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
 													+ this.atoIndividualTable3a.get(ATO_3A_TITLE_FOREIGN_INCOME2_AMOUNT)
 															.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
 											.longValue());
-									atoAmountAttributeInterestIncome.add(Float
+									atoAmountAttributeInterestIncome.set(incomeMapNum, Float
 											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_INTEREST_INCOME_AMOUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
 											.longValue());
-									atoAmountAttributeDividendIncome.add(Float.valueOf(this.atoIndividualTable3a
-											.get(ATO_3A_TITLE_DIVIDENDS_UNFRANKED_AMOUNT).get(incomeRangeAto).get(age)
-											.get(sex).get(taxableStatus)
-											+ this.atoIndividualTable3a.get(ATO_3A_TITLE_DIVIDENDS_FRANKED_AMOUNT)
-													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
-											.longValue());
-									atoAmountAttributeWorkRelatedExpenses.add(Float
+									atoAmountAttributeDividendIncome.set(incomeMapNum,
+											Float.valueOf(this.atoIndividualTable3a
+													.get(ATO_3A_TITLE_DIVIDENDS_UNFRANKED_AMOUNT).get(incomeRangeAto)
+													.get(age).get(sex).get(taxableStatus)
+													+ this.atoIndividualTable3a
+															.get(ATO_3A_TITLE_DIVIDENDS_FRANKED_AMOUNT)
+															.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
+													.longValue());
+									atoAmountAttributeWorkRelatedExpenses.set(incomeMapNum, Float
 											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_WORK_RELATED_EXP_AMOUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
 											.longValue());
-									atoAmountAttributeDonations.add(Float
-											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_DONATIONS_AMOUNT)
+									atoAmountAttributeDonations.set(incomeMapNum,
+											Float.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_DONATIONS_AMOUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
-											.longValue());
-									atoAmountAttributeRentIncome.add(Float
-											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_RENT_INCOME_AMOUNT)
+													.longValue());
+									atoAmountAttributeRentIncome.set(incomeMapNum,
+											Float.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_RENT_INCOME_AMOUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
-											.longValue());
-									atoAmountAttributeRentInterest.add(Float
+													.longValue());
+									atoAmountAttributeRentInterest.set(incomeMapNum, Float
 											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_RENT_INTEREST_AMOUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
 											.longValue());
-									atoAmountAttributeTotalIncome.add(Float
+									atoAmountAttributeTotalIncome.set(incomeMapNum, Float
 											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_TOTAL_INCOME_AMOUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
 											.longValue());
-									atoAmountAttributeStudentLoan.add(Float
-											.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_HELP_DEBT_AMOUNT)
+									atoAmountAttributeStudentLoan.set(incomeMapNum,
+											Float.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_HELP_DEBT_AMOUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
 													+ this.atoIndividualTable3a.get(ATO_3A_TITLE_TSL_DEBT_AMOUNT)
 															.get(incomeRangeAto).get(age).get(sex).get(taxableStatus)
 													+ this.atoIndividualTable3a.get(ATO_3A_TITLE_SFSS_DEBT_AMOUNT)
 															.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
-											.longValue());
+													.longValue());
 								}
 							} // end for income map number
 						} // end for taxable status
@@ -1219,6 +1290,15 @@ public class CalibrateIndividuals {
 							atoPerPersonEmployed.add(atoCountEmployed.get(incomeMapNum) == 0 ? 0f
 									: ((float) atoAmountEmployed.get(incomeMapNum))
 											/ (float) atoCountEmployed.get(incomeMapNum));
+							if (DEBUG_ZEROS1241) {
+								System.out.println("1224: incomeMapNum: " + incomeMapNum);
+								System.out.println("1225: atoPerPersonEmployed.get(incomeMapNum): "
+										+ atoPerPersonEmployed.get(incomeMapNum));
+								System.out.println("1227: atoCountEmployed.get(incomeMapNum): "
+										+ atoCountEmployed.get(incomeMapNum));
+								System.out.println("1229: atoAmountEmployed.get(incomeMapNum): "
+										+ atoAmountEmployed.get(incomeMapNum));
+							}
 							atoPerPersonUnemployed.add(atoCountUnemployed.get(incomeMapNum) == 0 ? 0f
 									: ((float) atoAmountUnemployed.get(incomeMapNum))
 											/ (float) atoCountUnemployed.get(incomeMapNum));
@@ -1278,301 +1358,417 @@ public class CalibrateIndividuals {
 								if (DEBUG_DETAIL) {
 									System.out.println(" poa: " + poa);
 								}
+								// reset ATO per person figures inside this loop so we don't sum to infinity
+								List<Float> atoPerPersonEmployedDivPoa = new ArrayList<Float>(atoPerPersonEmployed);
+								List<Float> atoPerPersonUnemployedDivPoa = new ArrayList<Float>(atoPerPersonUnemployed);
+								List<Float> atoPerPersonPensionDivPoa = new ArrayList<Float>(atoPerPersonPension);
+								List<Float> atoPerPersonSelfFundedRetireeDivPoa = new ArrayList<Float>(
+										atoPerPersonSelfFundedRetiree);
+								List<Float> atoPerPersonForeignIncomeDivPoa = new ArrayList<Float>(
+										atoPerPersonForeignIncome);
+								List<Float> atoPerPersonAttributeInterestIncomeDivPoa = new ArrayList<Float>(
+										atoPerPersonAttributeInterestIncome);
+								List<Float> atoPerPersonAttributeDividendIncomeDivPoa = new ArrayList<Float>(
+										atoPerPersonAttributeDividendIncome);
+								List<Float> atoPerPersonAttributeWorkRelatedExpensesDivPoa = new ArrayList<Float>(
+										atoPerPersonAttributeWorkRelatedExpenses);
+								List<Float> atoPerPersonAttributeDonationsDivPoa = new ArrayList<Float>(
+										atoPerPersonAttributeDonations);
+								List<Float> atoPerPersonAttributeRentIncomeDivPoa = new ArrayList<Float>(
+										atoPerPersonAttributeRentIncome);
+								List<Float> atoPerPersonAttributeRentInterestDivPoa = new ArrayList<Float>(
+										atoPerPersonAttributeRentInterest);
+								List<Float> atoPerPersonAttributeOtherIncomeDivPoa = new ArrayList<Float>(
+										atoPerPersonAttributeOtherIncome);
+								List<Float> atoPerPersonAttributeTotalIncomeDivPoa = new ArrayList<Float>(
+										atoPerPersonAttributeTotalIncome);
+								List<Float> atoPerPersonAttributeStudentLoanDivPoa = new ArrayList<Float>(
+										atoPerPersonAttributeStudentLoan);
+
 								int poaIdx = poaIndexMap.get(poa);
 								String lgaCode = this.area.getLgaCodeFromPoa(poa);
-								String state = this.area.getStateFromPoa(poa);
-								if (!state.equals("Other")) { // skip "Other" to solve mapping issues
-									// for each state, sex & age, multiply by state count ratio
-									float stateAmtMult = stateTaxableIncomeMultiplier.get(sex).get(age).get(state);
+								if (lgaCode != null) {
+									String state = this.area.getStateFromPoa(poa);
+									if (!state.equals("Other")) { // skip "Other" to solve mapping issues
+										// for each state, sex & age, multiply by state count ratio
+										float stateAmtMult = stateTaxableIncomeMultiplier.get(sex).get(age).get(state);
 
-									// get ATO taxable count by income, age, sex, industry, poa (same as ABS)
-									// for each poa, multiply by poa count ratio
-									float poaAmtMult = postcodeStateTaxableIncomeMultiplier.get(state).get(poa);
+										// get ATO taxable count by income, age, sex, industry, poa (same as ABS)
+										// for each poa, multiply by poa count ratio
+										float poaAmtMult = postcodeStateTaxableIncomeMultiplier.get(state).get(poa);
 
-									// divide ABS count by ATO count to get multiplier, and apply to counts
-									float amountMultiplier = divAmtMult * stateAmtMult * poaAmtMult;
+										// divide ABS count by ATO count to get multiplier, and apply to counts
+										float amountMultiplier = divAmtMult * stateAmtMult * poaAmtMult;
 
-									// for each ATO income category in this iteration
-									for (int incomeMapNum = 0; incomeMapNum < numAtoIncomeIndices; incomeMapNum++) {
-										// multiply ATO 3A averages per person to calibrate them
-										atoPerPersonEmployed.set(incomeMapNum,
-												atoPerPersonEmployed.get(incomeMapNum) * amountMultiplier);
-										atoPerPersonUnemployed.set(incomeMapNum,
-												atoPerPersonUnemployed.get(incomeMapNum) * amountMultiplier);
-										atoPerPersonPension.set(incomeMapNum,
-												atoPerPersonPension.get(incomeMapNum) * amountMultiplier);
-										atoPerPersonSelfFundedRetiree.set(incomeMapNum,
-												atoPerPersonSelfFundedRetiree.get(incomeMapNum) * amountMultiplier);
-										atoPerPersonForeignIncome.set(incomeMapNum,
-												atoPerPersonForeignIncome.get(incomeMapNum) * amountMultiplier);
-										atoPerPersonAttributeInterestIncome.set(incomeMapNum,
-												atoPerPersonAttributeInterestIncome.get(incomeMapNum)
-														* amountMultiplier);
-										atoPerPersonAttributeDividendIncome.set(incomeMapNum,
-												atoPerPersonAttributeDividendIncome.get(incomeMapNum)
-														* amountMultiplier);
-										atoPerPersonAttributeWorkRelatedExpenses.set(incomeMapNum,
-												atoPerPersonAttributeWorkRelatedExpenses.get(incomeMapNum)
-														* amountMultiplier);
-										atoPerPersonAttributeDonations.set(incomeMapNum,
-												atoPerPersonAttributeDonations.get(incomeMapNum) * amountMultiplier);
-										atoPerPersonAttributeRentIncome.set(incomeMapNum,
-												atoPerPersonAttributeRentIncome.get(incomeMapNum) * amountMultiplier);
-										atoPerPersonAttributeRentInterest.set(incomeMapNum,
-												atoPerPersonAttributeRentInterest.get(incomeMapNum) * amountMultiplier);
-										atoPerPersonAttributeOtherIncome.set(incomeMapNum,
-												atoPerPersonAttributeOtherIncome.get(incomeMapNum) * amountMultiplier);
-										atoPerPersonAttributeTotalIncome.set(incomeMapNum,
-												atoPerPersonAttributeTotalIncome.get(incomeMapNum) * amountMultiplier);
-										atoPerPersonAttributeStudentLoan.set(incomeMapNum,
-												atoPerPersonAttributeStudentLoan.get(incomeMapNum) * amountMultiplier);
-									}
-
-									/**
-									 * RANDOM SAMPLING ALGORITHM Assumptions: I don't care about the ATO counts -
-									 * they can be ignored or deleted.<br>
-									 * I do care about the average amounts per person so the P&Ls are different.<br>
-									 * I also care about the split between various P&L compositions.<br>
-									 * 
-									 * Algorithm:<br>
-									 * 1. Set the flags using percentages so that I can use a pdf lookup then
-									 * generate a random float between 0 and 1.<br>
-									 * 2. Create an Individual based on this index.<br>
-									 * 3. Repeat for as many people as are in the corresponding ABS data.<br>
-									 * 
-									 * Special cases:<br>
-									 * (A) Where there are multiple ATO categories for the one ABS category, put
-									 * them all in the one pdf array.<br>
-									 * (B) Where there are multiple ABS categories for the one ATO category, loop
-									 * through the flag arrays as per usual, but store in the relevant ABS
-									 * category's cell.
-									 */
-
-									// create probability density functions for the relevant attributes
-									float totalCountDenominator = 0f;
-									for (int incomeMapNum = 0; incomeMapNum < numAtoIncomeIndices; incomeMapNum++) {
-										totalCountDenominator += atoCountTotal.get(incomeMapNum);
-									}
-									float[] pdfAtoIncomeRange = new float[numAtoIncomeIndices];
-									float[][] pdfMainIncomeSource = new float[numAtoIncomeIndices][5];
-									float[][] pdfAttributeInterestIncome = new float[numAtoIncomeIndices][2];
-									float[][] pdfAttributeDividendIncome = new float[numAtoIncomeIndices][2];
-									float[][] pdfAttributeDonations = new float[numAtoIncomeIndices][2];
-									float[][] pdfAttributeRentIncomeInterest = new float[numAtoIncomeIndices][3];
-									float[][] pdfAttributeOtherIncome = new float[numAtoIncomeIndices][2];
-									float[][] pdfAttributeStudentLoan = new float[numAtoIncomeIndices][2];
-									for (int incomeMapNum = 0; incomeMapNum < numAtoIncomeIndices; incomeMapNum++) {
-										// this determines the first index
-										pdfAtoIncomeRange[incomeMapNum] = ((float) atoCountTotal.get(incomeMapNum))
-												/ totalCountDenominator;
-
-										// create pdf for the main income source
-										pdfMainIncomeSource[incomeMapNum][0] = ((float) atoCountEmployed
-												.get(incomeMapNum)) / totalCountDenominator;
-										pdfMainIncomeSource[incomeMapNum][1] = ((float) atoCountUnemployed
-												.get(incomeMapNum)) / totalCountDenominator;
-										pdfMainIncomeSource[incomeMapNum][2] = ((float) atoCountPension
-												.get(incomeMapNum)) / totalCountDenominator;
-										pdfMainIncomeSource[incomeMapNum][3] = ((float) atoCountSelfFundedRetiree
-												.get(incomeMapNum)) / totalCountDenominator;
-										pdfMainIncomeSource[incomeMapNum][4] = 1f - pdfMainIncomeSource[incomeMapNum][0]
-												- pdfMainIncomeSource[incomeMapNum][1]
-												- pdfMainIncomeSource[incomeMapNum][2]
-												- pdfMainIncomeSource[incomeMapNum][3];
-
-										// create pdfs for the binary attributes
-										pdfAttributeInterestIncome[incomeMapNum][0] = ((float) atoCountAttributeInterestIncome
-												.get(incomeMapNum)) / totalCountDenominator;
-										pdfAttributeInterestIncome[incomeMapNum][1] = 1f
-												- pdfAttributeInterestIncome[incomeMapNum][0];
-										pdfAttributeDividendIncome[incomeMapNum][0] = ((float) atoCountAttributeDividendIncome
-												.get(incomeMapNum)) / totalCountDenominator;
-										pdfAttributeDividendIncome[incomeMapNum][1] = 1f
-												- pdfAttributeDividendIncome[incomeMapNum][0];
-										pdfAttributeDonations[incomeMapNum][0] = ((float) atoCountAttributeDonations
-												.get(incomeMapNum)) / totalCountDenominator;
-										pdfAttributeDonations[incomeMapNum][1] = 1f
-												- pdfAttributeDonations[incomeMapNum][0];
-										pdfAttributeOtherIncome[incomeMapNum][0] = ((float) atoCountAttributeOtherIncome
-												.get(incomeMapNum)) / totalCountDenominator;
-										pdfAttributeOtherIncome[incomeMapNum][1] = 1f
-												- pdfAttributeOtherIncome[incomeMapNum][0];
-										pdfAttributeStudentLoan[incomeMapNum][0] = ((float) atoCountAttributeStudentLoan
-												.get(incomeMapNum)) / totalCountDenominator;
-										pdfAttributeStudentLoan[incomeMapNum][1] = 1f
-												- pdfAttributeStudentLoan[incomeMapNum][0];
-
-										// create pdf for rental property owners
-										int propertyInvestorCount = Math.max(
-												atoCountAttributeRentIncome.get(incomeMapNum),
-												atoCountAttributeRentInterest.get(incomeMapNum));
-										int propertyInvestorWithLoanCount = atoCountAttributeRentInterest
-												.get(incomeMapNum);
-										int propertyInvestorWithoutLoanCount = propertyInvestorCount
-												- propertyInvestorWithLoanCount;
-										pdfAttributeRentIncomeInterest[incomeMapNum][0] = ((float) propertyInvestorWithLoanCount)
-												/ totalCountDenominator; // rent & interest
-										pdfAttributeRentIncomeInterest[incomeMapNum][1] = ((float) propertyInvestorWithoutLoanCount)
-												/ totalCountDenominator; // rent only
-										pdfAttributeRentIncomeInterest[incomeMapNum][2] = 1f
-												- pdfAttributeRentIncomeInterest[incomeMapNum][0]
-												- pdfAttributeRentIncomeInterest[incomeMapNum][1]; // neither
-									}
-
-									// create Individual agents and store in a List matrix
-									// the loops take into account n:m mappings between ATO and ABS
-									for (int ageIdxAbs : ageIndicesAbs) {
-										// doesn't need to exclude children because it already filters on income range
-										for (int incomeIdxAbs : incomeIndicesAbs) {
-											int absCount = censusMatrixPersonsAdjustedPOA[poaIdx][sexIdx][ageIdxAbs][divIdx][incomeIdxAbs];
-											for (int agentNo = 0; agentNo < absCount; agentNo++) {
-												// create one agent for each person in the ABS data
-												Individual individual = new Individual();
-												individual.setAge(AGE_ARRAY_ABS_MIDPOINT[ageIdxAbs]);
-												individual.setSex(SEX_ARRAY[sexIdx]);
-												individual.setEmploymentIndustry(DIVISION_CODE_ARRAY[divIdx]);
-												individual.setLocalGovernmentAreaCode(this.area.getLgaCodeFromPoa(poa));
-
-												int incomeMapNum = CustomMath.sample(pdfAtoIncomeRange, this.random);
-												int incomeSourceNum = CustomMath
-														.sample(pdfMainIncomeSource[incomeMapNum], this.random);
-												switch (incomeSourceNum) {
-												case 0:
-													individual.setMainIncomeSource(0); // employed
-													individual.setPnlWagesSalaries(
-															atoPerPersonEmployed.get(incomeMapNum) / NUM_MONTHS);
-													individual.setPnlWorkRelatedExpenses(
-															atoPerPersonAttributeWorkRelatedExpenses.get(incomeMapNum)
-																	/ NUM_MONTHS);
-													break;
-												case 1:
-													individual.setMainIncomeSource(1); // unemployed
-													individual.setPnlUnemploymentBenefits(
-															atoPerPersonUnemployed.get(incomeMapNum) / NUM_MONTHS);
-													break;
-												case 2:
-													individual.setMainIncomeSource(2); // pension
-													individual.setPnlOtherSocialSecurityIncome(
-															atoPerPersonPension.get(incomeMapNum) / NUM_MONTHS);
-													break;
-												case 3:
-													individual.setMainIncomeSource(3); // self-funded retiree
-													individual.setPnlInvestmentIncome(
-															atoPerPersonSelfFundedRetiree.get(incomeMapNum)
-																	/ NUM_MONTHS);
-													break;
-												default:
-													individual.setMainIncomeSource(4); // foreign income
-													individual.setPnlForeignIncome(
-															atoPerPersonForeignIncome.get(incomeMapNum) / NUM_MONTHS);
-													break;
+										// for each ATO income category in this iteration
+										for (int incomeMapNum = 0; incomeMapNum < numAtoIncomeIndices; incomeMapNum++) {
+											// multiply ATO 3A averages per person to calibrate them
+											if (DEBUG_BIG_NUM) {
+												System.out
+														.println("1379: atoPerPersonEmployed.get(incomeMapNum) BEFORE: "
+																+ atoPerPersonEmployed.get(incomeMapNum));
+											}
+											atoPerPersonEmployedDivPoa.set(incomeMapNum,
+													atoPerPersonEmployedDivPoa.get(incomeMapNum) * amountMultiplier);
+											if (DEBUG_BIG_NUM) {
+												// FIXME: figure out why wages are sometimes huge
+												if ((lgaCode.equals("20570") && sex.equals("M") && division.equals("B"))
+														|| (lgaCode.equals("55320") && sex.equals("M")
+																&& division.equals("A"))) {
+													System.out.println("1386: incomeMapNum: " + incomeMapNum);
+													System.out.println("1387: amountMultiplier: " + amountMultiplier);
+													System.out.println("1388: atoPerPersonEmployed.get(incomeMapNum): "
+															+ atoPerPersonEmployed.get(incomeMapNum));
+													System.out.println(
+															"LGA: " + lgaCode + ", Div: " + division + ", Sex: " + sex);
 												}
+											}
+											atoPerPersonUnemployedDivPoa.set(incomeMapNum,
+													atoPerPersonUnemployedDivPoa.get(incomeMapNum) * amountMultiplier);
+											atoPerPersonPensionDivPoa.set(incomeMapNum,
+													atoPerPersonPensionDivPoa.get(incomeMapNum) * amountMultiplier);
+											atoPerPersonSelfFundedRetireeDivPoa.set(incomeMapNum,
+													atoPerPersonSelfFundedRetireeDivPoa.get(incomeMapNum)
+															* amountMultiplier);
+											atoPerPersonForeignIncomeDivPoa.set(incomeMapNum,
+													atoPerPersonForeignIncomeDivPoa.get(incomeMapNum)
+															* amountMultiplier);
+											atoPerPersonAttributeInterestIncomeDivPoa.set(incomeMapNum,
+													atoPerPersonAttributeInterestIncomeDivPoa.get(incomeMapNum)
+															* amountMultiplier);
+											atoPerPersonAttributeDividendIncomeDivPoa.set(incomeMapNum,
+													atoPerPersonAttributeDividendIncomeDivPoa.get(incomeMapNum)
+															* amountMultiplier);
+											atoPerPersonAttributeWorkRelatedExpensesDivPoa.set(incomeMapNum,
+													atoPerPersonAttributeWorkRelatedExpensesDivPoa.get(incomeMapNum)
+															* amountMultiplier);
+											atoPerPersonAttributeDonationsDivPoa.set(incomeMapNum,
+													atoPerPersonAttributeDonationsDivPoa.get(incomeMapNum)
+															* amountMultiplier);
+											atoPerPersonAttributeRentIncomeDivPoa.set(incomeMapNum,
+													atoPerPersonAttributeRentIncomeDivPoa.get(incomeMapNum)
+															* amountMultiplier);
+											atoPerPersonAttributeRentInterestDivPoa.set(incomeMapNum,
+													atoPerPersonAttributeRentInterestDivPoa.get(incomeMapNum)
+															* amountMultiplier);
+											atoPerPersonAttributeOtherIncomeDivPoa.set(incomeMapNum,
+													atoPerPersonAttributeOtherIncomeDivPoa.get(incomeMapNum)
+															* amountMultiplier);
+											atoPerPersonAttributeTotalIncomeDivPoa.set(incomeMapNum,
+													atoPerPersonAttributeTotalIncomeDivPoa.get(incomeMapNum)
+															* amountMultiplier);
+											atoPerPersonAttributeStudentLoanDivPoa.set(incomeMapNum,
+													atoPerPersonAttributeStudentLoanDivPoa.get(incomeMapNum)
+															* amountMultiplier);
+										}
 
-												int attributeIdx = CustomMath
-														.sample(pdfAttributeInterestIncome[incomeMapNum], this.random);
-												if (attributeIdx == 0) {
-													individual.setPnlInterestIncome(
-															atoPerPersonAttributeInterestIncome.get(incomeMapNum)
-																	/ NUM_MONTHS);
-												}
-												attributeIdx = CustomMath
-														.sample(pdfAttributeDividendIncome[incomeMapNum], this.random);
-												if (attributeIdx == 0) {
-													individual.setPnlInvestmentIncome(individual
-															.getPnlInvestmentIncome()
-															+ atoPerPersonAttributeDividendIncome.get(incomeMapNum)
-																	/ NUM_MONTHS);
-												}
-												attributeIdx = CustomMath.sample(pdfAttributeDonations[incomeMapNum],
-														this.random);
-												if (attributeIdx == 0) {
-													individual.setPnlDonations(
-															atoPerPersonAttributeDonations.get(incomeMapNum)
-																	/ NUM_MONTHS);
-												}
-												attributeIdx = CustomMath.sample(
-														pdfAttributeRentIncomeInterest[incomeMapNum], this.random);
-												if (attributeIdx < 2) {
-													individual.setPnlRentIncome(
-															atoPerPersonAttributeRentIncome.get(incomeMapNum)
-																	/ NUM_MONTHS);
-												} else if (attributeIdx == 1) {
-													individual.setPnlRentInterestExpense(
-															atoPerPersonAttributeRentInterest.get(incomeMapNum)
-																	/ NUM_MONTHS);
-												}
-												attributeIdx = CustomMath.sample(pdfAttributeOtherIncome[incomeMapNum],
-														this.random);
-												if (attributeIdx == 0) {
-													individual.setPnlOtherIncome(
-															atoPerPersonAttributeOtherIncome.get(incomeMapNum)
-																	/ NUM_MONTHS);
-												}
+										/**
+										 * RANDOM SAMPLING ALGORITHM Assumptions: I don't care about the ATO counts -
+										 * they can be ignored or deleted.<br>
+										 * I do care about the average amounts per person so the P&Ls are different.<br>
+										 * I also care about the split between various P&L compositions.<br>
+										 * 
+										 * Algorithm:<br>
+										 * 1. Set the flags using percentages so that I can use a pdf lookup then
+										 * generate a random float between 0 and 1.<br>
+										 * 2. Create an Individual based on this index.<br>
+										 * 3. Repeat for as many people as are in the corresponding ABS data.<br>
+										 * 
+										 * Special cases:<br>
+										 * (A) Where there are multiple ATO categories for the one ABS category, put
+										 * them all in the one pdf array.<br>
+										 * (B) Where there are multiple ABS categories for the one ATO category, loop
+										 * through the flag arrays as per usual, but store in the relevant ABS
+										 * category's cell.
+										 */
 
-												// adjust other income if the sum of the income lines is less than total
-												// income
-												/*
-												 * if (individual.getGrossIncome() <
-												 * atoPerPersonAttributeTotalIncome.get(incomeMapNum)) { float
-												 * newOtherIncome = individual.getPnlOtherIncome() +
-												 * (atoPerPersonAttributeTotalIncome.get(incomeMapNum) -
-												 * individual.getGrossIncome());
-												 * individual.setPnlOtherIncome(newOtherIncome); }
-												 */
+										// create probability density functions for the relevant attributes
+										float totalCountDenominator = 0f;
+										for (int incomeMapNum = 0; incomeMapNum < numAtoIncomeIndices; incomeMapNum++) {
+											totalCountDenominator += atoCountTotal.get(incomeMapNum);
+										}
+										float[] pdfAtoIncomeRange = new float[numAtoIncomeIndices];
+										float[][] pdfMainIncomeSource = new float[numAtoIncomeIndices][5];
+										float[][] pdfAttributeInterestIncome = new float[numAtoIncomeIndices][2];
+										float[][] pdfAttributeDividendIncome = new float[numAtoIncomeIndices][2];
+										float[][] pdfAttributeDonations = new float[numAtoIncomeIndices][2];
+										float[][] pdfAttributeRentIncomeInterest = new float[numAtoIncomeIndices][3];
+										float[][] pdfAttributeOtherIncome = new float[numAtoIncomeIndices][2];
+										float[][] pdfAttributeStudentLoan = new float[numAtoIncomeIndices][2];
+										for (int incomeMapNum = 0; incomeMapNum < numAtoIncomeIndices; incomeMapNum++) {
+											// this determines the first index
+											pdfAtoIncomeRange[incomeMapNum] = ((float) atoCountTotal.get(incomeMapNum))
+													/ totalCountDenominator;
 
-												// Bal Sht
-												if (individual.getPnlInterestIncome() <= EPSILON) {
-													// assume no savings, so the individual uses up their entire income
-													// each fortnight. This means the average bank balance is one week's
-													// income. Income is recorded monthly, so divide by 4 weeks.
-													individual.setBsBankDeposits(individual.getGrossIncome() / 4);
-												}
-												attributeIdx = CustomMath.sample(pdfAttributeStudentLoan[incomeMapNum],
-														this.random);
-												if (attributeIdx == 0) {
-													individual.setBsStudentLoans(
-															atoPerPersonAttributeStudentLoan.get(incomeMapNum)
-																	/ NUM_MONTHS);
-												}
+											// create pdf for the main income source
+											pdfMainIncomeSource[incomeMapNum][0] = ((float) atoCountEmployed
+													.get(incomeMapNum)) / totalCountDenominator;
+											pdfMainIncomeSource[incomeMapNum][1] = ((float) atoCountUnemployed
+													.get(incomeMapNum)) / totalCountDenominator;
+											pdfMainIncomeSource[incomeMapNum][2] = ((float) atoCountPension
+													.get(incomeMapNum)) / totalCountDenominator;
+											pdfMainIncomeSource[incomeMapNum][3] = ((float) atoCountSelfFundedRetiree
+													.get(incomeMapNum)) / totalCountDenominator;
+											pdfMainIncomeSource[incomeMapNum][4] = 1f
+													- pdfMainIncomeSource[incomeMapNum][0]
+													- pdfMainIncomeSource[incomeMapNum][1]
+													- pdfMainIncomeSource[incomeMapNum][2]
+													- pdfMainIncomeSource[incomeMapNum][3];
 
-												// add Individual to matrix (for household calibration) using ABS
-												// indices
-												// this.individualMatrix.get(poaIdx).get(sexIdx).get(ageIdxAbs).get(divIdx)
-												// .get(incomeIdxAbs).add(individual);
+											// create pdfs for the binary attributes
+											pdfAttributeInterestIncome[incomeMapNum][0] = ((float) atoCountAttributeInterestIncome
+													.get(incomeMapNum)) / totalCountDenominator;
+											pdfAttributeInterestIncome[incomeMapNum][1] = 1f
+													- pdfAttributeInterestIncome[incomeMapNum][0];
+											pdfAttributeDividendIncome[incomeMapNum][0] = ((float) atoCountAttributeDividendIncome
+													.get(incomeMapNum)) / totalCountDenominator;
+											pdfAttributeDividendIncome[incomeMapNum][1] = 1f
+													- pdfAttributeDividendIncome[incomeMapNum][0];
+											pdfAttributeDonations[incomeMapNum][0] = ((float) atoCountAttributeDonations
+													.get(incomeMapNum)) / totalCountDenominator;
+											pdfAttributeDonations[incomeMapNum][1] = 1f
+													- pdfAttributeDonations[incomeMapNum][0];
+											pdfAttributeOtherIncome[incomeMapNum][0] = ((float) atoCountAttributeOtherIncome
+													.get(incomeMapNum)) / totalCountDenominator;
+											pdfAttributeOtherIncome[incomeMapNum][1] = 1f
+													- pdfAttributeOtherIncome[incomeMapNum][0];
+											pdfAttributeStudentLoan[incomeMapNum][0] = ((float) atoCountAttributeStudentLoan
+													.get(incomeMapNum)) / totalCountDenominator;
+											pdfAttributeStudentLoan[incomeMapNum][1] = 1f
+													- pdfAttributeStudentLoan[incomeMapNum][0];
 
-												// TODO: add individual to simplified map
-												// Keys: LGA, AGE5P, INCP
-												if (!this.individualMap.containsKey(lgaCode)) {
-													this.individualMap.put(lgaCode,
-															new HashMap<String, Map<String, ArrayList<Individual>>>(
-																	AGE_ARRAY_ABS.length));
-												}
-												if (!this.individualMap.get(lgaCode)
-														.containsKey(AGE_ARRAY_ABS[ageIdxAbs])) {
-													this.individualMap.get(lgaCode).put(AGE_ARRAY_ABS[ageIdxAbs],
-															new HashMap<String, ArrayList<Individual>>(
-																	INDIVIDUAL_INCOME_RANGES_ABS.length));
-												}
-												if (!this.individualMap.get(lgaCode).get(AGE_ARRAY_ABS[ageIdxAbs])
-														.containsKey(INDIVIDUAL_INCOME_RANGES_ABS[incomeIdxAbs])) {
-													this.individualMap.get(lgaCode).get(AGE_ARRAY_ABS[ageIdxAbs]).put(
-															INDIVIDUAL_INCOME_RANGES_ABS[incomeIdxAbs],
-															new ArrayList<Individual>());
-												}
-												this.individualMap.get(lgaCode).get(AGE_ARRAY_ABS[ageIdxAbs])
-														.get(INDIVIDUAL_INCOME_RANGES_ABS[incomeIdxAbs])
-														.add(individual);
+											// create pdf for rental property owners
+											int propertyInvestorCount = Math.max(
+													atoCountAttributeRentIncome.get(incomeMapNum),
+													atoCountAttributeRentInterest.get(incomeMapNum));
+											int propertyInvestorWithLoanCount = atoCountAttributeRentInterest
+													.get(incomeMapNum);
+											int propertyInvestorWithoutLoanCount = propertyInvestorCount
+													- propertyInvestorWithLoanCount;
+											pdfAttributeRentIncomeInterest[incomeMapNum][0] = ((float) propertyInvestorWithLoanCount)
+													/ totalCountDenominator; // rent & interest
+											pdfAttributeRentIncomeInterest[incomeMapNum][1] = ((float) propertyInvestorWithoutLoanCount)
+													/ totalCountDenominator; // rent only
+											pdfAttributeRentIncomeInterest[incomeMapNum][2] = 1f
+													- pdfAttributeRentIncomeInterest[incomeMapNum][0]
+													- pdfAttributeRentIncomeInterest[incomeMapNum][1]; // neither
+										}
 
-												// add Individual to list (for payment clearing algorithm)
-												// CHANGE OF MIND: add the chosen Individuals as they are assigned into
-												// Households
-												// this.individualAgents.add(individual);
-												agentId++;
-											} // end Individual creation loop
-										} // end ABS income indices loop
-									} // end ABS age indices loop
+										// create Individual agents and store in a List matrix
+										// the loops take into account n:m mappings between ATO and ABS
+										for (int ageIdxAbs : ageIndicesAbs) {
+											// doesn't need to exclude children because it already filters on income
+											// range
+											for (int incomeIdxAbs : incomeIndicesAbs) {
+												int absCount = censusMatrixPersonsAdjustedPOA[poaIdx][sexIdx][ageIdxAbs][divIdx][incomeIdxAbs];
+												for (int agentNo = 0; agentNo < absCount; agentNo++) {
+													// create one agent for each person in the ABS data
+													Individual individual = new Individual();
+													individual.setAge(AGE_ARRAY_ABS_MIDPOINT[ageIdxAbs]);
+													individual.setSex(SEX_ARRAY[sexIdx]);
+													individual.setEmploymentIndustry(DIVISION_CODE_ARRAY[divIdx]);
+													individual.setLocalGovernmentAreaCode(
+															this.area.getLgaCodeFromPoa(poa));
 
-								} // end if !state.equals("Other")
+													int incomeMapNum = CustomMath.sample(pdfAtoIncomeRange,
+															this.random);
+													int incomeSourceNum = CustomMath
+															.sample(pdfMainIncomeSource[incomeMapNum], this.random);
+													if (DEBUG_ZEROS2) {
+														if (incomeSourceNum == 0) {
+															System.out.println(
+																	"numAtoIncomeIndices: " + numAtoIncomeIndices);
+															System.out.println("pdfMainIncomeSource[incomeMapNum]: "
+																	+ pdfMainIncomeSource[incomeMapNum]);
+														}
+													}
+													switch (incomeSourceNum) {
+													case 0:
+														individual.setMainIncomeSource(0); // employed
+														individual.setPnlWagesSalaries(
+																atoPerPersonEmployedDivPoa.get(incomeMapNum)
+																		/ NUM_MONTHS);
+														if (DEBUG_BIG_NUM2) {
+															// FIXME: figure out why wages are sometimes huge
+															if ((lgaCode.equals("20570") && sex.equals("M")
+																	&& division.equals("B") && ageIdxAbs == 6
+																	&& incomeSourceNum == 0)
+																	|| (lgaCode.equals("55320") && sex.equals("M")
+																			&& division.equals("A") && ageIdxAbs == 13
+																			&& incomeSourceNum == 0)) {
+																System.out.println("LGA: " + lgaCode + ", Div: "
+																		+ division + ", Sex: " + sex + ", Age: "
+																		+ AGE_ARRAY_ABS_MIDPOINT[ageIdxAbs]
+																		+ ", Income Source: " + incomeSourceNum);
+																System.out.println("agentNo: " + agentNo);
+																System.out.println("incomeMapNum: " + incomeMapNum);
+																System.out
+																		.println("incomeSourceNum: " + incomeSourceNum);
+																System.out.println(
+																		"atoPerPersonEmployedDivPoa.get(incomeMapNum): "
+																				+ atoPerPersonEmployedDivPoa
+																						.get(incomeMapNum));
+																System.out.println("individual.getPnlWagesSalaries(): "
+																		+ individual.getPnlWagesSalaries());
+															}
+														}
+														individual.setPnlWorkRelatedExpenses(
+																atoPerPersonAttributeWorkRelatedExpensesDivPoa
+																		.get(incomeMapNum) / NUM_MONTHS);
+														break;
+													case 1:
+														individual.setMainIncomeSource(1); // unemployed
+														individual.setPnlUnemploymentBenefits(
+																atoPerPersonUnemployedDivPoa.get(incomeMapNum)
+																		/ NUM_MONTHS);
+														break;
+													case 2:
+														individual.setMainIncomeSource(2); // pension
+														individual.setPnlOtherSocialSecurityIncome(
+																atoPerPersonPensionDivPoa.get(incomeMapNum)
+																		/ NUM_MONTHS);
+														break;
+													case 3:
+														individual.setMainIncomeSource(3); // self-funded retiree
+														individual.setPnlInvestmentIncome(
+																atoPerPersonSelfFundedRetireeDivPoa.get(incomeMapNum)
+																		/ NUM_MONTHS);
+														break;
+													default:
+														individual.setMainIncomeSource(4); // foreign income
+														individual.setPnlForeignIncome(
+																atoPerPersonForeignIncomeDivPoa.get(incomeMapNum)
+																		/ NUM_MONTHS);
+														break;
+													}
+
+													int attributeIdx = CustomMath.sample(
+															pdfAttributeInterestIncome[incomeMapNum], this.random);
+													if (attributeIdx == 0) {
+														individual.setPnlInterestIncome(
+																atoPerPersonAttributeInterestIncomeDivPoa
+																		.get(incomeMapNum) / NUM_MONTHS);
+														if (DEBUG_BIG_NUM2) {
+															// FIXME: figure out why interest is sometimes huge
+															if ((lgaCode.equals("20570") && sex.equals("M")
+																	&& division.equals("B") && ageIdxAbs == 6
+																	&& incomeSourceNum == 0)
+																	|| (lgaCode.equals("55320") && sex.equals("M")
+																			&& division.equals("A") && ageIdxAbs == 13
+																			&& incomeSourceNum == 0)) {
+																System.out.println("incomeMapNum: " + incomeMapNum);
+																System.out.println(
+																		"atoPerPersonAttributeInterestIncomeDivPoa.get(incomeMapNum): "
+																				+ atoPerPersonAttributeInterestIncomeDivPoa
+																						.get(incomeMapNum));
+																System.out.println("individual.getPnlInterestIncome(): "
+																		+ individual.getPnlInterestIncome());
+															}
+														}
+													}
+													attributeIdx = CustomMath.sample(
+															pdfAttributeDividendIncome[incomeMapNum], this.random);
+													if (attributeIdx == 0) {
+														individual.setPnlInvestmentIncome(
+																individual.getPnlInvestmentIncome()
+																		+ atoPerPersonAttributeDividendIncomeDivPoa
+																				.get(incomeMapNum) / NUM_MONTHS);
+													}
+													attributeIdx = CustomMath
+															.sample(pdfAttributeDonations[incomeMapNum], this.random);
+													if (attributeIdx == 0) {
+														individual.setPnlDonations(
+																atoPerPersonAttributeDonationsDivPoa.get(incomeMapNum)
+																		/ NUM_MONTHS);
+													}
+													attributeIdx = CustomMath.sample(
+															pdfAttributeRentIncomeInterest[incomeMapNum], this.random);
+													if (attributeIdx < 2) {
+														individual.setPnlRentIncome(
+																atoPerPersonAttributeRentIncomeDivPoa.get(incomeMapNum)
+																		/ NUM_MONTHS);
+													} else if (attributeIdx == 1) {
+														individual.setPnlRentInterestExpense(
+																atoPerPersonAttributeRentInterestDivPoa
+																		.get(incomeMapNum) / NUM_MONTHS);
+													}
+													attributeIdx = CustomMath
+															.sample(pdfAttributeOtherIncome[incomeMapNum], this.random);
+													if (attributeIdx == 0) {
+														individual.setPnlOtherIncome(
+																atoPerPersonAttributeOtherIncomeDivPoa.get(incomeMapNum)
+																		/ NUM_MONTHS);
+													}
+
+													// adjust other income if the sum of the income lines is less than
+													// total
+													// income
+													/*
+													 * if (individual.getGrossIncome() <
+													 * atoPerPersonAttributeTotalIncome.get(incomeMapNum)) { float
+													 * newOtherIncome = individual.getPnlOtherIncome() +
+													 * (atoPerPersonAttributeTotalIncome.get(incomeMapNum) -
+													 * individual.getGrossIncome());
+													 * individual.setPnlOtherIncome(newOtherIncome); }
+													 */
+
+													// Bal Sht
+													if (individual.getPnlInterestIncome() <= EPSILON) {
+														// assume no savings, so the individual uses up their entire
+														// income
+														// each fortnight. This means the average bank balance is one
+														// week's
+														// income. Income is recorded monthly, so divide by 4 weeks.
+														individual.setBsBankDeposits(individual.getGrossIncome() / 4f);
+													}
+													attributeIdx = CustomMath
+															.sample(pdfAttributeStudentLoan[incomeMapNum], this.random);
+													if (attributeIdx == 0) {
+														individual.setBsStudentLoans(
+																atoPerPersonAttributeStudentLoanDivPoa
+																		.get(incomeMapNum));
+													}
+
+													// add Individual to matrix (for household calibration) using ABS
+													// indices
+													// this.individualMatrix.get(poaIdx).get(sexIdx).get(ageIdxAbs).get(divIdx)
+													// .get(incomeIdxAbs).add(individual);
+
+													// TODO: add individual to simplified map
+													// Keys: LGA, AGE5P, INCP
+													if (!this.individualMap.containsKey(lgaCode)) {
+														this.individualMap.put(lgaCode,
+																new HashMap<String, Map<String, ArrayList<Individual>>>(
+																		AGE_ARRAY_ABS.length));
+													}
+													if (!this.individualMap.get(lgaCode)
+															.containsKey(AGE_ARRAY_ABS[ageIdxAbs])) {
+														this.individualMap.get(lgaCode).put(AGE_ARRAY_ABS[ageIdxAbs],
+																new HashMap<String, ArrayList<Individual>>(
+																		INDIVIDUAL_INCOME_RANGES_ABS.length));
+													}
+													if (!this.individualMap.get(lgaCode).get(AGE_ARRAY_ABS[ageIdxAbs])
+															.containsKey(INDIVIDUAL_INCOME_RANGES_ABS[incomeIdxAbs])) {
+														this.individualMap.get(lgaCode).get(AGE_ARRAY_ABS[ageIdxAbs])
+																.put(INDIVIDUAL_INCOME_RANGES_ABS[incomeIdxAbs],
+																		new ArrayList<Individual>());
+													}
+													this.individualMap.get(lgaCode).get(AGE_ARRAY_ABS[ageIdxAbs])
+															.get(INDIVIDUAL_INCOME_RANGES_ABS[incomeIdxAbs])
+															.add(individual);
+
+													// add Individual to list (for payment clearing algorithm)
+													// CHANGE OF MIND: add the chosen Individuals as they are assigned
+													// into
+													// Households
+													// this.individualAgents.add(individual);
+													agentId++;
+												} // end Individual creation loop
+											} // end ABS income indices loop
+										} // end ABS age indices loop
+
+									} // end if !state.equals("Other")
+								} // end if lgaCode != null
 							} // end for POA
 						} // end for division
 					} // end for sex

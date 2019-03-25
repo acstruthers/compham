@@ -3,6 +3,7 @@
  */
 package xyz.struthers.rhul.ham.agent;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,6 +95,108 @@ public class Household extends Agent {
 		this.init();
 		this.individuals = householdIndividuals;
 		this.initialiseFinancialsFromIndividuals();
+	}
+
+	/**
+	 * Gets the column headings, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the column headings
+	 */
+	public String toCsvStringHeaders(String separator) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Name" + separator);
+		sb.append("PaymentClearingIndex" + separator);
+		sb.append("AdultCount" + separator);
+		sb.append("ChildCount" + separator);
+		sb.append("LoanAdiID" + separator);
+		sb.append("SupplierCount" + separator);
+		sb.append("LandlordID" + separator);
+		sb.append("GovtID" + separator);
+		sb.append("WagesSalaries" + separator);
+		sb.append("UnemploymentBenefits" + separator);
+		sb.append("OtherSocialSecurityIncome" + separator);
+		sb.append("InvestmentIncome" + separator);
+		sb.append("InterestIncome" + separator);
+		sb.append("RentIncome" + separator);
+		sb.append("ForeignIncome" + separator);
+		sb.append("OtherIncome" + separator);
+		sb.append("IncomeTaxExpense" + separator);
+		sb.append("LivingExpenses" + separator);
+		sb.append("RentExpense" + separator);
+		sb.append("MortgageRepayments" + separator);
+		sb.append("WorkRelatedExpenses" + separator);
+		sb.append("RentInterestExpense" + separator);
+		sb.append("Donations" + separator);
+		sb.append("OtherDiscretionaryExpenses" + separator);
+		sb.append("BankDeposits" + separator);
+		sb.append("SuperannuationBalance" + separator);
+		sb.append("Equities" + separator);
+		sb.append("OtherFinancialAssets" + separator);
+		sb.append("ResidentialLandAndDwellings" + separator);
+		sb.append("OtherNonFinancialAssets" + separator);
+		sb.append("TotalAssets" + separator);
+		sb.append("Loans" + separator);
+		sb.append("StudentLoans" + separator);
+		sb.append("OtherLiabilities" + separator);
+		sb.append("TotalLiabilities" + separator);
+		sb.append("NetWorth");
+
+		return sb.toString();
+	}
+
+	/**
+	 * Gets the data, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the data
+	 */
+	public String toCsvString(String separator, int iteration) {
+		StringBuilder sb = new StringBuilder();
+
+		DecimalFormat decimal = new DecimalFormat("###0.00");
+		DecimalFormat wholeNumber = new DecimalFormat("###0");
+		DecimalFormat percent = new DecimalFormat("###0.0000");
+
+		sb.append(this.name + separator);
+		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
+		sb.append(wholeNumber.format(this.numAdults) + separator);
+		sb.append(wholeNumber.format(this.numChildren) + separator);
+		sb.append(wholeNumber.format(this.loanAdi != null ? this.loanAdi.getPaymentClearingIndex() : 0) + separator);
+		sb.append(wholeNumber.format(this.suppliers != null ? this.suppliers.size() : 0) + separator);
+		sb.append(wholeNumber.format(this.landlord != null ? this.landlord.getPaymentClearingIndex() : 0) + separator);
+		sb.append(wholeNumber.format(this.govt != null ? this.govt.getPaymentClearingIndex() : 0) + separator);
+		sb.append(decimal.format(this.pnlWagesSalaries) + separator);
+		sb.append(decimal.format(this.pnlUnemploymentBenefits) + separator);
+		sb.append(decimal.format(this.pnlOtherSocialSecurityIncome) + separator);
+		sb.append(decimal.format(this.pnlInvestmentIncome) + separator);
+		sb.append(decimal.format(this.pnlInterestIncome) + separator);
+		sb.append(decimal.format(this.pnlRentIncome) + separator);
+		sb.append(decimal.format(this.pnlForeignIncome) + separator);
+		sb.append(decimal.format(this.pnlOtherIncome) + separator);
+		sb.append(decimal.format(this.pnlIncomeTaxExpense) + separator);
+		sb.append(decimal.format(this.pnlLivingExpenses) + separator);
+		sb.append(decimal.format(this.pnlRentExpense) + separator);
+		sb.append(decimal.format(this.pnlMortgageRepayments) + separator);
+		sb.append(decimal.format(this.pnlWorkRelatedExpenses) + separator);
+		sb.append(decimal.format(this.pnlRentInterestExpense) + separator);
+		sb.append(decimal.format(this.pnlDonations) + separator);
+		sb.append(decimal.format(this.pnlOtherDiscretionaryExpenses) + separator);
+		sb.append(decimal.format(this.bsBankDeposits) + separator);
+		sb.append(decimal.format(this.bsSuperannuation) + separator);
+		sb.append(decimal.format(this.bsEquities) + separator);
+		sb.append(decimal.format(this.bsOtherFinancialAssets) + separator);
+		sb.append(decimal.format(this.bsResidentialLandAndDwellings) + separator);
+		sb.append(decimal.format(this.bsOtherNonFinancialAssets) + separator);
+		sb.append(decimal.format(this.bsTotalAssets) + separator);
+		sb.append(decimal.format(this.bsLoans) + separator);
+		sb.append(decimal.format(this.bsStudentLoans) + separator);
+		sb.append(decimal.format(this.bsOtherLiabilities) + separator);
+		sb.append(decimal.format(this.bsTotalLiabilities) + separator);
+		sb.append(decimal.format(this.bsNetWorth));
+
+		return sb.toString();
 	}
 
 	@Override

@@ -3,6 +3,7 @@
  */
 package xyz.struthers.rhul.ham.agent;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +62,7 @@ public final class AustralianGovernment extends Agent implements Employer {
 	private float bsOtherLiabilities;
 
 	// Interest rates
-	protected float interestRateStudentLoans; // in Australia this is always CPI (by law)
+	protected ArrayList<Float> interestRateStudentLoans; // in Australia this is always CPI (by law)
 
 	/**
 	 * Default constructor
@@ -111,6 +112,89 @@ public final class AustralianGovernment extends Agent implements Employer {
 		this.bsBorrowings = balSht.get("Borrowing");
 		this.bsOtherLiabilities = balSht.get("Total liabilities") - this.bsCurrencyOnIssue - this.bsDepositsHeld
 				- this.bsBorrowings;
+	}
+
+	/**
+	 * Gets the column headings, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the column headings
+	 */
+	public String toCsvStringHeaders(String separator) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Name" + separator);
+		sb.append("PaymentClearingIndex" + separator);
+		sb.append("Division" + separator);
+		sb.append("EmployeeCount" + separator);
+		sb.append("WelfareRecipientCount" + separator);
+		sb.append("BondInvestorCount" + separator);
+		sb.append("TaxIncome" + separator);
+		sb.append("SaleOfGoodsAndServices" + separator);
+		sb.append("InterestIncome" + separator);
+		sb.append("OtherIncome" + separator);
+		sb.append("PersonnelExpenses" + separator);
+		sb.append("InterestExpense" + separator);
+		sb.append("Depreciation" + separator);
+		sb.append("OtherExpenses" + separator);
+		sb.append("NetAcquisitionOfNonFinancialAssets" + separator);
+		sb.append("Cash" + separator);
+		sb.append("InvestmentLoansPlacements" + separator);
+		sb.append("EquityAssets" + separator);
+		sb.append("OtherFinancialAssets" + separator);
+		sb.append("LandAndFixedAssets" + separator);
+		sb.append("OtherNonFinancialAssets" + separator);
+		sb.append("CurrencyOnIssue" + separator);
+		sb.append("DepositsHeld" + separator);
+		sb.append("Borrowings" + separator);
+		sb.append("OtherLiabilities" + separator);
+		sb.append("CurrentInterestRateStudentLoans");
+
+		return sb.toString();
+	}
+
+	/**
+	 * Gets the data, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the data
+	 */
+	public String toCsvString(String separator, int iteration) {
+		StringBuilder sb = new StringBuilder();
+
+		DecimalFormat decimal = new DecimalFormat("###0.00");
+		DecimalFormat wholeNumber = new DecimalFormat("###0");
+		DecimalFormat percent = new DecimalFormat("###0.0000");
+
+		sb.append(this.name + separator);
+		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
+		sb.append(this.industryDivisionCode + separator);
+		sb.append(wholeNumber.format(this.employees != null ? this.employees.size() : 0) + separator);
+		sb.append(wholeNumber.format(this.welfareRecipients != null ? this.welfareRecipients.size() : 0) + separator);
+		sb.append(wholeNumber.format(this.bondInvestors != null ? this.bondInvestors.size() : 0) + separator);
+		sb.append(decimal.format(this.pnlTaxIncome) + separator);
+		sb.append(decimal.format(this.pnlSaleOfGoodsAndServices) + separator);
+		sb.append(decimal.format(this.pnlInterestIncome) + separator);
+		sb.append(decimal.format(this.pnlOtherIncome) + separator);
+		sb.append(decimal.format(this.pnlPersonnelExpenses) + separator);
+		sb.append(decimal.format(this.pnlInterestExpense) + separator);
+		sb.append(decimal.format(this.pnlDepreciationAmortisation) + separator);
+		sb.append(decimal.format(this.pnlOtherExpenses) + separator);
+		sb.append(decimal.format(this.pnlNetAcquisitionOfNonFinancialAssets) + separator);
+		sb.append(decimal.format(this.bsCash) + separator);
+		sb.append(decimal.format(this.bsInvestmentsLoansPlacements) + separator);
+		sb.append(decimal.format(this.bsEquityAssets) + separator);
+		sb.append(decimal.format(this.bsOtherFinancialAssets) + separator);
+		sb.append(decimal.format(this.bsLandAndFixedAssets) + separator);
+		sb.append(decimal.format(this.bsOtherNonFinancialAssets) + separator);
+		sb.append(decimal.format(this.bsCurrencyOnIssue) + separator);
+		sb.append(decimal.format(this.bsDepositsHeld) + separator);
+		sb.append(decimal.format(this.bsBorrowings) + separator);
+		sb.append(decimal.format(this.bsOtherLiabilities) + separator);
+		sb.append(percent
+				.format(this.interestRateStudentLoans != null ? this.interestRateStudentLoans.get(iteration) : 0));
+
+		return sb.toString();
 	}
 
 	@Override
@@ -175,6 +259,8 @@ public final class AustralianGovernment extends Agent implements Employer {
 			liabilities.add(new NodePayment(index, monthlyInterest));
 		}
 
+		// FIXME: calculate government sales due to Businesses
+
 		liabilities.trimToSize();
 		return liabilities;
 	}
@@ -226,15 +312,26 @@ public final class AustralianGovernment extends Agent implements Employer {
 	/**
 	 * @return the interestRateStudentLoans
 	 */
-	public float getInterestRateStudentLoans() {
+	public ArrayList<Float> getInterestRateStudentLoans() {
 		return interestRateStudentLoans;
+	}
+
+	/**
+	 * @param iteration
+	 * @return the interest rate for that iteration
+	 */
+	public float getInterestRateStudentLoans(int iteration) {
+		return interestRateStudentLoans.get(iteration);
 	}
 
 	/**
 	 * @param interestRateStudentLoans the interestRateStudentLoans to set
 	 */
-	public void setInterestRateStudentLoans(float interestRateStudentLoans) {
-		this.interestRateStudentLoans = interestRateStudentLoans;
+	public void addInterestRateStudentLoans(float interestRateStudentLoans) {
+		if (this.interestRateStudentLoans == null) {
+			this.interestRateStudentLoans = new ArrayList<Float>(1);
+		}
+		this.interestRateStudentLoans.add(interestRateStudentLoans);
 	}
 
 	public Map<String, Float> getFinancialStatements() {

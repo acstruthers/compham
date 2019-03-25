@@ -116,15 +116,6 @@ public class App {
 			CalibrateCountries calCountry = ctx.getBean(CalibrateCountries.class);
 			calCountry.createCountryAgents();
 
-			AustralianEconomy auEconomy = ctx.getBean(AustralianEconomy.class);
-			int iteration = 0;
-			Set<String> filenames = auEconomy.saveDetailsToFile(iteration);
-			System.out.println(filenames.size() + " DETAILED FILES SAVED TO:");
-			for (String file : filenames) {
-				System.out.println(file);
-			}
-			System.exit(0);
-
 			System.gc();
 			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 			megabytesAfter = memoryAfter / 1024f / 1024f;
@@ -174,6 +165,17 @@ public class App {
 			System.out.println("MEMORY CONSUMED BY HOUSEHOLDS: " + formatter.format(megabytesAfter - megabytesBefore)
 					+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
 			memoryBefore = memoryAfter;
+
+			System.out.println(new Date(System.currentTimeMillis()) + ": Starting export of agents to CSV");
+			AustralianEconomy auEconomy = ctx.getBean(AustralianEconomy.class);
+			int iteration = 0;
+			Set<String> filenames = auEconomy.saveDetailsToFile(iteration);
+			System.out.println(filenames.size() + " DETAILED FILES SAVED TO:");
+			for (String file : filenames) {
+				System.out.println(file);
+			}
+			System.out.println(new Date(System.currentTimeMillis()) + ": Finished export of agents to CSV");
+			System.exit(0);
 
 			CalibrateEconomy economy = ctx.getBean(CalibrateEconomy.class);
 			economy.linkAllAgents();

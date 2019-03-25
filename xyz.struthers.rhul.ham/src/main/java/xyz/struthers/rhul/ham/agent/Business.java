@@ -3,6 +3,7 @@
  */
 package xyz.struthers.rhul.ham.agent;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -175,6 +176,125 @@ public class Business extends Agent implements Employer {
 		this.interestRateDeposits = business.interestRateDeposits;
 	}
 
+	/**
+	 * Gets the column headings, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the column headings
+	 */
+	public String toCsvStringHeaders(String separator) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Name" + separator);
+		sb.append("PaymentClearingIndex" + separator);
+		sb.append("BusinessTypeID" + separator);
+		sb.append("IndustryDivisionCode" + separator);
+		sb.append("IndustryCode" + separator);
+		sb.append("State" + separator);
+		sb.append("LGA" + separator);
+		sb.append("Size" + separator);
+		sb.append("IsExporter" + separator);
+		sb.append("DestinationCountryCount" + separator);
+		sb.append("EmployeeCountTarget" + separator);
+		sb.append("EmployeeCount" + separator);
+		sb.append("AdiID" + separator);
+		sb.append("DomesticSupplierCount" + separator);
+		sb.append("ForeignSupplierCount" + separator);
+		sb.append("LandlordID" + separator);
+		sb.append("GovtID" + separator);
+		sb.append("TotalIncome" + separator);
+		sb.append("SalesDomestic" + separator);
+		sb.append("SalesGovernment" + separator);
+		sb.append("SalesForeign" + separator);
+		sb.append("InterestIncome" + separator);
+		sb.append("RentIncome" + separator);
+		sb.append("OtherIncome" + separator);
+		sb.append("TotalExpenses" + separator);
+		sb.append("Wages" + separator);
+		sb.append("Superannuation" + separator);
+		sb.append("PayrollTax" + separator);
+		sb.append("ForeignExpenses" + separator);
+		sb.append("InterestExpense" + separator);
+		sb.append("RentExpense" + separator);
+		sb.append("Depreciation" + separator);
+		sb.append("OtherExpenses" + separator);
+		sb.append("TotalAssets" + separator);
+		sb.append("BankDeposits" + separator);
+		sb.append("ForeignEquities" + separator);
+		sb.append("OtherFinancialAssets" + separator);
+		sb.append("OtherNonFinancialAssets" + separator);
+		sb.append("TotalLiabilities" + separator);
+		sb.append("TradeCreditors" + separator);
+		sb.append("Loans" + separator);
+		sb.append("OtherCurrentLiabilities" + separator);
+		sb.append("OtherNonCurrentLiabilities" + separator);
+		sb.append("TotalEquity");
+
+		return sb.toString();
+	}
+
+	/**
+	 * Gets the data, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the data
+	 */
+	public String toCsvString(String separator, int iteration) {
+		StringBuilder sb = new StringBuilder();
+
+		DecimalFormat decimal = new DecimalFormat("###0.00");
+		DecimalFormat wholeNumber = new DecimalFormat("###0");
+		DecimalFormat percent = new DecimalFormat("###0.0000");
+
+		sb.append(this.name + separator);
+		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
+		sb.append(wholeNumber.format(this.businessTypeId) + separator);
+		sb.append(this.industryDivisionCode + separator);
+		sb.append(this.industryCode + separator);
+		sb.append(this.state + separator);
+		sb.append(this.lgaCode + separator);
+		sb.append(this.size + separator);
+		sb.append((this.isExporter ? "Y" : "N") + separator);
+		sb.append(wholeNumber.format(this.destinationCountries != null ? this.destinationCountries.size() : 0)
+				+ separator);
+		sb.append(wholeNumber.format(this.employeeCountTarget) + separator);
+		sb.append(wholeNumber.format(this.employees != null ? this.employees.size() : 0) + separator);
+		sb.append(wholeNumber.format(this.adi != null ? this.adi.getPaymentClearingIndex() : 0) + separator);
+		sb.append(wholeNumber.format(this.domesticSuppliers != null ? this.domesticSuppliers.size() : 0) + separator);
+		sb.append(wholeNumber.format(this.foreignSuppliers != null ? this.foreignSuppliers.size() : 0) + separator);
+		sb.append(wholeNumber.format(this.landlord != null ? this.landlord.getPaymentClearingIndex() : 0) + separator);
+		sb.append(wholeNumber.format(this.govt != null ? this.govt.getPaymentClearingIndex() : 0) + separator);
+		sb.append(decimal.format(this.totalIncome) + separator);
+		sb.append(decimal.format(this.salesDomestic) + separator);
+		sb.append(decimal.format(this.salesGovernment) + separator);
+		sb.append(decimal.format(this.salesForeign) + separator);
+		sb.append(decimal.format(this.interestIncome) + separator);
+		sb.append(decimal.format(this.rentIncome) + separator);
+		sb.append(decimal.format(this.otherIncome) + separator);
+		sb.append(decimal.format(this.totalExpenses) + separator);
+		sb.append(decimal.format(this.wageExpenses) + separator);
+		sb.append(decimal.format(this.superannuationExpense) + separator);
+		sb.append(decimal.format(this.payrollTaxExpense) + separator);
+		sb.append(decimal.format(this.foreignExpenses) + separator);
+		sb.append(decimal.format(this.interestExpense) + separator);
+		sb.append(decimal.format(this.rentExpense) + separator);
+		sb.append(decimal.format(this.depreciationExpense) + separator);
+		sb.append(decimal.format(this.otherExpenses) + separator);
+		sb.append(decimal.format(this.totalAssets) + separator);
+		sb.append(decimal.format(this.bankDeposits) + separator);
+		sb.append(decimal.format(this.foreignEquities) + separator);
+		sb.append(decimal.format(this.otherFinancialAssets) + separator);
+		sb.append(decimal.format(this.otherNonFinancialAssets) + separator);
+		sb.append(decimal.format(this.totalLiabilities) + separator);
+		sb.append(decimal.format(this.tradeCreditors) + separator);
+		sb.append(decimal.format(this.loans) + separator);
+		sb.append(decimal.format(this.otherCurrentLiabilities) + separator);
+		sb.append(decimal.format(this.otherNonCurrentLiabilities) + separator);
+		sb.append(decimal.format(this.totalEquity));
+
+		return sb.toString();
+	}
+
 	@Override
 	public ArrayList<Individual> getEmployees() {
 		return this.employees;
@@ -296,7 +416,7 @@ public class Business extends Agent implements Employer {
 
 	protected void init() {
 		super.init();
-		
+
 		this.industryDivisionCode = '\0'; // unicode zero
 		this.industrySubdivisionCode = null;
 		this.industryGroupCode = null;
