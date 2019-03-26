@@ -102,6 +102,16 @@ public class ClearingPaymentVector {
 	}
 
 	/**
+	 * Calculates the payments that will clear the whole economy, noting in which
+	 * order nodes defaulted.
+	 * 
+	 * N.B. In the event of an ADI defaulting, the caller needs to apply the
+	 * Financial Claims Scheme (FCS) rules when calculating the inputs for this
+	 * method. This assumes that an ADI default is an exogeneous event, which is
+	 * partly true because the government declares when the FCS applies - not the
+	 * ADI or even the market. An ADI would typically be declared before it is
+	 * technically insolvent, so should never get to the point where this payment
+	 * clearing vector algorithm finds it defaulting on its obligations.
 	 * 
 	 * @param liabilitiesAmounts - amounts owed by every node to the other nodes
 	 *                           they're connected to

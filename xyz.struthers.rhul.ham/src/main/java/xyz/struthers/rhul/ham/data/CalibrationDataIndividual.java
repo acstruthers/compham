@@ -132,118 +132,134 @@ public class CalibrationDataIndividual {
 		this.adjustedPeopleByLga = null;
 		this.abs1292_0_55_002ANZSIC = null;
 
-		for (String key : this.title.keySet()) {
-			this.title.get(key).clear();
-			this.title.put(key, null);
+		if (this.title != null) {
+			for (String key : this.title.keySet()) {
+				this.title.get(key).clear();
+				this.title.put(key, null);
+			}
+			this.title = null;
 		}
-		this.title = null;
-		for (String key : this.unitType.keySet()) {
-			this.unitType.get(key).clear();
-			this.unitType.put(key, null);
+		if (this.unitType != null) {
+			for (String key : this.unitType.keySet()) {
+				this.unitType.get(key).clear();
+				this.unitType.put(key, null);
+			}
+			this.unitType = null;
 		}
-		this.unitType = null;
 		// ATO 2A Keys: Series Title, State, Age, Gender, Taxable Status, Lodgment
 		// Method
-		for (String series : this.atoIndividualTable2a.keySet()) {
-			for (String state : this.atoIndividualTable2a.get(series).keySet()) {
-				for (String age : this.atoIndividualTable2a.get(series).get(state).keySet()) {
-					for (String sex : this.atoIndividualTable2a.get(series).get(state).get(age).keySet()) {
-						for (String taxableStatus : this.atoIndividualTable2a.get(series).get(state).get(age).get(sex)
-								.keySet()) {
-							for (String lodgment : this.atoIndividualTable2a.get(series).get(state).get(age).get(sex)
-									.get(taxableStatus).keySet()) {
+		if (this.atoIndividualTable2a != null) {
+			for (String series : this.atoIndividualTable2a.keySet()) {
+				for (String state : this.atoIndividualTable2a.get(series).keySet()) {
+					for (String age : this.atoIndividualTable2a.get(series).get(state).keySet()) {
+						for (String sex : this.atoIndividualTable2a.get(series).get(state).get(age).keySet()) {
+							for (String taxableStatus : this.atoIndividualTable2a.get(series).get(state).get(age)
+									.get(sex).keySet()) {
+								for (String lodgment : this.atoIndividualTable2a.get(series).get(state).get(age)
+										.get(sex).get(taxableStatus).keySet()) {
+									this.atoIndividualTable2a.get(series).get(state).get(age).get(sex)
+											.get(taxableStatus).put(lodgment, null);
+								} // end lodgment loop
 								this.atoIndividualTable2a.get(series).get(state).get(age).get(sex).get(taxableStatus)
-										.put(lodgment, null);
-							} // end lodgment loop
-							this.atoIndividualTable2a.get(series).get(state).get(age).get(sex).get(taxableStatus)
-									.clear();
-							this.atoIndividualTable2a.get(series).get(state).get(age).get(sex).put(taxableStatus, null);
-						} // end taxable status loop
-						this.atoIndividualTable2a.get(series).get(state).get(age).get(sex).clear();
-						this.atoIndividualTable2a.get(series).get(state).get(age).put(sex, null);
-					} // end sex loop
-					this.atoIndividualTable2a.get(series).get(state).get(age).clear();
-					this.atoIndividualTable2a.get(series).get(state).put(age, null);
-				} // end age loop
-				this.atoIndividualTable2a.get(series).get(state).clear();
-				this.atoIndividualTable2a.get(series).put(state, null);
-			} // end state loop
-			this.atoIndividualTable2a.get(series).clear();
-			this.atoIndividualTable2a.put(series, null);
-		} // end series loop
-		this.atoIndividualTable2a.clear();
-		this.atoIndividualTable2a = null;
+										.clear();
+								this.atoIndividualTable2a.get(series).get(state).get(age).get(sex).put(taxableStatus,
+										null);
+							} // end taxable status loop
+							this.atoIndividualTable2a.get(series).get(state).get(age).get(sex).clear();
+							this.atoIndividualTable2a.get(series).get(state).get(age).put(sex, null);
+						} // end sex loop
+						this.atoIndividualTable2a.get(series).get(state).get(age).clear();
+						this.atoIndividualTable2a.get(series).get(state).put(age, null);
+					} // end age loop
+					this.atoIndividualTable2a.get(series).get(state).clear();
+					this.atoIndividualTable2a.get(series).put(state, null);
+				} // end state loop
+				this.atoIndividualTable2a.get(series).clear();
+				this.atoIndividualTable2a.put(series, null);
+			} // end series loop
+			this.atoIndividualTable2a.clear();
+			this.atoIndividualTable2a = null;
+		}
 
 		// ATO 3A Keys: Series Title, Income Range, Age, Gender, Taxable Status
-		for (String series : this.atoIndividualTable3a.keySet()) {
-			for (String income : this.atoIndividualTable3a.get(series).keySet()) {
-				for (String age : this.atoIndividualTable3a.get(series).get(income).keySet()) {
-					for (String sex : this.atoIndividualTable3a.get(series).get(income).get(age).keySet()) {
-						for (String taxableStatus : this.atoIndividualTable3a.get(series).get(income).get(age).get(sex)
-								.keySet()) {
-							this.atoIndividualTable3a.get(series).get(income).get(age).get(sex).put(taxableStatus,
-									null);
-						} // end taxable status loop
-						this.atoIndividualTable3a.get(series).get(income).get(age).get(sex).clear();
-						this.atoIndividualTable3a.get(series).get(income).get(age).put(sex, null);
-					} // end sex loop
-					this.atoIndividualTable3a.get(series).get(income).get(age).clear();
-					this.atoIndividualTable3a.get(series).get(income).put(age, null);
-				} // end age loop
-				this.atoIndividualTable3a.get(series).get(income).clear();
-				this.atoIndividualTable3a.get(series).put(income, null);
-			} // end state loop
-			this.atoIndividualTable3a.get(series).clear();
-			this.atoIndividualTable3a.put(series, null);
-		} // end series loop
-		this.atoIndividualTable3a.clear();
-		this.atoIndividualTable3a = null;
+		if (this.atoIndividualTable3a != null) {
+			for (String series : this.atoIndividualTable3a.keySet()) {
+				for (String income : this.atoIndividualTable3a.get(series).keySet()) {
+					for (String age : this.atoIndividualTable3a.get(series).get(income).keySet()) {
+						for (String sex : this.atoIndividualTable3a.get(series).get(income).get(age).keySet()) {
+							for (String taxableStatus : this.atoIndividualTable3a.get(series).get(income).get(age)
+									.get(sex).keySet()) {
+								this.atoIndividualTable3a.get(series).get(income).get(age).get(sex).put(taxableStatus,
+										null);
+							} // end taxable status loop
+							this.atoIndividualTable3a.get(series).get(income).get(age).get(sex).clear();
+							this.atoIndividualTable3a.get(series).get(income).get(age).put(sex, null);
+						} // end sex loop
+						this.atoIndividualTable3a.get(series).get(income).get(age).clear();
+						this.atoIndividualTable3a.get(series).get(income).put(age, null);
+					} // end age loop
+					this.atoIndividualTable3a.get(series).get(income).clear();
+					this.atoIndividualTable3a.get(series).put(income, null);
+				} // end state loop
+				this.atoIndividualTable3a.get(series).clear();
+				this.atoIndividualTable3a.put(series, null);
+			} // end series loop
+			this.atoIndividualTable3a.clear();
+			this.atoIndividualTable3a = null;
+		}
 
 		// ATO 6B Keys: Series Title, Post Code
-		for (String series : this.atoIndividualTable6b.keySet()) {
-			for (String poa : this.atoIndividualTable6b.get(series).keySet()) {
-				this.atoIndividualTable6b.get(series).put(poa, null);
-			} // end poa loop
-			this.atoIndividualTable6b.get(series).clear();
-			this.atoIndividualTable6b.put(series, null);
+		if (this.atoIndividualTable6b != null) {
+			for (String series : this.atoIndividualTable6b.keySet()) {
+				for (String poa : this.atoIndividualTable6b.get(series).keySet()) {
+					this.atoIndividualTable6b.get(series).put(poa, null);
+				} // end poa loop
+				this.atoIndividualTable6b.get(series).clear();
+				this.atoIndividualTable6b.put(series, null);
+			}
+			this.atoIndividualTable6b.clear();
+			this.atoIndividualTable6b = null;
 		}
-		this.atoIndividualTable6b.clear();
-		this.atoIndividualTable6b = null;
 
 		// ATO 9 Keys: Series Title, Industry Division Code
-		for (String series : this.atoIndividualTable9DivisionSummary.keySet()) {
-			for (String div : this.atoIndividualTable9DivisionSummary.get(series).keySet()) {
-				this.atoIndividualTable9DivisionSummary.get(series).put(div, null);
-			} // end poa loop
-			this.atoIndividualTable9DivisionSummary.get(series).clear();
-			this.atoIndividualTable9DivisionSummary.put(series, null);
+		if (this.atoIndividualTable9DivisionSummary != null) {
+			for (String series : this.atoIndividualTable9DivisionSummary.keySet()) {
+				for (String div : this.atoIndividualTable9DivisionSummary.get(series).keySet()) {
+					this.atoIndividualTable9DivisionSummary.get(series).put(div, null);
+				} // end poa loop
+				this.atoIndividualTable9DivisionSummary.get(series).clear();
+				this.atoIndividualTable9DivisionSummary.put(series, null);
+			}
+			this.atoIndividualTable9DivisionSummary.clear();
+			this.atoIndividualTable9DivisionSummary = null;
 		}
-		this.atoIndividualTable9DivisionSummary.clear();
-		this.atoIndividualTable9DivisionSummary = null;
 
-		// Census SEXP Keys: Age5, Industry Division, Personal Income, POA, Sex<br>
-		for (String age : this.censusSEXP_POA_AGE5P_INDP_INCP.keySet()) {
-			for (String div : this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).keySet()) {
-				for (String income : this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).keySet()) {
-					for (String poa : this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).keySet()) {
-						for (String sex : this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).get(poa)
-								.keySet()) {
-							this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).get(poa).put(sex, null);
-						} // end taxable status loop
-						this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).get(poa).clear();
-						this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).put(poa, null);
-					} // end sex loop
-					this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).clear();
-					this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).put(income, null);
-				} // end age loop
-				this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).clear();
-				this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).put(div, null);
-			} // end state loop
-			this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).clear();
-			this.censusSEXP_POA_AGE5P_INDP_INCP.put(age, null);
-		} // end series loop
-		this.censusSEXP_POA_AGE5P_INDP_INCP.clear();
-		this.censusSEXP_POA_AGE5P_INDP_INCP = null;
+		// Census SEXP Keys: Age5, Industry Division, Personal Income, POA, Sex
+		if (this.censusSEXP_POA_AGE5P_INDP_INCP != null) {
+			for (String age : this.censusSEXP_POA_AGE5P_INDP_INCP.keySet()) {
+				for (String div : this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).keySet()) {
+					for (String income : this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).keySet()) {
+						for (String poa : this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).keySet()) {
+							for (String sex : this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).get(poa)
+									.keySet()) {
+								this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).get(poa).put(sex,
+										null);
+							} // end taxable status loop
+							this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).get(poa).clear();
+							this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).put(poa, null);
+						} // end sex loop
+						this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).clear();
+						this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).put(income, null);
+					} // end age loop
+					this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).clear();
+					this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).put(div, null);
+				} // end state loop
+				this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).clear();
+				this.censusSEXP_POA_AGE5P_INDP_INCP.put(age, null);
+			} // end series loop
+			this.censusSEXP_POA_AGE5P_INDP_INCP.clear();
+			this.censusSEXP_POA_AGE5P_INDP_INCP = null;
+		}
 		this.initialisedCensusSEXP_POA_AGE5P_INDP_INCP = false;
 
 		this.init(); // set all the pointers to null

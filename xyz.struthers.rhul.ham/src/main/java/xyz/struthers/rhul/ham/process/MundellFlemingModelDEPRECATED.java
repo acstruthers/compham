@@ -23,7 +23,7 @@ package xyz.struthers.rhul.ham.process;
 public class MundellFlemingModelDEPRECATED {
 
 	/**
-	 * TODO: probably replace this class with something that implements the MASON library?
+	 * probably replace this class with something that implements the MASON library?
 	 */
 	public MundellFlemingModelDEPRECATED() {
 		super();

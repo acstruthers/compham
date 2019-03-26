@@ -758,7 +758,7 @@ public class CalibrateHouseholds {
 									.round(this.censusHCFMF_LGA_FINF_CDCF.get(hind).get(cdcf).get(lgaCode).get(hcfmd)
 											* HOUSEHOLD_MULTIPLIER);
 
-							// FIXME: count number of families in source data
+							// count number of families in source data
 							rawFamilyCount += numFamiliesInCell;
 
 							// if it's the last HCFMD index, split between lone person & group households
@@ -1371,35 +1371,17 @@ public class CalibrateHouseholds {
 											Individual newFamilyMember = null;
 
 											if (makeCopies.get(age).get(incp)) {
-												// we're iterating over the list a second time (or more), so make a copy
-												// of
-												// the Individual so we don't have multiple Households pointing to the
-												// same
-												// object
+												/*
+												 * we're iterating over the list a second time (or more), so make a copy
+												 * of the Individual so we don't have multiple Households pointing to
+												 * the same object
+												 */
 												newFamilyMember = new Individual(this.individualMap.get(lgaCode)
 														.get(age).get(incp).get(nextIndividualIdx));
 											} else {
-												// FIXME: remove debugging code
-												if (false) { // if (lgaCode == "20570") {
-													System.out.println("lgaCode: " + lgaCode);
-													System.out.println("age: " + age);
-													System.out.println("incp: " + incp);
-													System.out.println("nextIndividualIdx: " + nextIndividualIdx);
-													System.out.println("this.individualMap.get(lgaCode).keySet(): "
-															+ this.individualMap.get(lgaCode).keySet());
-													System.out.println(
-															"this.individualMap.get(lgaCode).get(age).keySet(): "
-																	+ this.individualMap.get(lgaCode).get(age)
-																			.keySet());
-													System.out.println(
-															"this.individualMap.get(lgaCode).get(age).get(incp): "
-																	+ this.individualMap.get(lgaCode).get(age)
-																			.get(incp));
-												}
-
 												// use original Individual instance
 												newFamilyMember = this.individualMap.get(lgaCode).get(age).get(incp)
-														.get(nextIndividualIdx); // FIXME: null pointer
+														.get(nextIndividualIdx);
 											}
 											members.add(newFamilyMember);
 										} // end Adult Number loop

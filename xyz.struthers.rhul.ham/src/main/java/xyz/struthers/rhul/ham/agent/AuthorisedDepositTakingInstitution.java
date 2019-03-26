@@ -613,6 +613,16 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	}
 
 	/**
+	 * @param retailDepositor the retailDepositor to set
+	 */
+	public void addRetailDepositor(Household retailDepositor) {
+		if (this.retailDepositors == null) {
+			this.retailDepositors = new ArrayList<Household>();
+		}
+		this.retailDepositors.add(retailDepositor);
+	}
+
+	/**
 	 * @return the commercialDepositors
 	 */
 	public ArrayList<Business> getCommercialDepositors() {
@@ -624,6 +634,25 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	 */
 	public void setCommercialDepositors(ArrayList<Business> commercialDepositors) {
 		this.commercialDepositors = commercialDepositors;
+	}
+
+	/**
+	 * @param commercialDepositor the commercialDepositor to set
+	 */
+	public void addCommercialDepositor(Business commercialDepositor) {
+		if (this.commercialDepositors == null) {
+			this.commercialDepositors = new ArrayList<Business>();
+		}
+		this.commercialDepositors.add(commercialDepositor);
+	}
+
+	/**
+	 * Trims the Commercial Depositors list to minimise memory consumption.
+	 */
+	public void trimCommercialDepositorList() {
+		if (this.commercialDepositors != null) {
+			this.commercialDepositors.trimToSize();
+		}
 	}
 
 	/**

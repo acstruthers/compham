@@ -28,6 +28,8 @@ import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
 
 /**
+ * FIXME: If a Business has no Other Expenses, assign 5% of Total Expenses
+ * 
  * @author Adam Struthers
  * @since 12-Feb-2019
  */
@@ -307,7 +309,7 @@ public class CalibrateBusinesses {
 		 * pay the same rate, which is unrealistic but good enough for the sake of this
 		 * model and its stated aims and degree of accuracy.
 		 */
-		//System.out.println("Step 1: " + new Date(System.currentTimeMillis()));
+		// System.out.println("Step 1: " + new Date(System.currentTimeMillis()));
 
 		Set<String> fineIndustryKeySet = new HashSet<String>(this.atoCompanyTable4a.get("Total Income3 no.").keySet());
 		int numFineIndustryKeys = fineIndustryKeySet.size();
@@ -517,7 +519,7 @@ public class CalibrateBusinesses {
 		 * relevant industry codes for each of the 18 industry divisions. This allows us
 		 * to break the ABS data for 18 industries down into 574 industry codes.
 		 */
-		//System.out.println("Step 2: " + new Date(System.currentTimeMillis()));
+		// System.out.println("Step 2: " + new Date(System.currentTimeMillis()));
 
 		Set<String> industryCodeKeySet = new HashSet<String>(
 				this.atoCompanyTable4b.get("Number of companies").keySet());
@@ -621,7 +623,7 @@ public class CalibrateBusinesses {
 		 * 
 		 * Keys: year, column title, state, industry
 		 */
-		//System.out.println("Step 3: " + new Date(System.currentTimeMillis()));
+		// System.out.println("Step 3: " + new Date(System.currentTimeMillis()));
 
 		// String[] states = { "NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT",
 		// "Other" };
@@ -685,7 +687,7 @@ public class CalibrateBusinesses {
 		 * 
 		 * Keys: year, column title, size, industry
 		 */
-		//System.out.println("Step 4: " + new Date(System.currentTimeMillis()));
+		// System.out.println("Step 4: " + new Date(System.currentTimeMillis()));
 
 		String[] sizes = { "S", "M", "L" };
 		float[] totalSizeEmploymentByIndustry = new float[industries8155.length];
@@ -772,7 +774,7 @@ public class CalibrateBusinesses {
 		 * state / industry / size. Also calculate a total national mean dollars and
 		 * employees per business.
 		 */
-		//System.out.println("Step 5: " + new Date(System.currentTimeMillis()));
+		// System.out.println("Step 5: " + new Date(System.currentTimeMillis()));
 
 		float businessCountAU = 0f;
 		float employmentCountAU = 0f;
@@ -901,7 +903,7 @@ public class CalibrateBusinesses {
 		 * 6. Divide each state / industry / size's figures by the national average to
 		 * produce a multiplier for each category combination.
 		 */
-		//System.out.println("Step 6: " + new Date(System.currentTimeMillis()));
+		// System.out.println("Step 6: " + new Date(System.currentTimeMillis()));
 
 		float[][][] employmentCountMultiplier = new float[states.length][industries8155.length][sizes.length];
 		float[][][] wagesMultiplier = new float[states.length][industries8155.length][sizes.length];
@@ -949,7 +951,7 @@ public class CalibrateBusinesses {
 		 * that only large businesses hold foreign equities (i.e. multi-national
 		 * corporations and large investment firms).
 		 */
-		//System.out.println("Step 7: " + new Date(System.currentTimeMillis()));
+		// System.out.println("Step 7: " + new Date(System.currentTimeMillis()));
 
 		DateFormat df = new SimpleDateFormat("MMM-yyyy", Locale.ENGLISH);
 		Date rbaE1Date = null;
@@ -957,7 +959,7 @@ public class CalibrateBusinesses {
 			// convert String to Date
 			rbaE1Date = df.parse(RBA_E1_DATE_STRING);
 		} catch (ParseException e1) {
-			// TODO Auto-generated catch block
+			// Auto-generated catch block
 			e1.printStackTrace();
 		}
 		float bankDepositsE1 = Float.valueOf(this.rbaE1.get(RBA_E1_BUSINESS_BANK_DEPOSITS).get(rbaE1Date));
@@ -972,7 +974,7 @@ public class CalibrateBusinesses {
 		 * this multiplier to calibrate the ATO company P&L and Bal Shts so they're now
 		 * representative of businesses per state / industry / size.
 		 */
-		//System.out.println("Step 8: " + new Date(System.currentTimeMillis()));
+		// System.out.println("Step 8: " + new Date(System.currentTimeMillis()));
 
 		// make a map so we can look up division indices cheaply
 		Map<String, Integer> divisionCodeKeyIndex = new HashMap<String, Integer>(industries8155.length);
@@ -1120,7 +1122,7 @@ public class CalibrateBusinesses {
 		 * combination of state and size, calculate the ratio of the number of
 		 * businesses in each industry code within each industry division.
 		 */
-		//System.out.println("Step 9: " + new Date(System.currentTimeMillis()));
+		// System.out.println("Step 9: " + new Date(System.currentTimeMillis()));
 
 		// LGA emp Keys: emp range, state, LGA code, industry division code
 		Set<String> divisionsKeySet8165 = abs8165_0LgaEmployment.get(ABS8165_TITLE_EMPLOYMENT_1).get(states[0])
@@ -1223,7 +1225,7 @@ public class CalibrateBusinesses {
 		 * Deal with exporters later when linking the agents to create the network
 		 * topology.
 		 */
-		//System.out.println("Step 10: " + new Date(System.currentTimeMillis()));
+		// System.out.println("Step 10: " + new Date(System.currentTimeMillis()));
 
 		// calculate ratio of no. businesses in each Industry Code by Industry Class
 		Map<String, Float> industryCodeClassRatio4B = new HashMap<String, Float>(industryCodes.length);
@@ -1292,11 +1294,11 @@ public class CalibrateBusinesses {
 						}
 
 						/*
-						 * TODO: Loop over this section, using multiples of epsilon until the number of
-						 * agents equals the number in the ABS8165 LGA data. Need to do this at a higher
-						 * level though, not industry level. Would need to re-factor the loops, which is
-						 * too hard for now. I can just manually tweak the EPSILON constant for now
-						 * until the number of business agents created is about right.
+						 * CHECKME: Loop over this section, using multiples of epsilon until the number
+						 * of agents equals the number in the ABS8165 LGA data. Need to do this at a
+						 * higher level though, not industry level. Would need to re-factor the loops,
+						 * which is too hard for now. I can just manually tweak the EPSILON constant for
+						 * now until the number of business agents created is about right.
 						 */
 						// calculate number of business agents to instantiate
 						int numSmallBusinesses = (int) Math

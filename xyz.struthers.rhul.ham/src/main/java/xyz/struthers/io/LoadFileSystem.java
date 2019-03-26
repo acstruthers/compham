@@ -13,7 +13,7 @@ import xyz.struthers.rhul.ham.config.Properties;
 /**
  * Loads a list of files in a network folder.
  * 
- * TODO: add in a recursive option (https://javaconceptoftheday.com/list-all-files-in-directory-in-java/)
+ * TO DO: add in a recursive option (https://javaconceptoftheday.com/list-all-files-in-directory-in-java/)
  * 
  * @author Adam
  * @since 19-Nov-2018

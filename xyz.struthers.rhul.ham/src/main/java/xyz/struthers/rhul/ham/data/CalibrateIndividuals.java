@@ -1403,26 +1403,8 @@ public class CalibrateIndividuals {
 										// for each ATO income category in this iteration
 										for (int incomeMapNum = 0; incomeMapNum < numAtoIncomeIndices; incomeMapNum++) {
 											// multiply ATO 3A averages per person to calibrate them
-											if (DEBUG_BIG_NUM) {
-												System.out
-														.println("1379: atoPerPersonEmployed.get(incomeMapNum) BEFORE: "
-																+ atoPerPersonEmployed.get(incomeMapNum));
-											}
 											atoPerPersonEmployedDivPoa.set(incomeMapNum,
 													atoPerPersonEmployedDivPoa.get(incomeMapNum) * amountMultiplier);
-											if (DEBUG_BIG_NUM) {
-												// FIXME: figure out why wages are sometimes huge
-												if ((lgaCode.equals("20570") && sex.equals("M") && division.equals("B"))
-														|| (lgaCode.equals("55320") && sex.equals("M")
-																&& division.equals("A"))) {
-													System.out.println("1386: incomeMapNum: " + incomeMapNum);
-													System.out.println("1387: amountMultiplier: " + amountMultiplier);
-													System.out.println("1388: atoPerPersonEmployed.get(incomeMapNum): "
-															+ atoPerPersonEmployed.get(incomeMapNum));
-													System.out.println(
-															"LGA: " + lgaCode + ", Div: " + division + ", Sex: " + sex);
-												}
-											}
 											atoPerPersonUnemployedDivPoa.set(incomeMapNum,
 													atoPerPersonUnemployedDivPoa.get(incomeMapNum) * amountMultiplier);
 											atoPerPersonPensionDivPoa.set(incomeMapNum,
@@ -1588,30 +1570,6 @@ public class CalibrateIndividuals {
 														individual.setPnlWagesSalaries(
 																atoPerPersonEmployedDivPoa.get(incomeMapNum)
 																		/ NUM_MONTHS);
-														if (DEBUG_BIG_NUM2) {
-															// FIXME: figure out why wages are sometimes huge
-															if ((lgaCode.equals("20570") && sex.equals("M")
-																	&& division.equals("B") && ageIdxAbs == 6
-																	&& incomeSourceNum == 0)
-																	|| (lgaCode.equals("55320") && sex.equals("M")
-																			&& division.equals("A") && ageIdxAbs == 13
-																			&& incomeSourceNum == 0)) {
-																System.out.println("LGA: " + lgaCode + ", Div: "
-																		+ division + ", Sex: " + sex + ", Age: "
-																		+ AGE_ARRAY_ABS_MIDPOINT[ageIdxAbs]
-																		+ ", Income Source: " + incomeSourceNum);
-																System.out.println("agentNo: " + agentNo);
-																System.out.println("incomeMapNum: " + incomeMapNum);
-																System.out
-																		.println("incomeSourceNum: " + incomeSourceNum);
-																System.out.println(
-																		"atoPerPersonEmployedDivPoa.get(incomeMapNum): "
-																				+ atoPerPersonEmployedDivPoa
-																						.get(incomeMapNum));
-																System.out.println("individual.getPnlWagesSalaries(): "
-																		+ individual.getPnlWagesSalaries());
-															}
-														}
 														individual.setPnlWorkRelatedExpenses(
 																atoPerPersonAttributeWorkRelatedExpensesDivPoa
 																		.get(incomeMapNum) / NUM_MONTHS);
@@ -1648,23 +1606,6 @@ public class CalibrateIndividuals {
 														individual.setPnlInterestIncome(
 																atoPerPersonAttributeInterestIncomeDivPoa
 																		.get(incomeMapNum) / NUM_MONTHS);
-														if (DEBUG_BIG_NUM2) {
-															// FIXME: figure out why interest is sometimes huge
-															if ((lgaCode.equals("20570") && sex.equals("M")
-																	&& division.equals("B") && ageIdxAbs == 6
-																	&& incomeSourceNum == 0)
-																	|| (lgaCode.equals("55320") && sex.equals("M")
-																			&& division.equals("A") && ageIdxAbs == 13
-																			&& incomeSourceNum == 0)) {
-																System.out.println("incomeMapNum: " + incomeMapNum);
-																System.out.println(
-																		"atoPerPersonAttributeInterestIncomeDivPoa.get(incomeMapNum): "
-																				+ atoPerPersonAttributeInterestIncomeDivPoa
-																						.get(incomeMapNum));
-																System.out.println("individual.getPnlInterestIncome(): "
-																		+ individual.getPnlInterestIncome());
-															}
-														}
 													}
 													attributeIdx = CustomMath.sample(
 															pdfAttributeDividendIncome[incomeMapNum], this.random);
@@ -1734,7 +1675,7 @@ public class CalibrateIndividuals {
 													// this.individualMatrix.get(poaIdx).get(sexIdx).get(ageIdxAbs).get(divIdx)
 													// .get(incomeIdxAbs).add(individual);
 
-													// TODO: add individual to simplified map
+													// add individual to simplified map
 													// Keys: LGA, AGE5P, INCP
 													if (!this.individualMap.containsKey(lgaCode)) {
 														this.individualMap.put(lgaCode,

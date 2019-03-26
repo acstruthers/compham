@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.data.CalibrateEconomy;
 import xyz.struthers.rhul.ham.process.Employer;
 import xyz.struthers.rhul.ham.process.NodePayment;
 import xyz.struthers.rhul.ham.process.Tax;
@@ -490,6 +491,15 @@ public class Business extends Agent implements Employer {
 	public float getNetProfit() {
 		return this.getGrossProfit() - this.getTax();
 	}
+	
+	/**
+	 * Domestic expenses figure that is used when forming links between agents.
+	 * 
+	 * @return domestic expenses
+	 */
+	public float getDomesticExpenses() {
+		return this.otherExpenses;
+	}
 
 	/**
 	 * @return the businessTypeId
@@ -689,6 +699,25 @@ public class Business extends Agent implements Employer {
 	 */
 	public void setDomesticSuppliers(ArrayList<Business> domesticSuppliers) {
 		this.domesticSuppliers = domesticSuppliers;
+	}
+	
+	/**
+	 * @param domesticSupplier the domesticSupplier to set
+	 */
+	public void addDomesticSupplier(Business domesticSupplier) {
+		if (this.domesticSuppliers == null) {
+			this.domesticSuppliers = new ArrayList<Business>(CalibrateEconomy.BUSINESS_SUPPLIER_DIV_CODE.length);
+		}
+		this.domesticSuppliers.add(domesticSupplier);
+	}
+	
+	/**
+	 * Trims the list to size to minimise memory usage.
+	 */
+	public void trimDomesticSuppliersList() {
+		if (this.domesticSuppliers != null) {
+			this.domesticSuppliers.trimToSize();
+		}
 	}
 
 	/**

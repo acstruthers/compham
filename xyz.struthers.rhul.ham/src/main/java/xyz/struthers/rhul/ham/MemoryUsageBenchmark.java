@@ -24,7 +24,7 @@ public class MemoryUsageBenchmark {
 	}
 
 	/**
-	 * TODO: Idea to test to reduce memory footprint Map the key to an index, then
+	 * Idea to test to reduce memory footprint Map the key to an index, then
 	 * store everything else in an array. Create the arrays on the second reading of
 	 * the file, when the data size is known exactly. Could even drop the original
 	 * map and create another one with the minimum required initial capacity.

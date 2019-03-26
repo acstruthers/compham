@@ -20,7 +20,6 @@ public class Simulator extends SimState {
 	 */
 	public Simulator(long seed) {
 		super(seed);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -28,7 +27,6 @@ public class Simulator extends SimState {
 	 */
 	public Simulator(MersenneTwisterFast random) {
 		super(random);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -37,7 +35,6 @@ public class Simulator extends SimState {
 	 */
 	public Simulator(MersenneTwisterFast random, Schedule schedule) {
 		super(random, schedule);
-		// TODO Auto-generated constructor stub
 	}
 
 }

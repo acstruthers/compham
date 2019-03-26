@@ -38,13 +38,13 @@ import java.util.Map;
  * approximately 5.5 petabytes of RAM. This is clearly impractical for a dataset
  * of this size, so needs to be refactored.
  * 
- * TODO: If an ADI defaults, apply the govt g'tee rules to customer's deposits.
+ * If an ADI defaults, apply the govt g'tee rules to customer's deposits.
  * Not just the $250k limit per account, but also the $15Bn limit per ADI
  * (double-check those amounts).
  * 
- * TODO: Use EJML or JAMA for matrix maths. Will be at least as fast as my code.
+ * Use EJML or JAMA for matrix maths. Will be at least as fast as my code.
  * 
- * TODO: Refactor to use lists of connected nodes only (27 million nodes need
+ * Refactor to use lists of connected nodes only (27 million nodes need
  * over 5.5 PB of RAM).
  * 
  * @author Adam Struthers
@@ -95,11 +95,11 @@ public class ClearingPaymentMatrixDEPRECATED {
 			this.calculateLiabilities();
 			this.calculatePayments();
 
-			// TODO: save output to file for analysis
+			// save output to file for analysis
 
 			// return output to caller
 			result = new HashMap<String, Object>();
-			result.put("ClearingPaymentMatrix", this.clearingPaymentMatrix); // TODO: check that it's happy with me
+			result.put("ClearingPaymentMatrix", this.clearingPaymentMatrix); // check that it's happy with me
 																				// giving it a primitive not a class
 			result.put("ClearingPaymentVector", this.clearingPaymentVector);
 			result.put("NodeEquity", this.equityOfNode);

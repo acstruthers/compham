@@ -27,9 +27,6 @@ import xyz.struthers.rhul.ham.data.CalibrateRba;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
 
 /**
- * FIXME: Change from Double to Float to halve memory consumption
- * Double.MAX_VALUE = 1.7976931348623157E308 (64 bits) Float.MAX_VALUE =
- * 3.4028235E38 (32 bits)
  * 
  * @author Adam Struthers
  *
@@ -165,18 +162,16 @@ public class App {
 			System.out.println("MEMORY CONSUMED BY HOUSEHOLDS: " + formatter.format(megabytesAfter - megabytesBefore)
 					+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
 			memoryBefore = memoryAfter;
-
-			System.out.println(new Date(System.currentTimeMillis()) + ": Starting export of agents to CSV");
-			AustralianEconomy auEconomy = ctx.getBean(AustralianEconomy.class);
-			int iteration = 0;
-			Set<String> filenames = auEconomy.saveDetailsToFile(iteration);
-			System.out.println(filenames.size() + " DETAILED FILES SAVED TO:");
-			for (String file : filenames) {
-				System.out.println(file);
-			}
-			System.out.println(new Date(System.currentTimeMillis()) + ": Finished export of agents to CSV");
-			System.exit(0);
-
+			/*
+			 * System.out.println(new Date(System.currentTimeMillis()) +
+			 * ": Starting export of agents to CSV"); AustralianEconomy auEconomy =
+			 * ctx.getBean(AustralianEconomy.class); int iteration = 0; Set<String>
+			 * filenames = auEconomy.saveDetailsToFile(iteration);
+			 * System.out.println(filenames.size() + " DETAILED FILES SAVED TO:"); for
+			 * (String file : filenames) { System.out.println(file); }
+			 * System.out.println(new Date(System.currentTimeMillis()) +
+			 * ": Finished export of agents to CSV"); System.exit(0);
+			 */
 			CalibrateEconomy economy = ctx.getBean(CalibrateEconomy.class);
 			economy.linkAllAgents();
 

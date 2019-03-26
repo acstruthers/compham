@@ -100,6 +100,16 @@ public class AustralianEconomy implements Serializable {
 	}
 
 	/**
+	 * Prepares input data for Payments Clearing Vector algorithm.
+	 * 
+	 * TODO: Combine employees in the one Household if they work for the same
+	 * Employer.
+	 */
+	private void preparePaymentsClearingVectorInputs() {
+
+	}
+
+	/**
 	 * Saves every single Agent to file.
 	 * 
 	 * @return a Set of the filenames for each Agent class
