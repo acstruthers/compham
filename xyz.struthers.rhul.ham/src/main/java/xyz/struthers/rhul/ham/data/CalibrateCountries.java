@@ -56,13 +56,15 @@ public class CalibrateCountries {
 			String ccyCode = this.allCountryData.get(key).get("Currency Code");
 			Currency currency = this.currencies.getCurrency(ccyCode);
 			ForeignCountry countryAgent = new ForeignCountry(country, currency);
+			// populate the initial import/export estimates
+			
 			this.countryAgents.add(countryAgent);
-			// Note: Populate the import/export volumes later when the exporter agents have
-			// been calibrated
+			// N.B. Populate the actual import/export volumes later when the exporter agents
+			// have been calibrated
 		}
 
 		this.addAgentsToEconomy();
-		
+
 		// release memory
 		this.data.dropCountryData();
 	}

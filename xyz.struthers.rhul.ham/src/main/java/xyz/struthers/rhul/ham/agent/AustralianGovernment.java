@@ -34,6 +34,8 @@ public final class AustralianGovernment extends Agent implements Employer {
 	protected ArrayList<Individual> employees; // calculate wages & super
 	private ArrayList<Household> welfareRecipients;
 	private ArrayList<AuthorisedDepositTakingInstitution> bondInvestors;
+	private ArrayList<Float> bondInvestorAmounts;
+	private ArrayList<Business> governmentSuppliers;
 
 	// P&L
 	private float pnlTaxIncome;
@@ -259,7 +261,12 @@ public final class AustralianGovernment extends Agent implements Employer {
 			liabilities.add(new NodePayment(index, monthlyInterest));
 		}
 
-		// FIXME: calculate government sales due to Businesses
+		// calculate government sales due to Businesses
+		for (Business govtSupplier : this.governmentSuppliers) {
+			int index = govtSupplier.getPaymentClearingIndex();
+			float monthlySpend = govtSupplier.getSalesGovernment();
+			liabilities.add(new NodePayment(index, monthlySpend));
+		}
 
 		liabilities.trimToSize();
 		return liabilities;
@@ -307,6 +314,34 @@ public final class AustralianGovernment extends Agent implements Employer {
 	 */
 	public void setBondInvestors(ArrayList<AuthorisedDepositTakingInstitution> bondInvestors) {
 		this.bondInvestors = bondInvestors;
+	}
+
+	/**
+	 * @return the bondInvestorAmounts
+	 */
+	public ArrayList<Float> getBondInvestorAmounts() {
+		return bondInvestorAmounts;
+	}
+
+	/**
+	 * @param bondInvestorAmounts the bondInvestorAmounts to set
+	 */
+	public void setBondInvestorAmounts(ArrayList<Float> bondInvestorAmounts) {
+		this.bondInvestorAmounts = bondInvestorAmounts;
+	}
+
+	/**
+	 * @return the governmentSuppliers
+	 */
+	public ArrayList<Business> getGovernmentSuppliers() {
+		return governmentSuppliers;
+	}
+
+	/**
+	 * @param governmentSuppliers the governmentSuppliers to set
+	 */
+	public void setGovernmentSuppliers(ArrayList<Business> governmentSuppliers) {
+		this.governmentSuppliers = governmentSuppliers;
 	}
 
 	/**

@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import xyz.struthers.lang.CustomMath;
 import xyz.struthers.rhul.ham.agent.AustralianGovernment;
 import xyz.struthers.rhul.ham.agent.AuthorisedDepositTakingInstitution;
 import xyz.struthers.rhul.ham.agent.Business;
@@ -177,6 +178,7 @@ public class CalibrateEconomy {
 		this.linkHouseholds();
 		this.linkEmployees();
 		this.linkBusinesses();
+		// N.B. Must link Businesses before ADIs for the business links to be populated.
 		this.linkAdis();
 		this.linkForeignCountries();
 		this.linkGovernment();
@@ -367,10 +369,12 @@ public class CalibrateEconomy {
 	 * Assigns employees to employers. Recognises that employers can be either
 	 * Business, ADIs, the RBA or the Australian Government.
 	 * 
-	 * FIXME: Individuals are already assigned to Industry Divisions, so should
-	 * drill through the Household to get the relevant Individuals and link the
-	 * employer to the Household based on the Individual's Division and wages or
-	 * salary.
+	 * Individuals are already assigned to Industry Divisions, so should drill
+	 * through the Household to get the relevant Individuals and link the employer
+	 * to the Household based on the Individual's Division and wages or salary. It
+	 * links the Employer to the Individual, then it's the responsibility of the
+	 * Payment Clearing Vector algorithm's driver to consolidate these at a
+	 * Household level.
 	 */
 	private void linkEmployees() {
 		if (!this.indicesAssigned) {
@@ -518,16 +522,6 @@ public class CalibrateEconomy {
 	 * N.B. Must run linkBusiness() before linkAdis() for the business links to be
 	 * populated.
 	 * 
-	 * ------------------------------------------------------------------
-	 * 
-	 * Make a PDF of businesses by their wage expense: one for each industry
-	 * division.
-	 * 
-	 * Choose business in the same industry as the individual, based on PDF<br>
-	 * IF (existing assigned wages + current wage) < (business calibrated wage +
-	 * small tolerance)<br>
-	 * THEN assign individual to business
-	 * 
 	 * FIXME: Randomly select 50k businesses and make a PDF of these businesses'
 	 * relative revenue (foreign revenue?), by state. Assign foreign countries to
 	 * the businesses based on the given probabilities.
@@ -579,15 +573,30 @@ public class CalibrateEconomy {
 		// assign suppliers to customers
 		for (int customerIdx = 0; customerIdx < this.businesses.length; customerIdx++) {
 			Business customer = this.businesses[customerIdx];
+			ArrayList<Float> supplierRatios = new ArrayList<Float>(BUSINESS_SUPPLIER_DIV_CODE.length);
+			float sum = 0f;
 			for (int supDivIdx = 0; supDivIdx < BUSINESS_SUPPLIER_DIV_CODE.length; supDivIdx++) {
+				// assign suppliers
 				String div = BUSINESS_SUPPLIER_DIV_CODE[supDivIdx];
 				int nextIdx = nextDivIdx.get(div);
 				Business supplier = this.businesses[shuffledSupplierIndicesByDiv.get(div).get(nextIdx)];
 				customer.addDomesticSupplier(supplier);
 				nextIdx = (nextIdx + 1) % shuffledSupplierIndicesByDiv.get(div).size();
 				nextDivIdx.put(div, nextIdx);
+
+				// calculate random numbers (not ratios yet)
+				float rand = this.random.nextFloat();
+				supplierRatios.add(rand);
+				sum += rand;
+			}
+			// calculate & assign supplier ratios
+			for (int supDivIdx = 0; supDivIdx < BUSINESS_SUPPLIER_DIV_CODE.length; supDivIdx++) {
+				// normalise ratios so they sum to 100%
+				supplierRatios.set(supDivIdx, supplierRatios.get(supDivIdx) / sum);
 			}
 			customer.trimDomesticSuppliersList();
+			supplierRatios.trimToSize();
+			customer.setSupplierRatios(supplierRatios);
 		}
 		// release memory
 		for (String div : totalDomesticRevenueByDiv.keySet()) {
@@ -676,7 +685,7 @@ public class CalibrateEconomy {
 	 * N.B. Must run linkBusiness() before linkAdis() for the business links to be
 	 * populated.
 	 */
-	void linkAdis() {
+	private void linkAdis() {
 		if (!this.indicesAssigned) {
 			this.assignPaymentClearingIndices();
 		}
@@ -684,9 +693,84 @@ public class CalibrateEconomy {
 		// N.B. link to employees performed in linkEmployees()
 
 		// link to domestic suppliers
-		// TODO: copy supplier link logic from businesses
+		// get total domestic revenue by industry division
+		Map<String, Float> totalDomesticRevenueByDiv = new HashMap<String, Float>(
+				(int) Math.ceil(ADI_SUPPLIER_DIV_CODE.length / 0.75f));
+		for (String div : ADI_SUPPLIER_DIV_CODE) {
+			float divDomesticRevenue = (float) Arrays.asList(this.businesses).stream()
+					.filter(o -> String.valueOf(o.getIndustryDivisionCode()).equals(div))
+					.mapToDouble(o -> o.getSalesDomestic()).sum();
+			totalDomesticRevenueByDiv.put(div, divDomesticRevenue);
+		}
+		// assume all ADIs have some domestic expenses
+		// get businesses with domestic revenue, by division (for specified divisions)
+		Set<String> domesticSupplierDivs = new HashSet<String>(Arrays.asList(ADI_SUPPLIER_DIV_CODE));
+		// make a PDF of suppliers in each industry, with relative weights
+		Map<String, ArrayList<Integer>> pdfSupplierIndicesByDiv = new HashMap<String, ArrayList<Integer>>(
+				(int) Math.ceil(ADI_SUPPLIER_DIV_CODE.length / 0.75f));
+		Map<String, ArrayList<Float>> pdfSupplierRatiosByDiv = new HashMap<String, ArrayList<Float>>(
+				(int) Math.ceil(ADI_SUPPLIER_DIV_CODE.length / 0.75f));
+		for (String div : ADI_SUPPLIER_DIV_CODE) {
+			pdfSupplierIndicesByDiv.put(div, new ArrayList<Integer>(
+					(int) Math.ceil(this.businesses.length / ADI_SUPPLIER_DIV_CODE.length * 2f / 0.75f)));
+			pdfSupplierRatiosByDiv.put(div, new ArrayList<Float>(
+					(int) Math.ceil(this.businesses.length / ADI_SUPPLIER_DIV_CODE.length * 2f / 0.75f)));
+		}
+		for (int i = 0; i < this.businesses.length; i++) {
+			String div = this.businesses[i].getIndustryCode();
+			if (domesticSupplierDivs.contains(div)) {
+				float domesticSales = this.businesses[i].getSalesDomestic();
+				// can't just use indices here because only 86 ADIs. Use PDFs.
+				float businessRatio = (int) domesticSales / totalDomesticRevenueByDiv.get(div);
+				pdfSupplierIndicesByDiv.get(div).add(i);
+				pdfSupplierRatiosByDiv.get(div).add(businessRatio);
+			}
+		}
+		// randomly assign suppliers to ADIs
+		for (int customerIdx = 0; customerIdx < this.adis.length; customerIdx++) {
+			AuthorisedDepositTakingInstitution customer = this.adis[customerIdx];
+			ArrayList<Float> supplierRatios = new ArrayList<Float>(ADI_SUPPLIER_DIV_CODE.length);
+			float sum = 0f;
+			for (int supDivIdx = 0; supDivIdx < ADI_SUPPLIER_DIV_CODE.length; supDivIdx++) {
+				String div = ADI_SUPPLIER_DIV_CODE[supDivIdx];
+				int nextIdx = CustomMath.sample(pdfSupplierRatiosByDiv.get(div), this.random);
+				Business supplier = this.businesses[nextIdx];
+				customer.addDomesticSupplier(supplier);
 
-		// TODO link to retail depositors (Households)
+				// calculate random numbers
+				float rand = this.random.nextFloat();
+				supplierRatios.add(rand);
+				sum += rand;
+			}
+			// calculate & assign supplier ratios
+			for (int i = 0; i < supplierRatios.size(); i++) {
+				// normalise ratios so they sum to 100%
+				supplierRatios.set(i, supplierRatios.get(i) / sum);
+			}
+			customer.trimDomesticSuppliersList();
+			supplierRatios.trimToSize();
+			customer.setDomesticSupplierRatios(supplierRatios);
+		}
+		// release memory
+		for (String div : totalDomesticRevenueByDiv.keySet()) {
+			totalDomesticRevenueByDiv.put(div, null);
+		}
+		totalDomesticRevenueByDiv.clear();
+		totalDomesticRevenueByDiv = null;
+		domesticSupplierDivs.clear();
+		domesticSupplierDivs = null;
+		for (String div : pdfSupplierIndicesByDiv.keySet()) {
+			pdfSupplierIndicesByDiv.put(div, null);
+		}
+		pdfSupplierIndicesByDiv.clear();
+		pdfSupplierIndicesByDiv = null;
+		for (String div : pdfSupplierRatiosByDiv.keySet()) {
+			pdfSupplierRatiosByDiv.put(div, null);
+		}
+		pdfSupplierRatiosByDiv.clear();
+		pdfSupplierRatiosByDiv = null;
+
+		// link to retail depositors (Households)
 		// get total deposits for entire ADI industry
 		float totalDepositBal = (float) Arrays.asList(this.adis).stream().mapToDouble(o -> o.getBsDepositsAtCall())
 				.sum();
@@ -727,7 +811,127 @@ public class CalibrateEconomy {
 			adi.trimCommercialDepositorList();
 		}
 
-		// TODO link to ADI investors (can't be more than 50% of capital)
+		// link to ADI investors (can't be more than 50% of capital)
+		/**
+		 * ADIs aren't allowed to invest more than 50% of their capital with a single
+		 * counterparty. The largest ratio of investments to total regulatory capital is
+		 * 754% by Pulse Credit Union. Limiting the ratios so that no more than 10% of
+		 * investment balances can be with a single counterparty is a reasonable proxy
+		 * for ADIs complying with investment concentration restrictions.
+		 * 
+		 * ALGORITHM THINKING:<br>
+		 * $335bn in ADI Repo Deposits (liability)<br>
+		 * $97bn in ADI loans (asset)<br>
+		 * $238bn remaining to be allocated<br>
+		 * $51bn investments by non-major-bank ADIs. Cross-multiply matrix approach.<br>
+		 * $187bn investments remaining must be by major banks<br>
+		 * Allocate the $187bn per the ratio of the major banks' investment balances<br>
+		 * 
+		 * So to turn this into code:<br>
+		 * 1. Calculate the ratio of the major banks' investment balances
+		 * (majorBankInvestmentRatio).<br>
+		 * 2. Sum the $335bn in ADI Repo Deposits (totalAdiRepoEligibleDeposits).<br>
+		 * 3. Subtract from the ADI repo deposits the $97bn in ADI loans and $51bn
+		 * non-major-bank investments.<br>
+		 * 4. Split the remaining $187bn to the major banks per their investment balance
+		 * ratio.<br>
+		 * 5. For each ADI, sum the ADI loans and investments (per steps 3-4).<br>
+		 * 6. For each ADI, calculate the ratio of the investment balances of the other
+		 * ADIs, excluding the major banks. Assign the ADI's ADI Repo Deposits to the
+		 * other ADIs per these calculated ratios (store the amounts - not the ratios).
+		 * Store pointers to the ADIs at the same time.<br>
+		 * 7. Take the Government Loans, add in the remaining investment amounts for the
+		 * major banks, and assign these as Bond Investors in the AustralianGovernment
+		 * agent.
+		 */
+		// 1. Calculate the ratio of the major banks' investment balances
+		float majorBankInvestmentBalTotal = (float) Arrays.asList(this.adis).stream()
+				.filter(o -> o.getAdiCategory().equals("Major Bank")).mapToDouble(o -> o.getBsInvestments()).sum();
+		ArrayList<Float> majorBankInvestmentRatio = new ArrayList<Float>(Collections.nCopies(this.adis.length, 0f));
+		for (int adiIdx = 0; adiIdx < this.adis.length; adiIdx++) {
+			if (this.adis[adiIdx].getAdiCategory().equals("Major Bank")) {
+				majorBankInvestmentRatio.set(adiIdx,
+						this.adis[adiIdx].getBsInvestments() / majorBankInvestmentBalTotal);
+			}
+		}
+		// 2. Sum the $335bn in ADI Repo Deposits
+		float totalAdiRepoEligibleDeposits = (float) Arrays.asList(this.adis).stream()
+				.mapToDouble(o -> o.getBsDepositsAdiRepoEligible()).sum();
+		// 3. Subtract from the ADI repo deposits the $97bn in ADI loans and $51bn
+		// non-major-bank investments.
+		float totalAdiLoans = (float) Arrays.asList(this.adis).stream().mapToDouble(o -> o.getBsLoansADI()).sum();
+		float totalInvestmentsNonMajorBank = (float) Arrays.asList(this.adis).stream()
+				.filter(o -> !o.getAdiCategory().equals("Major Bank")).mapToDouble(o -> o.getBsInvestments()).sum();
+		// 4. Split the remaining $187bn to the major banks per their investment balance
+		// ratio.
+		float remainingMajorBankInvestments = totalAdiRepoEligibleDeposits - totalAdiLoans
+				- totalInvestmentsNonMajorBank;
+		ArrayList<Float> interAdiInvestments = new ArrayList<Float>(Collections.nCopies(this.adis.length, 0f));
+		for (int adiIdx = 0; adiIdx < this.adis.length; adiIdx++) {
+			if (this.adis[adiIdx].getAdiCategory().equals("Major Bank")) {
+				interAdiInvestments.set(adiIdx, remainingMajorBankInvestments * majorBankInvestmentRatio.get(adiIdx));
+			}
+		}
+		ArrayList<Float> majorBankInvestments = new ArrayList<Float>(interAdiInvestments);
+		// 5. For each ADI, sum the ADI loans and investments (per steps 3-4).
+		for (int adiIdx = 0; adiIdx < this.adis.length; adiIdx++) {
+			float adiBal = this.adis[adiIdx].getBsLoansADI();
+			if (this.adis[adiIdx].getAdiCategory().equals("Major Bank")) {
+				adiBal += interAdiInvestments.get(adiIdx);
+			} else {
+				adiBal += this.adis[adiIdx].getBsInvestments();
+			}
+			interAdiInvestments.set(adiIdx, adiBal);
+		}
+		// 6. For each ADI, calculate the ratio of the investment balances of the other
+		// ADIs, excluding the major banks. Assign the ADI's ADI Repo Deposits to the
+		// other ADIs per these calculated ratios (store the amounts - not the ratios).
+		// Store pointers to the ADIs at the same time.
+		for (int adiIdx = 0; adiIdx < this.adis.length; adiIdx++) {
+			ArrayList<Float> otherAdiRatios = new ArrayList<Float>(Collections.nCopies(this.adis.length, 0f));
+			// calculate total
+			float otherAdiTotal = 0f;
+			for (int otherAdiIdx = 0; otherAdiIdx < this.adis.length; otherAdiIdx++) {
+				if (adiIdx != otherAdiIdx) {
+					otherAdiTotal += interAdiInvestments.get(otherAdiIdx);
+				}
+			}
+			// create links between ADIs
+			ArrayList<AuthorisedDepositTakingInstitution> adiInvestors = new ArrayList<AuthorisedDepositTakingInstitution>(
+					this.adis.length - 1);
+			ArrayList<Float> adiInvestorAmounts = new ArrayList<Float>(this.adis.length - 1);
+			for (int otherAdiIdx = 0; otherAdiIdx < this.adis.length; otherAdiIdx++) {
+				if (adiIdx != otherAdiIdx) {
+					// calculate ratios and amounts
+					float liability = this.adis[adiIdx].getBsDepositsAdiRepoEligible()
+							* interAdiInvestments.get(otherAdiIdx) / otherAdiTotal;
+					adiInvestorAmounts.add(liability);
+					adiInvestors.add(this.adis[otherAdiIdx]);
+				}
+			}
+			adiInvestors.trimToSize();
+			adiInvestorAmounts.trimToSize();
+			this.adis[adiIdx].setAdiInvestors(adiInvestors);
+			this.adis[adiIdx].setAdiInvestorAmounts(adiInvestorAmounts);
+		}
+		// 7. Take the Government Loans, add in the remaining investment amounts for the
+		// major banks, and assign these as Bond Investors in the AustralianGovernment
+		// agent.
+		ArrayList<AuthorisedDepositTakingInstitution> bondInvestors = new ArrayList<AuthorisedDepositTakingInstitution>();
+		ArrayList<Float> bondInvestorAmounts = new ArrayList<Float>();
+		for (int adiIdx = 0; adiIdx < this.adis.length; adiIdx++) {
+			float bondAmount = majorBankInvestments.get(adiIdx);
+			bondAmount += this.adis[adiIdx].getBsLoansGovernment();
+			if (bondAmount > 0f) {
+				// add bond investor amount & link to govt agent
+				bondInvestors.add(this.adis[adiIdx]);
+				bondInvestorAmounts.add(bondAmount);
+			}
+		}
+		bondInvestors.trimToSize();
+		bondInvestorAmounts.trimToSize();
+		this.govt.setBondInvestors(bondInvestors);
+		this.govt.setBondInvestorAmounts(bondInvestorAmounts);
 
 		// link to Australian Government (payroll & income tax)
 		for (int i = 0; i < this.adis.length; i++) {
@@ -772,20 +976,20 @@ public class CalibrateEconomy {
 		welfareRecipients.trimToSize();
 		this.govt.setWelfareRecipients(welfareRecipients);
 
-		// link to bond investors (ADIs)
-		ArrayList<AuthorisedDepositTakingInstitution> bondInvestors = new ArrayList<AuthorisedDepositTakingInstitution>(
-				this.adis.length);
-		for (int i = 0; i < this.adis.length; i++) {
-			if (this.adis[i].getBsLoansGovernment() > 0f) {
-				// ADI is a government investor
-				bondInvestors.add(adis[i]);
-			}
-		}
-		bondInvestors.trimToSize();
-		this.govt.setBondInvestors(bondInvestors);
+		// N.B. link to bond investors (ADIs) is done in the linkAdis() method
+		/*
+		 * ArrayList<AuthorisedDepositTakingInstitution> bondInvestors = new
+		 * ArrayList<AuthorisedDepositTakingInstitution>( this.adis.length); for (int i
+		 * = 0; i < this.adis.length; i++) { if (this.adis[i].getBsLoansGovernment() >
+		 * 0f) { // ADI is a government investor bondInvestors.add(adis[i]); } }
+		 * bondInvestors.trimToSize(); this.govt.setBondInvestors(bondInvestors);
+		 */
 
-		// FIXME: link to businesses with government sales revenue
-
+		// link to businesses with government sales revenue
+		List<Business> govtSuppliers = Arrays.asList(this.businesses).stream().filter(o -> o.getSalesGovernment() > 0f)
+				.collect(Collectors.toList());
+		ArrayList<Business> governmentSuppliers = new ArrayList<Business>(govtSuppliers);
+		this.govt.setGovernmentSuppliers(governmentSuppliers);
 	}
 
 	/**

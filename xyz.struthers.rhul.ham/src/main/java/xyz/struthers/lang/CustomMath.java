@@ -3,6 +3,7 @@
  */
 package xyz.struthers.lang;
 
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -67,6 +68,16 @@ public class CustomMath {
 			r -= pdf[i];
 		}
 		return pdf.length - 1; // should not happen
+	}
+
+	public static int sample(final List<Float> pdf, Random random) {
+		float r = random.nextFloat();
+		for (int i = 0; i < pdf.size(); i++) {
+			if (r < pdf.get(i))
+				return i;
+			r -= pdf.get(i);
+		}
+		return pdf.size() - 1; // should not happen
 	}
 
 	public static int sample(final double[] pdf, double random) {

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.data.CalibrateEconomy;
 import xyz.struthers.rhul.ham.process.Employer;
 import xyz.struthers.rhul.ham.process.NodePayment;
 import xyz.struthers.rhul.ham.process.Tax;
@@ -584,6 +585,25 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		this.domesticSuppliers = domesticSuppliers;
 	}
 
+	/**
+	 * @param domesticSupplier the domesticSupplier to set
+	 */
+	public void addDomesticSupplier(Business domesticSupplier) {
+		if (this.domesticSuppliers == null) {
+			this.domesticSuppliers = new ArrayList<Business>(CalibrateEconomy.BUSINESS_SUPPLIER_DIV_CODE.length);
+		}
+		this.domesticSuppliers.add(domesticSupplier);
+	}
+	
+	/**
+	 * Trims the list to size to minimise memory usage.
+	 */
+	public void trimDomesticSuppliersList() {
+		if (this.domesticSuppliers != null) {
+			this.domesticSuppliers.trimToSize();
+		}
+	}
+	
 	/**
 	 * @return the domesticSupplierRatios
 	 */

@@ -5,6 +5,8 @@ package xyz.struthers.rhul.ham.agent;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +18,9 @@ import xyz.struthers.rhul.ham.process.NodePayment;
  * only their impact on the Australian economy - so very little detail is
  * recorded against the countries themselves. Most of the details are recorded
  * against the individual businesses that are engaged in international trade
- * with these countries.
+ * with these countries. Importantly, foreign ountries are given a receive a
+ * large enough exogeneous income so that they never default in the Payment
+ * Clearing Vector calculations.
  * 
  * Each instance of this class stores 1 pointer, 18 floats and 17 strings, so
  * will consume approximately 260 bytes of RAM. There are 114 instances of this
@@ -30,6 +34,7 @@ public final class ForeignCountry extends Agent {
 	private static final long serialVersionUID = 1L;
 
 	private final int EXPORTERS_INIT_CAPACITY = 50000;
+	private final String[] STATES = { "NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT" };
 
 	// agent relationships
 	private int paymentClearingIndex;
@@ -47,8 +52,12 @@ public final class ForeignCountry extends Agent {
 	private ArrayList<Float> exchangeRates;
 	private float totalExportsFromAustralia;
 	private float totalImportsToAustralia;
-	private Map<String, Float> exportsFromAustraliaByState; // 8 states
-	private Map<String, Float> importsToAustraliaByState;
+	// values based on ABS data, used to calibrate Agent links
+	private Map<String, Float> initialExportsFromAustraliaByState; // 8 states
+	private Map<String, Float> initialImportsToAustraliaByState;
+	// values based on actual linked Business Agents
+	private Map<String, Float> actualExportsFromAustraliaByState;
+	private Map<String, Float> actualImportsToAustraliaByState;
 
 	/**
 	 * 
@@ -84,8 +93,8 @@ public final class ForeignCountry extends Agent {
 		this.exchangeRates.add(initialExchangeRate);
 		this.totalExportsFromAustralia = exportsFromAustralia;
 		this.totalImportsToAustralia = importsToAustralia;
-		this.exportsFromAustraliaByState = exportsFromAusByState;
-		this.importsToAustraliaByState = importsToAusByState;
+		this.initialExportsFromAustraliaByState = exportsFromAusByState;
+		this.initialImportsToAustraliaByState = importsToAusByState;
 	}
 
 	public void addExporter(Business exporter) {
@@ -97,7 +106,7 @@ public final class ForeignCountry extends Agent {
 
 	public void addAllExporters(List<Business> exporters) {
 		if (this.exporters == null) {
-			this.exporters = new ArrayList<Business>(EXPORTERS_INIT_CAPACITY);
+			this.exporters = new ArrayList<Business>(exporters.size());
 		}
 		this.exporters.addAll(exporters);
 	}
@@ -105,6 +114,29 @@ public final class ForeignCountry extends Agent {
 	public void trimExportersListToSize() {
 		if (this.exporters != null) {
 			this.exporters.trimToSize();
+		}
+	}
+
+	/**
+	 * Updates the state totals based on the actual Business agents that are
+	 * exporters.
+	 */
+	public void updateActualExporters() {
+		if (this.exporters != null) {
+			if (this.actualExportsFromAustraliaByState != null) {
+				// clear out any existing data
+				for (String state : this.actualExportsFromAustraliaByState.keySet()) {
+					this.actualExportsFromAustraliaByState.put(state, 0f);
+				}
+				this.actualExportsFromAustraliaByState.clear();
+				this.actualExportsFromAustraliaByState = null;
+			}
+		}
+		this.actualExportsFromAustraliaByState = new HashMap<String, Float>((int) Math.ceil(STATES.length / 0.75f));
+		for (String state : STATES) {
+			float stateTotal = (float) this.exporters.stream().filter(o -> o.getState().equals(state))
+					.mapToDouble(o -> o.getSalesForeign()).sum();
+			this.actualExportsFromAustraliaByState.put(state, stateTotal);
 		}
 	}
 
@@ -165,84 +197,84 @@ public final class ForeignCountry extends Agent {
 		sb.append(rate.format(this.exchangeRates != null ? this.exchangeRates.get(iteration) : 0) + separator);
 		sb.append(decimal.format(this.totalExportsFromAustralia) + separator);
 		sb.append(decimal.format(this.totalImportsToAustralia) + separator);
-		sb.append(decimal
-				.format(this.exportsFromAustraliaByState != null && this.exportsFromAustraliaByState.containsKey("NSW")
-						? this.exportsFromAustraliaByState.get("NSW")
+		sb.append(decimal.format(this.initialExportsFromAustraliaByState != null
+				&& this.initialExportsFromAustraliaByState.containsKey("NSW")
+						? this.initialExportsFromAustraliaByState.get("NSW")
 						: 0)
 				+ separator);
-		sb.append(decimal
-				.format(this.exportsFromAustraliaByState != null && this.exportsFromAustraliaByState.containsKey("VIC")
-						? this.exportsFromAustraliaByState.get("VIC")
+		sb.append(decimal.format(this.initialExportsFromAustraliaByState != null
+				&& this.initialExportsFromAustraliaByState.containsKey("VIC")
+						? this.initialExportsFromAustraliaByState.get("VIC")
 						: 0)
 				+ separator);
-		sb.append(decimal
-				.format(this.exportsFromAustraliaByState != null && this.exportsFromAustraliaByState.containsKey("QLD")
-						? this.exportsFromAustraliaByState.get("QLD")
+		sb.append(decimal.format(this.initialExportsFromAustraliaByState != null
+				&& this.initialExportsFromAustraliaByState.containsKey("QLD")
+						? this.initialExportsFromAustraliaByState.get("QLD")
 						: 0)
 				+ separator);
-		sb.append(decimal
-				.format(this.exportsFromAustraliaByState != null && this.exportsFromAustraliaByState.containsKey("SA")
-						? this.exportsFromAustraliaByState.get("SA")
+		sb.append(decimal.format(this.initialExportsFromAustraliaByState != null
+				&& this.initialExportsFromAustraliaByState.containsKey("SA")
+						? this.initialExportsFromAustraliaByState.get("SA")
 						: 0)
 				+ separator);
-		sb.append(decimal
-				.format(this.exportsFromAustraliaByState != null && this.exportsFromAustraliaByState.containsKey("WA")
-						? this.exportsFromAustraliaByState.get("WA")
+		sb.append(decimal.format(this.initialExportsFromAustraliaByState != null
+				&& this.initialExportsFromAustraliaByState.containsKey("WA")
+						? this.initialExportsFromAustraliaByState.get("WA")
 						: 0)
 				+ separator);
-		sb.append(decimal
-				.format(this.exportsFromAustraliaByState != null && this.exportsFromAustraliaByState.containsKey("TAS")
-						? this.exportsFromAustraliaByState.get("TAS")
+		sb.append(decimal.format(this.initialExportsFromAustraliaByState != null
+				&& this.initialExportsFromAustraliaByState.containsKey("TAS")
+						? this.initialExportsFromAustraliaByState.get("TAS")
 						: 0)
 				+ separator);
-		sb.append(decimal
-				.format(this.exportsFromAustraliaByState != null && this.exportsFromAustraliaByState.containsKey("NT")
-						? this.exportsFromAustraliaByState.get("NT")
+		sb.append(decimal.format(this.initialExportsFromAustraliaByState != null
+				&& this.initialExportsFromAustraliaByState.containsKey("NT")
+						? this.initialExportsFromAustraliaByState.get("NT")
 						: 0)
 				+ separator);
-		sb.append(decimal
-				.format(this.exportsFromAustraliaByState != null && this.exportsFromAustraliaByState.containsKey("ACT")
-						? this.exportsFromAustraliaByState.get("ACT")
+		sb.append(decimal.format(this.initialExportsFromAustraliaByState != null
+				&& this.initialExportsFromAustraliaByState.containsKey("ACT")
+						? this.initialExportsFromAustraliaByState.get("ACT")
 						: 0)
 				+ separator);
-		sb.append(decimal
-				.format(this.importsToAustraliaByState != null && this.importsToAustraliaByState.containsKey("NSW")
-						? this.importsToAustraliaByState.get("NSW")
+		sb.append(decimal.format(this.initialImportsToAustraliaByState != null
+				&& this.initialImportsToAustraliaByState.containsKey("NSW")
+						? this.initialImportsToAustraliaByState.get("NSW")
 						: 0)
 				+ separator);
-		sb.append(decimal
-				.format(this.importsToAustraliaByState != null && this.importsToAustraliaByState.containsKey("VIC")
-						? this.importsToAustraliaByState.get("VIC")
+		sb.append(decimal.format(this.initialImportsToAustraliaByState != null
+				&& this.initialImportsToAustraliaByState.containsKey("VIC")
+						? this.initialImportsToAustraliaByState.get("VIC")
 						: 0)
 				+ separator);
-		sb.append(decimal
-				.format(this.importsToAustraliaByState != null && this.importsToAustraliaByState.containsKey("QLD")
-						? this.importsToAustraliaByState.get("QLD")
+		sb.append(decimal.format(this.initialImportsToAustraliaByState != null
+				&& this.initialImportsToAustraliaByState.containsKey("QLD")
+						? this.initialImportsToAustraliaByState.get("QLD")
 						: 0)
 				+ separator);
-		sb.append(decimal
-				.format(this.importsToAustraliaByState != null && this.importsToAustraliaByState.containsKey("SA")
-						? this.importsToAustraliaByState.get("SA")
+		sb.append(decimal.format(
+				this.initialImportsToAustraliaByState != null && this.initialImportsToAustraliaByState.containsKey("SA")
+						? this.initialImportsToAustraliaByState.get("SA")
 						: 0)
 				+ separator);
-		sb.append(decimal
-				.format(this.importsToAustraliaByState != null && this.importsToAustraliaByState.containsKey("WA")
-						? this.importsToAustraliaByState.get("WA")
+		sb.append(decimal.format(
+				this.initialImportsToAustraliaByState != null && this.initialImportsToAustraliaByState.containsKey("WA")
+						? this.initialImportsToAustraliaByState.get("WA")
 						: 0)
 				+ separator);
-		sb.append(decimal
-				.format(this.importsToAustraliaByState != null && this.importsToAustraliaByState.containsKey("TAS")
-						? this.importsToAustraliaByState.get("TAS")
+		sb.append(decimal.format(this.initialImportsToAustraliaByState != null
+				&& this.initialImportsToAustraliaByState.containsKey("TAS")
+						? this.initialImportsToAustraliaByState.get("TAS")
 						: 0)
 				+ separator);
-		sb.append(decimal
-				.format(this.importsToAustraliaByState != null && this.importsToAustraliaByState.containsKey("NT")
-						? this.importsToAustraliaByState.get("NT")
+		sb.append(decimal.format(
+				this.initialImportsToAustraliaByState != null && this.initialImportsToAustraliaByState.containsKey("NT")
+						? this.initialImportsToAustraliaByState.get("NT")
 						: 0)
 				+ separator);
-		sb.append(decimal
-				.format(this.importsToAustraliaByState != null && this.importsToAustraliaByState.containsKey("ACT")
-						? this.importsToAustraliaByState.get("ACT")
+		sb.append(decimal.format(this.initialImportsToAustraliaByState != null
+				&& this.initialImportsToAustraliaByState.containsKey("ACT")
+						? this.initialImportsToAustraliaByState.get("ACT")
 						: 0));
 
 		return sb.toString();
@@ -293,10 +325,14 @@ public final class ForeignCountry extends Agent {
 		this.exporters = null;
 
 		this.currency = null;
+		this.exchangeRates = null;
+
 		this.totalExportsFromAustralia = 0f;
 		this.totalImportsToAustralia = 0f;
-		this.exportsFromAustraliaByState = null;
-		this.importsToAustraliaByState = null;
+		this.initialExportsFromAustraliaByState = null;
+		this.initialImportsToAustraliaByState = null;
+		this.actualExportsFromAustraliaByState = null;
+		this.actualImportsToAustraliaByState = null;
 	}
 
 	/**
@@ -345,28 +381,28 @@ public final class ForeignCountry extends Agent {
 	 * @return the exportsFromAustraliaByState
 	 */
 	public Map<String, Float> getExportsFromAustraliaByState() {
-		return exportsFromAustraliaByState;
+		return initialExportsFromAustraliaByState;
 	}
 
 	/**
 	 * @param exportsFromAustraliaByState the exportsFromAustraliaByState to set
 	 */
 	public void setExportsFromAustraliaByState(Map<String, Float> exportsFromAustraliaByState) {
-		this.exportsFromAustraliaByState = exportsFromAustraliaByState;
+		this.initialExportsFromAustraliaByState = exportsFromAustraliaByState;
 	}
 
 	/**
 	 * @return the importsToAustraliaByState
 	 */
 	public Map<String, Float> getImportsToAustraliaByState() {
-		return importsToAustraliaByState;
+		return initialImportsToAustraliaByState;
 	}
 
 	/**
 	 * @param importsToAustraliaByState the importsToAustraliaByState to set
 	 */
 	public void setImportsToAustraliaByState(Map<String, Float> importsToAustraliaByState) {
-		this.importsToAustraliaByState = importsToAustraliaByState;
+		this.initialImportsToAustraliaByState = importsToAustraliaByState;
 	}
 
 }
