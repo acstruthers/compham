@@ -59,9 +59,9 @@ public class CalibrateEconomy {
 			82.38f, 206.69f, 46.62f, 171.85f, 43.86f, 28.64f, 97.08f };
 	public static final String[] ABS_6530_0_SPEND_DIV_CODE = { "D", "G", "H", "G", "G", "C", "P", "Q", "I", "J", "R",
 			"P", "S", "S" };
-	public static final String[] BUSINESS_SUPPLIER_DIV_CODE = { "A", "B", "C", "D", "E", "F", "I", "J", "K", "L", "M",
-			"N", "O" };
-	public static final String[] ADI_SUPPLIER_DIV_CODE = { "C", "D", "E", "F", "I", "J", "K", "L", "M", "N", "O", "P" };
+	public static final String[] BUSINESS_SUPPLIER_DIV_CODE = { "A", "B", "C", "D", "E", "F", "I", "J", "L", "M", "N",
+			"O" };
+	public static final String[] ADI_SUPPLIER_DIV_CODE = { "C", "D", "E", "F", "I", "J", "L", "M", "N", "O", "P" };
 	public static final int[] DIVISION_CODE_INDICES = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
 			18 };
 
@@ -557,7 +557,8 @@ public class CalibrateEconomy {
 					(int) Math.ceil(this.businesses.length / BUSINESS_SUPPLIER_DIV_CODE.length * 2f / 0.75f)));
 		}
 		for (int i = 0; i < this.businesses.length; i++) {
-			String div = this.businesses[i].getIndustryCode();
+			// String div = this.businesses[i].getIndustryCode();
+			String div = String.valueOf(this.businesses[i].getIndustryDivisionCode());
 			if (domesticSupplierDivs.contains(div)) {
 				float domesticSales = this.businesses[i].getSalesDomestic();
 				int businessCount = (int) Math
@@ -636,6 +637,7 @@ public class CalibrateEconomy {
 			String state = ForeignCountry.STATES[stateIdx];
 			stateCountries.put(state, Arrays.asList(this.countries).stream()
 					.filter(o -> o.getAbsImportsToAustraliaForState(state) > 0f).collect(Collectors.toList()));
+			// FIXME: null pointer in ForeignCountry.getAbsImportsToAustrliaForState():433
 
 			// calculate state totals
 			stateImportTotal.put(state, (float) stateCountries.get(state).stream()

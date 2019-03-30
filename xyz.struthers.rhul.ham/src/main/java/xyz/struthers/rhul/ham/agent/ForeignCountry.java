@@ -97,6 +97,13 @@ public final class ForeignCountry extends Agent {
 		this.absImportsToAustraliaByState = importsToAusByState;
 	}
 
+	/**
+	 * @return the exporters
+	 */
+	public ArrayList<Business> getExporters() {
+		return exporters;
+	}
+
 	public void addExporter(Business exporter) {
 		if (this.exporters == null) {
 			this.exporters = new ArrayList<Business>(EXPORTERS_INIT_CAPACITY);
@@ -350,6 +357,20 @@ public final class ForeignCountry extends Agent {
 	}
 
 	/**
+	 * @return the exchangeRates
+	 */
+	public ArrayList<Float> getExchangeRates() {
+		return exchangeRates;
+	}
+
+	/**
+	 * @param exchangeRates the exchangeRates to set
+	 */
+	public void setExchangeRates(ArrayList<Float> exchangeRates) {
+		this.exchangeRates = exchangeRates;
+	}
+
+	/**
 	 * @return the totalExportsFromAustralia
 	 */
 	public float getTotalExportsFromAustralia() {
@@ -383,7 +404,7 @@ public final class ForeignCountry extends Agent {
 	public Map<String, Float> getAbsExportsFromAustraliaByState() {
 		return absExportsFromAustraliaByState;
 	}
-	
+
 	/**
 	 * @return the exportsFromAustraliaByState for the specified state
 	 */
@@ -417,6 +438,20 @@ public final class ForeignCountry extends Agent {
 	 */
 	public void setAbsImportsToAustraliaByState(Map<String, Float> absImportsToAustraliaByState) {
 		this.absImportsToAustraliaByState = absImportsToAustraliaByState;
+	}
+
+	/**
+	 * @return the actualExportsFromAustraliaByState
+	 */
+	public Map<String, Float> getActualExportsFromAustraliaByState() {
+		return actualExportsFromAustraliaByState;
+	}
+
+	/**
+	 * @return the actualImportsToAustraliaByState
+	 */
+	public Map<String, Float> getActualImportsToAustraliaByState() {
+		return actualImportsToAustraliaByState;
 	}
 
 }

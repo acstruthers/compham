@@ -373,10 +373,19 @@ public class Business extends Agent implements Employer {
 
 		// calculate amounts due to foreign suppliers
 		if (this.foreignSuppliers != null && this.foreignExpenses > 0d) {
-			for (ForeignCountry supplier : this.foreignSuppliers) {
+			for (int supplierIdx = 0; supplierIdx < this.foreignSuppliers.size(); supplierIdx++) {
+				ForeignCountry supplier = this.foreignSuppliers.get(supplierIdx);
 				int index = supplier.getPaymentClearingIndex();
-				// FIXME: refactor to use foreign supplier ratios
-				float expense = this.foreignExpenses / this.foreignSuppliers.size();
+				float expense = this.foreignExpenses * this.foreignSupplierRatios.get(supplierIdx);
+				// add in the effect of FX rate movements
+				ArrayList<Float> exchangeRates = supplier.getExchangeRates();
+				float currentExchangeRate = exchangeRates.get(0);
+				if (exchangeRates.size() >= iteration && exchangeRates.get(iteration) != null) {
+					currentExchangeRate = exchangeRates.get(iteration);
+				}
+				// adjust in the opposite direction to exports
+				float exchRateAdjustment = currentExchangeRate / exchangeRates.get(0);
+				expense *= exchRateAdjustment;
 				liabilities.add(new NodePayment(index, expense));
 			}
 		}

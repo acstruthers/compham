@@ -69,6 +69,8 @@ public class CalibrateCountries {
 			Currency currency = this.currencies.getCurrency(ccyCode);
 			ForeignCountry countryAgent = new ForeignCountry(country, currency);
 			// populate the initial import/export estimates
+			this.initialExportsFromAustraliaByState = this.calculateInitialExportsFromAustraliaByState();
+			this.initialImportsToAustraliaByState = this.calculateInitialImportsToAustraliaByState();
 
 			this.countryAgents.add(countryAgent);
 			// N.B. Populate the actual import/export volumes later when the exporter agents
@@ -123,6 +125,8 @@ public class CalibrateCountries {
 				if (countryNames.contains(country)) {
 					// one of the countries for which we have FX data
 					stateSum += dataStates.get(state).get(country).get(absDate);
+					
+					//FIXME: add these to the country itself (ABS exports)
 				}
 			}
 			exports.put(state, stateSum);
@@ -169,6 +173,8 @@ public class CalibrateCountries {
 				if (countryNames.contains(country)) {
 					// one of the countries for which we have FX data
 					stateSum += dataStates.get(state).get(country).get(absDate);
+					
+					//FIXME: add these to the country itself (ABS imports)
 				}
 			}
 			imports.put(state, stateSum);
