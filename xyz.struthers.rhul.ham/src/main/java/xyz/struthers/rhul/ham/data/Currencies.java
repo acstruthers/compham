@@ -69,10 +69,10 @@ public class Currencies {
 		return result;
 	}
 
-	public float getExchangeRate(String isoCode) {
+	public float getExchangeRate(String isoCode, int iteration) {
 		float result = 0f;
 		if (this.currencies != null) {
-			result = this.currencies.get(isoCode).getExchangeRate();
+			result = this.currencies.get(isoCode).getExchangeRate(iteration);
 		}
 		return result;
 	}

@@ -1857,6 +1857,8 @@ public class CalibrationData {
 	}
 
 	/**
+	 * Have already filtered to only those countries for which FX data exists during
+	 * the CSV import process, so this is the list of countries to use in the model.
 	 * 
 	 * @return country data (country name, field name, value)
 	 */

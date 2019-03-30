@@ -3,6 +3,9 @@
  */
 package xyz.struthers.rhul.ham.data;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 /**
  * @author Adam Struthers
  * @since 27-Jan-2019
@@ -11,16 +14,17 @@ public class Currency {
 
 	String iso4217code;
 	String name;
-	float exchangeRate;
 	float avg1yr;
 	float stdev1yr;
 	float stdev5yr;
+	ArrayList<Float> exchangeRate;
 
 	/**
 	 * 
 	 */
 	public Currency() {
 		super();
+		this.exchangeRate = new ArrayList<Float>();
 	}
 
 	public Currency(String isoCode, String currencyName, float fxRate, float average1yr, float standardDeviation1yr,
@@ -28,10 +32,11 @@ public class Currency {
 		super();
 		this.iso4217code = isoCode;
 		this.name = currencyName;
-		this.exchangeRate = fxRate;
 		this.avg1yr = average1yr;
 		this.stdev1yr = standardDeviation1yr;
 		this.stdev5yr = standardDeviation5yr;
+		this.exchangeRate = new ArrayList<Float>();
+		this.exchangeRate.add(fxRate);
 	}
 
 	/**
@@ -65,15 +70,46 @@ public class Currency {
 	/**
 	 * @return the exchangeRate
 	 */
-	public float getExchangeRate() {
-		return exchangeRate;
+	public float getExchangeRate(int iteration) {
+		return exchangeRate.get(iteration);
 	}
 
 	/**
 	 * @param exchangeRate the exchangeRate to set
 	 */
-	public void setExchangeRate(float exchangeRate) {
-		this.exchangeRate = exchangeRate;
+	public int setExchangeRate(int iteration, float exchangeRate) {
+		int result = 0;
+		if (this.exchangeRate.size() > iteration) {
+			this.exchangeRate.set(iteration, exchangeRate);
+		} else if (this.exchangeRate.size() == iteration) {
+			this.exchangeRate.set(iteration, exchangeRate);
+		} else {
+			result = 1;
+		}
+		return result;
+	}
+
+	/**
+	 * Generates the next FX rate, using a Gaussian ("normal") distribution.
+	 * 
+	 * @param random       - the random number genreator to use
+	 * @param use5yrStdDev - true to use 5-year standard deviation, false to use
+	 *                     1-year standard deviation.
+	 * @return the next "random" FX rate
+	 */
+	public float generateNextGaussianFxRate(Random random, boolean use5yrStdDev) {
+		int lastIdx = this.exchangeRate.size() - 1;
+		float oldFxRate = this.exchangeRate.get(lastIdx);
+		double numStdDevs = random.nextGaussian();
+		float newFxRate = 0f;
+		if (use5yrStdDev) {
+			// use 5-year standard deviation
+			oldFxRate = (float) (oldFxRate + numStdDevs * this.stdev5yr);
+		} else {
+			// use 1-year standard deviation
+			oldFxRate = (float) (oldFxRate + numStdDevs * this.stdev1yr);
+		}
+		return newFxRate;
 	}
 
 	/**

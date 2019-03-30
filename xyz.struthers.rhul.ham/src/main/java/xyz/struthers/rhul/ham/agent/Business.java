@@ -375,7 +375,8 @@ public class Business extends Agent implements Employer {
 		if (this.foreignSuppliers != null && this.foreignExpenses > 0d) {
 			for (ForeignCountry supplier : this.foreignSuppliers) {
 				int index = supplier.getPaymentClearingIndex();
-				float expense = this.foreignExpenses / this.domesticSuppliers.size();
+				// FIXME: refactor to use foreign supplier ratios
+				float expense = this.foreignExpenses / this.foreignSuppliers.size();
 				liabilities.add(new NodePayment(index, expense));
 			}
 		}
@@ -491,7 +492,7 @@ public class Business extends Agent implements Employer {
 	public float getNetProfit() {
 		return this.getGrossProfit() - this.getTax();
 	}
-	
+
 	/**
 	 * Domestic expenses figure that is used when forming links between agents.
 	 * 
@@ -700,7 +701,7 @@ public class Business extends Agent implements Employer {
 	public void setDomesticSuppliers(ArrayList<Business> domesticSuppliers) {
 		this.domesticSuppliers = domesticSuppliers;
 	}
-	
+
 	/**
 	 * @param domesticSupplier the domesticSupplier to set
 	 */
@@ -710,7 +711,7 @@ public class Business extends Agent implements Employer {
 		}
 		this.domesticSuppliers.add(domesticSupplier);
 	}
-	
+
 	/**
 	 * Trims the list to size to minimise memory usage.
 	 */

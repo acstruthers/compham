@@ -44,6 +44,9 @@ public class CalibrateEconomy {
 	private static final boolean DEBUG = true;
 	private static final boolean DEBUG_HH = false;
 
+	private static final int MAX_IMPORT_COUNTRIES = 3;
+	private static final int MAX_EXPORT_COUNTRIES = 3;
+
 	/*
 	 * SOURCE: ABS 6530.0 Household Expenditure Survey, Australia: Summary of
 	 * Results, 2015–16; Table 1.1 HOUSEHOLD EXPENDITURE, 1984 to 2015–16(a)
@@ -526,7 +529,7 @@ public class CalibrateEconomy {
 	 * relative revenue (foreign revenue?), by state. Assign foreign countries to
 	 * the businesses based on the given probabilities.
 	 */
-	void linkBusinesses() {
+	private void linkBusinesses() {
 		if (!this.indicesAssigned) {
 			this.assignPaymentClearingIndices();
 		}
@@ -617,8 +620,70 @@ public class CalibrateEconomy {
 		nextDivIdx.clear();
 		nextDivIdx = null;
 
-		// FIXME: up to here implementing linkBusinesses()
-		// TODO link to foreign suppliers (i.e. foreign countries)
+		// link to foreign suppliers (i.e. foreign countries)
+		/**
+		 * Create PDF of each country's import volumes to Australia, by state. Loop
+		 * through the Businesses, assigning each to a country based on their state.
+		 */
+		Map<String, List<ForeignCountry>> stateCountries = new HashMap<String, List<ForeignCountry>>(
+				(int) Math.ceil(ForeignCountry.STATES.length / 0.75f));
+		Map<String, List<Float>> stateCountryImportRatios = new HashMap<String, List<Float>>(
+				(int) Math.ceil(ForeignCountry.STATES.length / 0.75f));
+		Map<String, Float> stateImportTotal = new HashMap<String, Float>(
+				(int) Math.ceil(ForeignCountry.STATES.length / 0.75));
+		for (int stateIdx = 0; stateIdx < ForeignCountry.STATES.length; stateIdx++) {
+			// get relevant foreign countries
+			String state = ForeignCountry.STATES[stateIdx];
+			stateCountries.put(state, Arrays.asList(this.countries).stream()
+					.filter(o -> o.getAbsImportsToAustraliaForState(state) > 0f).collect(Collectors.toList()));
+
+			// calculate state totals
+			stateImportTotal.put(state, (float) stateCountries.get(state).stream()
+					.mapToDouble(o -> o.getAbsImportsToAustraliaForState(state)).sum());
+		}
+		for (int stateIdx = 0; stateIdx < ForeignCountry.STATES.length; stateIdx++) {
+			// calculate PDF from country ratios
+			String state = ForeignCountry.STATES[stateIdx];
+			float stateTotal = stateImportTotal.get(state);
+			ArrayList<Float> ratios = new ArrayList<Float>(stateCountries.get(state).size());
+			for (ForeignCountry country : stateCountries.get(state)) {
+				float countryAmt = country.getAbsImportsToAustraliaForState(state);
+				ratios.add(countryAmt / stateTotal);
+			}
+			ratios.trimToSize();
+			stateCountryImportRatios.put(state, ratios);
+		}
+		for (int importerIdx = 0; importerIdx < this.businesses.length; importerIdx++) {
+			// calculate country ratios within each state
+			String state = this.businesses[importerIdx].getState();
+			if (this.businesses[importerIdx].getForeignExpenses() > 0f) {
+				int numCountries = this.random.nextInt(MAX_IMPORT_COUNTRIES);
+				ArrayList<ForeignCountry> foreignSuppliers = new ArrayList<ForeignCountry>(numCountries);
+				ArrayList<Float> foreignSupplierRatios = new ArrayList<Float>(numCountries);
+				for (int i = 0; i < numCountries; i++) {
+					int countryIdx = CustomMath.sample(stateCountryImportRatios.get(state), this.random);
+					foreignSuppliers.add(stateCountries.get(state).get(countryIdx));
+					foreignSupplierRatios.add(1f / numCountries);
+				}
+				foreignSuppliers.trimToSize();
+				foreignSupplierRatios.trimToSize();
+				this.businesses[importerIdx].setForeignSuppliers(foreignSuppliers);
+				this.businesses[importerIdx].setForeignSupplierRatios(foreignSupplierRatios);
+			}
+		}
+		// release memory
+		for (String state : stateCountries.keySet()) {
+			stateCountries.get(state).clear();
+		}
+		stateCountries.clear();
+		stateCountries = null;
+		for (String state : stateCountryImportRatios.keySet()) {
+			stateCountryImportRatios.get(state).clear();
+		}
+		stateCountryImportRatios.clear();
+		stateCountryImportRatios = null;
+		stateImportTotal.clear();
+		stateImportTotal = null;
 
 		// link to landlord (rent)
 		// get list of businesses with rental income
@@ -950,8 +1015,72 @@ public class CalibrateEconomy {
 			this.assignPaymentClearingIndices();
 		}
 
-		// link to exporters
+		// FIXME link to exporters
+		/**
+		 * Create PDF of each country's export volumes from Australia, by state. Loop
+		 * through the Businesses, assigning each to a country based on their state.
+		 */
+		Map<String, List<ForeignCountry>> stateCountries = new HashMap<String, List<ForeignCountry>>(
+				(int) Math.ceil(ForeignCountry.STATES.length / 0.75f));
+		Map<String, List<Float>> stateCountryExportRatios = new HashMap<String, List<Float>>(
+				(int) Math.ceil(ForeignCountry.STATES.length / 0.75f));
+		Map<String, Float> stateExportTotal = new HashMap<String, Float>(
+				(int) Math.ceil(ForeignCountry.STATES.length / 0.75));
+		for (int stateIdx = 0; stateIdx < ForeignCountry.STATES.length; stateIdx++) {
+			// get relevant foreign countries
+			String state = ForeignCountry.STATES[stateIdx];
+			stateCountries.put(state, Arrays.asList(this.countries).stream()
+					.filter(o -> o.getAbsExportsFromAustraliaForState(state) > 0f).collect(Collectors.toList()));
 
+			// calculate state totals
+			stateExportTotal.put(state, (float) stateCountries.get(state).stream()
+					.mapToDouble(o -> o.getAbsExportsFromAustraliaForState(state)).sum());
+		}
+		for (int stateIdx = 0; stateIdx < ForeignCountry.STATES.length; stateIdx++) {
+			// calculate PDF from country ratios
+			String state = ForeignCountry.STATES[stateIdx];
+			float stateTotal = stateExportTotal.get(state);
+			ArrayList<Float> ratios = new ArrayList<Float>(stateCountries.get(state).size());
+			for (ForeignCountry country : stateCountries.get(state)) {
+				float countryAmt = country.getAbsExportsFromAustraliaForState(state);
+				ratios.add(countryAmt / stateTotal);
+			}
+			ratios.trimToSize();
+			stateCountryExportRatios.put(state, ratios);
+		}
+
+		// TODO UP TO HERE ### link to foreign suppliers (i.e. foreign countries)
+		for (int exporterIdx = 0; exporterIdx < this.businesses.length; exporterIdx++) {
+			// calculate country ratios within each state
+			String state = this.businesses[exporterIdx].getState();
+			if (this.businesses[exporterIdx].getSalesForeign() > 0f) {
+				int numCountries = this.random.nextInt(MAX_EXPORT_COUNTRIES);
+				ArrayList<ForeignCountry> foreignCustomers = new ArrayList<ForeignCountry>(numCountries);
+				ArrayList<Float> foreignCustomerRatios = new ArrayList<Float>(numCountries);
+				for (int i = 0; i < numCountries; i++) {
+					int countryIdx = CustomMath.sample(stateCountryExportRatios.get(state), this.random);
+					foreignCustomers.add(stateCountries.get(state).get(countryIdx));
+					foreignCustomerRatios.add(1f / numCountries);
+				}
+				foreignCustomers.trimToSize();
+				foreignCustomerRatios.trimToSize();
+				this.businesses[exporterIdx].setForeignSuppliers(foreignCustomers);
+				this.businesses[exporterIdx].setForeignSupplierRatios(foreignCustomerRatios);
+			}
+		}
+		// release memory
+		for (String state : stateCountries.keySet()) {
+			stateCountries.get(state).clear();
+		}
+		stateCountries.clear();
+		stateCountries = null;
+		for (String state : stateCountryExportRatios.keySet()) {
+			stateCountryExportRatios.get(state).clear();
+		}
+		stateCountryExportRatios.clear();
+		stateCountryExportRatios = null;
+		stateExportTotal.clear();
+		stateExportTotal = null;
 	}
 
 	/**
