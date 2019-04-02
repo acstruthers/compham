@@ -131,6 +131,9 @@ public class AustralianEconomy implements Serializable {
 	 * 
 	 * TODO: Combine employees in the one Household if they work for the same
 	 * Employer.
+	 * 
+	 * TODO: include cash balances as exogeneous inputs because they only default if
+	 * cash plus income is less than liabilities
 	 */
 	void preparePaymentsClearingVectorInputs(int iteration) {
 		// initialise local variables
@@ -281,11 +284,12 @@ public class AustralianEconomy implements Serializable {
 			// calculate exogeneous cash flow (i.e. not from another Agent)
 			// TODO the RBA is assumed to never default
 			// whatever it is short by it simply borrows
-			float exogeneous = totalLiabilities + BUFFER_RBA; // liabilities plus a buffer
+			float exogeneous = this.rba.getPnlPersonnelExpenses() + this.rba.getPnlOtherExpenses()
+					+ this.rba.getPnlDistributionPayableToCommonwealth() + this.rba.getBsCash() + BUFFER_RBA;
+			// liabilities plus a buffer
+
 			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
 		}
-	}
-
 	}
 
 	/**

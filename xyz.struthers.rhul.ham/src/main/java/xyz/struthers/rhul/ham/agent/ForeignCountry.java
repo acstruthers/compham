@@ -429,7 +429,11 @@ public final class ForeignCountry extends Agent {
 	 * @return the exportsFromAustraliaByState for the specified state
 	 */
 	public float getAbsExportsFromAustraliaForState(String state) {
-		return absExportsFromAustraliaByState.get(state);
+		float exports = 0f;
+		if (absExportsFromAustraliaByState.containsKey(state)) {
+			exports = absExportsFromAustraliaByState.get(state);
+		}
+		return exports;
 	}
 
 	/**
@@ -437,6 +441,19 @@ public final class ForeignCountry extends Agent {
 	 */
 	public void setAbsExportsFromAustraliaByState(Map<String, Float> exportsFromAustraliaByState) {
 		this.absExportsFromAustraliaByState = exportsFromAustraliaByState;
+	}
+
+	/**
+	 * Adds a single state's exports to the country
+	 * 
+	 * @param state
+	 * @param exportsFromAustralia
+	 */
+	public void putAbsExportsFromAustraliaByState(String state, Float exportsFromAustralia) {
+		if (this.absExportsFromAustraliaByState == null) {
+			this.absExportsFromAustraliaByState = new HashMap<String, Float>((int) Math.ceil(STATES.length / 0.75f));
+		}
+		this.absExportsFromAustraliaByState.put(state, exportsFromAustralia);
 	}
 
 	/**
@@ -450,7 +467,11 @@ public final class ForeignCountry extends Agent {
 	 * @return the importsToAustraliaByState for the specified state
 	 */
 	public float getAbsImportsToAustraliaForState(String state) {
-		return absImportsToAustraliaByState.get(state);
+		float imports = 0f;
+		if (absImportsToAustraliaByState.containsKey(state)) {
+			imports = absImportsToAustraliaByState.get(state);
+		}
+		return imports;
 	}
 
 	/**
@@ -458,6 +479,19 @@ public final class ForeignCountry extends Agent {
 	 */
 	public void setAbsImportsToAustraliaByState(Map<String, Float> absImportsToAustraliaByState) {
 		this.absImportsToAustraliaByState = absImportsToAustraliaByState;
+	}
+
+	/**
+	 * Adds a single state's imports to the country
+	 * 
+	 * @param state
+	 * @param absImportsToAustralia
+	 */
+	public void putAbsImportsToAustraliaByState(String state, Float absImportsToAustralia) {
+		if (this.absImportsToAustraliaByState == null) {
+			this.absImportsToAustraliaByState = new HashMap<String, Float>((int) Math.ceil(STATES.length / 0.75f));
+		}
+		this.absImportsToAustraliaByState.put(state, absImportsToAustralia);
 	}
 
 	/**

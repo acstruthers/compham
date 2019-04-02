@@ -44,7 +44,8 @@ public class CalibrateCountries {
 
 	// field variables
 	private Map<String, Map<String, String>> allCountryData;
-	private List<ForeignCountry> countryAgents;
+	private ArrayList<ForeignCountry> countryAgents;
+	private Map<String, ForeignCountry> countryNameMap;
 
 	// values based on ABS data, used to calibrate Agent links
 	private Map<String, Float> initialExportsFromAustraliaByState; // 8 states
@@ -60,9 +61,10 @@ public class CalibrateCountries {
 
 	public void createCountryAgents() {
 		this.allCountryData = this.data.getCountryData(); // just those with FX data
-		this.countryAgents = new ArrayList<ForeignCountry>();
-
+		
 		Set<String> countryKeySet = new HashSet<String>(this.allCountryData.keySet());
+		this.countryAgents = new ArrayList<ForeignCountry>(countryKeySet.size());
+		this.countryNameMap = new HashMap<String, ForeignCountry>((int) Math.ceil(countryKeySet.size() / 0.75f));
 		for (String key : countryKeySet) {
 			String country = key;
 			String ccyCode = this.allCountryData.get(key).get("Currency Code");
@@ -72,11 +74,16 @@ public class CalibrateCountries {
 			this.initialExportsFromAustraliaByState = this.calculateInitialExportsFromAustraliaByState();
 			this.initialImportsToAustraliaByState = this.calculateInitialImportsToAustraliaByState();
 
+			// FIXME: add ABS initial import/export volumes to country agent
+			
 			this.countryAgents.add(countryAgent);
 			// N.B. Populate the actual import/export volumes later when the exporter agents
 			// have been calibrated
-		}
 
+			// add the countries to a map so we can look them up by name
+			this.countryNameMap.put(countryAgent.getName(), countryAgent); // CHECKME: does the name exist here?
+		}
+		this.countryAgents.trimToSize();
 		this.addAgentsToEconomy();
 
 		// release memory
@@ -88,7 +95,7 @@ public class CalibrateCountries {
 	}
 
 	/**
-	 * FIXME: Converts the CSV data into a summarised map. This will be used in
+	 * CHECKME: Converts the CSV data into a summarised map. This will be used in
 	 * calibrating the links between countries and businesses.
 	 * 
 	 * @return a map of total exports from Australia by state
@@ -124,9 +131,11 @@ public class CalibrateCountries {
 			for (String country : dataStates.get(state).keySet()) {
 				if (countryNames.contains(country)) {
 					// one of the countries for which we have FX data
-					stateSum += dataStates.get(state).get(country).get(absDate);
-					
-					//FIXME: add these to the country itself (ABS exports)
+					float exportAmount = dataStates.get(state).get(country).get(absDate);
+					stateSum += exportAmount;
+
+					// add these to the country itself (ABS exports)
+					this.countryNameMap.get(country).putAbsExportsFromAustraliaByState(state, exportAmount);
 				}
 			}
 			exports.put(state, stateSum);
@@ -172,9 +181,11 @@ public class CalibrateCountries {
 			for (String country : dataStates.get(state).keySet()) {
 				if (countryNames.contains(country)) {
 					// one of the countries for which we have FX data
-					stateSum += dataStates.get(state).get(country).get(absDate);
-					
-					//FIXME: add these to the country itself (ABS imports)
+					float importAmount = dataStates.get(state).get(country).get(absDate);
+					stateSum += importAmount;
+
+					// add these to the country itself (ABS imports)
+					this.countryNameMap.get(country).putAbsImportsToAustraliaByState(state, importAmount);
 				}
 			}
 			imports.put(state, stateSum);
