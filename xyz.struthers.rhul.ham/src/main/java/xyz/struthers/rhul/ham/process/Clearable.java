@@ -49,4 +49,29 @@ public interface Clearable {
 	 *         amounts owed.
 	 */
 	public List<NodePayment> getAmountsPayable(int iteration);
+
+	/**
+	 * Sets which iteration and order the Agent defaulted on their payments.
+	 * 
+	 * @param iteration
+	 * @param order
+	 */
+	public void setDefaultedIteration(int iteration, int order);
+
+	/**
+	 * Gets the iteration that the Agent defaulted on their payments. If they
+	 * haven't defaulted yet, this is zero.
+	 * 
+	 * @return
+	 */
+	public int getDefaultIteration();
+
+	/**
+	 * Gets the order within the iteration that the Agent defaulted on their
+	 * payments.
+	 * 
+	 * @return the order that he agent defaulted within the iteration that they
+	 *         defaulted
+	 */
+	public int getDefaultOrder();
 }

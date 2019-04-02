@@ -39,6 +39,8 @@ public final class ForeignCountry extends Agent {
 	// agent relationships
 	private int paymentClearingIndex;
 	private ArrayList<Business> exporters;
+	private int defaultIteration;
+	private int defaultOrder;
 
 	// field variables
 	private Currency currency;
@@ -318,11 +320,29 @@ public final class ForeignCountry extends Agent {
 		return liabilities;
 	}
 
+	@Override
+	public void setDefaultedIteration(int iteration, int order) {
+		this.defaultIteration = iteration;
+		this.defaultOrder = order;
+	}
+
+	@Override
+	public int getDefaultIteration() {
+		return this.defaultIteration;
+	}
+
+	@Override
+	public int getDefaultOrder() {
+		return this.defaultOrder;
+	}
+
 	protected void init() {
 		super.name = null;
 
 		this.paymentClearingIndex = 0;
 		this.exporters = null;
+		this.defaultIteration = 0;
+		this.defaultOrder = 0;
 
 		this.currency = null;
 		this.exchangeRates = null;
@@ -383,7 +403,7 @@ public final class ForeignCountry extends Agent {
 	public Map<String, Float> getAbsExportsFromAustraliaByState() {
 		return absExportsFromAustraliaByState;
 	}
-	
+
 	/**
 	 * @return the exportsFromAustraliaByState for the specified state
 	 */

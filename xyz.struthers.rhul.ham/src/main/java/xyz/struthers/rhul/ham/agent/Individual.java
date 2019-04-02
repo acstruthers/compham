@@ -201,6 +201,32 @@ public final class Individual extends Agent {
 		return null;
 	}
 
+	@Override
+	public void setDefaultedIteration(int iteration, int order) {
+		/*
+		 * Individuals don't participate directly in the Payments Clearing Vector
+		 * algorithm - only through the Households they belong to.
+		 */
+	}
+
+	@Override
+	public int getDefaultIteration() {
+		/*
+		 * Individuals don't participate directly in the Payments Clearing Vector
+		 * algorithm - only through the Households they belong to.
+		 */
+		return 0;
+	}
+
+	@Override
+	public int getDefaultOrder() {
+		/*
+		 * Individuals don't participate directly in the Payments Clearing Vector
+		 * algorithm - only through the Households they belong to.
+		 */
+		return 0;
+	}
+
 	protected void init() {
 		// agents
 		this.household = null;

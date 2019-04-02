@@ -36,6 +36,8 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 	protected ArrayList<Individual> employees; // calculate wages & super
 	protected ArrayList<AuthorisedDepositTakingInstitution> adiDepositors; // major and other domestic banks
 	private AustralianGovernment govt;
+	private int defaultIteration;
+	private int defaultOrder;
 
 	// cash rate
 	protected ArrayList<Float> cashRate;
@@ -43,8 +45,8 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 	// P&L
 	private float pnlInterestIncome;
 	private float pnlInterestExpense;
-	private float pnlCommittedLiquidityFacilityFees;
-	private float pnlForeignExchangeGainsLosses;
+	private float pnlCommittedLiquidityFacilityFees; // FIXME: add CLF to major banks' payables
+	private float pnlForeignExchangeGainsLosses; // TODO: add FX GOL to exogeneous cashflow, with FX rates
 	private float pnlAudSecurities;
 	private float pnlOtherIncome;
 
@@ -265,6 +267,22 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 		return liabilities;
 	}
 
+	@Override
+	public void setDefaultedIteration(int iteration, int order) {
+		this.defaultIteration = iteration;
+		this.defaultOrder = order;
+	}
+
+	@Override
+	public int getDefaultIteration() {
+		return this.defaultIteration;
+	}
+
+	@Override
+	public int getDefaultOrder() {
+		return this.defaultOrder;
+	}
+
 	/**
 	 * @return the industryDivisionCode
 	 */
@@ -390,6 +408,8 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 		// agent relationships
 		this.paymentClearingIndex = 0;
 		this.adiDepositors = null;
+		this.defaultIteration = 0;
+		this.defaultOrder = 0;
 
 		// cash rate
 		this.cashRate = null;

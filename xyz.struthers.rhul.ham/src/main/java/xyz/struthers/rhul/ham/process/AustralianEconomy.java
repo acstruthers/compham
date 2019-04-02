@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -54,6 +56,10 @@ public class AustralianEconomy implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	public static final float BUFFER_COUNTRY = 1000000f;
+	public static final float BUFFER_GOVT = 1000000f;
+	public static final float BUFFER_RBA = 1000000f;
+
 	// Agents
 	Household[] households;
 	Individual[] individuals;
@@ -63,6 +69,12 @@ public class AustralianEconomy implements Serializable {
 	Currencies currencies;
 	ReserveBankOfAustralia rba;
 	AustralianGovernment government;
+
+	// Process
+	ClearingPaymentVector payments;
+	List<List<Float>> liabilitiesAmounts;
+	List<List<Integer>> liabilitiesIndices;
+	List<Float> operatingCashFlow;
 
 	// Analytics
 	int[] businessTypeCount;
@@ -87,6 +99,12 @@ public class AustralianEconomy implements Serializable {
 		this.rba = null;
 		this.government = null;
 
+		// Process
+		this.payments = null;
+		this.liabilitiesAmounts = null;
+		this.liabilitiesIndices = null;
+		this.operatingCashFlow = null;
+
 		// Analytics
 		this.businessTypeCount = null;
 	}
@@ -96,16 +114,185 @@ public class AustralianEconomy implements Serializable {
 	 */
 	@PreDestroy
 	public void close() {
-		// TODO: implement me
+		// TODO: implement close method for Clearing Payment Vector
 	}
 
 	/**
-	 * Prepares input data for Payments Clearing Vector algorithm.
+	 * Prepares input data for Clearing Payments Vector algorithm.
+	 * 
+	 * Operating cashflow should be at least the sum of the liabilities for foreign
+	 * countries because they're outside of the scope of the model. They are only
+	 * included so that payments from agents who are in scope to foreign countries
+	 * can be included.
+	 * 
+	 * Businesses can cease to exist if they have gone bankrupt in a prior
+	 * iteration, they must still appear in the model so the indices that were set
+	 * during calibration remain valid.
 	 * 
 	 * TODO: Combine employees in the one Household if they work for the same
 	 * Employer.
 	 */
-	private void preparePaymentsClearingVectorInputs() {
+	void preparePaymentsClearingVectorInputs(int iteration) {
+		// initialise local variables
+		int totalAgentCount = 1 + 1 + this.households.length + this.businesses.length + this.adis.length
+				+ this.countries.length;
+		this.liabilitiesAmounts = new ArrayList<List<Float>>(totalAgentCount);
+		this.liabilitiesIndices = new ArrayList<List<Integer>>(totalAgentCount);
+		this.operatingCashFlow = new ArrayList<Float>(totalAgentCount);
+		for (int i = 0; i < totalAgentCount; i++) {
+			// initialise them so we can use set without getting index out of bounds errors
+			this.liabilitiesAmounts.add(new ArrayList<Float>());
+			this.liabilitiesIndices.add(new ArrayList<Integer>());
+			this.operatingCashFlow.add(0f);
+		}
+
+		// households
+		for (Household household : this.households) {
+			int paymentClearingIndex = household.getPaymentClearingIndex();
+
+			// calculate liabilities
+			List<NodePayment> nodePayments = household.getAmountsPayable(iteration);
+			ArrayList<Float> liabilityAmounts = new ArrayList<Float>(nodePayments.size());
+			ArrayList<Integer> liabilityIndices = new ArrayList<Integer>(nodePayments.size());
+			for (int creditorIdx = 0; creditorIdx < nodePayments.size(); creditorIdx++) {
+				liabilityAmounts.add(nodePayments.get(creditorIdx).getLiabilityAmount());
+				liabilityIndices.add(nodePayments.get(creditorIdx).getRecipientIndex());
+			}
+			liabilityAmounts.trimToSize();
+			liabilityIndices.trimToSize();
+			this.liabilitiesAmounts.set(paymentClearingIndex, liabilityAmounts);
+			this.liabilitiesIndices.set(paymentClearingIndex, liabilityIndices);
+
+			// calculate exogeneous cash flow (i.e. not from another Agent)
+			float exogeneous = household.getPnlInvestmentIncome() + household.getPnlOtherIncome();
+			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
+		}
+
+		// businesses
+		for (Business business : this.businesses) {
+			int paymentClearingIndex = business.getPaymentClearingIndex();
+
+			// calculate liabilities
+			List<NodePayment> nodePayments = business.getAmountsPayable(iteration);
+			ArrayList<Float> liabilityAmounts = new ArrayList<Float>(nodePayments.size());
+			ArrayList<Integer> liabilityIndices = new ArrayList<Integer>(nodePayments.size());
+			for (int creditorIdx = 0; creditorIdx < nodePayments.size(); creditorIdx++) {
+				liabilityAmounts.add(nodePayments.get(creditorIdx).getLiabilityAmount());
+				liabilityIndices.add(nodePayments.get(creditorIdx).getRecipientIndex());
+			}
+			liabilityAmounts.trimToSize();
+			liabilityIndices.trimToSize();
+			this.liabilitiesAmounts.set(paymentClearingIndex, liabilityAmounts);
+			this.liabilitiesIndices.set(paymentClearingIndex, liabilityIndices);
+
+			// calculate exogeneous cash flow (i.e. not from another Agent)
+			float exogeneous = business.getOtherIncome();
+			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
+		}
+
+		// ADIs
+		for (AuthorisedDepositTakingInstitution adi : this.adis) {
+			int paymentClearingIndex = adi.getPaymentClearingIndex();
+
+			// calculate liabilities
+			List<NodePayment> nodePayments = adi.getAmountsPayable(iteration);
+			ArrayList<Float> liabilityAmounts = new ArrayList<Float>(nodePayments.size());
+			ArrayList<Integer> liabilityIndices = new ArrayList<Integer>(nodePayments.size());
+			for (int creditorIdx = 0; creditorIdx < nodePayments.size(); creditorIdx++) {
+				liabilityAmounts.add(nodePayments.get(creditorIdx).getLiabilityAmount());
+				liabilityIndices.add(nodePayments.get(creditorIdx).getRecipientIndex());
+			}
+			liabilityAmounts.trimToSize();
+			liabilityIndices.trimToSize();
+			this.liabilitiesAmounts.set(paymentClearingIndex, liabilityAmounts);
+			this.liabilitiesIndices.set(paymentClearingIndex, liabilityIndices);
+
+			// calculate exogeneous cash flow (i.e. not from another Agent)
+			float exogeneous = adi.getPnlTradingIncome() + adi.getPnlInvestmentIncome() + adi.getPnlOtherIncome();
+			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
+		}
+
+		// countries
+		for (ForeignCountry country : this.countries) {
+			int paymentClearingIndex = country.getPaymentClearingIndex();
+
+			// calculate liabilities
+			List<NodePayment> nodePayments = country.getAmountsPayable(iteration);
+			ArrayList<Float> liabilityAmounts = new ArrayList<Float>(nodePayments.size());
+			ArrayList<Integer> liabilityIndices = new ArrayList<Integer>(nodePayments.size());
+			for (int creditorIdx = 0; creditorIdx < nodePayments.size(); creditorIdx++) {
+				liabilityAmounts.add(nodePayments.get(creditorIdx).getLiabilityAmount());
+				liabilityIndices.add(nodePayments.get(creditorIdx).getRecipientIndex());
+			}
+			liabilityAmounts.trimToSize();
+			liabilityIndices.trimToSize();
+			this.liabilitiesAmounts.set(paymentClearingIndex, liabilityAmounts);
+			this.liabilitiesIndices.set(paymentClearingIndex, liabilityIndices);
+
+			// calculate exogeneous cash flow (i.e. not from another Agent)
+			// foreign countries are assumed to never default
+			float totalLiabilities = (float) liabilityAmounts.stream().mapToDouble(o -> o).sum();
+			float exogeneous = totalLiabilities + BUFFER_COUNTRY; // liabilities plus a buffer
+			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
+		}
+
+		// government
+		{
+			int paymentClearingIndex = this.government.getPaymentClearingIndex();
+
+			// calculate liabilities
+			List<NodePayment> nodePayments = this.government.getAmountsPayable(iteration);
+			ArrayList<Float> liabilityAmounts = new ArrayList<Float>(nodePayments.size());
+			ArrayList<Integer> liabilityIndices = new ArrayList<Integer>(nodePayments.size());
+			for (int creditorIdx = 0; creditorIdx < nodePayments.size(); creditorIdx++) {
+				liabilityAmounts.add(nodePayments.get(creditorIdx).getLiabilityAmount());
+				liabilityIndices.add(nodePayments.get(creditorIdx).getRecipientIndex());
+			}
+			liabilityAmounts.trimToSize();
+			liabilityIndices.trimToSize();
+			this.liabilitiesAmounts.set(paymentClearingIndex, liabilityAmounts);
+			this.liabilitiesIndices.set(paymentClearingIndex, liabilityIndices);
+
+			// calculate exogeneous cash flow (i.e. not from another Agent)
+			// the government is assumed to never default
+			// whatever it is short by it simply borrows
+			float exogeneous = this.government.getPnlSaleOfGoodsAndServices() + this.government.getPnlOtherIncome()
+					+ BUFFER_GOVT; // liabilities plus a buffer
+			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
+		}
+
+		// RBA
+		{
+			int paymentClearingIndex = this.rba.getPaymentClearingIndex();
+
+			// calculate liabilities
+			List<NodePayment> nodePayments = this.rba.getAmountsPayable(iteration);
+			ArrayList<Float> liabilityAmounts = new ArrayList<Float>(nodePayments.size());
+			ArrayList<Integer> liabilityIndices = new ArrayList<Integer>(nodePayments.size());
+			for (int creditorIdx = 0; creditorIdx < nodePayments.size(); creditorIdx++) {
+				liabilityAmounts.add(nodePayments.get(creditorIdx).getLiabilityAmount());
+				liabilityIndices.add(nodePayments.get(creditorIdx).getRecipientIndex());
+			}
+			liabilityAmounts.trimToSize();
+			liabilityIndices.trimToSize();
+			this.liabilitiesAmounts.set(paymentClearingIndex, liabilityAmounts);
+			this.liabilitiesIndices.set(paymentClearingIndex, liabilityIndices);
+
+			// calculate exogeneous cash flow (i.e. not from another Agent)
+			// TODO the RBA is assumed to never default
+			// whatever it is short by it simply borrows
+			float exogeneous = totalLiabilities + BUFFER_RBA; // liabilities plus a buffer
+			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
+		}
+	}
+
+	}
+
+	/**
+	 * Takes the output of the Payments Clearing Vector algorithm and updates the
+	 * status and financial statements of the agents involved.
+	 */
+	void processPaymentsClearingVectorOutputs() {
 
 	}
 

@@ -36,6 +36,8 @@ public class Household extends Agent {
 	private ArrayList<Float> supplierRatios; // per ABS 6530.0
 	private Household landlord;
 	private AustralianGovernment govt;
+	private int defaultIteration;
+	private int defaultOrder;
 
 	// P&L (72 bytes)
 	private float pnlWagesSalaries;
@@ -44,7 +46,7 @@ public class Household extends Agent {
 	private float pnlInvestmentIncome; // other income (including superannuation & dividends)
 	private float pnlInterestIncome;
 	private float pnlRentIncome; // income from investment properties
-	private float pnlForeignIncome;
+	private float pnlForeignIncome; // FIXME: link to country
 	private float pnlOtherIncome;
 	private float pnlIncomeTaxExpense;
 
@@ -257,6 +259,22 @@ public class Household extends Agent {
 		return null;
 	}
 
+	@Override
+	public void setDefaultedIteration(int iteration, int order) {
+		this.defaultIteration = iteration;
+		this.defaultOrder = order;
+	}
+
+	@Override
+	public int getDefaultIteration() {
+		return this.defaultIteration;
+	}
+
+	@Override
+	public int getDefaultOrder() {
+		return this.defaultOrder;
+	}
+
 	/**
 	 * Calculates the interest component of the loan repayment due to bank. Assumes
 	 * home loans are principal and interest, while investment property loans are
@@ -323,6 +341,8 @@ public class Household extends Agent {
 		this.supplierRatios = null;
 		this.landlord = null;
 		this.govt = null;
+		this.defaultIteration = 0;
+		this.defaultOrder = 0;
 
 		// P&L
 		this.pnlWagesSalaries = 0f;

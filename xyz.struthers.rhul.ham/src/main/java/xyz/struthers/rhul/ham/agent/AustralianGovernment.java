@@ -36,6 +36,8 @@ public final class AustralianGovernment extends Agent implements Employer {
 	private ArrayList<AuthorisedDepositTakingInstitution> bondInvestors;
 	private ArrayList<Float> bondInvestorAmounts;
 	private ArrayList<Business> governmentSuppliers;
+	private int defaultIteration;
+	private int defaultOrder;
 
 	// P&L
 	private float pnlTaxIncome;
@@ -272,6 +274,22 @@ public final class AustralianGovernment extends Agent implements Employer {
 		return liabilities;
 	}
 
+	@Override
+	public void setDefaultedIteration(int iteration, int order) {
+		this.defaultIteration = iteration;
+		this.defaultOrder = order;
+	}
+
+	@Override
+	public int getDefaultIteration() {
+		return this.defaultIteration;
+	}
+
+	@Override
+	public int getDefaultOrder() {
+		return this.defaultOrder;
+	}
+
 	/**
 	 * @return the industryDivisionCode
 	 */
@@ -407,6 +425,8 @@ public final class AustralianGovernment extends Agent implements Employer {
 		// Agent details
 		super.init();
 		this.name = "Australian Government";
+		this.defaultIteration = 0;
+		this.defaultOrder = 0;
 
 		// P&L
 		this.pnlTaxIncome = 0f;

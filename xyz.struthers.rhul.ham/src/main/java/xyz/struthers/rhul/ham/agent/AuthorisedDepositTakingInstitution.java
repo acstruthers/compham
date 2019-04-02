@@ -48,6 +48,8 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	protected ArrayList<Float> adiInvestorAmounts;// TODO: implement me
 	protected AustralianGovernment govt;
 	protected ReserveBankOfAustralia rba;
+	protected int defaultIteration;
+	protected int defaultOrder;
 
 	// P&L (40 bytes)
 	protected float pnlInterestIncome;
@@ -555,6 +557,22 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		return liabilities;
 	}
 
+	@Override
+	public void setDefaultedIteration(int iteration, int order) {
+		this.defaultIteration = iteration;
+		this.defaultOrder = order;
+	}
+
+	@Override
+	public int getDefaultIteration() {
+		return this.defaultIteration;
+	}
+
+	@Override
+	public int getDefaultOrder() {
+		return this.defaultOrder;
+	}
+
 	/**
 	 * @return the industryDivisionCode
 	 */
@@ -569,6 +587,85 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	@Override
 	public void setIndustryDivisionCode(char industryDivisionCode) {
 		this.industryDivisionCode = industryDivisionCode;
+	}
+
+	protected void init() {
+		super.init();
+
+		// Company details
+		this.australianBusinessNumber = null;
+		this.shortName = null;
+		this.adiCategory = null;
+		this.industryDivisionCode = '\0';
+		this.state = null;
+		this.isGccsa = false;
+
+		// agent relationships
+		this.paymentClearingIndex = 0;
+		this.employees = null;
+		this.domesticSuppliers = null;
+		this.domesticSupplierRatios = null;
+		this.retailDepositors = null;
+		this.commercialDepositors = null;
+		this.adiInvestors = null;
+		this.adiInvestorAmounts = null;
+		this.govt = null;
+		this.rba = null;
+		this.defaultIteration = 0;
+		this.defaultOrder = 0;
+
+		// P&L
+		this.pnlInterestIncome = 0f;
+		this.pnlInterestExpense = 0f;
+		this.pnlTradingIncome = 0f;
+		this.pnlInvestmentIncome = 0f;
+		this.pnlOtherIncome = 0f;
+		this.pnlPersonnelExpenses = 0f;
+		this.pnlLoanImpairmentExpense = 0f;
+		this.pnlDepreciationAmortisation = 0f;
+		this.pnlOtherExpenses = 0f;
+		this.pnlIncomeTaxExpense = 0f;
+
+		// Bal Sht
+		this.bsCash = 0f;
+		this.bsTradingSecurities = 0f;
+		this.bsDerivativeAssets = 0f;
+		this.bsInvestments = 0f;
+		this.bsLoansPersonal = 0f;
+		this.bsLoansHome = 0f;
+		this.bsLoansBusiness = 0f;
+		this.bsLoansADI = 0f;
+		this.bsLoansGovernment = 0f;
+		this.bsOtherNonFinancialAssets = 0f;
+		this.bsDepositsAtCall = 0f;
+		this.bsDepositsTerm = 0f;
+		this.bsDepositsAdiRepoEligible = 0f;
+		this.bsDerivativeLiabilities = 0f;
+		this.bsBondsNotesBorrowings = 0f;
+		this.bsOtherLiabilities = 0f;
+		this.bsRetainedEarnings = 0f;
+		this.bsReserves = 0f;
+		this.bsOtherEquity = 0f;
+
+		// Metrics
+		this.rateCash = 0f;
+		this.rateTrading = 0f;
+		this.rateInvestment = 0f;
+		this.rateAdiLoan = 0f;
+		this.rateGovernmentLoan = 0f;
+		this.rateTotalLoans = 0f;
+		this.rateTotalDeposits = 0f;
+		this.rateBondsNotesBorrowings = 0f;
+		this.capitalTotalRatio = 0f;
+		this.capitalTotalAmount = 0f;
+		this.capitalTotalRWA = 0f;
+		this.capitalCreditRWA = 0f;
+
+		// effective interest rates
+		this.depositRate = null;
+		this.loanRate = null;
+		this.borrowingsRate = null;
+		this.govtBondRate = null;
 	}
 
 	/**
@@ -594,7 +691,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		}
 		this.domesticSuppliers.add(domesticSupplier);
 	}
-	
+
 	/**
 	 * Trims the list to size to minimise memory usage.
 	 */
@@ -603,7 +700,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 			this.domesticSuppliers.trimToSize();
 		}
 	}
-	
+
 	/**
 	 * @return the domesticSupplierRatios
 	 */

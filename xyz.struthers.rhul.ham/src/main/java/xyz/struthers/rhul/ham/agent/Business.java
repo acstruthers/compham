@@ -59,6 +59,8 @@ public class Business extends Agent implements Employer {
 	protected ArrayList<Float> foreignSupplierRatios;
 	protected Business landlord;
 	protected AustralianGovernment govt;
+	private int defaultIteration;
+	private int defaultOrder;
 
 	// P&L (64 bytes)
 	protected float totalIncome;
@@ -400,6 +402,22 @@ public class Business extends Agent implements Employer {
 		return liabilities;
 	}
 
+	@Override
+	public void setDefaultedIteration(int iteration, int order) {
+		this.defaultIteration = iteration;
+		this.defaultOrder = order;
+	}
+
+	@Override
+	public int getDefaultIteration() {
+		return this.defaultIteration;
+	}
+
+	@Override
+	public int getDefaultOrder() {
+		return this.defaultOrder;
+	}
+
 	/**
 	 * @return the industryDivisionCode
 	 */
@@ -435,6 +453,9 @@ public class Business extends Agent implements Employer {
 
 		this.employeeCountTarget = 0;
 		this.employees = null;
+
+		this.defaultIteration = 0;
+		this.defaultOrder = 0;
 
 		// P&L
 		this.totalIncome = 0f;
