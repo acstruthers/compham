@@ -36,6 +36,9 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
 public class CalibrateCountries {
 
 	public static final String CALIBRATION_DATE_ABS = "01/06/2018";
+	private static final boolean DEBUG = false;
+
+	private static final float MILLION = 1000000f;
 
 	// beans
 	private CalibrationData data;
@@ -61,7 +64,11 @@ public class CalibrateCountries {
 
 	public void createCountryAgents() {
 		this.allCountryData = this.data.getCountryData(); // just those with FX data
-		
+
+		if (DEBUG) {
+			System.out.println(new Date(System.currentTimeMillis()) + ": CREATING COUNTRY AGENTS");
+		}
+
 		Set<String> countryKeySet = new HashSet<String>(this.allCountryData.keySet());
 		this.countryAgents = new ArrayList<ForeignCountry>(countryKeySet.size());
 		this.countryNameMap = new HashMap<String, ForeignCountry>((int) Math.ceil(countryKeySet.size() / 0.75f));
@@ -70,12 +77,9 @@ public class CalibrateCountries {
 			String ccyCode = this.allCountryData.get(key).get("Currency Code");
 			Currency currency = this.currencies.getCurrency(ccyCode);
 			ForeignCountry countryAgent = new ForeignCountry(country, currency);
-			// populate the initial import/export estimates
-			this.initialExportsFromAustraliaByState = this.calculateInitialExportsFromAustraliaByState();
-			this.initialImportsToAustraliaByState = this.calculateInitialImportsToAustraliaByState();
 
-			// FIXME: add ABS initial import/export volumes to country agent
-			
+			// CHECKME: add ABS initial import/export volumes to country agent (below loop)
+
 			this.countryAgents.add(countryAgent);
 			// N.B. Populate the actual import/export volumes later when the exporter agents
 			// have been calibrated
@@ -83,11 +87,19 @@ public class CalibrateCountries {
 			// add the countries to a map so we can look them up by name
 			this.countryNameMap.put(countryAgent.getName(), countryAgent); // CHECKME: does the name exist here?
 		}
+		// populate the initial import/export estimates
+		this.initialExportsFromAustraliaByState = this.calculateInitialExportsFromAustraliaByState();
+		this.initialImportsToAustraliaByState = this.calculateInitialImportsToAustraliaByState();
+		// add to economy
 		this.countryAgents.trimToSize();
 		this.addAgentsToEconomy();
 
+		if (DEBUG) {
+			System.out.println(new Date(System.currentTimeMillis()) + ": CREATED COUNTRY AGENTS");
+		}
+
 		// release memory
-		this.data.dropCountryData();
+		// this.data.dropCountryData();
 	}
 
 	private void addAgentsToEconomy() {
@@ -122,23 +134,43 @@ public class CalibrateCountries {
 		dataStates.put("NT", this.data.getAbs5368_0Table36g());
 		dataStates.put("ACT", this.data.getAbs5368_0Table36h());
 
+		if (DEBUG) {
+			System.out.println(new Date(System.currentTimeMillis())
+					+ ": Setting initial Exports from Australia using ABS 5368.0 Table 36");
+		}
+
 		// sum data for each state
 		Map<String, Float> exports = new HashMap<String, Float>((int) Math.ceil(ForeignCountry.STATES.length / 0.75f));
 		Set<String> countryNames = this.allCountryData.keySet(); // just those with FX data
 		for (int stateIdx = 0; stateIdx < ForeignCountry.STATES.length; stateIdx++) {
 			String state = ForeignCountry.STATES[stateIdx];
+			if (DEBUG) {
+				System.out.println("--------------------------------------------------");
+				System.out.println("stateIdx: " + stateIdx + ", state: " + state);
+				System.out.println("dataStates.get(state).keySet(): " + dataStates.get(state).keySet());
+				System.out.println("countryNames: " + countryNames);
+			}
 			float stateSum = 0f;
 			for (String country : dataStates.get(state).keySet()) {
+				if (DEBUG) {
+					System.out.println("country: " + country + ", state: " + state);
+				}
 				if (countryNames.contains(country)) {
 					// one of the countries for which we have FX data
-					float exportAmount = dataStates.get(state).get(country).get(absDate);
+					float exportAmount = dataStates.get(state).get(country).get(absDate) * MILLION;
 					stateSum += exportAmount;
 
 					// add these to the country itself (ABS exports)
 					this.countryNameMap.get(country).putAbsExportsFromAustraliaByState(state, exportAmount);
+					if (DEBUG) {
+						System.out.println(country + ", " + state + ", " + exportAmount);
+					}
 				}
 			}
 			exports.put(state, stateSum);
+		}
+		if (DEBUG) {
+			System.out.println("--------------------------------------------------");
 		}
 
 		return exports;
@@ -172,6 +204,11 @@ public class CalibrateCountries {
 		dataStates.put("NT", this.data.getAbs5368_0Table37g());
 		dataStates.put("ACT", this.data.getAbs5368_0Table37h());
 
+		if (DEBUG) {
+			System.out.println(new Date(System.currentTimeMillis())
+					+ ": Setting initial Imports to Australia using ABS 5368.0 Table 37");
+		}
+
 		// sum data for each state
 		Map<String, Float> imports = new HashMap<String, Float>((int) Math.ceil(ForeignCountry.STATES.length / 0.75f));
 		Set<String> countryNames = this.allCountryData.keySet(); // just those with FX data
@@ -181,11 +218,14 @@ public class CalibrateCountries {
 			for (String country : dataStates.get(state).keySet()) {
 				if (countryNames.contains(country)) {
 					// one of the countries for which we have FX data
-					float importAmount = dataStates.get(state).get(country).get(absDate);
+					float importAmount = dataStates.get(state).get(country).get(absDate) * MILLION;
 					stateSum += importAmount;
 
 					// add these to the country itself (ABS imports)
 					this.countryNameMap.get(country).putAbsImportsToAustraliaByState(state, importAmount);
+					if (DEBUG) {
+						System.out.println(country + ", " + state + ", " + importAmount);
+					}
 				}
 			}
 			imports.put(state, stateSum);

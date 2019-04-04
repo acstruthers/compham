@@ -110,8 +110,11 @@ public class App {
 			calAdi.createAdiAgents();
 			CalibrateCurrencies calCcy = ctx.getBean(CalibrateCurrencies.class);
 			calCcy.createExchangeRates();
+			System.out.println(new Date(System.currentTimeMillis()) + ": CALIBRATING COUNTRIES");
 			CalibrateCountries calCountry = ctx.getBean(CalibrateCountries.class);
 			calCountry.createCountryAgents();
+			System.out.println("calCountry: " + calCountry);
+			System.out.println(new Date(System.currentTimeMillis()) + ": FINISHED CALIBRATING COUNTRIES");
 
 			System.gc();
 			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();

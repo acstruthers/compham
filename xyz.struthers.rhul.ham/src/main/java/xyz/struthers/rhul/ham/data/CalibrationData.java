@@ -1090,6 +1090,14 @@ public class CalibrationData {
 						for (int i = 0; i < columnsToImport.length; i++) {
 							titles.get(catalogueName).add(line[columnsToImport[i]]);
 						}
+
+						// store series ID as key with blank collections to populate with data below
+						for (int i = 0; i < columnsToImport.length; i++) {
+							seriesId[i] = line[columnsToImport[i]].replace(";", "").trim();
+							data.put(seriesId[i], new HashMap<Date, Float>());
+						}
+						// N.B. I want country names not Series ID codes, so moved this code up here
+
 						titleRow = false;
 					} else if (line[0].equals("Unit")) {
 						// store unit types
@@ -1099,10 +1107,11 @@ public class CalibrationData {
 						}
 					} else if (line[0].equals("Series ID")) {
 						// store series ID as key with blank collections to populate with data below
-						for (int i = 0; i < columnsToImport.length; i++) {
-							seriesId[i] = line[columnsToImport[i]];
-							data.put(line[columnsToImport[i]], new HashMap<Date, Float>());
-						}
+						/*
+						 * for (int i = 0; i < columnsToImport.length; i++) { seriesId[i] =
+						 * line[columnsToImport[i]]; data.put(line[columnsToImport[i]], new
+						 * HashMap<Date, Float>()); }
+						 */
 						header = false;
 					}
 				} else {

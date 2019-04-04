@@ -6,6 +6,7 @@ package xyz.struthers.rhul.ham.data;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,6 +44,8 @@ public class CalibrateEconomy {
 
 	private static final boolean DEBUG = true;
 	private static final boolean DEBUG_HH = false;
+	private static final boolean DEBUG_COUNTRY = false;
+	private static final boolean DEBUG_ADI = false;
 
 	private static final int MAX_IMPORT_COUNTRIES = 3;
 	private static final int MAX_EXPORT_COUNTRIES = 3;
@@ -94,6 +97,8 @@ public class CalibrateEconomy {
 	}
 
 	private void init() {
+		System.out.println("################## initialising economy ##################");
+
 		// agents
 		this.households = null;
 		this.individuals = null;
@@ -654,6 +659,11 @@ public class CalibrateEconomy {
 			}
 			ratios.trimToSize();
 			stateCountryImportRatios.put(state, ratios);
+			if (DEBUG_COUNTRY) {
+				System.out.println("state: " + state);
+				System.out.println("ratios: " + ratios);
+				System.out.println("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*");
+			}
 		}
 		for (int importerIdx = 0; importerIdx < this.businesses.length; importerIdx++) {
 			// calculate country ratios within each state
@@ -663,9 +673,17 @@ public class CalibrateEconomy {
 				ArrayList<ForeignCountry> foreignSuppliers = new ArrayList<ForeignCountry>(numCountries);
 				ArrayList<Float> foreignSupplierRatios = new ArrayList<Float>(numCountries);
 				for (int i = 0; i < numCountries; i++) {
-					int countryIdx = CustomMath.sample(stateCountryImportRatios.get(state), this.random);
-					foreignSuppliers.add(stateCountries.get(state).get(countryIdx));
-					foreignSupplierRatios.add(1f / numCountries);
+					if (DEBUG_COUNTRY) {
+						System.out.println("i: " + i + ", state: " + state);
+						System.out.println("stateCountryImportRatios: " + stateCountryImportRatios);
+						System.out
+								.println("stateCountryImportRatios.get(state): " + stateCountryImportRatios.get(state));
+					}
+					if (stateCountryImportRatios.get(state) != null) {
+						int countryIdx = CustomMath.sample(stateCountryImportRatios.get(state), this.random);
+						foreignSuppliers.add(stateCountries.get(state).get(countryIdx));
+						foreignSupplierRatios.add(1f / numCountries);
+					}
 				}
 				foreignSuppliers.trimToSize();
 				foreignSupplierRatios.trimToSize();
@@ -784,11 +802,11 @@ public class CalibrateEconomy {
 					(int) Math.ceil(this.businesses.length / ADI_SUPPLIER_DIV_CODE.length * 2f / 0.75f)));
 		}
 		for (int i = 0; i < this.businesses.length; i++) {
-			String div = this.businesses[i].getIndustryCode();
+			String div = String.valueOf(this.businesses[i].getIndustryDivisionCode());
 			if (domesticSupplierDivs.contains(div)) {
 				float domesticSales = this.businesses[i].getSalesDomestic();
 				// can't just use indices here because only 86 ADIs. Use PDFs.
-				float businessRatio = (int) domesticSales / totalDomesticRevenueByDiv.get(div);
+				float businessRatio = domesticSales / totalDomesticRevenueByDiv.get(div);
 				pdfSupplierIndicesByDiv.get(div).add(i);
 				pdfSupplierRatiosByDiv.get(div).add(businessRatio);
 			}
@@ -800,8 +818,10 @@ public class CalibrateEconomy {
 			float sum = 0f;
 			for (int supDivIdx = 0; supDivIdx < ADI_SUPPLIER_DIV_CODE.length; supDivIdx++) {
 				String div = ADI_SUPPLIER_DIV_CODE[supDivIdx];
+				// get index within Division from PDF
 				int nextIdx = CustomMath.sample(pdfSupplierRatiosByDiv.get(div), this.random);
-				Business supplier = this.businesses[nextIdx];
+				// convert to the corresponding business index
+				Business supplier = this.businesses[pdfSupplierIndicesByDiv.get(div).get(nextIdx)];
 				customer.addDomesticSupplier(supplier);
 
 				// calculate random numbers
@@ -1060,6 +1080,7 @@ public class CalibrateEconomy {
 				ArrayList<ForeignCountry> foreignCustomers = new ArrayList<ForeignCountry>(numCountries);
 				ArrayList<Float> foreignCustomerRatios = new ArrayList<Float>(numCountries);
 				for (int i = 0; i < numCountries; i++) {
+					// FIXME: 2019-04-04 null pointer
 					int countryIdx = CustomMath.sample(stateCountryExportRatios.get(state), this.random);
 					foreignCustomers.add(stateCountries.get(state).get(countryIdx));
 					foreignCustomerRatios.add(1f / numCountries);

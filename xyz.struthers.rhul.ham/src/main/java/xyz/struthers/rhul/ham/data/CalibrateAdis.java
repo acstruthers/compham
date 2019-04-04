@@ -29,7 +29,7 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
 @Scope(value = "singleton")
 public class CalibrateAdis {
 
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 
 	// beans
 	private CalibrationData data;
