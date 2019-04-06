@@ -30,6 +30,8 @@ public class Household extends Agent {
 	private Individual[] individuals; // get employers from individuals
 	private int numAdults;
 	private int numChildren;
+	private String lgaCode;
+	private String state;
 
 	private AuthorisedDepositTakingInstitution loanAdi; // can be null if no loan
 	private ArrayList<Business> suppliers; // household spending goes to these per ABS 6530.0
@@ -46,7 +48,7 @@ public class Household extends Agent {
 	private float pnlInvestmentIncome; // other income (including superannuation & dividends)
 	private float pnlInterestIncome;
 	private float pnlRentIncome; // income from investment properties
-	private float pnlForeignIncome; // FIXME: link to country
+	private float pnlForeignIncome; // linked to country with relevant FX rate
 	private float pnlOtherIncome;
 	private float pnlIncomeTaxExpense;
 
@@ -336,6 +338,9 @@ public class Household extends Agent {
 		this.individuals = null;
 		this.numAdults = 0;
 		this.numChildren = 0;
+		this.lgaCode = null;
+		this.state = null;
+		
 		this.loanAdi = null;
 		this.suppliers = null;
 		this.supplierRatios = null;
@@ -417,6 +422,34 @@ public class Household extends Agent {
 	 */
 	public void setNumChildren(int numChildren) {
 		this.numChildren = numChildren;
+	}
+
+	/**
+	 * @return the lgaCode
+	 */
+	public String getLgaCode() {
+		return lgaCode;
+	}
+
+	/**
+	 * @param lgaCode the lgaCode to set
+	 */
+	public void setLgaCode(String lgaCode) {
+		this.lgaCode = lgaCode;
+	}
+
+	/**
+	 * @return the state
+	 */
+	public String getState() {
+		return state;
+	}
+
+	/**
+	 * @param state the state to set
+	 */
+	public void setState(String state) {
+		this.state = state;
 	}
 
 	/**

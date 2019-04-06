@@ -1052,6 +1052,7 @@ public class CalibrateBusinesses {
 						agent.setIndustryCode(industryCodes[idxIndustryCode]);
 						agent.setIndustryDivisionCode(divisionCode.charAt(0));
 
+						agent.setState(states[idxState]);
 						agent.setSize(sizes[idxSize].charAt(0));
 						agent.setExporter(false);
 
@@ -1321,6 +1322,7 @@ public class CalibrateBusinesses {
 								 * business with.
 								 */
 								Business businessAgent = new Business(agentMatrix[idxState][idxIndustryCode][0]);
+								businessAgent.setLgaCode(lgaCode);
 								this.businessAgents.add(businessAgent);
 								int typeId = businessAgent.getBusinessTypeId();
 								this.businessTypeCount[typeId]++;
@@ -1329,6 +1331,7 @@ public class CalibrateBusinesses {
 						for (int i = 0; i < numMediumBusinesses; i++) {
 							if (agentMatrix[idxState][idxIndustryCode][1] != null) {
 								Business businessAgent = new Business(agentMatrix[idxState][idxIndustryCode][1]);
+								businessAgent.setLgaCode(lgaCode);
 								this.businessAgents.add(businessAgent);
 								int typeId = businessAgent.getBusinessTypeId();
 								this.businessTypeCount[typeId]++;
@@ -1337,6 +1340,7 @@ public class CalibrateBusinesses {
 						for (int i = 0; i < numLargeBusinesses; i++) {
 							if (agentMatrix[idxState][idxIndustryCode][2] != null) {
 								Business businessAgent = new Business(agentMatrix[idxState][idxIndustryCode][2]);
+								businessAgent.setLgaCode(lgaCode);
 								this.businessAgents.add(businessAgent);
 								int typeId = businessAgent.getBusinessTypeId();
 								this.businessTypeCount[typeId]++;

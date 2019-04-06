@@ -34,8 +34,8 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	protected String shortName;
 	protected String adiCategory;
 	protected char industryDivisionCode;
-	protected String state; // FIXME: implement state
-	protected boolean isGccsa; // FIXME: implement capital city
+	protected String state; // FIXME: implement state in ADIs
+	protected boolean isGccsa; // FIXME: implement capital city in ADIs
 
 	// agent relationships
 	protected int paymentClearingIndex;

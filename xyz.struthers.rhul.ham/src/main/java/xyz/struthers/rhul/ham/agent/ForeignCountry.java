@@ -34,11 +34,13 @@ public final class ForeignCountry extends Agent {
 	private static final long serialVersionUID = 1L;
 
 	private final int EXPORTERS_INIT_CAPACITY = 50000;
+	private final int HOUSEHOLDS_INIT_CAPACITY = 50000;
 	public static final String[] STATES = { "NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT" };
 
 	// agent relationships
 	private int paymentClearingIndex;
 	private ArrayList<Business> exporters;
+	private ArrayList<Household> households;
 	private int defaultIteration;
 	private int defaultOrder;
 
@@ -123,6 +125,33 @@ public final class ForeignCountry extends Agent {
 	public void trimExportersListToSize() {
 		if (this.exporters != null) {
 			this.exporters.trimToSize();
+		}
+	}
+
+	/**
+	 * @return the households
+	 */
+	public ArrayList<Household> getHouseholds() {
+		return households;
+	}
+
+	public void addHousehold(Household household) {
+		if (this.households == null) {
+			this.households = new ArrayList<Household>(HOUSEHOLDS_INIT_CAPACITY);
+		}
+		this.households.add(household);
+	}
+
+	public void addAllHouseholds(List<Household> households) {
+		if (this.households == null) {
+			this.households = new ArrayList<Household>(households.size());
+		}
+		this.households.addAll(households);
+	}
+
+	public void trimHouseholdsListToSize() {
+		if (this.households != null) {
+			this.households.trimToSize();
 		}
 	}
 
@@ -305,6 +334,10 @@ public final class ForeignCountry extends Agent {
 		if (this.exporters != null) {
 			numberOfCreditors = this.exporters.size();
 		}
+		if (this.households != null) {
+			numberOfCreditors += this.households.size();
+		}
+
 		ArrayList<NodePayment> liabilities = new ArrayList<NodePayment>(numberOfCreditors);
 
 		/*
@@ -320,6 +353,13 @@ public final class ForeignCountry extends Agent {
 		for (int exporterIdx = 0; exporterIdx < this.exporters.size(); exporterIdx++) {
 			int index = this.exporters.get(exporterIdx).getPaymentClearingIndex();
 			float audAmount = this.exporters.get(exporterIdx).getSalesForeign() * exchRateAdjustment;
+			liabilities.add(new NodePayment(index, audAmount));
+		}
+
+		// some households have foreign income
+		for (int householdIdx = 0; householdIdx < this.households.size(); householdIdx++) {
+			int index = this.households.get(householdIdx).getPaymentClearingIndex();
+			float audAmount = this.households.get(householdIdx).getPnlForeignIncome() * exchRateAdjustment;
 			liabilities.add(new NodePayment(index, audAmount));
 		}
 
@@ -348,6 +388,7 @@ public final class ForeignCountry extends Agent {
 
 		this.paymentClearingIndex = 0;
 		this.exporters = null;
+		this.households = null;
 		this.defaultIteration = 0;
 		this.defaultOrder = 0;
 

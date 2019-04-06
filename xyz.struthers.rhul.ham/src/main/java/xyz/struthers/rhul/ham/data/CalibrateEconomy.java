@@ -45,6 +45,7 @@ public class CalibrateEconomy {
 	private static final boolean DEBUG = true;
 	private static final boolean DEBUG_HH = false;
 	private static final boolean DEBUG_COUNTRY = false;
+	private static final boolean DEBUG_COUNTRY2 = false;
 	private static final boolean DEBUG_ADI = false;
 
 	private static final int MAX_IMPORT_COUNTRIES = 3;
@@ -642,7 +643,6 @@ public class CalibrateEconomy {
 			String state = ForeignCountry.STATES[stateIdx];
 			stateCountries.put(state, Arrays.asList(this.countries).stream()
 					.filter(o -> o.getAbsImportsToAustraliaForState(state) > 0f).collect(Collectors.toList()));
-			// FIXME: null pointer in ForeignCountry.getAbsImportsToAustrliaForState():433
 
 			// calculate state totals
 			stateImportTotal.put(state, (float) stateCountries.get(state).stream()
@@ -1032,12 +1032,12 @@ public class CalibrateEconomy {
 	 * The Business calibration stage didn't create any exporters, so we need to do
 	 * that at this stage while linking them to countries.
 	 */
-	void linkForeignCountries() {
+	private void linkForeignCountries() {
 		if (!this.indicesAssigned) {
 			this.assignPaymentClearingIndices();
 		}
 
-		// FIXME link to exporters
+		// link to exporters
 		/**
 		 * Create PDF of each country's export volumes from Australia, by state. Loop
 		 * through the Businesses, assigning each to a country based on their state.
@@ -1070,8 +1070,6 @@ public class CalibrateEconomy {
 			ratios.trimToSize();
 			stateCountryExportRatios.put(state, ratios);
 		}
-
-		// TODO UP TO HERE ### link to foreign suppliers (i.e. foreign countries)
 		for (int exporterIdx = 0; exporterIdx < this.businesses.length; exporterIdx++) {
 			// calculate country ratios within each state
 			String state = this.businesses[exporterIdx].getState();
@@ -1080,7 +1078,6 @@ public class CalibrateEconomy {
 				ArrayList<ForeignCountry> foreignCustomers = new ArrayList<ForeignCountry>(numCountries);
 				ArrayList<Float> foreignCustomerRatios = new ArrayList<Float>(numCountries);
 				for (int i = 0; i < numCountries; i++) {
-					// FIXME: 2019-04-04 null pointer
 					int countryIdx = CustomMath.sample(stateCountryExportRatios.get(state), this.random);
 					foreignCustomers.add(stateCountries.get(state).get(countryIdx));
 					foreignCustomerRatios.add(1f / numCountries);
@@ -1089,7 +1086,37 @@ public class CalibrateEconomy {
 				foreignCustomerRatios.trimToSize();
 				this.businesses[exporterIdx].setForeignSuppliers(foreignCustomers);
 				this.businesses[exporterIdx].setForeignSupplierRatios(foreignCustomerRatios);
+
+				// FIXME (2019-04-06) exports need to be in the ForeignCountry too
+				// the country can't see the businesses when calculating its liabilities
+
 			}
+		}
+		// release memory
+		stateExportTotal.clear();
+		stateExportTotal = null;
+
+		// link to households with foreign income
+		/**
+		 * Use the PDF of each country's export volumes from Australia, by state created
+		 * above. Loop through the Households with foreign income, assigning each to a
+		 * country based on their state.
+		 */
+		for (int householdIdx = 0; householdIdx < this.households.length; householdIdx++) {
+			if (this.households[householdIdx].getPnlForeignIncome() > 0f) {
+				// use country ratios within each state
+				String state = this.households[householdIdx].getState();
+
+				// assume foreign income is from a single country (e.g. a job or a pension)
+				int countryIdx = CustomMath.sample(stateCountryExportRatios.get(state), this.random);
+				ForeignCountry foreignIncomeSource = stateCountries.get(state).get(countryIdx);
+
+				// link household and country
+				foreignIncomeSource.addHousehold(this.households[householdIdx]);
+			}
+		}
+		for (ForeignCountry country : this.countries) {
+			country.trimHouseholdsListToSize();
 		}
 		// release memory
 		for (String state : stateCountries.keySet()) {
@@ -1102,8 +1129,6 @@ public class CalibrateEconomy {
 		}
 		stateCountryExportRatios.clear();
 		stateCountryExportRatios = null;
-		stateExportTotal.clear();
-		stateExportTotal = null;
 	}
 
 	/**
