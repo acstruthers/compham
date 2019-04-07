@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.aspectj.org.eclipse.jdt.core.dom.ThisExpression;
-
 import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.process.Employer;
 import xyz.struthers.rhul.ham.process.NodePayment;

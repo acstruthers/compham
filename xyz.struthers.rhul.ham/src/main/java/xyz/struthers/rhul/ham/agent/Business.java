@@ -381,7 +381,7 @@ public class Business extends Agent implements Employer {
 				float expense = this.foreignExpenses * this.foreignSupplierRatios.get(supplierIdx);
 				// add in the effect of FX rate movements
 				ArrayList<Float> exchangeRates = supplier.getExchangeRates();
-				float currentExchangeRate = exchangeRates.get(0);
+				float currentExchangeRate = exchangeRates.get(0); // FIXME 2019-04-07 null pointer
 				if (exchangeRates.size() >= iteration && exchangeRates.get(iteration) != null) {
 					currentExchangeRate = exchangeRates.get(iteration);
 				}

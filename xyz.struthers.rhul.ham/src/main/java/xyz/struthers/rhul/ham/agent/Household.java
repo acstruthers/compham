@@ -234,7 +234,7 @@ public class Household extends Agent {
 			for (int supIdx = 0; supIdx < this.suppliers.size(); supIdx++) {
 				int index = this.suppliers.get(supIdx).getPaymentClearingIndex();
 				// split expenses per the ABS 6530.0 ratios
-				float expense = totalExpense * this.supplierRatios.get(index);
+				float expense = totalExpense * this.supplierRatios.get(supIdx);
 				liabilities.add(new NodePayment(index, expense));
 			}
 		}
@@ -258,7 +258,7 @@ public class Household extends Agent {
 		liabilities.add(new NodePayment(this.govt.getPaymentClearingIndex(), incomeTax));
 
 		liabilities.trimToSize();
-		return null;
+		return liabilities;
 	}
 
 	@Override

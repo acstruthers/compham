@@ -1491,7 +1491,9 @@ public class CalibrateHouseholds {
 									household.setNumChildren(numChildren);
 									household.setIndividuals(members.toArray(Individual[]::new));
 
-									//FIXME add LGA Code and State to household
+									//add LGA Code and State to household
+									household.setLgaCode(lgaCode);
+									household.setState(this.area.getStateFromLgaCode(lgaCode));
 									
 									// consolidate Individual financials into Household financials
 									household.initialiseFinancialsFromIndividuals();

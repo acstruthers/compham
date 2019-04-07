@@ -11,8 +11,10 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -56,6 +58,8 @@ public class AustralianEconomy implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	public static final boolean DEBUG_RAM_USAGE = true;
+
 	public static final float BUFFER_COUNTRY = 1000000f;
 	public static final float BUFFER_GOVT = 1000000f;
 	public static final float BUFFER_RBA = 1000000f;
@@ -75,6 +79,15 @@ public class AustralianEconomy implements Serializable {
 	List<List<Float>> liabilitiesAmounts;
 	List<List<Integer>> liabilitiesIndices;
 	List<Float> operatingCashFlow;
+	/**
+	 * Clearing Payment Vector output is a map containing:<br>
+	 * List<Float> ClearingPaymentVector,<br>
+	 * List<List<Float>> ClearingPaymentMatrix,<br>
+	 * List<List<Integer>> ClearingPaymentIndices,<br>
+	 * List<Float> NodeEquity, and<br>
+	 * List<Integer> NodeDefaultOrder.
+	 */
+	Map<String, Object> clearingPaymentVectorOutput;
 
 	// Analytics
 	int[] businessTypeCount;
@@ -115,6 +128,59 @@ public class AustralianEconomy implements Serializable {
 	@PreDestroy
 	public void close() {
 		// TODO: implement close method for Clearing Payment Vector
+	}
+
+	public void simulateOneMonth(int iteration) {
+		long memoryBefore = 0L;
+		long memoryAfter = 0L;
+		DecimalFormat formatter = new DecimalFormat("#,##0.00");
+		if (DEBUG_RAM_USAGE) {
+			System.gc();
+			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			float megabytesAfter = memoryAfter / 1024f / 1024f;
+			System.out.println(new Date(System.currentTimeMillis()) + ": MEMORY USAGE BEFORE SIMULATION ROUND "
+					+ iteration + ": " + formatter.format(megabytesAfter) + "MB");
+			memoryBefore = memoryAfter;
+		}
+
+		this.preparePaymentsClearingVectorInputs(iteration);
+
+		if (DEBUG_RAM_USAGE) {
+			System.gc();
+			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			float megabytesAfter = memoryAfter / 1024f / 1024f;
+			float megabytesBefore = memoryBefore / 1024f / 1024f;
+			System.out
+					.println(new Date(System.currentTimeMillis()) + ": MEMORY CONSUMED PREPARING CPV INPUTS FOR ROUND "
+							+ iteration + ": " + formatter.format(megabytesAfter - megabytesBefore)
+							+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
+		}
+
+		this.clearingPaymentVectorOutput = this.payments.calculate(this.liabilitiesAmounts, this.liabilitiesIndices,
+				this.operatingCashFlow);
+
+		if (DEBUG_RAM_USAGE) {
+			System.gc();
+			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			float megabytesAfter = memoryAfter / 1024f / 1024f;
+			float megabytesBefore = memoryBefore / 1024f / 1024f;
+			System.out.println(new Date(System.currentTimeMillis()) + ": MEMORY CONSUMED BY SIMULATION ROUND "
+					+ iteration + ": " + formatter.format(megabytesAfter - megabytesBefore) + "MB (CURRENT TOTAL IS: "
+					+ formatter.format(megabytesAfter) + "MB)");
+		}
+
+		this.processPaymentsClearingVectorOutputs();
+
+		if (DEBUG_RAM_USAGE) {
+			System.gc();
+			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			float megabytesAfter = memoryAfter / 1024f / 1024f;
+			float megabytesBefore = memoryBefore / 1024f / 1024f;
+			System.out.println(
+					new Date(System.currentTimeMillis()) + ": MEMORY CONSUMED AFTER PROCESSING CPV OUTPUTS FOR ROUND "
+							+ iteration + ": " + formatter.format(megabytesAfter - megabytesBefore)
+							+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
+		}
 	}
 
 	/**

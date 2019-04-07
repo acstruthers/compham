@@ -6,7 +6,6 @@ package xyz.struthers.rhul.ham.data;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -41,12 +40,6 @@ import xyz.struthers.rhul.ham.process.Employer;
 @Component
 @Scope(value = "singleton")
 public class CalibrateEconomy {
-
-	private static final boolean DEBUG = true;
-	private static final boolean DEBUG_HH = false;
-	private static final boolean DEBUG_COUNTRY = false;
-	private static final boolean DEBUG_COUNTRY2 = false;
-	private static final boolean DEBUG_ADI = false;
 
 	private static final int MAX_IMPORT_COUNTRIES = 3;
 	private static final int MAX_EXPORT_COUNTRIES = 3;
@@ -88,6 +81,7 @@ public class CalibrateEconomy {
 	// field variables
 	private Random random;
 	private boolean indicesAssigned;
+	private boolean agentsLinked;
 
 	/**
 	 * 
@@ -113,6 +107,7 @@ public class CalibrateEconomy {
 		// field variables
 		this.random = null;
 		this.indicesAssigned = false;
+		this.agentsLinked = false;
 	}
 
 	/**
@@ -157,42 +152,45 @@ public class CalibrateEconomy {
 	 * it would consume a lot of unnecessary memory.
 	 */
 	public void linkAllAgents() {
-		// get agents
-		this.govt = this.economy.getGovernment();
-		this.rba = this.economy.getRba();
-		this.households = this.economy.getHouseholds();
-		this.individuals = this.economy.getIndividuals();
-		this.businesses = this.economy.getBusinesses();
-		this.adis = this.economy.getAdis();
-		this.countries = this.economy.getCountries();
-		this.currencies = this.economy.getCurrencies();
+		if (!this.agentsLinked) {
+			// get agents
+			this.govt = this.economy.getGovernment();
+			this.rba = this.economy.getRba();
+			this.households = this.economy.getHouseholds();
+			this.individuals = this.economy.getIndividuals();
+			this.businesses = this.economy.getBusinesses();
+			this.adis = this.economy.getAdis();
+			this.countries = this.economy.getCountries();
+			this.currencies = this.economy.getCurrencies();
 
-		/*
-		 * To ensure that every agent has other agents linked to it, use the shuffled
-		 * index approach rather than just sampling from a PDF to assign links. Could
-		 * even populate the indices with relative counts per the PDF so that they get
-		 * the right weighting during the sampling process. It would be much harder to
-		 * weight by balance too, so I would probably just use "head count" to assign
-		 * links.
-		 * 
-		 * An alternative but similar approach would be to re-calculate the PDF between
-		 * each assignment so it's more akin to sampling without replacement. That would
-		 * be better than the pure PDF approach, but still not as robust as the shuffled
-		 * index approach. The biggest issue I've had in the calibration process has
-		 * been mis-matches where cells have data in some sources but not others, so the
-		 * cross-product results in lots more empty cells and ultimately a loss of data.
-		 */
-		this.assignPaymentClearingIndices();
-		this.random = this.properties.getRandom();
-		this.linkHouseholds();
-		this.linkEmployees();
-		this.linkBusinesses();
-		// N.B. Must link Businesses before ADIs for the business links to be populated.
-		this.linkAdis();
-		this.linkForeignCountries();
-		this.linkGovernment();
-		this.linkRba();
+			/*
+			 * To ensure that every agent has other agents linked to it, use the shuffled
+			 * index approach rather than just sampling from a PDF to assign links. Could
+			 * even populate the indices with relative counts per the PDF so that they get
+			 * the right weighting during the sampling process. It would be much harder to
+			 * weight by balance too, so I would probably just use "head count" to assign
+			 * links.
+			 * 
+			 * An alternative but similar approach would be to re-calculate the PDF between
+			 * each assignment so it's more akin to sampling without replacement. That would
+			 * be better than the pure PDF approach, but still not as robust as the shuffled
+			 * index approach. The biggest issue I've had in the calibration process has
+			 * been mis-matches where cells have data in some sources but not others, so the
+			 * cross-product results in lots more empty cells and ultimately a loss of data.
+			 */
+			this.assignPaymentClearingIndices();
+			this.random = this.properties.getRandom();
+			this.linkHouseholds();
+			this.linkEmployees();
+			this.linkBusinesses();
+			// N.B. Must link Businesses before ADIs for the business links to be populated.
+			this.linkAdis();
+			this.linkForeignCountries();
+			this.linkGovernment();
+			this.linkRba();
 
+			this.agentsLinked = true;
+		}
 	}
 
 	/**
@@ -309,9 +307,6 @@ public class CalibrateEconomy {
 				// convert to indices, rounding up so we have at least enough
 				int landlordTenantCount = (int) Math.ceil(landlordRent / totalRent * this.households.length);
 				shuffledIndices.addAll(Collections.nCopies(landlordTenantCount, i));
-				if (DEBUG_HH) {
-					System.out.println("landlordRent (" + i + "): " + landlordRent);
-				}
 			}
 		}
 		// shuffle indices, and assign landlords to renting Households
@@ -321,17 +316,6 @@ public class CalibrateEconomy {
 		for (int i = 0; i < this.households.length; i++) {
 			if (this.households[i].getPnlRentExpense() > 0f) {
 				// assign landlord to Household
-				if (DEBUG_HH) {
-					System.out.println("totalRent: " + totalRent);
-					System.out.println("i: " + i);
-					System.out.println("households.length: " + households.length);
-					System.out.println("shuffledIndices.size(): " + shuffledIndices.size());
-					System.out.println("nextShuffledIdx: " + nextShuffledIdx);
-					System.out
-							.println("shuffledIndices.get(nextShuffledIdx++): " + shuffledIndices.get(nextShuffledIdx));
-					System.out.println("this.households[shuffledIndices.get(nextShuffledIdx++)]: "
-							+ this.households[shuffledIndices.get(nextShuffledIdx)]);
-				}
 				this.households[i].setLandlord(this.households[shuffledIndices.get(nextShuffledIdx++)]);
 			}
 		}
@@ -530,10 +514,6 @@ public class CalibrateEconomy {
 	 * 
 	 * N.B. Must run linkBusiness() before linkAdis() for the business links to be
 	 * populated.
-	 * 
-	 * FIXME: Randomly select 50k businesses and make a PDF of these businesses'
-	 * relative revenue (foreign revenue?), by state. Assign foreign countries to
-	 * the businesses based on the given probabilities.
 	 */
 	private void linkBusinesses() {
 		if (!this.indicesAssigned) {
@@ -659,11 +639,6 @@ public class CalibrateEconomy {
 			}
 			ratios.trimToSize();
 			stateCountryImportRatios.put(state, ratios);
-			if (DEBUG_COUNTRY) {
-				System.out.println("state: " + state);
-				System.out.println("ratios: " + ratios);
-				System.out.println("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*");
-			}
 		}
 		for (int importerIdx = 0; importerIdx < this.businesses.length; importerIdx++) {
 			// calculate country ratios within each state
@@ -673,12 +648,6 @@ public class CalibrateEconomy {
 				ArrayList<ForeignCountry> foreignSuppliers = new ArrayList<ForeignCountry>(numCountries);
 				ArrayList<Float> foreignSupplierRatios = new ArrayList<Float>(numCountries);
 				for (int i = 0; i < numCountries; i++) {
-					if (DEBUG_COUNTRY) {
-						System.out.println("i: " + i + ", state: " + state);
-						System.out.println("stateCountryImportRatios: " + stateCountryImportRatios);
-						System.out
-								.println("stateCountryImportRatios.get(state): " + stateCountryImportRatios.get(state));
-					}
 					if (stateCountryImportRatios.get(state) != null) {
 						int countryIdx = CustomMath.sample(stateCountryImportRatios.get(state), this.random);
 						foreignSuppliers.add(stateCountries.get(state).get(countryIdx));
@@ -1079,17 +1048,17 @@ public class CalibrateEconomy {
 				ArrayList<Float> foreignCustomerRatios = new ArrayList<Float>(numCountries);
 				for (int i = 0; i < numCountries; i++) {
 					int countryIdx = CustomMath.sample(stateCountryExportRatios.get(state), this.random);
-					foreignCustomers.add(stateCountries.get(state).get(countryIdx));
+					ForeignCountry country = stateCountries.get(state).get(countryIdx);
+					foreignCustomers.add(country);
 					foreignCustomerRatios.add(1f / numCountries);
+
+					// add exporter to the ForeignCountry too
+					country.addExporter(this.businesses[exporterIdx]);
 				}
 				foreignCustomers.trimToSize();
 				foreignCustomerRatios.trimToSize();
 				this.businesses[exporterIdx].setForeignSuppliers(foreignCustomers);
 				this.businesses[exporterIdx].setForeignSupplierRatios(foreignCustomerRatios);
-
-				// FIXME (2019-04-06) exports need to be in the ForeignCountry too
-				// the country can't see the businesses when calculating its liabilities
-
 			}
 		}
 		// release memory

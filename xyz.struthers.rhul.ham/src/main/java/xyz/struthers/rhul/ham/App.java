@@ -175,8 +175,11 @@ public class App {
 			 * System.out.println(new Date(System.currentTimeMillis()) +
 			 * ": Finished export of agents to CSV"); System.exit(0);
 			 */
-			CalibrateEconomy economy = ctx.getBean(CalibrateEconomy.class);
-			economy.linkAllAgents();
+			CalibrateEconomy calibrateEconomy = ctx.getBean(CalibrateEconomy.class);
+			calibrateEconomy.linkAllAgents();
+
+			AustralianEconomy economy = ctx.getBean(AustralianEconomy.class);
+			economy.simulateOneMonth(0);
 
 			System.gc();
 			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
