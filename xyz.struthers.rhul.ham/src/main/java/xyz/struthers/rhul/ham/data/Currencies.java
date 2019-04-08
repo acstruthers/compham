@@ -5,6 +5,7 @@ package xyz.struthers.rhul.ham.data;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,48 @@ public class Currencies {
 	 */
 	public Currencies() {
 		super();
+	}
+
+	public void prepareFxRatesSame(int iteration) {
+		for (String ccyCode : this.currencies.keySet()) {
+			this.currencies.get(ccyCode).setExchangeRateSame(iteration);
+		}
+	}
+
+	public void prepareFxRatesRandom1yr(int iteration, Random random) {
+		for (String ccyCode : this.currencies.keySet()) {
+			this.currencies.get(ccyCode).setExchangeRateRandom1yr(iteration, random);
+		}
+	}
+
+	public void prepareFxRatesRandom1yrUp(int iteration, Random random) {
+		for (String ccyCode : this.currencies.keySet()) {
+			this.currencies.get(ccyCode).setExchangeRateRandom1yrUp(iteration, random);
+		}
+	}
+
+	public void prepareFxRatesRandom1yrDown(int iteration, Random random) {
+		for (String ccyCode : this.currencies.keySet()) {
+			this.currencies.get(ccyCode).setExchangeRateRandom1yrDown(iteration, random);
+		}
+	}
+
+	public void prepareFxRatesRandom5yr(int iteration, Random random) {
+		for (String ccyCode : this.currencies.keySet()) {
+			this.currencies.get(ccyCode).setExchangeRateRandom5yr(iteration, random);
+		}
+	}
+
+	public void prepareFxRatesRandom5yrUp(int iteration, Random random) {
+		for (String ccyCode : this.currencies.keySet()) {
+			this.currencies.get(ccyCode).setExchangeRateRandom5yrUp(iteration, random);
+		}
+	}
+
+	public void prepareFxRatesRandom5yDown(int iteration, Random random) {
+		for (String ccyCode : this.currencies.keySet()) {
+			this.currencies.get(ccyCode).setExchangeRateRandom5yrDown(iteration, random);
+		}
 	}
 
 	public void setCurrency(Currency currency) {

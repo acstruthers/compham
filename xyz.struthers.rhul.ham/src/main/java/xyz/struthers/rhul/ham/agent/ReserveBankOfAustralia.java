@@ -43,7 +43,7 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 	// P&L
 	private float pnlInterestIncome;
 	private float pnlInterestExpense;
-	private float pnlCommittedLiquidityFacilityFees; // FIXME: add CLF to major banks' payables
+	private float pnlCommittedLiquidityFacilityFees;
 	private float pnlForeignExchangeGainsLosses; // TODO: add FX GOL to exogeneous cashflow, with FX rates
 	private float pnlAudSecurities;
 	private float pnlOtherIncome;

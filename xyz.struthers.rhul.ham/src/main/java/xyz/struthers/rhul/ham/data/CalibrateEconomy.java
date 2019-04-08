@@ -374,6 +374,8 @@ public class CalibrateEconomy {
 			this.assignPaymentClearingIndices();
 		}
 
+		// FIXME think about how ADIs are linked to employees given ADIs have no LGA
+
 		// link to employees
 		// get total wages expense by industry division
 		Map<String, Float> totalWagesExpenseByDiv = new HashMap<String, Float>(
@@ -988,6 +990,28 @@ public class CalibrateEconomy {
 		bondInvestorAmounts.trimToSize();
 		this.govt.setBondInvestors(bondInvestors);
 		this.govt.setBondInvestorAmounts(bondInvestorAmounts);
+
+		// link major banks to the RBA for Committed Liquidity Facility fees
+		float clfTotal = this.rba.getPnlCommittedLiquidityFacilityFees();
+		float majorBankDepositsTotal = (float) Arrays.asList(this.adis).stream()
+				.filter(o -> o.getAdiCategory().equals("Major Bank")).mapToDouble(o -> o.getBsDepositsAtCall()).sum();
+		majorBankDepositsTotal += (float) Arrays.asList(this.adis).stream()
+				.filter(o -> o.getAdiCategory().equals("Major Bank")).mapToDouble(o -> o.getBsDepositsTerm()).sum();
+		majorBankDepositsTotal += (float) Arrays.asList(this.adis).stream()
+				.filter(o -> o.getAdiCategory().equals("Major Bank")).mapToDouble(o -> o.getBsDepositsAdiRepoEligible())
+				.sum();
+		List<AuthorisedDepositTakingInstitution> majorBanks = Arrays.asList(this.adis).stream()
+				.filter(o -> o.getAdiCategory().equals("Major Bank")).collect(Collectors.toList());
+		for (AuthorisedDepositTakingInstitution majorBank : majorBanks) {
+			float bankDeposits = majorBank.getBsDepositsAtCall() + majorBank.getBsDepositsTerm()
+					+ majorBank.getBsDepositsAdiRepoEligible();
+			float ratio = bankDeposits / majorBankDepositsTotal;
+			float clfExpense = ratio * clfTotal;
+			majorBank.setPnlCommittedLiquidityFacilityFees(clfExpense);
+			// take CLF fees from the Other Expenses category
+			float otherExpense = majorBank.getPnlOtherExpenses();
+			majorBank.setPnlOtherExpenses(Math.max(otherExpense - clfExpense, 0f));
+		}
 
 		// link to Australian Government (payroll & income tax)
 		for (int i = 0; i < this.adis.length; i++) {

@@ -10,7 +10,6 @@ import java.io.Writer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -39,6 +38,7 @@ import xyz.struthers.rhul.ham.agent.Individual;
 import xyz.struthers.rhul.ham.agent.ReserveBankOfAustralia;
 import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.data.Currencies;
+import xyz.struthers.rhul.ham.data.Currency;
 
 /**
  * A class to hold all the Agents so they're all available in the one place.
@@ -143,6 +143,13 @@ public class AustralianEconomy implements Serializable {
 			memoryBefore = memoryAfter;
 		}
 
+		// generate the FX rates for this iteration using the desired strategy
+		this.currencies.prepareFxRatesSame(iteration);
+		for (ForeignCountry country : this.countries) {
+			country.updateExchangeRates(); // applies currency FX rates to country
+		}
+
+		// prepare the inputs to the Clearing Payments Vector algorithm
 		this.preparePaymentsClearingVectorInputs(iteration);
 
 		if (DEBUG_RAM_USAGE) {

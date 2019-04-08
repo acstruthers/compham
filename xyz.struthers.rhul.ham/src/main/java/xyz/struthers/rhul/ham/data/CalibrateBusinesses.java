@@ -28,7 +28,6 @@ import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
 
 /**
- * FIXME: If a Business has no Other Expenses, assign 5% of Total Expenses
  * 
  * @author Adam Struthers
  * @since 12-Feb-2019
@@ -1323,6 +1322,15 @@ public class CalibrateBusinesses {
 								 */
 								Business businessAgent = new Business(agentMatrix[idxState][idxIndustryCode][0]);
 								businessAgent.setLgaCode(lgaCode);
+
+								// if a Business has no Other Expenses, assign 5% of Total Expenses
+								if (businessAgent.getOtherExpenses() <= 0f) {
+									float totalExp = businessAgent.getTotalExpenses();
+									float otherExp = totalExp * 0.05f;
+									businessAgent.setOtherExpenses(otherExp);
+									businessAgent.setTotalExpenses(totalExp + otherExp);
+								}
+
 								this.businessAgents.add(businessAgent);
 								int typeId = businessAgent.getBusinessTypeId();
 								this.businessTypeCount[typeId]++;
@@ -1332,6 +1340,15 @@ public class CalibrateBusinesses {
 							if (agentMatrix[idxState][idxIndustryCode][1] != null) {
 								Business businessAgent = new Business(agentMatrix[idxState][idxIndustryCode][1]);
 								businessAgent.setLgaCode(lgaCode);
+
+								// if a Business has no Other Expenses, assign 5% of Total Expenses
+								if (businessAgent.getOtherExpenses() <= 0f) {
+									float totalExp = businessAgent.getTotalExpenses();
+									float otherExp = totalExp * 0.05f;
+									businessAgent.setOtherExpenses(otherExp);
+									businessAgent.setTotalExpenses(totalExp + otherExp);
+								}
+
 								this.businessAgents.add(businessAgent);
 								int typeId = businessAgent.getBusinessTypeId();
 								this.businessTypeCount[typeId]++;
@@ -1341,6 +1358,15 @@ public class CalibrateBusinesses {
 							if (agentMatrix[idxState][idxIndustryCode][2] != null) {
 								Business businessAgent = new Business(agentMatrix[idxState][idxIndustryCode][2]);
 								businessAgent.setLgaCode(lgaCode);
+
+								// if a Business has no Other Expenses, assign 5% of Total Expenses
+								if (businessAgent.getOtherExpenses() <= 0f) {
+									float totalExp = businessAgent.getTotalExpenses();
+									float otherExp = totalExp * 0.05f;
+									businessAgent.setOtherExpenses(otherExp);
+									businessAgent.setTotalExpenses(totalExp + otherExp);
+								}
+
 								this.businessAgents.add(businessAgent);
 								int typeId = businessAgent.getBusinessTypeId();
 								this.businessTypeCount[typeId]++;

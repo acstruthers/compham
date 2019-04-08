@@ -179,6 +179,13 @@ public final class ForeignCountry extends Agent {
 	}
 
 	/**
+	 * Updates the list of exchange rates from the currency's current data.
+	 */
+	public void updateExchangeRates() {
+		this.exchangeRates = this.currency.getExchangeRates();
+	}
+
+	/**
 	 * Gets the column headings, to write to CSV file.
 	 * 
 	 * @param separator

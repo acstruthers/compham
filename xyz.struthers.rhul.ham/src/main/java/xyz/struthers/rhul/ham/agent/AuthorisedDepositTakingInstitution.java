@@ -60,6 +60,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 
 	protected float pnlPersonnelExpenses;
 	protected float pnlLoanImpairmentExpense;
+	protected float pnlCommittedLiquidityFacilityFees;
 	protected float pnlDepreciationAmortisation;
 	protected float pnlOtherExpenses;
 
@@ -491,6 +492,9 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		if (this.adiInvestors != null) {
 			numberOfCreditors += this.adiInvestors.size();
 		}
+		if (this.pnlCommittedLiquidityFacilityFees > 0f) {
+			numberOfCreditors++; // RBA
+		}
 		ArrayList<NodePayment> liabilities = new ArrayList<NodePayment>(numberOfCreditors);
 
 		// calculate wages due to employees (incl. superannuation)
@@ -551,7 +555,10 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		}
 		float totalTax = payrollTax + Tax.calculateCompanyTax(this.getTotalIncome(),
 				this.getTotalIncome() - this.getTotalExpensesExcludingTax() - payrollTax);
-		liabilities.add(new NodePayment(govt.getPaymentClearingIndex(), totalTax));
+		liabilities.add(new NodePayment(this.govt.getPaymentClearingIndex(), totalTax));
+
+		// calculate Committed Liquidity Facility (CLF) fees due to RBA
+		liabilities.add(new NodePayment(this.rba.getPaymentClearingIndex(), this.pnlCommittedLiquidityFacilityFees));
 
 		liabilities.trimToSize();
 		return liabilities;
@@ -622,6 +629,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		this.pnlOtherIncome = 0f;
 		this.pnlPersonnelExpenses = 0f;
 		this.pnlLoanImpairmentExpense = 0f;
+		this.pnlCommittedLiquidityFacilityFees = 0f;
 		this.pnlDepreciationAmortisation = 0f;
 		this.pnlOtherExpenses = 0f;
 		this.pnlIncomeTaxExpense = 0f;
@@ -1001,6 +1009,22 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	 */
 	public void setPnlLoanImpairmentExpense(float pnlLoanImpairmentExpense) {
 		this.pnlLoanImpairmentExpense = pnlLoanImpairmentExpense;
+	}
+
+	/**
+	 * @return the pnlCommittedLiquidityFacilityFees
+	 */
+	public float getPnlCommittedLiquidityFacilityFees() {
+		return pnlCommittedLiquidityFacilityFees;
+	}
+
+	/**
+	 * @param pnlCommittedLiquidityFacilityFees the
+	 *                                          pnlCommittedLiquidityFacilityFees to
+	 *                                          set
+	 */
+	public void setPnlCommittedLiquidityFacilityFees(float pnlCommittedLiquidityFacilityFees) {
+		this.pnlCommittedLiquidityFacilityFees = pnlCommittedLiquidityFacilityFees;
 	}
 
 	/**

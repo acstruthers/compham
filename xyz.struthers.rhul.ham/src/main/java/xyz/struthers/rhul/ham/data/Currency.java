@@ -83,10 +83,147 @@ public class Currency {
 			this.exchangeRate.set(iteration, exchangeRate);
 		} else if (this.exchangeRate.size() == iteration) {
 			this.exchangeRate.set(iteration, exchangeRate);
+		} else if (this.exchangeRate.size() == (iteration - 1)) {
+			this.exchangeRate.add(exchangeRate);
 		} else {
 			result = 1;
 		}
 		return result;
+	}
+
+	/**
+	 * Sets the exchange rate for this iteration to be the same as the previous
+	 * exchange rate.
+	 * 
+	 * @param iteration
+	 * @return the exchange rate
+	 */
+	public float setExchangeRateSame(int iteration) {
+		float fxRate = 0f;
+		if (this.exchangeRate.size() >= iteration) {
+			float prevFxRate = iteration == 0 ? this.avg1yr : this.exchangeRate.get(iteration - 1);
+			this.exchangeRate.set(iteration, prevFxRate);
+		} else if (this.exchangeRate.size() == (iteration - 1)) {
+			float prevFxRate = iteration == 0 ? this.avg1yr : this.exchangeRate.get(iteration - 1);
+			this.exchangeRate.add(prevFxRate);
+		} else {
+			fxRate = 1f;
+		}
+		return fxRate;
+	}
+
+	/**
+	 * Generates the exchange rate for this iteration randomly, using the 1-year
+	 * standard deviation.
+	 * 
+	 * @param iteration
+	 * @param random    - the pseudo-random number generator to use
+	 * @return - the exchange rate
+	 */
+	public float setExchangeRateRandom1yr(int iteration, Random random) {
+		return this.setExchangeRateRandom(iteration, random, this.stdev1yr, 0);
+	}
+
+	/**
+	 * Generates an upward movement in the exchange rate for this iteration
+	 * randomly, using the 1-year standard deviation.
+	 * 
+	 * @param iteration
+	 * @param random    - the pseudo-random number generator to use
+	 * @return - the exchange rate
+	 */
+	public float setExchangeRateRandom1yrUp(int iteration, Random random) {
+		return this.setExchangeRateRandom(iteration, random, this.stdev1yr, 1);
+	}
+
+	/**
+	 * Generates a downward movement in the exchange rate for this iteration
+	 * randomly, using the 1-year standard deviation.
+	 * 
+	 * @param iteration
+	 * @param random    - the pseudo-random number generator to use
+	 * @return - the exchange rate
+	 */
+	public float setExchangeRateRandom1yrDown(int iteration, Random random) {
+		return this.setExchangeRateRandom(iteration, random, this.stdev1yr, -1);
+	}
+
+	/**
+	 * Generates the exchange rate for this iteration randomly, using the 5-year
+	 * standard deviation.
+	 * 
+	 * @param iteration
+	 * @param random    - the pseudo-random number generator to use
+	 * @return - the exchange rate
+	 */
+	public float setExchangeRateRandom5yr(int iteration, Random random) {
+		return this.setExchangeRateRandom(iteration, random, this.stdev5yr, 0);
+	}
+
+	/**
+	 * Generates an upward movement in the exchange rate for this iteration
+	 * randomly, using the 5-year standard deviation.
+	 * 
+	 * @param iteration
+	 * @param random    - the pseudo-random number generator to use
+	 * @return - the exchange rate
+	 */
+	public float setExchangeRateRandom5yrUp(int iteration, Random random) {
+		return this.setExchangeRateRandom(iteration, random, this.stdev5yr, 1);
+	}
+
+	/**
+	 * Generates a downward movement in the exchange rate for this iteration
+	 * randomly, using the 5-year standard deviation.
+	 * 
+	 * @param iteration
+	 * @param random    - the pseudo-random number generator to use
+	 * @return - the exchange rate
+	 */
+	public float setExchangeRateRandom5yrDown(int iteration, Random random) {
+		return this.setExchangeRateRandom(iteration, random, this.stdev5yr, -1);
+	}
+
+	/**
+	 * Generates the exchange rate for this iteration randomly, using the specified
+	 * standard deviation.
+	 * 
+	 * @param iteration
+	 * @param random    - the pseudo-random number generator to use
+	 * @param stdDev    - the standard deviation to use
+	 * @param forceSign - force the change to be positive (forceSign > 0), negative
+	 *                  (forceSign < 0), or leave it random (forceSign == 0).
+	 * @return - the exchange rate
+	 */
+	private float setExchangeRateRandom(int iteration, Random random, float stdDev, int forceSign) {
+		if (this.exchangeRate == null) {
+			this.exchangeRate = new ArrayList<Float>();
+		}
+		float prevFxRate = iteration == 0 ? this.avg1yr : this.exchangeRate.get(iteration - 1);
+		float fxRate = 1f;
+		if (forceSign > 0) {
+			fxRate = prevFxRate + (float) Math.abs(random.nextGaussian()) * stdDev;
+		} else if (forceSign < 0) {
+			fxRate = prevFxRate + (float) -Math.abs(random.nextGaussian()) * stdDev;
+		} else {
+			fxRate = prevFxRate + (float) random.nextGaussian() * stdDev;
+		}
+		if (this.exchangeRate.size() >= iteration) {
+			this.exchangeRate.set(iteration, fxRate);
+		} else {
+			for (int i = this.exchangeRate.size(); i < iteration; i++) {
+				this.exchangeRate.add(fxRate);
+				prevFxRate = fxRate;
+				if (forceSign > 0) {
+					fxRate = prevFxRate + (float) Math.abs(random.nextGaussian()) * stdDev;
+				} else if (forceSign < 0) {
+					fxRate = prevFxRate + (float) -Math.abs(random.nextGaussian()) * stdDev;
+				} else {
+					fxRate = prevFxRate + (float) random.nextGaussian() * stdDev;
+				}
+			}
+		}
+		return fxRate;
 	}
 
 	/**
@@ -152,6 +289,10 @@ public class Currency {
 	 */
 	public void setStdev5yr(float stdev5yr) {
 		this.stdev5yr = stdev5yr;
+	}
+	
+	public ArrayList<Float> getExchangeRates() {
+		return this.exchangeRate;
 	}
 
 }

@@ -325,7 +325,7 @@ public class Household extends Agent {
 			this.bsStudentLoans += i.getBsStudentLoans();
 		}
 
-		// TODO: calculate Henderson, Bal Sht ratios, etc.
+		// TODO calculate Henderson, Bal Sht ratios, etc.
 	}
 
 	public float getGrossIncome() {
