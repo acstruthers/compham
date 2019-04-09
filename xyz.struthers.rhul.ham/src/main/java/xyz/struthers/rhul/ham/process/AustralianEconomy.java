@@ -149,6 +149,16 @@ public class AustralianEconomy implements Serializable {
 			country.updateExchangeRates(); // applies currency FX rates to country
 		}
 
+		// generate interest rates for this iteration using the desired strategy
+		this.rba.setCashRateSame(iteration);
+		for (AuthorisedDepositTakingInstitution adi : this.adis) {
+			adi.setRba(this.rba);
+			adi.setLoanRate(iteration);
+			adi.setDepositRate(iteration);
+			adi.setBorrowingsRate(iteration);
+			adi.setGovtBondRate(iteration);
+		}
+
 		// prepare the inputs to the Clearing Payments Vector algorithm
 		this.preparePaymentsClearingVectorInputs(iteration);
 
@@ -161,6 +171,30 @@ public class AustralianEconomy implements Serializable {
 					.println(new Date(System.currentTimeMillis()) + ": MEMORY CONSUMED PREPARING CPV INPUTS FOR ROUND "
 							+ iteration + ": " + formatter.format(megabytesAfter - megabytesBefore)
 							+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
+		}
+
+		// FIXME Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+		// when looping through second iteration of CPV, so write agents to disk then
+		// drop them
+
+		this.households = null;
+		this.individuals = null;
+		this.businesses = null;
+		this.adis = null;
+		this.countries = null;
+		this.currencies = null;
+		this.rba = null;
+		this.government = null;
+		System.gc();
+
+		if (DEBUG_RAM_USAGE) {
+			System.gc();
+			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			float megabytesAfter = memoryAfter / 1024f / 1024f;
+			float megabytesBefore = memoryBefore / 1024f / 1024f;
+			System.out.println(new Date(System.currentTimeMillis()) + ": MEMORY CLEARED DUMPING AGENTS FOR ROUND "
+					+ iteration + ": " + formatter.format(megabytesAfter - megabytesBefore) + "MB (CURRENT TOTAL IS: "
+					+ formatter.format(megabytesAfter) + "MB)");
 		}
 
 		this.clearingPaymentVectorOutput = this.payments.calculate(this.liabilitiesAmounts, this.liabilitiesIndices,
@@ -363,6 +397,9 @@ public class AustralianEconomy implements Serializable {
 
 			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
 		}
+
+		// create Clearing Payments Vector
+		this.payments = new ClearingPaymentVector();
 	}
 
 	/**

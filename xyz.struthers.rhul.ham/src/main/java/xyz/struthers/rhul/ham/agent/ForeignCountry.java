@@ -5,7 +5,6 @@ package xyz.struthers.rhul.ham.agent;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -357,17 +356,21 @@ public final class ForeignCountry extends Agent {
 			currentExchangeRate = this.exchangeRates.get(iteration);
 		}
 		float exchRateAdjustment = this.exchangeRates.get(0) / currentExchangeRate;
-		for (int exporterIdx = 0; exporterIdx < this.exporters.size(); exporterIdx++) {
-			int index = this.exporters.get(exporterIdx).getPaymentClearingIndex();
-			float audAmount = this.exporters.get(exporterIdx).getSalesForeign() * exchRateAdjustment;
-			liabilities.add(new NodePayment(index, audAmount));
+		if (this.exporters != null) {
+			for (int exporterIdx = 0; exporterIdx < this.exporters.size(); exporterIdx++) {
+				int index = this.exporters.get(exporterIdx).getPaymentClearingIndex();
+				float audAmount = this.exporters.get(exporterIdx).getSalesForeign() * exchRateAdjustment;
+				liabilities.add(new NodePayment(index, audAmount));
+			}
 		}
 
 		// some households have foreign income
-		for (int householdIdx = 0; householdIdx < this.households.size(); householdIdx++) {
-			int index = this.households.get(householdIdx).getPaymentClearingIndex();
-			float audAmount = this.households.get(householdIdx).getPnlForeignIncome() * exchRateAdjustment;
-			liabilities.add(new NodePayment(index, audAmount));
+		if (this.households != null) {
+			for (int householdIdx = 0; householdIdx < this.households.size(); householdIdx++) {
+				int index = this.households.get(householdIdx).getPaymentClearingIndex();
+				float audAmount = this.households.get(householdIdx).getPnlForeignIncome() * exchRateAdjustment;
+				liabilities.add(new NodePayment(index, audAmount));
+			}
 		}
 
 		liabilities.trimToSize();

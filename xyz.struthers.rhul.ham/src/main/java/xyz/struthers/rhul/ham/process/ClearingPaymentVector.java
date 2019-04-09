@@ -3,8 +3,10 @@
  */
 package xyz.struthers.rhul.ham.process;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +53,8 @@ import java.util.Map;
  * @since 12-Nov-2018
  */
 public class ClearingPaymentVector {
+
+	public static final boolean DEBUG_RAM_USAGE = true;
 
 	// We know the size in advance, so can use arrays to improve speed & reduce
 	// memory usage because these don't change
@@ -129,6 +133,8 @@ public class ClearingPaymentVector {
 	 */
 	public Map<String, Object> calculate(List<List<Float>> liabilitiesAmounts, List<List<Integer>> liabilitiesIndices,
 			List<Float> operatingCashFlow) {
+		System.gc();
+
 		Map<String, Object> result = null;
 		if (liabilitiesAmounts.size() == liabilitiesIndices.size()
 				&& liabilitiesAmounts.size() == operatingCashFlow.size()) {
@@ -148,7 +154,7 @@ public class ClearingPaymentVector {
 			}
 			for (int fromIdx = 0; fromIdx < this.agentCount; fromIdx++) {
 				// store node links
-				for (int to = 0; to < this.liabilitiesIndex.size(); to++) {
+				for (int to = 0; to < this.liabilitiesIndex.get(fromIdx).size(); to++) {
 					int toIdx = this.liabilitiesIndex.get(fromIdx).get(to);
 					NodeLink link = new NodeLink(fromIdx, to);
 					this.receivablesIndex.get(toIdx).add(link);
@@ -159,8 +165,33 @@ public class ClearingPaymentVector {
 				this.receivablesIndex.get(fromIdx).trimToSize();
 			}
 
+			long memoryBefore = 0L;
+			long memoryAfter = 0L;
+			DecimalFormat formatter = new DecimalFormat("#,##0.00");
+			if (DEBUG_RAM_USAGE) {
+				System.gc();
+				memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+				float megabytesAfter = memoryAfter / 1024f / 1024f;
+				System.out.println(new Date(System.currentTimeMillis())
+						+ ": MEMORY USAGE BEFORE CACLULATING LIABILITIES: " + formatter.format(megabytesAfter) + "MB");
+				memoryBefore = memoryAfter;
+			}
+
 			// calculate clearing payment vector
+			System.out.println(new Date(System.currentTimeMillis()) + ": CPV calculating liabilities");
 			this.calculateLiabilities();
+			if (DEBUG_RAM_USAGE) {
+				System.gc();
+				memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+				float megabytesAfter = memoryAfter / 1024f / 1024f;
+				float megabytesBefore = memoryBefore / 1024f / 1024f;
+				System.out
+						.println(new Date(System.currentTimeMillis()) + ": MEMORY CONSUMED AFTER PREPARING CPV INPUTS: "
+								+ formatter.format(megabytesAfter - megabytesBefore) + "MB (CURRENT TOTAL IS: "
+								+ formatter.format(megabytesAfter) + "MB)");
+			}
+			System.gc();
+			System.out.println(new Date(System.currentTimeMillis()) + ": CPV calculating payments");
 			this.calculatePayments();
 
 			// TODO: save output to file for analysis
@@ -198,6 +229,8 @@ public class ClearingPaymentVector {
 	 * @since 2019-03-18
 	 */
 	private void calculatePayments() {
+		System.gc(); // it's a memory hog, so clean up first
+
 		// initialise variables, making copies so we don't alter the originals
 		List<Float> oldPaymentClearingVector = new ArrayList<Float>(this.totalLiabilitiesOfNode);
 		this.clearingPaymentVector = new ArrayList<Float>(this.totalLiabilitiesOfNode);
@@ -213,6 +246,7 @@ public class ClearingPaymentVector {
 			// algorithm.
 			// 3. If second-order defaults occur, then try to clear again
 			// assuming only second-order defaults occur, and so on.
+			System.out.println("CPV order: " + order);
 			order++;
 			systemCleared = true;
 			for (int fromIdx = 0; fromIdx < this.agentCount; fromIdx++) {
@@ -289,10 +323,12 @@ public class ClearingPaymentVector {
 		for (int fromIdx = 0; fromIdx < this.agentCount; fromIdx++) {
 			// calculate contractual liabilities
 			float liabilities = 0f;
-			for (int to = 0; to < this.nominalLiabilitiesAmount.size(); to++) {
+			for (int to = 0; to < this.nominalLiabilitiesAmount.get(fromIdx).size(); to++) {
 				liabilities += this.nominalLiabilitiesAmount.get(fromIdx).get(to);
 			}
-			this.totalLiabilitiesOfNode.set(fromIdx, liabilities);
+			// FIXME Index 0 out of bounds for length 0
+			// this.totalLiabilitiesOfNode.set(fromIdx, liabilities);
+			this.totalLiabilitiesOfNode.add(liabilities);
 
 			// calculate contractual receivables
 			float receivables = 0f;
@@ -301,15 +337,19 @@ public class ClearingPaymentVector {
 				int to = this.receivablesIndex.get(fromIdx).get(link).getTo();
 				receivables += this.nominalLiabilitiesAmount.get(from).get(to);
 			}
-			this.totalOwedToNode.set(fromIdx, receivables);
+			// this.totalOwedToNode.set(fromIdx, receivables);
+			this.totalOwedToNode.add(receivables);
 
 			// calculate relative liabilities
 			for (int to = 0; to < this.nominalLiabilitiesAmount.get(fromIdx).size(); to++) {
 				if (liabilities > 0f) {
-					this.relativeLiabilitiesAmount.get(fromIdx).set(to,
-							this.nominalLiabilitiesAmount.get(fromIdx).get(to) / liabilities);
+					// this.relativeLiabilitiesAmount.get(fromIdx).set(to,
+					// this.nominalLiabilitiesAmount.get(fromIdx).get(to) / liabilities);
+					this.relativeLiabilitiesAmount.get(fromIdx)
+							.add(this.nominalLiabilitiesAmount.get(fromIdx).get(to) / liabilities);
 				} else {
-					this.relativeLiabilitiesAmount.get(fromIdx).set(to, 0f);
+					// this.relativeLiabilitiesAmount.get(fromIdx).set(to, 0f);
+					this.relativeLiabilitiesAmount.get(fromIdx).add(0f);
 				}
 			}
 		}

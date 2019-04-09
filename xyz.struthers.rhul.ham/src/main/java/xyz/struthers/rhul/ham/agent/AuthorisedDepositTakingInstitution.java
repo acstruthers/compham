@@ -206,6 +206,10 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	}
 
 	public float setDepositRate(int iteration) {
+		if (this.depositRate == null) {
+			this.depositRate = new ArrayList<Float>();
+			this.depositRate.add(this.rateTotalDeposits);
+		}
 		float rate = 0f;
 		if (this.depositRate != null && this.depositRate.size() > iteration && this.rba != null) {
 			// assume rates can't be negative
@@ -227,6 +231,10 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	}
 
 	public float setLoanRate(int iteration) {
+		if (this.loanRate == null) {
+			this.loanRate = new ArrayList<Float>();
+			this.loanRate.add(this.rateTotalLoans);
+		}
 		float rate = 0f;
 		if (this.loanRate != null && this.loanRate.size() > iteration && this.rba != null) {
 			// assume rates can't be negative
@@ -248,6 +256,10 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	}
 
 	public float setBorrowingsRate(int iteration) {
+		if (this.borrowingsRate == null) {
+			this.borrowingsRate = new ArrayList<Float>();
+			this.borrowingsRate.add(this.rateBondsNotesBorrowings);
+		}
 		float rate = 0f;
 		if (this.borrowingsRate != null && this.borrowingsRate.size() > iteration && this.rba != null) {
 			// assume rates can't be negative
@@ -269,6 +281,10 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	}
 
 	public float setGovtBondRate(int iteration) {
+		if (this.govtBondRate == null) {
+			this.govtBondRate = new ArrayList<Float>();
+			this.govtBondRate.add(this.rateGovernmentLoan);
+		}
 		float rate = 0f;
 		if (this.govtBondRate != null && this.govtBondRate.size() > iteration && this.rba != null) {
 			// assume rates can't be negative
@@ -558,7 +574,10 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		liabilities.add(new NodePayment(this.govt.getPaymentClearingIndex(), totalTax));
 
 		// calculate Committed Liquidity Facility (CLF) fees due to RBA
-		liabilities.add(new NodePayment(this.rba.getPaymentClearingIndex(), this.pnlCommittedLiquidityFacilityFees));
+		if (this.pnlCommittedLiquidityFacilityFees > 0f) {
+			liabilities
+					.add(new NodePayment(this.rba.getPaymentClearingIndex(), this.pnlCommittedLiquidityFacilityFees));
+		}
 
 		liabilities.trimToSize();
 		return liabilities;
