@@ -3,6 +3,7 @@
  */
 package xyz.struthers.rhul.ham.process;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,7 +51,9 @@ import java.util.Map;
  * @version 0.1
  * @since 12-Nov-2018
  */
-public class ClearingPaymentVector {
+public class ClearingPaymentVector implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	// We know the size in advance, so can use arrays to improve speed & reduce
 	// memory usage because these don't change
@@ -174,6 +177,43 @@ public class ClearingPaymentVector {
 			result.put("NodeDefaultOrder", this.defaultOrderOfNode);
 		}
 		return result;
+	}
+
+	/**
+	 * Releases memory for everything other than the variables that are returned to
+	 * the caller.
+	 */
+	public void clearInputsAndWorking() {
+		this.exogeneousNominalCashFlow.clear();
+		this.exogeneousNominalCashFlow = null;
+		for (int i = 0; i < this.nominalLiabilitiesAmount.size(); i++) {
+			this.nominalLiabilitiesAmount.clear();
+			this.nominalLiabilitiesAmount.set(i, null);
+		}
+		this.nominalLiabilitiesAmount.clear();
+		this.nominalLiabilitiesAmount = null;
+		for (int i = 0; i < this.relativeLiabilitiesAmount.size(); i++) {
+			this.relativeLiabilitiesAmount.clear();
+			this.relativeLiabilitiesAmount.set(i, null);
+		}
+		this.relativeLiabilitiesAmount.clear();
+		this.relativeLiabilitiesAmount = null;
+		for (int i = 0; i < this.liabilitiesIndex.size(); i++) {
+			this.liabilitiesIndex.clear();
+			this.liabilitiesIndex.set(i, null);
+		}
+		this.liabilitiesIndex.clear();
+		this.liabilitiesIndex = null;
+		this.totalLiabilitiesOfNode.clear();
+		this.totalLiabilitiesOfNode = null;
+		for (int i = 0; i < this.receivablesIndex.size(); i++) {
+			this.receivablesIndex.clear();
+			this.receivablesIndex.set(i, null);
+		}
+		this.receivablesIndex.clear();
+		this.receivablesIndex = null;
+		this.totalOwedToNode.clear();
+		this.totalOwedToNode = null;
 	}
 
 	/**

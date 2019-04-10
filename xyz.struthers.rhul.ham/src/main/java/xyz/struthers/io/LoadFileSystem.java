@@ -13,12 +13,13 @@ import xyz.struthers.rhul.ham.config.Properties;
 /**
  * Loads a list of files in a network folder.
  * 
- * TO DO: add in a recursive option (https://javaconceptoftheday.com/list-all-files-in-directory-in-java/)
+ * TO DO: add in a recursive option
+ * (https://javaconceptoftheday.com/list-all-files-in-directory-in-java/)
  * 
  * @author Adam
  * @since 19-Nov-2018
  */
-public class LoadFileSystem {
+public abstract class LoadFileSystem {
 
 	/**
 	 * 
@@ -30,17 +31,13 @@ public class LoadFileSystem {
 	/**
 	 * Gets a list of files/folders that match a given regular expression.
 	 * 
-	 * @param regex
-	 *            The regular expression to match.
-	 * @param showFolder
-	 *            Include folders in search results.
-	 * @param showFile
-	 *            Include files in search results.
-	 * @param showHidden
-	 *            Include hidden files/folders in search results.
+	 * @param regex      The regular expression to match.
+	 * @param showFolder Include folders in search results.
+	 * @param showFile   Include files in search results.
+	 * @param showHidden Include hidden files/folders in search results.
 	 * @return a map containing lists of file/folder details.
 	 */
-	public File[] loadFileSystem(String regex, boolean showFolder, boolean showFile, boolean showHidden) {
+	public static File[] loadFileSystem(String regex, boolean showFolder, boolean showFile, boolean showHidden) {
 
 		/*
 		 * https://javaconceptoftheday.com/list-all-files-in-directory-in-java/
@@ -75,36 +72,32 @@ public class LoadFileSystem {
 	 * 
 	 * @return a List of file/folder details.
 	 */
-	public File[] loadFileSystem() {
-		return this.loadFileSystem(".*", true, true, true); // get result with no filters
+	public static File[] loadFileSystem() {
+		return loadFileSystem(".*", true, true, true); // get result with no filters
 	}
 
 	/**
 	 * Gets a list of files/folders that match a given regular expression.
 	 * 
-	 * @param regex
-	 *            The regular expression to match.
+	 * @param regex The regular expression to match.
 	 * @return a List of file/folder details.
 	 */
-	public File[] loadFileSystem(String regex) {
+	public static File[] loadFileSystem(String regex) {
 		// get result with regex match
-		return this.loadFileSystem(regex, true, true, true);
+		return loadFileSystem(regex, true, true, true);
 	}
 
 	/**
 	 * Gets a list of all files/folders in a given network folder, matching a set of
 	 * criteria.
 	 * 
-	 * @param showFolder
-	 *            Include folders in search results.
-	 * @param showFile
-	 *            Include files in search results.
-	 * @param showHidden
-	 *            Include hidden files/folders in search results.
+	 * @param showFolder Include folders in search results.
+	 * @param showFile   Include files in search results.
+	 * @param showHidden Include hidden files/folders in search results.
 	 * @return a List of file/folder details.
 	 */
-	public File[] loadFileSystem(boolean showFolder, boolean showFile, boolean showHidden) {
+	public static File[] loadFileSystem(boolean showFolder, boolean showFile, boolean showHidden) {
 		// get result with selected filters, matching any regex
-		return this.loadFileSystem(".*", showFolder, showFile, showHidden);
+		return loadFileSystem(".*", showFolder, showFile, showHidden);
 	}
 }

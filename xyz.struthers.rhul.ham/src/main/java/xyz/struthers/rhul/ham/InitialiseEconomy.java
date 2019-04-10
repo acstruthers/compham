@@ -24,19 +24,30 @@ import xyz.struthers.rhul.ham.data.CalibrateHouseholds;
 import xyz.struthers.rhul.ham.data.CalibrateIndividuals;
 import xyz.struthers.rhul.ham.data.CalibrateRba;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
+import xyz.struthers.rhul.ham.process.ClearingPaymentInputs;
 
 /**
+ * Initialises the agents and economy, based on raw CSV data.
+ * 
+ * The main program runs out of RAM, so I've split it up so that this class
+ * builds the economy and creates the inputs for the Clearing Payments Vector
+ * (CPV). This consumes about 25GB of RAM, so it serializes the economy to disk,
+ * passes the CPV inputs back to the caller and drops all the objects to reduce
+ * its memory footprint. This should leave enough RAM available for the CPV
+ * algorithm to run.
  * 
  * @author Adam Struthers
- *
+ * @since 10-Apr-2019
  */
-// @SpringBootApplication
-public class App {
+public class InitialiseEconomy {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
+	public InitialiseEconomy() {
+		super();
+	}
+
+	public ClearingPaymentInputs initialiseEconomy() {
+		ClearingPaymentInputs cpvInputs = null;
+
 		DecimalFormat formatter = new DecimalFormat("#,##0.00");
 		long memoryBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 		float megabytesBefore = memoryBefore / 1024f / 1024f;
@@ -178,7 +189,8 @@ public class App {
 			calibrateEconomy.linkAllAgents();
 
 			AustralianEconomy economy = ctx.getBean(AustralianEconomy.class);
-			economy.simulateOneMonth(0);
+			// economy.simulateOneMonth(0);
+			cpvInputs = economy.prepareOneMonth(0);
 
 			System.gc();
 			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
@@ -188,19 +200,10 @@ public class App {
 					.println("MEMORY CONSUMED BY LINKING ECONOMY: " + formatter.format(megabytesAfter - megabytesBefore)
 							+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
 			memoryBefore = memoryAfter;
-
-			// while (true) {}
 		}
-		ctx.close();
-	}
 
-	public void areaMappingTestHarness() {
-		System.out.println("Started MeshblockMapping: " + new Date(System.currentTimeMillis()));
-		AreaMapping mb = new AreaMapping();
-		String gccsa = mb.getGccsaCodeFromLga("10050");
-		System.out.println("GCCSA is: " + gccsa + " (should be 1RNSW)");
-		gccsa = mb.getGccsaCodeFromLga("16350");
-		System.out.println("GCCSA is: " + gccsa + " (should be 1GSYD)");
-		System.out.println("Finished MeshblockMapping: " + new Date(System.currentTimeMillis()));
+		ctx.close();
+		
+		return cpvInputs;
 	}
 }

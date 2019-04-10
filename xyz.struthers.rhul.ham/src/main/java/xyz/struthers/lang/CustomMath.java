@@ -13,7 +13,7 @@ import java.util.Random;
  * @author Adam Struthers
  * @since 2019-01-26
  */
-public class CustomMath {
+public abstract class CustomMath {
 
 	private static final double EPSILON_LOAN = 0.0001f; // to compare interest rates in loan calculations
 

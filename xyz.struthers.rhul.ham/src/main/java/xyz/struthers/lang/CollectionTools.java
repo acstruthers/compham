@@ -14,7 +14,7 @@ import java.util.Set;
  * @author Adam Struthers
  *
  */
-public class CollectionTools {
+public abstract class CollectionTools {
 
 	/**
 	 * 
