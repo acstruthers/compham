@@ -433,8 +433,8 @@ public class AustralianEconomy implements Serializable {
 		filename = this.saveIndividualDetailsToFile(iteration);
 		filenames.add(filename);
 
-		// filename = this.saveCurrencyDetailsToFile(iteration);
-		// filenames.add(filename);
+		filename = this.saveCurrencyDetailsToFile(iteration);
+		filenames.add(filename);
 
 		return filenames;
 	}

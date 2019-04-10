@@ -3,14 +3,11 @@
  */
 package xyz.struthers.rhul.ham;
 
-import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
+import java.util.Set;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -168,16 +165,18 @@ public class App {
 			System.out.println("MEMORY CONSUMED BY HOUSEHOLDS: " + formatter.format(megabytesAfter - megabytesBefore)
 					+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
 			memoryBefore = memoryAfter;
-			/*
-			 * System.out.println(new Date(System.currentTimeMillis()) +
-			 * ": Starting export of agents to CSV"); AustralianEconomy auEconomy =
-			 * ctx.getBean(AustralianEconomy.class); int iteration = 0; Set<String>
-			 * filenames = auEconomy.saveDetailsToFile(iteration);
-			 * System.out.println(filenames.size() + " DETAILED FILES SAVED TO:"); for
-			 * (String file : filenames) { System.out.println(file); }
-			 * System.out.println(new Date(System.currentTimeMillis()) +
-			 * ": Finished export of agents to CSV"); System.exit(0);
-			 */
+
+			System.out.println(new Date(System.currentTimeMillis()) + ": Starting export of agents to CSV");
+			AustralianEconomy auEconomy = ctx.getBean(AustralianEconomy.class);
+			int iteration = 0;
+			Set<String> filenames = auEconomy.saveDetailsToFile(iteration);
+			System.out.println(filenames.size() + " DETAILED FILES SAVED TO:");
+			for (String file : filenames) {
+				System.out.println(file);
+			}
+			System.out.println(new Date(System.currentTimeMillis()) + ": Finished export of agents to CSV");
+			//System.exit(0);
+
 			CalibrateEconomy calibrateEconomy = ctx.getBean(CalibrateEconomy.class);
 			calibrateEconomy.linkAllAgents();
 
@@ -224,7 +223,7 @@ public class App {
 			calIndiv = null;
 			calHouse = null;
 			calibrateEconomy = null;
-			
+
 			economy.simulateOneMonth(0);
 
 			System.gc();
