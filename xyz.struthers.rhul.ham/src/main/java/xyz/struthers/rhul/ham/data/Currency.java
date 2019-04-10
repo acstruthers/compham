@@ -3,6 +3,7 @@
  */
 package xyz.struthers.rhul.ham.data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -10,7 +11,9 @@ import java.util.Random;
  * @author Adam Struthers
  * @since 27-Jan-2019
  */
-public class Currency {
+public class Currency implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	String iso4217code;
 	String name;
@@ -290,7 +293,7 @@ public class Currency {
 	public void setStdev5yr(float stdev5yr) {
 		this.stdev5yr = stdev5yr;
 	}
-	
+
 	public ArrayList<Float> getExchangeRates() {
 		return this.exchangeRate;
 	}

@@ -3,6 +3,7 @@
  */
 package xyz.struthers.rhul.ham.data;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -16,7 +17,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope(value = "singleton")
-public class Currencies {
+public class Currencies implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	Map<String, Currency> currencies; // key is ISO-4217 Code (e.g. USD)
 

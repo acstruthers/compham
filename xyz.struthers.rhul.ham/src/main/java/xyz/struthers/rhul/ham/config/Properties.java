@@ -3,6 +3,7 @@
  */
 package xyz.struthers.rhul.ham.config;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
@@ -18,7 +19,9 @@ import it.unimi.dsi.util.XoRoShiRo128PlusRandom;
  */
 @Component
 @Scope(value = "singleton")
-public class Properties {
+public class Properties implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	// static config constants
 	/*

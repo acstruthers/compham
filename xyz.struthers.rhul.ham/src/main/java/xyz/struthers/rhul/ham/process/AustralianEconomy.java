@@ -38,7 +38,6 @@ import xyz.struthers.rhul.ham.agent.Individual;
 import xyz.struthers.rhul.ham.agent.ReserveBankOfAustralia;
 import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.data.Currencies;
-import xyz.struthers.rhul.ham.data.Currency;
 
 /**
  * A class to hold all the Agents so they're all available in the one place.
@@ -128,6 +127,45 @@ public class AustralianEconomy implements Serializable {
 	@PreDestroy
 	public void close() {
 		// TODO: implement close method for Clearing Payment Vector
+	}
+
+	public ClearingPaymentInputs prepareOneMonth(int iteration) {
+		long memoryBefore = 0L;
+		long memoryAfter = 0L;
+		DecimalFormat formatter = new DecimalFormat("#,##0.00");
+		if (DEBUG_RAM_USAGE) {
+			System.gc();
+			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			float megabytesAfter = memoryAfter / 1024f / 1024f;
+			System.out.println(new Date(System.currentTimeMillis()) + ": MEMORY USAGE BEFORE SIMULATION ROUND "
+					+ iteration + ": " + formatter.format(megabytesAfter) + "MB");
+			memoryBefore = memoryAfter;
+		}
+
+		// generate the FX rates for this iteration using the desired strategy
+		this.currencies.prepareFxRatesSame(iteration);
+		for (ForeignCountry country : this.countries) {
+			country.updateExchangeRates(); // applies currency FX rates to country
+		}
+
+		// prepare the inputs to the Clearing Payments Vector algorithm
+		this.preparePaymentsClearingVectorInputs(iteration);
+
+		ClearingPaymentInputs cpvInputs = new ClearingPaymentInputs(this.liabilitiesAmounts, this.liabilitiesIndices,
+				this.operatingCashFlow);
+
+		if (DEBUG_RAM_USAGE) {
+			System.gc();
+			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			float megabytesAfter = memoryAfter / 1024f / 1024f;
+			float megabytesBefore = memoryBefore / 1024f / 1024f;
+			System.out
+					.println(new Date(System.currentTimeMillis()) + ": MEMORY CONSUMED PREPARING CPV INPUTS FOR ROUND "
+							+ iteration + ": " + formatter.format(megabytesAfter - megabytesBefore)
+							+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
+		}
+
+		return cpvInputs;
 	}
 
 	public void simulateOneMonth(int iteration) {
