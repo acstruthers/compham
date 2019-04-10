@@ -26,6 +26,9 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 
 	private final float NUMBER_MONTHS = 12f;
 
+	// interest rate scenarios
+	public static final float OCR_INITIAL = 0.015f;
+
 	// RBA details
 	protected char industryDivisionCode;
 
@@ -358,6 +361,24 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 			this.cashRate.addAll(tmp);
 		}
 		this.cashRate.set(iteration, rate);
+	}
+
+	public float setCashRateSame(int iteration) {
+		if (this.cashRate == null) {
+			this.cashRate = new ArrayList<Float>(12); // assume we model at least a year
+			this.cashRate.add(OCR_INITIAL);
+		}
+		float interestRate = 0f;
+		if (this.cashRate.size() >= iteration) {
+			float prevInterestRate = iteration == 0 ? OCR_INITIAL : this.cashRate.get(iteration - 1);
+			this.cashRate.set(iteration, prevInterestRate);
+		} else if (this.cashRate.size() == (iteration - 1)) {
+			float prevInterestRate = iteration == 0 ? OCR_INITIAL : this.cashRate.get(iteration - 1);
+			this.cashRate.add(prevInterestRate);
+		} else {
+			interestRate = OCR_INITIAL;
+		}
+		return interestRate;
 	}
 
 	public Map<String, Float> getFinancialStatements() {
