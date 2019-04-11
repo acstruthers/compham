@@ -3,6 +3,8 @@
  */
 package xyz.struthers.rhul.ham;
 
+import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +49,12 @@ public class RunSimulation {
 	public Map<String, Object> calculateClearingPaymentVector(List<List<Float>> liabilitiesAmounts,
 			List<List<Integer>> liabilitiesIndices, List<Float> operatingCashFlow, int iteration) {
 
+		DecimalFormat formatter = new DecimalFormat("#,##0.00");
+		long memoryBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+		float megabytesBefore = memoryBefore / 1024f / 1024f;
+		System.out.println(new Date(System.currentTimeMillis()) + ": *** MEMORY USAGE BEFORE CALCULATING CPV *** : "
+				+ formatter.format(megabytesBefore) + "MB");
+
 		ClearingPaymentVector payment = new ClearingPaymentVector();
 
 		Map<String, Object> result = payment.calculate(liabilitiesAmounts, liabilitiesIndices, operatingCashFlow);
@@ -54,6 +62,14 @@ public class RunSimulation {
 		payment.clearInputsAndWorking();
 		payment = null;
 		System.gc();
+
+		long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+		float megabytesAfter = memoryAfter / 1024f / 1024f;
+		megabytesBefore = memoryBefore / 1024f / 1024f;
+		System.out.println(new Date(System.currentTimeMillis()) + ": *** MEMORY CONSUMED BY CALCULATING CPV *** : "
+				+ formatter.format(megabytesAfter - megabytesBefore) + "MB (CURRENT TOTAL IS: "
+				+ formatter.format(megabytesAfter) + "MB)");
+		memoryBefore = memoryAfter;
 
 		return result;
 	}

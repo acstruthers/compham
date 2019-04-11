@@ -148,6 +148,16 @@ public class AustralianEconomy implements Serializable {
 			country.updateExchangeRates(); // applies currency FX rates to country
 		}
 
+		// generate interest rates for this iteration using the desired strategy
+		this.rba.setCashRateSame(iteration);
+		for (AuthorisedDepositTakingInstitution adi : this.adis) {
+			adi.setRba(this.rba);
+			adi.setLoanRate(iteration);
+			adi.setDepositRate(iteration);
+			adi.setBorrowingsRate(iteration);
+			adi.setGovtBondRate(iteration);
+		}
+
 		// prepare the inputs to the Clearing Payments Vector algorithm
 		this.preparePaymentsClearingVectorInputs(iteration);
 
@@ -165,6 +175,16 @@ public class AustralianEconomy implements Serializable {
 							+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
 		}
 
+		this.households = null;
+		this.individuals = null;
+		this.businesses = null;
+		this.adis = null;
+		this.countries = null;
+		this.currencies = null;
+		this.rba = null;
+		this.government = null;
+		System.gc();
+		
 		return cpvInputs;
 	}
 

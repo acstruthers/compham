@@ -324,7 +324,7 @@ public class ClearingPaymentVector implements Serializable {
 		for (int fromIdx = 0; fromIdx < this.agentCount; fromIdx++) {
 			// amounts paid by this node
 			for (int to = 0; to < this.nominalLiabilitiesAmount.get(fromIdx).size(); to++) {
-				this.clearingPaymentAmount.get(fromIdx).set(to,
+				this.clearingPaymentAmount.get(fromIdx).add(
 						this.clearingPaymentVector.get(fromIdx) * this.relativeLiabilitiesAmount.get(fromIdx).get(to));
 			}
 
@@ -338,7 +338,8 @@ public class ClearingPaymentVector implements Serializable {
 			}
 
 			// equity of this node
-			this.equityOfNode.set(fromIdx, paymentReceived + this.exogeneousNominalCashFlow.get(fromIdx)
+			// FIXME 11/4/19 IndexOutOfBoundsException: Index 0 out of bounds for length 0
+			this.equityOfNode.add(paymentReceived + this.exogeneousNominalCashFlow.get(fromIdx)
 					- this.clearingPaymentVector.get(fromIdx));
 		}
 	}
@@ -366,8 +367,6 @@ public class ClearingPaymentVector implements Serializable {
 			for (int to = 0; to < this.nominalLiabilitiesAmount.get(fromIdx).size(); to++) {
 				liabilities += this.nominalLiabilitiesAmount.get(fromIdx).get(to);
 			}
-			// FIXME Index 0 out of bounds for length 0
-			// this.totalLiabilitiesOfNode.set(fromIdx, liabilities);
 			this.totalLiabilitiesOfNode.add(liabilities);
 
 			// calculate contractual receivables

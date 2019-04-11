@@ -6,8 +6,11 @@ package xyz.struthers.rhul.ham.process;
 import java.util.List;
 
 /**
- * @author acstr
- *
+ * Just a data structure so it's easy to return all three variables from a
+ * single method call.
+ * 
+ * @author Adam Struthers
+ * @since 10-Apr-2019
  */
 public class ClearingPaymentInputs {
 
@@ -23,6 +26,23 @@ public class ClearingPaymentInputs {
 		this.liabilitiesAmounts = liabilitiesAmounts;
 		this.liabilitiesIndices = liabilitiesIndices;
 		this.operatingCashFlow = operatingCashFlow;
+	}
+
+	public void clear() {
+		for (int i = 0; i < this.liabilitiesAmounts.size(); i++) {
+			this.liabilitiesAmounts.clear();
+			this.liabilitiesAmounts.set(i, null);
+		}
+		this.liabilitiesAmounts.clear();
+		this.liabilitiesAmounts = null;
+		for (int i = 0; i < this.liabilitiesIndices.size(); i++) {
+			this.liabilitiesIndices.clear();
+			this.liabilitiesIndices.set(i, null);
+		}
+		this.liabilitiesIndices.clear();
+		this.liabilitiesIndices = null;
+		this.operatingCashFlow.clear();
+		this.operatingCashFlow = null;
 	}
 
 	/**
