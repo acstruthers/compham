@@ -20,15 +20,6 @@
 			<timezone>+10</timezone>
 		</developer>
 	</developers>
-	<repositories>
-		<repository>
-			<!-- needed for com.esotericsoftware.kryo -->
-			<id>sonatype-snapshots</id>
-			<name>sonatype 
-		snapshots repo</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</repository>
-	</repositories>
 
 	<properties>
 		<!-- Stops the following error message, per https://maven.apache.org/general.html: 
@@ -57,8 +48,6 @@
 		<version.it.unimi.dsi.dsiutils>2.5.4</version.it.unimi.dsi.dsiutils>
 		<version.ejml-core>0.37.1</version.ejml-core>
 		<version.de.ruedigermoeller.fst>2.57</version.de.ruedigermoeller.fst>
-		<version.com.esotericsoftware.kryo>5.0.0-RC4-SNAPSHOT</version.com.esotericsoftware.kryo>
-		<version.com.nqzero.permit-reflect>0.3</version.com.nqzero.permit-reflect>
 
 		<version.mysql>8.0.15</version.mysql>
 		<version.eclipse.persistence.eclipselink>2.7.4</version.eclipse.persistence.eclipselink>
@@ -127,16 +116,6 @@
 				<groupId>de.ruedigermoeller</groupId>
 				<artifactId>fst</artifactId>
 				<version>${version.de.ruedigermoeller.fst}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.esotericsoftware</groupId>
-				<artifactId>kryo</artifactId>
-				<version>${version.com.esotericsoftware.kryo}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.nqzero</groupId>
-				<artifactId>permit-reflect</artifactId>
-				<version>${version.com.nqzero.permit-reflect}</version>
 			</dependency>
 
 			<!-- Matrix maths -->
@@ -307,14 +286,6 @@
 		<dependency>
 			<groupId>de.ruedigermoeller</groupId>
 			<artifactId>fst</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.esotericsoftware</groupId>
-			<artifactId>kryo</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.nqzero</groupId>
-			<artifactId>permit-reflect</artifactId>
 		</dependency>
 
 		<!-- AOP dependencies -->
