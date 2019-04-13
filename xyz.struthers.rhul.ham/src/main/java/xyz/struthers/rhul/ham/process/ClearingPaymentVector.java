@@ -218,19 +218,19 @@ public class ClearingPaymentVector implements Serializable {
 		this.exogeneousNominalCashFlow.clear();
 		this.exogeneousNominalCashFlow = null;
 		for (int i = 0; i < this.nominalLiabilitiesAmount.size(); i++) {
-			this.nominalLiabilitiesAmount.clear();
+			this.nominalLiabilitiesAmount.get(i).clear();
 			this.nominalLiabilitiesAmount.set(i, null);
 		}
 		this.nominalLiabilitiesAmount.clear();
 		this.nominalLiabilitiesAmount = null;
 		for (int i = 0; i < this.relativeLiabilitiesAmount.size(); i++) {
-			this.relativeLiabilitiesAmount.clear();
+			this.relativeLiabilitiesAmount.get(i).clear();
 			this.relativeLiabilitiesAmount.set(i, null);
 		}
 		this.relativeLiabilitiesAmount.clear();
 		this.relativeLiabilitiesAmount = null;
 		for (int i = 0; i < this.liabilitiesIndex.size(); i++) {
-			this.liabilitiesIndex.clear();
+			this.liabilitiesIndex.get(i).clear();
 			this.liabilitiesIndex.set(i, null);
 		}
 		this.liabilitiesIndex.clear();
@@ -238,7 +238,7 @@ public class ClearingPaymentVector implements Serializable {
 		this.totalLiabilitiesOfNode.clear();
 		this.totalLiabilitiesOfNode = null;
 		for (int i = 0; i < this.receivablesIndex.size(); i++) {
-			this.receivablesIndex.clear();
+			this.receivablesIndex.get(i).clear();
 			this.receivablesIndex.set(i, null);
 		}
 		this.receivablesIndex.clear();

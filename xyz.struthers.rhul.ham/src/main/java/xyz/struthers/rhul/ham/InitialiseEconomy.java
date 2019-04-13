@@ -43,6 +43,8 @@ import xyz.struthers.rhul.ham.process.ClearingPaymentInputs;
  */
 public class InitialiseEconomy {
 
+	AustralianEconomy economy;
+
 	public InitialiseEconomy() {
 		super();
 	}
@@ -184,7 +186,7 @@ public class InitialiseEconomy {
 		CalibrateEconomy calibrateEconomy = ctx.getBean(CalibrateEconomy.class);
 		calibrateEconomy.linkAllAgents();
 
-		AustralianEconomy economy = ctx.getBean(AustralianEconomy.class);
+		this.economy = ctx.getBean(AustralianEconomy.class);
 		// economy.simulateOneMonth(0);
 		cpvInputs = economy.prepareOneMonth(0);
 
@@ -200,4 +202,12 @@ public class InitialiseEconomy {
 
 		return cpvInputs;
 	}
+
+	/**
+	 * @return the economy
+	 */
+	public AustralianEconomy getEconomy() {
+		return economy;
+	}
+
 }
