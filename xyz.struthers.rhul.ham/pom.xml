@@ -24,9 +24,13 @@
 		<repository>
 			<!-- needed for com.esotericsoftware.kryo -->
 			<id>sonatype-snapshots</id>
-			<name>sonatype 
-		snapshots repo</name>
+			<name>sonatype snapshots repo</name>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</repository>
+		<repository>
+			<!-- needed for kryonet.kryonet -->
+			<id>clojars</id>
+			<url>http://clojars.org/repo/</url>
 		</repository>
 	</repositories>
 
@@ -58,6 +62,7 @@
 		<version.ejml-core>0.37.1</version.ejml-core>
 		<version.de.ruedigermoeller.fst>2.57</version.de.ruedigermoeller.fst>
 		<version.com.esotericsoftware.kryo>5.0.0-RC4-SNAPSHOT</version.com.esotericsoftware.kryo>
+		<version.kryonet.kryonet>2.21</version.kryonet.kryonet>
 		<version.com.nqzero.permit-reflect>0.3</version.com.nqzero.permit-reflect>
 
 		<version.mysql>8.0.15</version.mysql>
@@ -132,6 +137,11 @@
 				<groupId>com.esotericsoftware</groupId>
 				<artifactId>kryo</artifactId>
 				<version>${version.com.esotericsoftware.kryo}</version>
+			</dependency>
+			<dependency>
+				<groupId>kryonet</groupId>
+				<artifactId>kryonet</artifactId>
+				<version>${version.kryonet.kryonet}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.nqzero</groupId>
@@ -311,6 +321,10 @@
 		<dependency>
 			<groupId>com.esotericsoftware</groupId>
 			<artifactId>kryo</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>kryonet</groupId>
+			<artifactId>kryonet</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.nqzero</groupId>

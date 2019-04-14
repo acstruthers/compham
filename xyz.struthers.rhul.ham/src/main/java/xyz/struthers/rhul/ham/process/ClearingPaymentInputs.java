@@ -30,13 +30,13 @@ public class ClearingPaymentInputs {
 
 	public void clear() {
 		for (int i = 0; i < this.liabilitiesAmounts.size(); i++) {
-			this.liabilitiesAmounts.clear();
+			this.liabilitiesAmounts.get(i).clear();
 			this.liabilitiesAmounts.set(i, null);
 		}
 		this.liabilitiesAmounts.clear();
 		this.liabilitiesAmounts = null;
 		for (int i = 0; i < this.liabilitiesIndices.size(); i++) {
-			this.liabilitiesIndices.clear();
+			this.liabilitiesIndices.get(i).clear();
 			this.liabilitiesIndices.set(i, null);
 		}
 		this.liabilitiesIndices.clear();
