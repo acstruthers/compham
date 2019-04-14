@@ -102,9 +102,11 @@ public class Main {
 			Registry registry = LocateRegistry.getRegistry(RMI_HOST, RMI_PORT);
 			ClearingPaymentVectorInterface stub = (ClearingPaymentVectorInterface) registry
 					.lookup("ClearingPaymentVector");
+			System.out.println(new Date(System.currentTimeMillis()) + ": Invoking CPV via RMI.");
 			Map<String, Object> cpvOutputs = stub.calculate(cpvInputs.getLiabilitiesAmounts(),
 					cpvInputs.getLiabilitiesIndices(), cpvInputs.getOperatingCashFlow(), iteration);
-
+			System.out.println(new Date(System.currentTimeMillis()) + ": Outputs returned from CPV via RMI.");
+			
 			/*
 			 * RunSimulation sim = new RunSimulation(); Map<String, Object> cpvOutputs =
 			 * sim.calculateClearingPaymentVector(cpvInputs.getLiabilitiesAmounts(),

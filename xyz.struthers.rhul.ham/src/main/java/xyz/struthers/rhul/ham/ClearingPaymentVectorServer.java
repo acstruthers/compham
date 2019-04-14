@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -39,9 +40,14 @@ public class ClearingPaymentVectorServer implements ClearingPaymentVectorInterfa
 	public Map<String, Object> calculate(List<List<Float>> liabilitiesAmounts, List<List<Integer>> liabilitiesIndices,
 			List<Float> operatingCashFlow, int iteration) throws RemoteException {
 
+		System.out.println(new Date(System.currentTimeMillis()) + ": CPV invoked via RMI.");
+
 		RunSimulation sim = new RunSimulation();
 		Map<String, Object> cpvOutputs = sim.calculateClearingPaymentVector(liabilitiesAmounts, liabilitiesIndices,
 				operatingCashFlow, iteration);
+
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": CPV outputs calculated and being returned to RMI client.");
 
 		return cpvOutputs;
 	}
