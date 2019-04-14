@@ -7,8 +7,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.text.DecimalFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.nustaq.serialization.FSTObjectInput;
@@ -34,6 +37,7 @@ import xyz.struthers.rhul.ham.process.ClearingPaymentInputs;
 import xyz.struthers.rhul.ham.process.ClearingPaymentVector;
 import xyz.struthers.rhul.ham.process.Employer;
 import xyz.struthers.rhul.ham.process.NodePayment;
+import xyz.struthers.rmi.IHello;
 
 /**
  * @author acstr
@@ -44,6 +48,9 @@ public class Main {
 	public static final String FILEPATH_AGENTS_INIT = "C:\\tmp\\Agents\\Agents_init.ser";
 	public static final String FILEPATH_AGENTS_INIT_FST = "C:\\tmp\\Agents\\Agents_init.fst";
 	public static final String FILEPATH_AGENTS_INIT_KRYO = "C:\\tmp\\Agents\\Agents_init.kryo";
+
+	public static final String RMI_HOST = "Adam-E590";
+	public static final int RMI_PORT = 1099;
 
 	public Main() {
 		super();
@@ -57,68 +64,85 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		// work around Java 9+ reflection illegal access exceptions
-		Permit.godMode();
+		// Permit.godMode();
 
-		DecimalFormat formatter = new DecimalFormat("#,##0.00");
-		long memoryBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-		float megabytesBefore = memoryBefore / 1024f / 1024f;
-		System.out.println("################################################");
-		System.out.println(new Date(System.currentTimeMillis()) + ": MEMORY USAGE IN MAIN AT BEGINNING: "
-				+ formatter.format(megabytesBefore) + "MB");
-		System.out.println("################################################");
+		try {
+			DecimalFormat formatter = new DecimalFormat("#,##0.00");
+			long memoryBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			float megabytesBefore = memoryBefore / 1024f / 1024f;
+			System.out.println("################################################");
+			System.out.println(new Date(System.currentTimeMillis()) + ": MEMORY USAGE IN MAIN AT BEGINNING: "
+					+ formatter.format(megabytesBefore) + "MB");
+			System.out.println("################################################");
 
-		InitialiseEconomy init = new InitialiseEconomy();
-		ClearingPaymentInputs cpvInputs = init.initialiseEconomy();
-		AustralianEconomy economy = init.getEconomy();
-		// writeObjectToFile(economy, FILEPATH_AGENTS_INIT);
-		// writeFstEconomyToFile(economy, FILEPATH_AGENTS_INIT_FST); // using FST
-		// serialization
-		writeKryoObjectToFile(economy, FILEPATH_AGENTS_INIT_KRYO);
+			InitialiseEconomy init = new InitialiseEconomy();
+			ClearingPaymentInputs cpvInputs = init.initialiseEconomy();
+			AustralianEconomy economy = init.getEconomy();
+			// writeObjectToFile(economy, FILEPATH_AGENTS_INIT);
+			// writeFstEconomyToFile(economy, FILEPATH_AGENTS_INIT_FST); // using FST
+			// serialization
+			// writeKryoObjectToFile(economy, FILEPATH_AGENTS_INIT_KRYO);
 
-		economy.close();
-		economy = null;
-		System.gc();
+			// economy.close();
+			// economy = null;
+			System.gc();
 
-		long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-		megabytesBefore = memoryBefore / 1024f / 1024f;
-		float megabytesAfter = memoryAfter / 1024f / 1024f;
-		System.out.println("################################################");
-		System.out.println(new Date(System.currentTimeMillis())
-				+ ": MEMORY USAGE IN MAIN AFTER MAKING CPV INPUTS AND DROPPING AGENTS: "
-				+ formatter.format(megabytesAfter) + "MB");
-		System.out.println("################################################");
-		memoryBefore = memoryAfter;
+			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			megabytesBefore = memoryBefore / 1024f / 1024f;
+			float megabytesAfter = memoryAfter / 1024f / 1024f;
+			System.out.println("################################################");
+			System.out.println(new Date(System.currentTimeMillis())
+					+ ": MEMORY USAGE IN MAIN AFTER MAKING CPV INPUTS AND DROPPING AGENTS: "
+					+ formatter.format(megabytesAfter) + "MB");
+			System.out.println("################################################");
+			memoryBefore = memoryAfter;
 
-		int iteration = 0;
-		RunSimulation sim = new RunSimulation();
-		Map<String, Object> cpvOutputs = sim.calculateClearingPaymentVector(cpvInputs.getLiabilitiesAmounts(),
-				cpvInputs.getLiabilitiesIndices(), cpvInputs.getOperatingCashFlow(), iteration);
+			int iteration = 0;
+			// Get RMI registry for Clearing Payment Vector calculation
+			Registry registry = LocateRegistry.getRegistry(RMI_HOST, RMI_PORT);
+			ClearingPaymentVectorInterface stub = (ClearingPaymentVectorInterface) registry
+					.lookup("ClearingPaymentVector");
+			Map<String, Object> cpvOutputs = stub.calculate(cpvInputs.getLiabilitiesAmounts(),
+					cpvInputs.getLiabilitiesIndices(), cpvInputs.getOperatingCashFlow(), iteration);
 
-		cpvInputs.clear();
-		cpvInputs = null;
-		System.gc();
-		memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-		megabytesAfter = memoryAfter / 1024f / 1024f;
-		System.out.println("################################################");
-		System.out.println(new Date(System.currentTimeMillis()) + ": MEMORY USAGE IN MAIN AFTER CALCULATING CPV: "
-				+ formatter.format(megabytesAfter) + "MB)");
-		System.out.println("################################################");
-		memoryBefore = memoryAfter;
+			/*
+			 * RunSimulation sim = new RunSimulation(); Map<String, Object> cpvOutputs =
+			 * sim.calculateClearingPaymentVector(cpvInputs.getLiabilitiesAmounts(),
+			 * cpvInputs.getLiabilitiesIndices(), cpvInputs.getOperatingCashFlow(),
+			 * iteration);
+			 */
 
-		// TODO process CPV outputs
-		// read agents back in from object file, then update financial statements
-		// economy = (AustralianEconomy) readObjectFromFile(FILEPATH_AGENTS_INIT);
-		// economy = readFstEconomyFromFile(FILEPATH_AGENTS_INIT_FST); // using FST
-		economy = readKryoObjectFromFile(FILEPATH_AGENTS_INIT_KRYO);
+			cpvInputs.clear();
+			cpvInputs = null;
+			System.gc();
+			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			megabytesAfter = memoryAfter / 1024f / 1024f;
+			System.out.println("################################################");
+			System.out.println(new Date(System.currentTimeMillis()) + ": MEMORY USAGE IN MAIN AFTER CALCULATING CPV: "
+					+ formatter.format(megabytesAfter) + "MB)");
+			System.out.println("################################################");
+			memoryBefore = memoryAfter;
 
-		System.gc();
-		memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-		megabytesAfter = memoryAfter / 1024f / 1024f;
-		System.out.println("################################################");
-		System.out.println(new Date(System.currentTimeMillis()) + ": MEMORY USAGE IN MAIN AFTER DESERIALIZING ECONOMY: "
-				+ formatter.format(megabytesAfter) + "MB)");
-		System.out.println("################################################");
-		memoryBefore = memoryAfter;
+			// TODO process CPV outputs
+			// read agents back in from object file, then update financial statements
+			// economy = (AustralianEconomy) readObjectFromFile(FILEPATH_AGENTS_INIT);
+			// economy = readFstEconomyFromFile(FILEPATH_AGENTS_INIT_FST); // using FST
+			// economy = readKryoObjectFromFile(FILEPATH_AGENTS_INIT_KRYO);
+
+			System.gc();
+			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			megabytesAfter = memoryAfter / 1024f / 1024f;
+			System.out.println("################################################");
+			System.out.println(
+					new Date(System.currentTimeMillis()) + ": MEMORY USAGE IN MAIN AFTER DESERIALIZING ECONOMY: "
+							+ formatter.format(megabytesAfter) + "MB)");
+			System.out.println("################################################");
+			memoryBefore = memoryAfter;
+
+		} catch (Exception e) {
+			System.err.println("Client exception: " + e.toString());
+			e.printStackTrace();
+		}
 	}
 
 	/**
