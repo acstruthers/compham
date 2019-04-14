@@ -166,15 +166,14 @@ public class Main {
 		kryo.register(ClearingPaymentVector.class);
 		kryo.register(ClearingPaymentInputs.class);
 		kryo.register(NodePayment.class);
-		kryo.register(Employer.class);
-		kryo.register(Clearable.class);
 		kryo.register(java.util.ArrayList.class);
 		kryo.register(java.util.HashMap.class);
 
 		try {
 			FileOutputStream fileOut = new FileOutputStream(filePath);
 			Output output = new Output(fileOut);
-			kryo.writeObject(output, serObj);
+			// kryo.writeObject(output, serObj); // can't handle interfaces
+			kryo.writeClassAndObject(output, serObj); // should handle interfaces
 			output.close();
 			System.out.println("The Object was succesfully written to the file: " + filePath);
 		} catch (Exception ex) {
@@ -251,8 +250,6 @@ public class Main {
 		kryo.register(ClearingPaymentVector.class);
 		kryo.register(ClearingPaymentInputs.class);
 		kryo.register(NodePayment.class);
-		kryo.register(Employer.class);
-		kryo.register(Clearable.class);
 		kryo.register(java.util.ArrayList.class);
 		kryo.register(java.util.HashMap.class);
 
@@ -260,7 +257,10 @@ public class Main {
 		try {
 			FileInputStream fileIn = new FileInputStream(filePath);
 			Input input = new Input(fileIn);
-			obj = kryo.readObject(input, AustralianEconomy.class);
+			// can't handle interfaces
+			// obj = kryo.readObject(input, AustralianEconomy.class);
+			// should handle interfaces
+			obj = (AustralianEconomy) kryo.readClassAndObject(input);
 			System.out.println("The Object has been read from the file: " + filePath);
 			input.close();
 		} catch (Exception ex) {
