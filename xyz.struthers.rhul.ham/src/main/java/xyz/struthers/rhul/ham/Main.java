@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -29,6 +30,7 @@ import xyz.struthers.rhul.ham.agent.ForeignCountry;
 import xyz.struthers.rhul.ham.agent.Household;
 import xyz.struthers.rhul.ham.agent.Individual;
 import xyz.struthers.rhul.ham.agent.ReserveBankOfAustralia;
+import xyz.struthers.rhul.ham.config.SpringConfiguration;
 import xyz.struthers.rhul.ham.data.Currencies;
 import xyz.struthers.rhul.ham.data.Currency;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
@@ -75,8 +77,9 @@ public class Main {
 					+ formatter.format(megabytesBefore) + "MB");
 			System.out.println("################################################");
 
+			AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfiguration.class);
 			InitialiseEconomy init = new InitialiseEconomy();
-			ClearingPaymentInputs cpvInputs = init.initialiseEconomy();
+			ClearingPaymentInputs cpvInputs = init.initialiseEconomy(ctx);
 			AustralianEconomy economy = init.getEconomy();
 			// writeObjectToFile(economy, FILEPATH_AGENTS_INIT);
 			// writeFstEconomyToFile(economy, FILEPATH_AGENTS_INIT_FST); // using FST
@@ -106,7 +109,7 @@ public class Main {
 			Map<String, Object> cpvOutputs = stub.calculate(cpvInputs.getLiabilitiesAmounts(),
 					cpvInputs.getLiabilitiesIndices(), cpvInputs.getOperatingCashFlow(), iteration);
 			System.out.println(new Date(System.currentTimeMillis()) + ": Outputs returned from CPV via RMI.");
-			
+
 			/*
 			 * RunSimulation sim = new RunSimulation(); Map<String, Object> cpvOutputs =
 			 * sim.calculateClearingPaymentVector(cpvInputs.getLiabilitiesAmounts(),
@@ -138,8 +141,13 @@ public class Main {
 			System.out.println(
 					new Date(System.currentTimeMillis()) + ": MEMORY USAGE IN MAIN AFTER DESERIALIZING ECONOMY: "
 							+ formatter.format(megabytesAfter) + "MB)");
+			System.out.println(new Date(System.currentTimeMillis())
+					+ ": MEMORY USAGE IN MAIN AFTER UPDATING ECONOMY WITH CPV OUTPUTS: "
+					+ formatter.format(megabytesAfter) + "MB)");
 			System.out.println("################################################");
 			memoryBefore = memoryAfter;
+
+			ctx.close();
 
 		} catch (Exception e) {
 			System.err.println("Client exception: " + e.toString());

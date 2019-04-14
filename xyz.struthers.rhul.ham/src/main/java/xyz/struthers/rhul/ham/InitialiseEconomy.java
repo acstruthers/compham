@@ -49,7 +49,7 @@ public class InitialiseEconomy {
 		super();
 	}
 
-	public ClearingPaymentInputs initialiseEconomy() {
+	public ClearingPaymentInputs initialiseEconomy(AnnotationConfigApplicationContext ctx) {
 		ClearingPaymentInputs cpvInputs = null;
 
 		DecimalFormat formatter = new DecimalFormat("#,##0.00");
@@ -61,7 +61,8 @@ public class InitialiseEconomy {
 		// https://www.tutorialspoint.com/spring/spring_java_based_configuration.htm
 		// ApplicationContext ctx = new
 		// ClassPathXmlApplicationContext("spring/applicationContext.xml");
-		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfiguration.class);
+		// AnnotationConfigApplicationContext ctx = new
+		// AnnotationConfigApplicationContext(SpringConfiguration.class);
 
 		/*
 		 * CalibrationData data = ctx.getBean(CalibrationData.class); Map<String,
@@ -198,7 +199,7 @@ public class InitialiseEconomy {
 				+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
 		memoryBefore = memoryAfter;
 
-		ctx.close();
+		// ctx.close();
 
 		return cpvInputs;
 	}
