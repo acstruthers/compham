@@ -96,6 +96,7 @@ public class Main {
 			memoryBefore = memoryAfter;
 
 			int iteration = 0;
+			// FIXME: Kryonet --- update from Java RMI
 			// Get RMI registry for Clearing Payment Vector calculation
 			Registry registry = LocateRegistry.getRegistry(RMI_HOST, RMI_PORT);
 			ClearingPaymentVectorInterface stub = (ClearingPaymentVectorInterface) registry

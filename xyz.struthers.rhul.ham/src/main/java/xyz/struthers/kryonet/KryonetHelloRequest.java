@@ -7,15 +7,11 @@ package xyz.struthers.kryonet;
  * @author acstr
  *
  */
-public class KryonetResponse {
+public class KryonetHelloRequest {
 
 	private String text;
 
-	public KryonetResponse() {
-		super();
-	}
-	
-	public KryonetResponse(String text) {
+	public KryonetHelloRequest() {
 		super();
 	}
 

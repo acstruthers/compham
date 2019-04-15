@@ -14,11 +14,11 @@ import com.nqzero.permit.Permit;
  * @author acstr
  *
  */
-public class KryonetClient {
+public class KryonetHelloClient {
 
 	Client client;
 
-	public KryonetClient() {
+	public KryonetHelloClient() {
 		super();
 		Permit.godMode();
 
@@ -29,14 +29,14 @@ public class KryonetClient {
 		// https://stackoverflow.com/questions/17011178/java-kryonet-servers-client-not-receiving-server-response
 
 		try {
-			client.connect(KryonetNetwork.NETWORK_TIMEOUT_MILLIS, KryonetNetwork.IPADDRESS_SERVER,
-					KryonetNetwork.NETWORK_PORT_TCP, KryonetNetwork.NETWORK_PORT_UDP);
+			client.connect(KryonetHelloNetwork.NETWORK_TIMEOUT_MILLIS, KryonetHelloNetwork.IPADDRESS_SERVER,
+					KryonetHelloNetwork.NETWORK_PORT_TCP, KryonetHelloNetwork.NETWORK_PORT_UDP);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 		// register classes
-		KryonetNetwork.register(client);
+		KryonetHelloNetwork.register(client);
 
 		client.addListener(new Listener() {
 			public void connected(Connection connection) {
@@ -46,8 +46,8 @@ public class KryonetClient {
 
 			public void received(Connection connection, Object object) {
 				System.out.println("Kryonet server responded.");
-				if (object instanceof KryonetResponse) {
-					KryonetResponse response = (KryonetResponse) object;
+				if (object instanceof KryonetHelloResponse) {
+					KryonetHelloResponse response = (KryonetHelloResponse) object;
 					System.out.println("Kryonet server response: " + response.getText());
 					client.sendTCP("Hello to you too.");
 					return;
@@ -60,7 +60,7 @@ public class KryonetClient {
 			}
 		});
 
-		KryonetRequest request = new KryonetRequest();
+		KryonetHelloRequest request = new KryonetHelloRequest();
 		request.setText("Hello");
 		client.sendTCP(request);
 		System.out.println("request sent");
@@ -78,7 +78,7 @@ public class KryonetClient {
 	}
 
 	public static void main(String[] args) {
-		new KryonetClient();
+		new KryonetHelloClient();
 	}
 
 }

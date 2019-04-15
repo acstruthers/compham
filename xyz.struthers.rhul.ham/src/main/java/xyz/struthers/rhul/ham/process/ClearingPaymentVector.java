@@ -137,11 +137,12 @@ public class ClearingPaymentVector implements Serializable {
 	 * @author Adam Struthers
 	 * @since 2019-03-18
 	 */
-	public Map<String, Object> calculate(List<List<Float>> liabilitiesAmounts, List<List<Integer>> liabilitiesIndices,
-			List<Float> operatingCashFlow, List<Float> liquidAssets) {
+	public ClearingPaymentOutputs calculate(List<List<Float>> liabilitiesAmounts,
+			List<List<Integer>> liabilitiesIndices, List<Float> operatingCashFlow, List<Float> liquidAssets) {
 		System.gc();
 
-		Map<String, Object> result = null;
+		ClearingPaymentOutputs result = null;
+
 		if (liabilitiesAmounts.size() == liabilitiesIndices.size()
 				&& liabilitiesAmounts.size() == operatingCashFlow.size()) {
 			// must be the same number of agents in each argument
@@ -212,12 +213,14 @@ public class ClearingPaymentVector implements Serializable {
 			 */
 
 			// return output to caller
-			result = new HashMap<String, Object>((int) Math.ceil(5f / 0.75f));
-			//result.put("ClearingPaymentVector", this.clearingPaymentVector);
-			//result.put("ClearingPaymentMatrix", this.clearingPaymentAmount);
-			//result.put("ClearingPaymentIndices", this.liabilitiesIndex);
-			result.put("NodeEquity", this.equityOfNode); // net cash flow
-			result.put("NodeDefaultOrder", this.defaultOrderOfNode);
+			// Map<String, Object> result = null;
+			// result = new HashMap<String, Object>((int) Math.ceil(5f / 0.75f));
+			result = new ClearingPaymentOutputs();
+			// result.put("ClearingPaymentVector", this.clearingPaymentVector);
+			// result.put("ClearingPaymentMatrix", this.clearingPaymentAmount);
+			// result.put("ClearingPaymentIndices", this.liabilitiesIndex);
+			result.setEquityOfNode(this.equityOfNode); // net cash flow
+			result.setDefaultOrderOfNode(this.defaultOrderOfNode);
 		}
 		return result;
 	}

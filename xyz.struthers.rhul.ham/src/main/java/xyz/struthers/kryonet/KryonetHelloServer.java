@@ -14,11 +14,11 @@ import com.nqzero.permit.Permit;
  * @author acstr
  *
  */
-public class KryonetServer {
+public class KryonetHelloServer {
 
 	Server server;
 
-	public KryonetServer() {
+	public KryonetHelloServer() {
 		super();
 
 		Permit.godMode();
@@ -28,7 +28,7 @@ public class KryonetServer {
 
 		// For consistency, the classes to be sent over the network are
 		// registered by the same method for both the client and server.
-		KryonetNetwork.register(server);
+		KryonetHelloNetwork.register(server);
 
 		server.addListener(new Listener() {
 			public void connected(Connection connection) {
@@ -36,11 +36,11 @@ public class KryonetServer {
 			}
 
 			public void received(Connection c, Object object) {
-				if (object instanceof KryonetRequest) {
-					KryonetRequest request = (KryonetRequest) object;
+				if (object instanceof KryonetHelloRequest) {
+					KryonetHelloRequest request = (KryonetHelloRequest) object;
 					System.out.println("Kryonet client request: " + request.getText());
 
-					KryonetResponse response = new KryonetResponse(request.getText());
+					KryonetHelloResponse response = new KryonetHelloResponse(request.getText());
 					response.setText(request.getText() + ", Kryonet world!");
 					server.sendToAllTCP(response);
 					c.sendTCP(response);
@@ -54,7 +54,7 @@ public class KryonetServer {
 		});
 
 		try {
-			server.bind(KryonetNetwork.NETWORK_PORT_TCP, KryonetNetwork.NETWORK_PORT_UDP);
+			server.bind(KryonetHelloNetwork.NETWORK_PORT_TCP, KryonetHelloNetwork.NETWORK_PORT_UDP);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -62,7 +62,7 @@ public class KryonetServer {
 	}
 
 	public static void main(String[] args) {
-		new KryonetServer();
+		new KryonetHelloServer();
 	}
 
 }

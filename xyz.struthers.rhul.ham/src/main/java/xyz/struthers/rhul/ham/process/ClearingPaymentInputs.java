@@ -19,9 +19,10 @@ public class ClearingPaymentInputs {
 	private List<Float> operatingCashFlow;
 	private List<Float> liquidAssets;
 
-	/**
-	 * 
-	 */
+	public ClearingPaymentInputs() {
+		super();
+	}
+
 	public ClearingPaymentInputs(List<List<Float>> liabilitiesAmounts, List<List<Integer>> liabilitiesIndices,
 			List<Float> operatingCashFlow, List<Float> liquidAssets) {
 		this.liabilitiesAmounts = liabilitiesAmounts;

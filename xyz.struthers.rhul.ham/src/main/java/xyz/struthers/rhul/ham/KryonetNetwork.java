@@ -1,7 +1,10 @@
-package xyz.struthers.kryonet;
+package xyz.struthers.rhul.ham;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
+
+import xyz.struthers.rhul.ham.process.ClearingPaymentInputs;
+import xyz.struthers.rhul.ham.process.ClearingPaymentOutputs;
 
 //This class is a convenient place to keep things common to both the client and server.
 public class KryonetNetwork {
@@ -18,8 +21,7 @@ public class KryonetNetwork {
 	// This registers objects that are going to be sent over the network.
 	static public void register(EndPoint endPoint) {
 		Kryo kryo = endPoint.getKryo();
-		kryo.register(KryonetResponse.class);
-		kryo.register(KryonetRequest.class);
+		kryo.register(ClearingPaymentInputs.class);
+		kryo.register(ClearingPaymentOutputs.class);
 	}
-
 }
