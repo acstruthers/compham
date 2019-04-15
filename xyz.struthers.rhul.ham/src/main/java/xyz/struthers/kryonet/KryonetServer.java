@@ -32,21 +32,24 @@ public class KryonetServer {
 
 		server.addListener(new Listener() {
 			public void connected(Connection connection) {
+				System.out.println("server connected");
 			}
 
 			public void received(Connection c, Object object) {
 				if (object instanceof KryonetRequest) {
 					KryonetRequest request = (KryonetRequest) object;
-					System.out.println("Kryonet server request: " + request.getText());
+					System.out.println("Kryonet client request: " + request.getText());
 
 					KryonetResponse response = new KryonetResponse(request.getText());
 					response.setText(request.getText() + ", Kryonet world!");
-					System.out.println(response.getText());
 					server.sendToAllTCP(response);
+					c.sendTCP(response);
+					System.out.println(response.getText());
 				}
 			}
 
 			public void disconnected(Connection c) {
+				System.out.println("server disconnected");
 			}
 		});
 

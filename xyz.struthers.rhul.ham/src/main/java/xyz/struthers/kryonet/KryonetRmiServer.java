@@ -6,14 +6,24 @@ import java.rmi.RemoteException;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.rmi.ObjectSpace;
+import com.nqzero.permit.Permit;
 
 public class KryonetRmiServer {
 
 	Server server;
+	KryonetRmiHello hello;
 
 	public KryonetRmiServer() {
-		server = new Server();
-
+		Permit.godMode();
+		
+		server = new Server() {
+			protected Connection newConnection() {
+				Connection conn = new KryonetRmiHello();
+				hello = (KryonetRmiHello) conn;
+				return conn;
+			}
+		};
+		
 		// Register the classes that will be sent over the network.
 		KryonetRmiNetwork.register(server);
 
