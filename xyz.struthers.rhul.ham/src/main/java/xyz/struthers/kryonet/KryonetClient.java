@@ -29,6 +29,7 @@ public class KryonetClient {
 
 		client.addListener(new Listener() {
 			public void connected(Connection connection) {
+				System.out.println("client connected");
 			}
 
 			public void received(Connection connection, Object object) {
@@ -40,6 +41,7 @@ public class KryonetClient {
 			}
 
 			public void disconnected(Connection connection) {
+				System.out.println("client disconnected");
 				System.exit(0);
 			}
 		});
