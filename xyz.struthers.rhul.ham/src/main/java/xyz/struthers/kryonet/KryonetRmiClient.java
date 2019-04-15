@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.rmi.ObjectSpace;
+import com.nqzero.permit.Permit;
 
 public class KryonetRmiClient {
 
@@ -11,6 +12,8 @@ public class KryonetRmiClient {
 	KryonetRmiHelloInterface serverHelloObject;
 
 	public KryonetRmiClient() {
+		Permit.godMode();
+		
 		client = new Client();
 		client.start();
 

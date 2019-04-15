@@ -3,12 +3,6 @@ package xyz.struthers.kryonet;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
 
-import xyz.struthers.kryonet.Network.AddCharacter;
-import xyz.struthers.kryonet.Network.MoveCharacter;
-import xyz.struthers.kryonet.Network.Register;
-import xyz.struthers.kryonet.Network.RemoveCharacter;
-import xyz.struthers.kryonet.Network.UpdateCharacter;
-
 //This class is a convenient place to keep things common to both the client and server.
 public class KryonetNetwork {
 
@@ -26,12 +20,6 @@ public class KryonetNetwork {
 		Kryo kryo = endPoint.getKryo();
 		kryo.register(KryonetResponse.class);
 		kryo.register(KryonetRequest.class);
-		kryo.register(Register.class);
-		kryo.register(AddCharacter.class);
-		kryo.register(UpdateCharacter.class);
-		kryo.register(RemoveCharacter.class);
-		kryo.register(Character.class);
-		kryo.register(MoveCharacter.class);
 	}
 
 }
