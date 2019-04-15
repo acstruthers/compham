@@ -18,6 +18,6 @@ import java.util.Map;
 public interface ClearingPaymentVectorInterface extends Remote {
 
 	public Map<String, Object> calculate(List<List<Float>> liabilitiesAmounts, List<List<Integer>> liabilitiesIndices,
-			List<Float> operatingCashFlow, int iteration) throws RemoteException;
+			List<Float> operatingCashFlow, List<Float> liquidAssets, int iteration) throws RemoteException;
 
 }

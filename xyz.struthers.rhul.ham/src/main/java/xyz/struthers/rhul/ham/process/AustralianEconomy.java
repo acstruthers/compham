@@ -78,6 +78,7 @@ public class AustralianEconomy implements Serializable {
 	List<List<Float>> liabilitiesAmounts;
 	List<List<Integer>> liabilitiesIndices;
 	List<Float> operatingCashFlow;
+	List<Float> liquidAssets; // cash at bank, etc.
 	/**
 	 * Clearing Payment Vector output is a map containing:<br>
 	 * List<Float> ClearingPaymentVector,<br>
@@ -162,7 +163,7 @@ public class AustralianEconomy implements Serializable {
 		this.preparePaymentsClearingVectorInputs(iteration);
 
 		ClearingPaymentInputs cpvInputs = new ClearingPaymentInputs(this.liabilitiesAmounts, this.liabilitiesIndices,
-				this.operatingCashFlow);
+				this.operatingCashFlow, this.liquidAssets);
 
 		if (DEBUG_RAM_USAGE) {
 			System.gc();
@@ -175,16 +176,14 @@ public class AustralianEconomy implements Serializable {
 							+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
 		}
 
-		this.households = null;
-		this.individuals = null;
-		this.businesses = null;
-		this.adis = null;
-		this.countries = null;
-		this.currencies = null;
-		this.rba = null;
-		this.government = null;
+		// drops data to reduce memory footprint
+		/*
+		 * this.households = null; this.individuals = null; this.businesses = null;
+		 * this.adis = null; this.countries = null; this.currencies = null; this.rba =
+		 * null; this.government = null;
+		 */
 		System.gc();
-		
+
 		return cpvInputs;
 	}
 
@@ -235,14 +234,12 @@ public class AustralianEconomy implements Serializable {
 		// when looping through second iteration of CPV, so write agents to disk then
 		// drop them
 
-		this.households = null;
-		this.individuals = null;
-		this.businesses = null;
-		this.adis = null;
-		this.countries = null;
-		this.currencies = null;
-		this.rba = null;
-		this.government = null;
+		// drops all agents to reduce memory footprint
+		/*
+		 * this.households = null; this.individuals = null; this.businesses = null;
+		 * this.adis = null; this.countries = null; this.currencies = null; this.rba =
+		 * null; this.government = null;
+		 */
 		System.gc();
 
 		if (DEBUG_RAM_USAGE) {
@@ -256,7 +253,7 @@ public class AustralianEconomy implements Serializable {
 		}
 
 		this.clearingPaymentVectorOutput = this.payments.calculate(this.liabilitiesAmounts, this.liabilitiesIndices,
-				this.operatingCashFlow);
+				this.operatingCashFlow, this.liquidAssets);
 
 		if (DEBUG_RAM_USAGE) {
 			System.gc();
@@ -280,6 +277,15 @@ public class AustralianEconomy implements Serializable {
 							+ iteration + ": " + formatter.format(megabytesAfter - megabytesBefore)
 							+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
 		}
+	}
+
+	/**
+	 * Updates agents with the output from the CPV.
+	 * 
+	 * @param iteration
+	 */
+	public void updateOneMonth(int iteration) {
+		this.processPaymentsClearingVectorOutputs();
 	}
 
 	/**
@@ -307,11 +313,13 @@ public class AustralianEconomy implements Serializable {
 		this.liabilitiesAmounts = new ArrayList<List<Float>>(totalAgentCount);
 		this.liabilitiesIndices = new ArrayList<List<Integer>>(totalAgentCount);
 		this.operatingCashFlow = new ArrayList<Float>(totalAgentCount);
+		this.liquidAssets = new ArrayList<Float>(totalAgentCount);
 		for (int i = 0; i < totalAgentCount; i++) {
 			// initialise them so we can use set without getting index out of bounds errors
 			this.liabilitiesAmounts.add(new ArrayList<Float>());
 			this.liabilitiesIndices.add(new ArrayList<Integer>());
 			this.operatingCashFlow.add(0f);
+			this.liquidAssets.add(0f);
 		}
 
 		// households
@@ -334,6 +342,10 @@ public class AustralianEconomy implements Serializable {
 			// calculate exogeneous cash flow (i.e. not from another Agent)
 			float exogeneous = household.getPnlInvestmentIncome() + household.getPnlOtherIncome();
 			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
+
+			// calculate liquid assets
+			float liquid = household.getBsBankDeposits();
+			this.liquidAssets.set(paymentClearingIndex, liquid);
 		}
 
 		// businesses
@@ -356,6 +368,10 @@ public class AustralianEconomy implements Serializable {
 			// calculate exogeneous cash flow (i.e. not from another Agent)
 			float exogeneous = business.getOtherIncome();
 			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
+
+			// calculate liquid assets
+			float liquid = business.getBankDeposits();
+			this.liquidAssets.set(paymentClearingIndex, liquid);
 		}
 
 		// ADIs
@@ -378,6 +394,10 @@ public class AustralianEconomy implements Serializable {
 			// calculate exogeneous cash flow (i.e. not from another Agent)
 			float exogeneous = adi.getPnlTradingIncome() + adi.getPnlInvestmentIncome() + adi.getPnlOtherIncome();
 			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
+
+			// calculate liquid assets
+			float liquid = adi.getBsCash() + adi.getBsInvestments() * Properties.ADI_HQLA_PROPORTION;
+			this.liquidAssets.set(paymentClearingIndex, liquid);
 		}
 
 		// countries
@@ -400,8 +420,12 @@ public class AustralianEconomy implements Serializable {
 			// calculate exogeneous cash flow (i.e. not from another Agent)
 			// foreign countries are assumed to never default
 			float totalLiabilities = (float) liabilityAmounts.stream().mapToDouble(o -> o).sum();
-			float exogeneous = totalLiabilities + BUFFER_COUNTRY; // liabilities plus a buffer
+			float exogeneous = totalLiabilities;
 			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
+
+			// calculate liquid assets
+			float liquid = BUFFER_COUNTRY; // buffer so countries never default
+			this.liquidAssets.set(paymentClearingIndex, liquid);
 		}
 
 		// government
@@ -424,9 +448,12 @@ public class AustralianEconomy implements Serializable {
 			// calculate exogeneous cash flow (i.e. not from another Agent)
 			// the government is assumed to never default
 			// whatever it is short by it simply borrows
-			float exogeneous = this.government.getPnlSaleOfGoodsAndServices() + this.government.getPnlOtherIncome()
-					+ BUFFER_GOVT; // liabilities plus a buffer
+			float exogeneous = this.government.getPnlSaleOfGoodsAndServices() + this.government.getPnlOtherIncome();
 			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
+
+			// calculate liquid assets
+			float liquid = BUFFER_GOVT; // buffer so government never defaults
+			this.liquidAssets.set(paymentClearingIndex, liquid);
 		}
 
 		// RBA
@@ -447,25 +474,54 @@ public class AustralianEconomy implements Serializable {
 			this.liabilitiesIndices.set(paymentClearingIndex, liabilityIndices);
 
 			// calculate exogeneous cash flow (i.e. not from another Agent)
-			// TODO the RBA is assumed to never default
-			// whatever it is short by it simply borrows
+			// N.B. The RBA is assumed to never default.
+			// Whatever it is short by it simply borrows.
 			float exogeneous = this.rba.getPnlPersonnelExpenses() + this.rba.getPnlOtherExpenses()
-					+ this.rba.getPnlDistributionPayableToCommonwealth() + this.rba.getBsCash() + BUFFER_RBA;
-			// liabilities plus a buffer
-
+					+ this.rba.getPnlDistributionPayableToCommonwealth() + this.rba.getBsCash();
 			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
+
+			// calculate liquid assets
+			float liquid = BUFFER_RBA; // buffer so RBA never defaults
+			this.liquidAssets.set(paymentClearingIndex, liquid);
 		}
 
 		// create Clearing Payments Vector
-		this.payments = new ClearingPaymentVector();
+		// this.payments = new ClearingPaymentVector();
 	}
 
 	/**
 	 * Takes the output of the Payments Clearing Vector algorithm and updates the
 	 * status and financial statements of the agents involved.
+	 * 
+	 * @param cpvOutput - ClearingPaymentVector output map
 	 */
 	void processPaymentsClearingVectorOutputs() {
+		// unmarshall CPV outouts into their original data structures
+		// net cash flow of each node after paying liabilities
+		List<Float> equityOfNode = (List<Float>) this.clearingPaymentVectorOutput.get("NodeEquity");
+		// Which round of the CPV algorithm caused the node to default (0 = no default)
+		List<Integer> defaultOrderOfNode = (List<Integer>) this.clearingPaymentVectorOutput.get("NodeDefaultOrder");
 
+		// update agents
+		for (int cpvIdx = 0; cpvIdx < equityOfNode.size(); cpvIdx++) {
+			// FIXME: up to here on train 15/4/19
+		}
+
+	}
+
+	/**
+	 * Saves a summary of the economy and agents to a file for easier (and faster)
+	 * analysis.
+	 * 
+	 * @param iteration
+	 * @return
+	 */
+	public String saveSummaryToFile(int iteration) {
+		String filename = "summary.csv";
+
+		// FIXME: implement saveSummaryToFile(int)
+
+		return filename;
 	}
 
 	/**

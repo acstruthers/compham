@@ -47,7 +47,8 @@ public class RunSimulation {
 	 *         List<Integer> NodeDefaultOrder.
 	 */
 	public Map<String, Object> calculateClearingPaymentVector(List<List<Float>> liabilitiesAmounts,
-			List<List<Integer>> liabilitiesIndices, List<Float> operatingCashFlow, int iteration) {
+			List<List<Integer>> liabilitiesIndices, List<Float> operatingCashFlow, List<Float> liquidAssets,
+			int iteration) {
 
 		DecimalFormat formatter = new DecimalFormat("#,##0.00");
 		long memoryBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
@@ -57,7 +58,8 @@ public class RunSimulation {
 
 		ClearingPaymentVector payment = new ClearingPaymentVector();
 
-		Map<String, Object> result = payment.calculate(liabilitiesAmounts, liabilitiesIndices, operatingCashFlow);
+		Map<String, Object> result = payment.calculate(liabilitiesAmounts, liabilitiesIndices, operatingCashFlow,
+				liquidAssets);
 
 		payment.clearInputsAndWorking();
 		payment = null;

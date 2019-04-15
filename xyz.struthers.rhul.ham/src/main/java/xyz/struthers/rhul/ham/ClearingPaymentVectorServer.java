@@ -38,13 +38,13 @@ public class ClearingPaymentVectorServer implements ClearingPaymentVectorInterfa
 	 */
 	@Override
 	public Map<String, Object> calculate(List<List<Float>> liabilitiesAmounts, List<List<Integer>> liabilitiesIndices,
-			List<Float> operatingCashFlow, int iteration) throws RemoteException {
+			List<Float> operatingCashFlow, List<Float> liquidAssets, int iteration) throws RemoteException {
 
 		System.out.println(new Date(System.currentTimeMillis()) + ": CPV invoked via RMI.");
 
 		RunSimulation sim = new RunSimulation();
 		Map<String, Object> cpvOutputs = sim.calculateClearingPaymentVector(liabilitiesAmounts, liabilitiesIndices,
-				operatingCashFlow, iteration);
+				operatingCashFlow, liquidAssets, iteration);
 
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": CPV outputs calculated and being returned to RMI client.");

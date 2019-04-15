@@ -17,15 +17,17 @@ public class ClearingPaymentInputs {
 	private List<List<Float>> liabilitiesAmounts;
 	private List<List<Integer>> liabilitiesIndices;
 	private List<Float> operatingCashFlow;
+	private List<Float> liquidAssets;
 
 	/**
 	 * 
 	 */
 	public ClearingPaymentInputs(List<List<Float>> liabilitiesAmounts, List<List<Integer>> liabilitiesIndices,
-			List<Float> operatingCashFlow) {
+			List<Float> operatingCashFlow, List<Float> liquidAssets) {
 		this.liabilitiesAmounts = liabilitiesAmounts;
 		this.liabilitiesIndices = liabilitiesIndices;
 		this.operatingCashFlow = operatingCashFlow;
+		this.liquidAssets = liquidAssets;
 	}
 
 	public void clear() {
@@ -85,6 +87,20 @@ public class ClearingPaymentInputs {
 	 */
 	public void setOperatingCashFlow(List<Float> operatingCashFlow) {
 		this.operatingCashFlow = operatingCashFlow;
+	}
+
+	/**
+	 * @return the liquidAssets
+	 */
+	public List<Float> getLiquidAssets() {
+		return liquidAssets;
+	}
+
+	/**
+	 * @param liquidAssets the liquidAssets to set
+	 */
+	public void setLiquidAssets(List<Float> liquidAssets) {
+		this.liquidAssets = liquidAssets;
 	}
 
 }

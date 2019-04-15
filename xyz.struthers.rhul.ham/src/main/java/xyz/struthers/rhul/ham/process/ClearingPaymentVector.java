@@ -80,7 +80,7 @@ public class ClearingPaymentVector implements Serializable {
 	private List<Float> totalOwedToNode; // amount owed to node, assuming no defaults
 	private List<List<Float>> clearingPaymentAmount; // to work out the exact amounts being paid between parties
 	private List<Float> clearingPaymentVector; // sum of the rows in the clearingPaymentMatrix
-	private List<Float> equityOfNode; // surplus cash flow of each node after paying liabilities
+	private List<Float> equityOfNode; // net cash flow of each node after paying liabilities
 	/**
 	 * Which round of the clearing vector algorithm caused the node to default.<br>
 	 * (0 = no default)
@@ -125,6 +125,9 @@ public class ClearingPaymentVector implements Serializable {
 	 * @param liabilitiesIndices - indices of the sub-list to designate which node
 	 *                           they relate to
 	 * @param operatingCashFlow  - exogeneous cash inflows to each node
+	 * @param liquidAssets       - cash at bank, etc. which can buffer a node
+	 *                           against defaulting if their liabilities exceed
+	 *                           their income in this iteration.
 	 * @return a map containing:<br>
 	 *         List<Float> ClearingPaymentVector,<br>
 	 *         List<List<Float>> ClearingPaymentMatrix,<br>
@@ -135,7 +138,7 @@ public class ClearingPaymentVector implements Serializable {
 	 * @since 2019-03-18
 	 */
 	public Map<String, Object> calculate(List<List<Float>> liabilitiesAmounts, List<List<Integer>> liabilitiesIndices,
-			List<Float> operatingCashFlow) {
+			List<Float> operatingCashFlow, List<Float> liquidAssets) {
 		System.gc();
 
 		Map<String, Object> result = null;
@@ -199,15 +202,31 @@ public class ClearingPaymentVector implements Serializable {
 
 			// TODO: save output to file for analysis
 
+			/**
+			 * I only really care about total cash in & out of each node ... maybe even only
+			 * the net amount. Can probably exclude the indices and matrix from the return
+			 * value. Reducing the amount of data returned will help both memory footprint
+			 * and speed.
+			 * 
+			 * FIXME: simplify CPV outputs
+			 */
+
 			// return output to caller
 			result = new HashMap<String, Object>((int) Math.ceil(5f / 0.75f));
-			result.put("ClearingPaymentVector", this.clearingPaymentVector);
-			result.put("ClearingPaymentMatrix", this.clearingPaymentAmount);
-			result.put("ClearingPaymentIndices", this.liabilitiesIndex);
-			result.put("NodeEquity", this.equityOfNode);
+			//result.put("ClearingPaymentVector", this.clearingPaymentVector);
+			//result.put("ClearingPaymentMatrix", this.clearingPaymentAmount);
+			//result.put("ClearingPaymentIndices", this.liabilitiesIndex);
+			result.put("NodeEquity", this.equityOfNode); // net cash flow
 			result.put("NodeDefaultOrder", this.defaultOrderOfNode);
 		}
 		return result;
+	}
+
+	public String saveCpvOutoutsToFile(int iteration) {
+		// FIXME: implement saveCpvOutoutsToFile(int)
+		String filename = "CPV_output" + iteration + ".csv";
+
+		return filename;
 	}
 
 	/**
@@ -298,6 +317,12 @@ public class ClearingPaymentVector implements Serializable {
 					paidToNode += oldPaymentClearingVector.get(from) * this.relativeLiabilitiesAmount.get(from).get(to);
 				}
 
+				/**
+				 * Need to add in each node's cash balance because they don't default simply
+				 * because they have negative net income this iteration - they default if they
+				 * run out of cash too.
+				 */
+
 				// check for negative equity to see who defaulted in this round
 				if (this.exogeneousNominalCashFlow.get(fromIdx) + paidToNode < this.totalLiabilitiesOfNode
 						.get(fromIdx)) {
@@ -338,7 +363,6 @@ public class ClearingPaymentVector implements Serializable {
 			}
 
 			// equity of this node
-			// FIXME 11/4/19 IndexOutOfBoundsException: Index 0 out of bounds for length 0
 			this.equityOfNode.add(paymentReceived + this.exogeneousNominalCashFlow.get(fromIdx)
 					- this.clearingPaymentVector.get(fromIdx));
 		}

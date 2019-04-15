@@ -5,7 +5,6 @@ package xyz.struthers.kryonet;
 
 import java.io.IOException;
 
-import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
@@ -16,38 +15,48 @@ import com.esotericsoftware.kryonet.Server;
  */
 public class KryonetServer {
 
-	public static final String IPADDRESS_SERVER = "192.168.0.17";
+	Server server;
 
 	public KryonetServer() {
 		super();
-	}
 
-	public static void kryonetServer(String[] args) {
-		Server server = new Server();
-		server.start();
-		try {
-			server.bind(54555, 54777);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// create server
+		server = new Server();
 
-		Kryo kryo = server.getKryo();
-		kryo.register(KryonetRequest.class);
-		kryo.register(KryonetResponse.class);
+		// For consistency, the classes to be sent over the network are
+		// registered by the same method for both the client and server.
+		KryonetNetwork.register(server);
 
 		server.addListener(new Listener() {
-			public void received(Connection connection, Object object) {
+			public void connected(Connection connection) {
+			}
+
+			public void received(Connection c, Object object) {
 				if (object instanceof KryonetRequest) {
 					KryonetRequest request = (KryonetRequest) object;
-					System.out.println(request.getText());
+					System.out.println("Kryonet server request: " + request.getText());
 
 					KryonetResponse response = new KryonetResponse(request.getText());
 					response.setText(request.getText() + ", Kryonet world!");
 					System.out.println(response.getText());
-					connection.sendTCP(response);
+					server.sendToAllTCP(response);
 				}
 			}
+
+			public void disconnected(Connection c) {
+			}
 		});
+
+		try {
+			server.bind(KryonetNetwork.NETWORK_PORT_TCP, KryonetNetwork.NETWORK_PORT_UDP);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		server.start();
+	}
+
+	public static void kryonetServer(String[] args) {
+		new KryonetServer();
 	}
 
 }

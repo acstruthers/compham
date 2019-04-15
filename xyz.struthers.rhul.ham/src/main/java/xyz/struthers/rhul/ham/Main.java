@@ -11,7 +11,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.text.DecimalFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import org.nustaq.serialization.FSTObjectInput;
@@ -21,7 +20,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.nqzero.permit.Permit;
 
 import xyz.struthers.rhul.ham.agent.AustralianGovernment;
 import xyz.struthers.rhul.ham.agent.AuthorisedDepositTakingInstitution;
@@ -34,12 +32,9 @@ import xyz.struthers.rhul.ham.config.SpringConfiguration;
 import xyz.struthers.rhul.ham.data.Currencies;
 import xyz.struthers.rhul.ham.data.Currency;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
-import xyz.struthers.rhul.ham.process.Clearable;
 import xyz.struthers.rhul.ham.process.ClearingPaymentInputs;
 import xyz.struthers.rhul.ham.process.ClearingPaymentVector;
-import xyz.struthers.rhul.ham.process.Employer;
 import xyz.struthers.rhul.ham.process.NodePayment;
-import xyz.struthers.rmi.IHello;
 
 /**
  * @author acstr
@@ -86,7 +81,7 @@ public class Main {
 			// serialization
 			// writeKryoObjectToFile(economy, FILEPATH_AGENTS_INIT_KRYO);
 
-			// economy.close();
+			// economy.close(); // clearing RAM for serialization solution
 			// economy = null;
 			System.gc();
 
@@ -107,7 +102,7 @@ public class Main {
 					.lookup("ClearingPaymentVector");
 			System.out.println(new Date(System.currentTimeMillis()) + ": Invoking CPV via RMI.");
 			Map<String, Object> cpvOutputs = stub.calculate(cpvInputs.getLiabilitiesAmounts(),
-					cpvInputs.getLiabilitiesIndices(), cpvInputs.getOperatingCashFlow(), iteration);
+					cpvInputs.getLiabilitiesIndices(), cpvInputs.getOperatingCashFlow(), cpvInputs.getLiquidAssets(), iteration);
 			System.out.println(new Date(System.currentTimeMillis()) + ": Outputs returned from CPV via RMI.");
 
 			/*
@@ -134,6 +129,8 @@ public class Main {
 			// economy = readFstEconomyFromFile(FILEPATH_AGENTS_INIT_FST); // using FST
 			// economy = readKryoObjectFromFile(FILEPATH_AGENTS_INIT_KRYO);
 
+			economy.updateOneMonth(iteration);
+
 			System.gc();
 			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 			megabytesAfter = memoryAfter / 1024f / 1024f;
@@ -146,6 +143,11 @@ public class Main {
 					+ formatter.format(megabytesAfter) + "MB)");
 			System.out.println("################################################");
 			memoryBefore = memoryAfter;
+
+			// save summary to file
+			economy.saveSummaryToFile(iteration);
+			iteration++;
+			economy.saveDetailsToFile(iteration); // details after being updated with CPV output
 
 			ctx.close();
 
@@ -310,7 +312,7 @@ public class Main {
 	 * @param filePath
 	 * @return
 	 * 
-	 * 		deprecated doesn't work in Java 9+ yet.
+	 *         deprecated doesn't work in Java 9+ yet.
 	 */
 	public static AustralianEconomy readFstEconomyFromFile(String filePath) {
 		AustralianEconomy obj = null;

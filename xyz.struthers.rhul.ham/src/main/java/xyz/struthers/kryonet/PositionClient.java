@@ -9,13 +9,13 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Listener.ThreadedListener;
-import com.esotericsoftware.kryonet.examples.position.Network.AddCharacter;
-import com.esotericsoftware.kryonet.examples.position.Network.Login;
-import com.esotericsoftware.kryonet.examples.position.Network.MoveCharacter;
-import com.esotericsoftware.kryonet.examples.position.Network.Register;
-import com.esotericsoftware.kryonet.examples.position.Network.RegistrationRequired;
-import com.esotericsoftware.kryonet.examples.position.Network.RemoveCharacter;
-import com.esotericsoftware.kryonet.examples.position.Network.UpdateCharacter;
+//import com.esotericsoftware.kryonet.examples.position.Network.AddCharacter;
+//import com.esotericsoftware.kryonet.examples.position.Network.Login;
+//import com.esotericsoftware.kryonet.examples.position.Network.MoveCharacter;
+//import com.esotericsoftware.kryonet.examples.position.Network.Register;
+//import com.esotericsoftware.kryonet.examples.position.Network.RegistrationRequired;
+//import com.esotericsoftware.kryonet.examples.position.Network.RemoveCharacter;
+//import com.esotericsoftware.kryonet.examples.position.Network.UpdateCharacter;
 import com.esotericsoftware.minlog.Log;
 
 public class PositionClient {
@@ -37,7 +37,7 @@ public class PositionClient {
 			}
 
 			public void received (Connection connection, Object object) {
-				if (object instanceof RegistrationRequired) {
+				/*if (object instanceof RegistrationRequired) {
 					Register register = new Register();
 					register.name = name;
 					register.otherStuff = ui.inputOtherStuff();
@@ -59,7 +59,7 @@ public class PositionClient {
 					RemoveCharacter msg = (RemoveCharacter)object;
 					ui.removeCharacter(msg.id);
 					return;
-				}
+				}*/
 			}
 
 			public void disconnected (Connection connection) {
@@ -78,9 +78,9 @@ public class PositionClient {
 		}
 
 		name = ui.inputName();
-		Login login = new Login();
+		/*Login login = new Login();
 		login.name = name;
-		client.sendTCP(login);
+		client.sendTCP(login);*/
 
 		while (true) {
 			int ch;
@@ -91,7 +91,7 @@ public class PositionClient {
 				break;
 			}
 
-			MoveCharacter msg = new MoveCharacter();
+			/*MoveCharacter msg = new MoveCharacter();
 			switch (ch) {
 			case 'w':
 				msg.y = -1;
@@ -108,7 +108,7 @@ public class PositionClient {
 			default:
 				msg = null;
 			}
-			if (msg != null) client.sendTCP(msg);
+			if (msg != null) client.sendTCP(msg);*/
 		}
 	}
 
@@ -141,13 +141,13 @@ public class PositionClient {
 			System.out.println(character.name + " added at " + character.x + ", " + character.y);
 		}
 
-		public void updateCharacter (UpdateCharacter msg) {
+		/*public void updateCharacter (UpdateCharacter msg) {
 			Character character = characters.get(msg.id);
 			if (character == null) return;
 			character.x = msg.x;
 			character.y = msg.y;
 			System.out.println(character.name + " moved to " + character.x + ", " + character.y);
-		}
+		}*/
 
 		public void removeCharacter (int id) {
 			Character character = characters.remove(id);

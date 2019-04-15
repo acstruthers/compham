@@ -38,6 +38,13 @@ public class Properties implements Serializable {
 	public static final String OUTPUT_DIRECTORY = "C:\\tmp\\";
 	public static final String CSV_SEPARATOR = ",";
 
+	// Kryonet networking parameters
+	public static final String NETWORK_IPADDRESS_SERVER = "192.168.0.17";
+	public static final int NETWORK_PORT_TCP = 54555;
+	public static final int NETWORK_PORT_UDP = 54777;
+	public static final int NETWORK_TIMEOUT_MILLIS = 5000;
+
+	public static final float ADI_HQLA_PROPORTION = 0.75f; // proportion of investments that are liquid
 	public static final boolean ALLOW_NEGATIVE_RATES = false; // allow negative interest rates?
 	public static final float SUPERANNUATION_RATE = 0.095f; // 9.5%
 	public static final long RANDOM_SEED = 20190315L;

@@ -11,22 +11,22 @@ import java.util.HashSet;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
-import com.esotericsoftware.kryonet.examples.position.Network.AddCharacter;
-import com.esotericsoftware.kryonet.examples.position.Network.Login;
-import com.esotericsoftware.kryonet.examples.position.Network.MoveCharacter;
-import com.esotericsoftware.kryonet.examples.position.Network.Register;
-import com.esotericsoftware.kryonet.examples.position.Network.RegistrationRequired;
-import com.esotericsoftware.kryonet.examples.position.Network.RemoveCharacter;
-import com.esotericsoftware.kryonet.examples.position.Network.UpdateCharacter;
+//import com.esotericsoftware.kryonet.examples.position.Network.AddCharacter;
+//import com.esotericsoftware.kryonet.examples.position.Network.Login;
+//import com.esotericsoftware.kryonet.examples.position.Network.MoveCharacter;
+//import com.esotericsoftware.kryonet.examples.position.Network.Register;
+//import com.esotericsoftware.kryonet.examples.position.Network.RegistrationRequired;
+//import com.esotericsoftware.kryonet.examples.position.Network.RemoveCharacter;
+//import com.esotericsoftware.kryonet.examples.position.Network.UpdateCharacter;
 import com.esotericsoftware.minlog.Log;
 
 public class PositionServer {
 	Server server;
 	HashSet<Character> loggedIn = new HashSet();
 
-	public PositionServer () throws IOException {
+	public PositionServer() throws IOException {
 		server = new Server() {
-			protected Connection newConnection () {
+			protected Connection newConnection() {
 				// By providing our own connection implementation, we can store per
 				// connection state without a connection ID to state look up.
 				return new CharacterConnection();
@@ -38,17 +38,18 @@ public class PositionServer {
 		Network.register(server);
 
 		server.addListener(new Listener() {
-			public void received (Connection c, Object object) {
+			public void received(Connection c, Object object) {
 				// We know all connections for this server are actually CharacterConnections.
-				CharacterConnection connection = (CharacterConnection)c;
+				CharacterConnection connection = (CharacterConnection) c;
 				Character character = connection.character;
 
-				if (object instanceof Login) {
+				/*if (object instanceof Login) {
 					// Ignore if already logged in.
-					if (character != null) return;
+					if (character != null)
+						return;
 
 					// Reject if the name is invalid.
-					String name = ((Login)object).name;
+					String name = ((Login) object).name;
 					if (!isValid(name)) {
 						c.close();
 						return;
@@ -76,9 +77,10 @@ public class PositionServer {
 
 				if (object instanceof Register) {
 					// Ignore if already logged in.
-					if (character != null) return;
+					if (character != null)
+						return;
 
-					Register register = (Register)object;
+					Register register = (Register) object;
 
 					// Reject if the login is invalid.
 					if (!isValid(register.name)) {
@@ -112,12 +114,14 @@ public class PositionServer {
 
 				if (object instanceof MoveCharacter) {
 					// Ignore if not logged in.
-					if (character == null) return;
+					if (character == null)
+						return;
 
-					MoveCharacter msg = (MoveCharacter)object;
+					MoveCharacter msg = (MoveCharacter) object;
 
 					// Ignore if invalid move.
-					if (Math.abs(msg.x) != 1 && Math.abs(msg.y) != 1) return;
+					if (Math.abs(msg.x) != 1 && Math.abs(msg.y) != 1)
+						return;
 
 					character.x += msg.x;
 					character.y += msg.y;
@@ -132,24 +136,26 @@ public class PositionServer {
 					update.y = character.y;
 					server.sendToAllTCP(update);
 					return;
-				}
+				}*/
 			}
 
-			private boolean isValid (String value) {
-				if (value == null) return false;
+			private boolean isValid(String value) {
+				if (value == null)
+					return false;
 				value = value.trim();
-				if (value.length() == 0) return false;
+				if (value.length() == 0)
+					return false;
 				return true;
 			}
 
-			public void disconnected (Connection c) {
-				CharacterConnection connection = (CharacterConnection)c;
+			public void disconnected(Connection c) {
+				CharacterConnection connection = (CharacterConnection) c;
 				if (connection.character != null) {
 					loggedIn.remove(connection.character);
 
-					RemoveCharacter removeCharacter = new RemoveCharacter();
+					/*RemoveCharacter removeCharacter = new RemoveCharacter();
 					removeCharacter.id = connection.character.id;
-					server.sendToAllTCP(removeCharacter);
+					server.sendToAllTCP(removeCharacter);*/
 				}
 			}
 		});
@@ -157,31 +163,32 @@ public class PositionServer {
 		server.start();
 	}
 
-	void loggedIn (CharacterConnection c, Character character) {
+	void loggedIn(CharacterConnection c, Character character) {
 		c.character = character;
 
 		// Add existing characters to new logged in connection.
 		for (Character other : loggedIn) {
-			AddCharacter addCharacter = new AddCharacter();
+			/*AddCharacter addCharacter = new AddCharacter();
 			addCharacter.character = other;
-			c.sendTCP(addCharacter);
+			c.sendTCP(addCharacter);*/
 		}
 
 		loggedIn.add(character);
 
 		// Add logged in character to all connections.
-		AddCharacter addCharacter = new AddCharacter();
+		/*AddCharacter addCharacter = new AddCharacter();
 		addCharacter.character = character;
-		server.sendToAllTCP(addCharacter);
+		server.sendToAllTCP(addCharacter);*/
 	}
 
-	boolean saveCharacter (Character character) {
+	boolean saveCharacter(Character character) {
 		File file = new File("characters", character.name.toLowerCase());
 		file.getParentFile().mkdirs();
 
 		if (character.id == 0) {
 			String[] children = file.getParentFile().list();
-			if (children == null) return false;
+			if (children == null)
+				return false;
 			character.id = children.length + 1;
 		}
 
@@ -204,9 +211,10 @@ public class PositionServer {
 		}
 	}
 
-	Character loadCharacter (String name) {
+	Character loadCharacter(String name) {
 		File file = new File("characters", name.toLowerCase());
-		if (!file.exists()) return null;
+		if (!file.exists())
+			return null;
 		DataInputStream input = null;
 		try {
 			input = new DataInputStream(new FileInputStream(file));
@@ -223,7 +231,8 @@ public class PositionServer {
 			return null;
 		} finally {
 			try {
-				if (input != null) input.close();
+				if (input != null)
+					input.close();
 			} catch (IOException ignored) {
 			}
 		}
@@ -234,7 +243,7 @@ public class PositionServer {
 		public Character character;
 	}
 
-	public static void main (String[] args) throws IOException {
+	public static void main(String[] args) throws IOException {
 		Log.set(Log.LEVEL_DEBUG);
 		new PositionServer();
 	}
