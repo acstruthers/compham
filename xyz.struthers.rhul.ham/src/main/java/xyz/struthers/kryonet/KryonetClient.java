@@ -19,7 +19,7 @@ public class KryonetClient {
 	public KryonetClient() {
 		super();
 		Permit.godMode();
-		
+
 		// create client
 		Client client = new Client();
 		client.start();
@@ -42,7 +42,7 @@ public class KryonetClient {
 
 			public void disconnected(Connection connection) {
 				System.out.println("client disconnected");
-				System.exit(0);
+				// System.exit(0);
 			}
 		});
 
