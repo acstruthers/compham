@@ -11,6 +11,10 @@ public class KryonetResponse {
 
 	private String text;
 
+	public KryonetResponse() {
+		super();
+	}
+	
 	public KryonetResponse(String text) {
 		super();
 	}

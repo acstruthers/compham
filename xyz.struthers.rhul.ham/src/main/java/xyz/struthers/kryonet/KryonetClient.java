@@ -24,7 +24,9 @@ public class KryonetClient {
 
 		// create client
 		client = new Client();
-		client.start();
+		//client.start();
+		new Thread(client).start();
+		// https://stackoverflow.com/questions/17011178/java-kryonet-servers-client-not-receiving-server-response
 
 		try {
 			client.connect(KryonetNetwork.NETWORK_TIMEOUT_MILLIS, KryonetNetwork.IPADDRESS_SERVER,
@@ -36,10 +38,6 @@ public class KryonetClient {
 		// register classes
 		KryonetNetwork.register(client);
 
-		KryonetRequest request = new KryonetRequest();
-		request.setText("Hello");
-		client.sendTCP(request);
-		
 		client.addListener(new Listener() {
 			public void connected(Connection connection) {
 				System.out.println("client connected");
@@ -62,7 +60,10 @@ public class KryonetClient {
 			}
 		});
 
-		
+		KryonetRequest request = new KryonetRequest();
+		request.setText("Hello");
+		client.sendTCP(request);
+		System.out.println("request sent");
 
 		// We'll do the connect on a new thread so the ChatFrame can show a progress
 		// bar.
