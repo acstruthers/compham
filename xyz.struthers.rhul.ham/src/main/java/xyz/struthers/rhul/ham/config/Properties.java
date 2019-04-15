@@ -40,7 +40,7 @@ public class Properties implements Serializable {
 
 	// Kryonet networking parameters
 	public static final String NETWORK_IPADDRESS_SERVER = "192.168.1.74";
-	public static final int NETWORK_PORT_TCP = 54555;
+	public static final int NETWORK_PORT_TCP = 1099; // 54555 default value
 	public static final int NETWORK_PORT_UDP = 54777;
 	public static final int NETWORK_TIMEOUT_MILLIS = 5000;
 
