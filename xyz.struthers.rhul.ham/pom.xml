@@ -148,6 +148,7 @@
 				<artifactId>permit-reflect</artifactId>
 				<version>${version.com.nqzero.permit-reflect}</version>
 			</dependency>
+			
 
 			<!-- Matrix maths -->
 			<!-- http://ejml.org/wiki/index.php?title=Main_Page -->

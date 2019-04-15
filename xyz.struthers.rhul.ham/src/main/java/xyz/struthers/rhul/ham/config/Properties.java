@@ -39,7 +39,7 @@ public class Properties implements Serializable {
 	public static final String CSV_SEPARATOR = ",";
 
 	// Kryonet networking parameters
-	public static final String NETWORK_IPADDRESS_SERVER = "192.168.0.17";
+	public static final String NETWORK_IPADDRESS_SERVER = "192.168.1.74";
 	public static final int NETWORK_PORT_TCP = 54555;
 	public static final int NETWORK_PORT_UDP = 54777;
 	public static final int NETWORK_TIMEOUT_MILLIS = 5000;

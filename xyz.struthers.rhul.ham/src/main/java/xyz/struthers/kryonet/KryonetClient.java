@@ -8,6 +8,7 @@ import java.io.IOException;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import com.nqzero.permit.Permit;
 
 /**
  * @author acstr
@@ -17,6 +18,8 @@ public class KryonetClient {
 
 	public KryonetClient() {
 		super();
+		Permit.godMode();
+		
 		// create client
 		Client client = new Client();
 		client.start();
@@ -54,7 +57,7 @@ public class KryonetClient {
 
 	}
 
-	public static void kryonetClient(String[] args) {
+	public static void main(String[] args) {
 		new KryonetClient();
 	}
 
