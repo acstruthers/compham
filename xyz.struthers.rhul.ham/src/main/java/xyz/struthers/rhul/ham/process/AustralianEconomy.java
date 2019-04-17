@@ -280,7 +280,8 @@ public class AustralianEconomy implements Serializable {
 	 * 
 	 * @param iteration
 	 */
-	public void updateOneMonth(int iteration) {
+	public void updateOneMonth(ClearingPaymentOutputs cpvOutput) {
+		this.clearingPaymentVectorOutput = cpvOutput;
 		this.processPaymentsClearingVectorOutputs();
 	}
 
@@ -485,9 +486,6 @@ public class AustralianEconomy implements Serializable {
 			float liquid = BUFFER_RBA; // buffer so RBA never defaults
 			this.liquidAssets.set(paymentClearingIndex, liquid);
 		}
-
-		// create Clearing Payments Vector
-		// this.payments = new ClearingPaymentVector();
 	}
 
 	/**
