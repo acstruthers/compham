@@ -16,16 +16,19 @@ import com.nqzero.permit.Permit;
  */
 public class KryonetHelloClient {
 
-	Client client;
+	static Client client;
+	static Thread t;
+	static String msg = "";
 
 	public KryonetHelloClient() {
 		super();
-		Permit.godMode();
+		Permit.godMode(); // allows reflection in Java 11
 
 		// create client
 		client = new Client();
-		//client.start();
-		new Thread(client).start();
+		// client.start();
+		t = new Thread(client);
+		t.start();
 		// https://stackoverflow.com/questions/17011178/java-kryonet-servers-client-not-receiving-server-response
 
 		try {
@@ -50,6 +53,10 @@ public class KryonetHelloClient {
 					KryonetHelloResponse response = (KryonetHelloResponse) object;
 					System.out.println("Kryonet server response: " + response.getText());
 					client.sendTCP("Hello to you too.");
+					msg = "I was set inside the listener";
+
+					// trying to return control to the main function below
+					Thread.currentThread().interrupt(); // will this return to the main method?
 					return;
 				}
 			}
@@ -78,7 +85,20 @@ public class KryonetHelloClient {
 	}
 
 	public static void main(String[] args) {
+		// https://www.codejava.net/java-core/concurrency/how-to-use-threads-in-java-create-start-pause-interrupt-and-join
+
+		System.out.println("MAIN before first client creation.");
 		new KryonetHelloClient();
+		try {
+			// wait for previous thread to terminate before continuing with execution
+			t.join();
+		} catch (InterruptedException e) {
+			// do nothing
+		}
+		System.out.println(msg);
+		System.out.println("MAIN before second client creation.");
+		new KryonetHelloClient();
+		System.out.println("MAIN after second client creation.");
 	}
 
 }

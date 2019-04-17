@@ -87,7 +87,7 @@ public class AustralianEconomy implements Serializable {
 	 * List<Float> NodeEquity, and<br>
 	 * List<Integer> NodeDefaultOrder.
 	 */
-	Map<String, Object> clearingPaymentVectorOutput;
+	ClearingPaymentOutputs clearingPaymentVectorOutput;
 
 	// Analytics
 	int[] businessTypeCount;
@@ -163,7 +163,7 @@ public class AustralianEconomy implements Serializable {
 		this.preparePaymentsClearingVectorInputs(iteration);
 
 		ClearingPaymentInputs cpvInputs = new ClearingPaymentInputs(this.liabilitiesAmounts, this.liabilitiesIndices,
-				this.operatingCashFlow, this.liquidAssets);
+				this.operatingCashFlow, this.liquidAssets, iteration);
 
 		if (DEBUG_RAM_USAGE) {
 			System.gc();
@@ -229,10 +229,6 @@ public class AustralianEconomy implements Serializable {
 							+ iteration + ": " + formatter.format(megabytesAfter - megabytesBefore)
 							+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
 		}
-
-		// FIXME Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
-		// when looping through second iteration of CPV, so write agents to disk then
-		// drop them
 
 		// drops all agents to reduce memory footprint
 		/*
@@ -300,11 +296,16 @@ public class AustralianEconomy implements Serializable {
 	 * iteration, they must still appear in the model so the indices that were set
 	 * during calibration remain valid.
 	 * 
+	 * Includes cash balances as exogeneous inputs because they only default if cash
+	 * plus income is less than liabilities.
+	 * 
 	 * TODO: Combine employees in the one Household if they work for the same
 	 * Employer.
 	 * 
-	 * TODO: include cash balances as exogeneous inputs because they only default if
-	 * cash plus income is less than liabilities
+	 * N.B. Agents MUST appear in the exact same order as they are assigned CPV
+	 * indices. This ensures that the right agents are addressed in in the
+	 * liabilities matrix. It also makes it far more efficient to process the output
+	 * of the CPV.
 	 */
 	void preparePaymentsClearingVectorInputs(int iteration) {
 		// initialise local variables
@@ -496,17 +497,43 @@ public class AustralianEconomy implements Serializable {
 	 * @param cpvOutput - ClearingPaymentVector output map
 	 */
 	void processPaymentsClearingVectorOutputs() {
-		// unmarshall CPV outouts into their original data structures
+		// unmarshall CPV outputs into their original data structures
 		// net cash flow of each node after paying liabilities
-		List<Float> equityOfNode = (List<Float>) this.clearingPaymentVectorOutput.get("NodeEquity");
+		List<Float> equityOfNode = this.clearingPaymentVectorOutput.getEquityOfNode();
 		// Which round of the CPV algorithm caused the node to default (0 = no default)
-		List<Integer> defaultOrderOfNode = (List<Integer>) this.clearingPaymentVectorOutput.get("NodeDefaultOrder");
+		List<Integer> defaultOrderOfNode = this.clearingPaymentVectorOutput.getDefaultOrderOfNode();
+		int iteration = this.clearingPaymentVectorOutput.getIteration();
 
 		// update agents
 		for (int cpvIdx = 0; cpvIdx < equityOfNode.size(); cpvIdx++) {
-			// FIXME: up to here on train 15/4/19
+			if (cpvIdx == 0) {
+				// government
+				this.government.processClearingPaymentVectorOutput(equityOfNode.get(cpvIdx), iteration,
+						defaultOrderOfNode.get(cpvIdx));
+			} else if (cpvIdx == 1) {
+				// RBA
+				this.rba.processClearingPaymentVectorOutput(equityOfNode.get(cpvIdx), iteration,
+						defaultOrderOfNode.get(cpvIdx));
+			} else if (cpvIdx < (this.households.length + 2)) {
+				// households
+				this.households[cpvIdx - 2].processClearingPaymentVectorOutput(equityOfNode.get(cpvIdx), iteration,
+						defaultOrderOfNode.get(cpvIdx));
+			} else if (cpvIdx < (this.businesses.length + this.households.length + 2)) {
+				// businesses
+				this.businesses[cpvIdx - 2 - this.households.length].processClearingPaymentVectorOutput(
+						equityOfNode.get(cpvIdx), iteration, defaultOrderOfNode.get(cpvIdx));
+			} else if (cpvIdx < (this.adis.length + this.businesses.length + this.households.length + 2)) {
+				// ADIs
+				this.adis[cpvIdx - 2 - this.households.length - this.businesses.length]
+						.processClearingPaymentVectorOutput(equityOfNode.get(cpvIdx), iteration,
+								defaultOrderOfNode.get(cpvIdx));
+			} else {
+				// foreign countries
+				this.countries[cpvIdx - 2 - this.households.length - this.businesses.length - this.adis.length]
+						.processClearingPaymentVectorOutput(equityOfNode.get(cpvIdx), iteration,
+								defaultOrderOfNode.get(cpvIdx));
+			}
 		}
-
 	}
 
 	/**

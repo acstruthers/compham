@@ -20,6 +20,8 @@ public class ClearingPaymentOutputs {
 	// Which round of the CPV algorithm caused the node to default. (0 = no default)
 	private List<Integer> defaultOrderOfNode;
 
+	private int iteration;
+
 	public ClearingPaymentOutputs() {
 		super();
 	}
@@ -50,6 +52,20 @@ public class ClearingPaymentOutputs {
 	 */
 	public void setDefaultOrderOfNode(List<Integer> defaultOrderOfNode) {
 		this.defaultOrderOfNode = defaultOrderOfNode;
+	}
+
+	/**
+	 * @return the iteration
+	 */
+	public int getIteration() {
+		return iteration;
+	}
+
+	/**
+	 * @param iteration the iteration to set
+	 */
+	public void setIteration(int iteration) {
+		this.iteration = iteration;
 	}
 
 }

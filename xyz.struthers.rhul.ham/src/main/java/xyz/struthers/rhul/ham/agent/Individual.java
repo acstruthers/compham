@@ -227,6 +227,22 @@ public final class Individual extends Agent {
 		return 0;
 	}
 
+	@Override
+	public void processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder) {
+		// FIXME: process CPV output in Agent
+	}
+
+	/**
+	 * If the business employing the individual goes bankrupt, the employee is
+	 * fired.
+	 * 
+	 * their salary and wages income is replaced by unemployment benefits, and they
+	 * cut out all discretionary spending.
+	 */
+	public void fireEmployee() {
+		// FIXME: fire employee - update Individual, and flow through to Household
+	}
+
 	protected void init() {
 		// agents
 		this.household = null;

@@ -290,6 +290,22 @@ public final class AustralianGovernment extends Agent implements Employer {
 		return this.defaultOrder;
 	}
 
+	@Override
+	public void processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder) {
+		// update default details
+		if (defaultOrder > 0) {
+			// update default details unless it defaulted in a previous iteration
+			if (this.defaultIteration == 0) {
+				// hasn't defaulted in a previous iteration
+				this.defaultIteration = iteration;
+				this.defaultOrder = defaultOrder;
+			}
+		}
+
+		// update financials
+		this.bsCash += nodeEquity;
+	}
+
 	/**
 	 * @return the industryDivisionCode
 	 */

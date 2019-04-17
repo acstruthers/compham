@@ -6,7 +6,8 @@ package xyz.struthers.rhul.ham;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
-import java.util.Map;
+
+import xyz.struthers.rhul.ham.process.ClearingPaymentOutputs;
 
 /**
  * ClearingPaymentVector interface to enable RMI processing on a separate
@@ -17,7 +18,7 @@ import java.util.Map;
  */
 public interface ClearingPaymentVectorInterface extends Remote {
 
-	public Map<String, Object> calculate(List<List<Float>> liabilitiesAmounts, List<List<Integer>> liabilitiesIndices,
+	public ClearingPaymentOutputs calculate(List<List<Float>> liabilitiesAmounts, List<List<Integer>> liabilitiesIndices,
 			List<Float> operatingCashFlow, List<Float> liquidAssets, int iteration) throws RemoteException;
 
 }

@@ -197,6 +197,10 @@ public class CalibrateEconomy {
 	 * Assign unique Payment Clearing Indices to every participating agent.
 	 * 
 	 * N.B. This is the order they MUST be in the Payment Clearing Vector arguments
+	 * 
+	 * By following this order exactly, it makes it far more efficient to deal with
+	 * the output of the CPV, being able to determine which agent each index relates
+	 * to simply by their relative position and hte number of each type of agent.
 	 */
 	private void assignPaymentClearingIndices() {
 		if (!this.indicesAssigned) {

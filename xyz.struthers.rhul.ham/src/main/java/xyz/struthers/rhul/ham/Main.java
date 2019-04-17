@@ -11,7 +11,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.text.DecimalFormat;
 import java.util.Date;
-import java.util.Map;
 
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;
@@ -33,6 +32,7 @@ import xyz.struthers.rhul.ham.data.Currencies;
 import xyz.struthers.rhul.ham.data.Currency;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
 import xyz.struthers.rhul.ham.process.ClearingPaymentInputs;
+import xyz.struthers.rhul.ham.process.ClearingPaymentOutputs;
 import xyz.struthers.rhul.ham.process.ClearingPaymentVector;
 import xyz.struthers.rhul.ham.process.NodePayment;
 
@@ -102,7 +102,7 @@ public class Main {
 			ClearingPaymentVectorInterface stub = (ClearingPaymentVectorInterface) registry
 					.lookup("ClearingPaymentVector");
 			System.out.println(new Date(System.currentTimeMillis()) + ": Invoking CPV via RMI.");
-			Map<String, Object> cpvOutputs = stub.calculate(cpvInputs.getLiabilitiesAmounts(),
+			ClearingPaymentOutputs cpvOutputs = stub.calculate(cpvInputs.getLiabilitiesAmounts(),
 					cpvInputs.getLiabilitiesIndices(), cpvInputs.getOperatingCashFlow(), cpvInputs.getLiquidAssets(), iteration);
 			System.out.println(new Date(System.currentTimeMillis()) + ": Outputs returned from CPV via RMI.");
 

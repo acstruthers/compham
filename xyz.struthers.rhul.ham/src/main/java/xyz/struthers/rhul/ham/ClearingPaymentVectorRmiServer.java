@@ -11,6 +11,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import xyz.struthers.rhul.ham.process.ClearingPaymentOutputs;
+
 /**
  * ClearingPaymentVector server to enable RMI processing on a separate computer.
  * This helps to overcome the RAM constraints. This server is the part that
@@ -20,12 +22,12 @@ import java.util.Map;
  * @author Adam Struthers
  * @since 14-Apr-2019
  */
-public class ClearingPaymentVectorServer implements ClearingPaymentVectorInterface {
+public class ClearingPaymentVectorRmiServer implements ClearingPaymentVectorInterface {
 
 	public static final String RMI_HOST = "Adam-E590";
 	public static final int RMI_PORT = 1099;
 
-	public ClearingPaymentVectorServer() {
+	public ClearingPaymentVectorRmiServer() {
 		super();
 	}
 
@@ -37,13 +39,14 @@ public class ClearingPaymentVectorServer implements ClearingPaymentVectorInterfa
 	 * List, java.util.List, java.util.List)
 	 */
 	@Override
-	public Map<String, Object> calculate(List<List<Float>> liabilitiesAmounts, List<List<Integer>> liabilitiesIndices,
-			List<Float> operatingCashFlow, List<Float> liquidAssets, int iteration) throws RemoteException {
+	public ClearingPaymentOutputs calculate(List<List<Float>> liabilitiesAmounts,
+			List<List<Integer>> liabilitiesIndices, List<Float> operatingCashFlow, List<Float> liquidAssets,
+			int iteration) throws RemoteException {
 
 		System.out.println(new Date(System.currentTimeMillis()) + ": CPV invoked via RMI.");
 
 		RunSimulation sim = new RunSimulation();
-		Map<String, Object> cpvOutputs = sim.calculateClearingPaymentVector(liabilitiesAmounts, liabilitiesIndices,
+		ClearingPaymentOutputs cpvOutputs = sim.calculateClearingPaymentVector(liabilitiesAmounts, liabilitiesIndices,
 				operatingCashFlow, liquidAssets, iteration);
 
 		System.out.println(
@@ -65,7 +68,7 @@ public class ClearingPaymentVectorServer implements ClearingPaymentVectorInterfa
 			LocateRegistry.createRegistry(RMI_PORT);
 
 			// register object
-			ClearingPaymentVectorServer obj = new ClearingPaymentVectorServer();
+			ClearingPaymentVectorRmiServer obj = new ClearingPaymentVectorRmiServer();
 			ClearingPaymentVectorInterface stub = (ClearingPaymentVectorInterface) UnicastRemoteObject.exportObject(obj,
 					0);
 

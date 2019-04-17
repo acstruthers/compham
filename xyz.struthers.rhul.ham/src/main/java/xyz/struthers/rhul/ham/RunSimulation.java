@@ -6,8 +6,8 @@ package xyz.struthers.rhul.ham;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
+import xyz.struthers.rhul.ham.process.ClearingPaymentOutputs;
 import xyz.struthers.rhul.ham.process.ClearingPaymentVector;
 
 /**
@@ -46,7 +46,7 @@ public class RunSimulation {
 	 *         List<Float> NodeEquity, and<br>
 	 *         List<Integer> NodeDefaultOrder.
 	 */
-	public Map<String, Object> calculateClearingPaymentVector(List<List<Float>> liabilitiesAmounts,
+	public ClearingPaymentOutputs calculateClearingPaymentVector(List<List<Float>> liabilitiesAmounts,
 			List<List<Integer>> liabilitiesIndices, List<Float> operatingCashFlow, List<Float> liquidAssets,
 			int iteration) {
 
@@ -58,7 +58,7 @@ public class RunSimulation {
 
 		ClearingPaymentVector payment = new ClearingPaymentVector();
 
-		Map<String, Object> result = payment.calculate(liabilitiesAmounts, liabilitiesIndices, operatingCashFlow,
+		ClearingPaymentOutputs result = payment.calculate(liabilitiesAmounts, liabilitiesIndices, operatingCashFlow,
 				liquidAssets);
 
 		payment.clearInputsAndWorking();

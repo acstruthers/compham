@@ -427,6 +427,109 @@ public class Business extends Agent implements Employer {
 		return this.defaultOrder;
 	}
 
+	@Override
+	public void processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder) {
+		// update default details
+		if (defaultOrder > 0) {
+			// update default details unless it defaulted in a previous iteration
+			if (this.defaultIteration == 0) {
+				// hasn't defaulted in a previous iteration
+				this.defaultIteration = iteration;
+				this.defaultOrder = defaultOrder;
+			}
+		}
+
+		// FIXME: process CPV output in Agent
+		// update financials
+		if ((this.bankDeposits + nodeEquity) > 0f) {
+			this.bankDeposits += nodeEquity;
+		} else {
+			// negative cashflow is greater than bank balance
+			if ((this.bankDeposits + this.otherFinancialAssets * (1f - Properties.INVESTMENT_HAIRCUT)
+					+ this.foreignEquities * (1f - Properties.FOREIGN_INVESTMENT_HAIRCUT) + nodeEquity) > 0f) {
+				// drawing down on other financial assets will be enough to avoid bankruptcy
+				// 1. liquidate domestic investments first
+				if (this.otherFinancialAssets * (1f - Properties.INVESTMENT_HAIRCUT) + nodeEquity < 0) {
+					// domestic financial assets weren't enough, so liquidate all of them
+					nodeEquity += this.otherFinancialAssets * (1f - Properties.INVESTMENT_HAIRCUT);
+					this.otherFinancialAssets = 0f;
+					this.interestIncome = 0f;
+				} else {
+					// domestic financial assets were enough, so only partially liquidate them
+					this.interestIncome = this.interestIncome
+							* (1f - (this.otherFinancialAssets + nodeEquity / (1f - Properties.INVESTMENT_HAIRCUT))
+									/ this.otherFinancialAssets);
+					this.otherFinancialAssets += nodeEquity / (1f - Properties.INVESTMENT_HAIRCUT);
+					nodeEquity = 0f;
+				}
+
+				// 2. then liquidate foreign investments
+				if (this.foreignEquities * (1f - Properties.FOREIGN_INVESTMENT_HAIRCUT) + nodeEquity < 0) {
+					// foreign assets weren't enough, so liquidate all of them
+					nodeEquity += this.foreignEquities * (1f - Properties.FOREIGN_INVESTMENT_HAIRCUT);
+					this.foreignEquities = 0f;
+					this.otherIncome = 0f;
+				} else {
+					// foreign assets were enough, so only partially liquidate them
+					this.otherIncome = this.otherIncome
+							* (1f - (this.foreignEquities + nodeEquity / (1f - Properties.FOREIGN_INVESTMENT_HAIRCUT))
+									/ this.foreignEquities);
+					this.foreignEquities += nodeEquity / (1f - Properties.FOREIGN_INVESTMENT_HAIRCUT);
+					nodeEquity = 0f;
+				}
+
+				// 3. finally use up remaining cash
+				if (this.bankDeposits + nodeEquity < 0) {
+					// cash must be enough because of the parent if statement that we're within
+					this.bankDeposits += nodeEquity;
+				}
+			} else {
+				// business is bankrupt, so fire all employees
+				for (Individual employee : this.employees) {
+					employee.fireEmployee();
+				}
+				
+				// TODO: remove business deposits from bank's balances
+				
+				// TODO: remove business loans from bank's balances
+
+				// business is bankrupt, so zero out all its financials
+				// it will have no financial impact on any other agent in future iterations
+				this.totalIncome = 0f;
+				this.salesDomestic = 0f;
+				this.salesGovernment = 0f;
+				this.salesForeign = 0f;
+				this.interestIncome = 0f;
+				this.rentIncome = 0f;
+				this.otherIncome = 0f;
+
+				this.totalExpenses = 0f;
+				this.wageExpenses = 0f;
+				this.superannuationExpense = 0f;
+				this.payrollTaxExpense = 0f;
+				this.foreignExpenses = 0f;
+				this.interestExpense = 0f;
+				this.rentExpense = 0f;
+				this.depreciationExpense = 0f;
+				this.otherExpenses = 0f;
+
+				this.totalAssets = 0f;
+				this.bankDeposits = 0f;
+				this.foreignEquities = 0f;
+				this.otherFinancialAssets = 0f;
+				this.otherNonFinancialAssets = 0f;
+
+				this.totalLiabilities = 0f;
+				this.tradeCreditors = 0f;
+				this.loans = 0f;
+				this.otherCurrentLiabilities = 0f;
+				this.otherNonCurrentLiabilities = 0f;
+
+				this.totalEquity = 0f;
+			}
+		}
+	}
+
 	/**
 	 * @return the industryDivisionCode
 	 */

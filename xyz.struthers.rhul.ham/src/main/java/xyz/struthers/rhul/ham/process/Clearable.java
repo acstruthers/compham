@@ -74,4 +74,27 @@ public interface Clearable {
 	 *         defaulted
 	 */
 	public int getDefaultOrder();
+
+	/**
+	 * Updates the Agent based on the output of the Clearing Payment Vector. If the
+	 * Agent defaulted in a previous iteration those values are not updated. If an
+	 * Agent defaulted for the first time in this iteration then their financial
+	 * statements and any affected linked Agents are updated to reflect the
+	 * situation.
+	 * 
+	 * Examples of how defaults are processed include:<br>
+	 * 1. Businesses that default result in employees that switch from wages to
+	 * unemployment benefits.<br>
+	 * 2. ADIs that default result in staff becoming unemployed and depositors being
+	 * paid out per the Financial Claims Scheme.<br>
+	 * 3. Households that default lose their house of they have one, switching from
+	 * mortgage repayments to rent payments.
+	 * 
+	 * @param nodeEquity   - the net cash flow to/(from) the node in this iteration.
+	 * @param iteration    - the iteration number.
+	 * @param defaultOrder - the order that the node defaulted in this iteration (0
+	 *                     if node did not default).
+	 */
+	public void processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder);
+	
 }

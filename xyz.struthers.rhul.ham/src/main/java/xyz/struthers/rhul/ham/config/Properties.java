@@ -23,6 +23,33 @@ public class Properties implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	// scenario parameters
+	/**
+	 * In the event of Household default mortgage repayments are switched over to be
+	 * rent payments that are this proportion of the original mortgage repayment
+	 * amount. Assume a 30% drop in property prices, and rent being cheaper than
+	 * loan repayments.
+	 */
+	public static final float MTG_RENT_CONVERSION_RATIO = 0.50f;
+	/**
+	 * In the event of a Household default they can draw down on their
+	 * superannuation. However, due to the financial crisis its liquidation value
+	 * has fallen and they must subtract this haircut from it when realising the
+	 * cash.
+	 */
+	public static final float SUPERANNUATION_HAIRCUT = 0.30f;
+	/**
+	 * Due to the financial crisis the liquidation value of any financial
+	 * investments has fallen and agents must subtract this haircut from it when
+	 * realising the cash.
+	 */
+	public static final float INVESTMENT_HAIRCUT = 0.50f;
+	/**
+	 * Due to the financial crisis the liquidation value of foreign investments has
+	 * fallen and agents must subtract this haircut from it when realising the cash.
+	 */
+	public static final float FOREIGN_INVESTMENT_HAIRCUT = 0.75f;
+
 	// static config constants
 	/*
 	 * Use a classpath resource loader instead. One of these two options:

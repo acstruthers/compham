@@ -284,6 +284,30 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 		return this.defaultOrder;
 	}
 
+	@Override
+	public void processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder) {
+		// update default details
+		if (defaultOrder > 0) {
+			// update default details unless it defaulted in a previous iteration
+			if (this.defaultIteration == 0) {
+				// hasn't defaulted in a previous iteration
+				this.defaultIteration = iteration;
+				this.defaultOrder = defaultOrder;
+			}
+		}
+
+		// update financials
+		if (nodeEquity < -this.bsCash) {
+			// net cash outflow was greater than cash reserves, so fund through new
+			// borrowings (could be "printing money" by borrowing from the government)
+			float newBorrowings = -nodeEquity - this.bsCash;
+			this.bsCash = 0f;
+			this.bsOtherLiabilities += newBorrowings;
+		} else {
+			this.bsCash += nodeEquity;
+		}
+	}
+
 	/**
 	 * @return the industryDivisionCode
 	 */
