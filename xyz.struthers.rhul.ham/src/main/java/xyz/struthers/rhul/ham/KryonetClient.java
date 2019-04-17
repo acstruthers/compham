@@ -14,6 +14,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.nqzero.permit.Permit;
 
+import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.config.SpringConfiguration;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
 import xyz.struthers.rhul.ham.process.ClearingPaymentInputs;
@@ -39,7 +40,7 @@ public class KryonetClient {
 		Permit.godMode(); // allows reflection in Java 11
 
 		// create client and connect to server
-		client = new Client();
+		client = new Client(Properties.NETWORK_BUFFER_BYTES, Properties.NETWORK_BUFFER_BYTES);
 		t = new Thread(client);
 		t.start();
 		// https://stackoverflow.com/questions/17011178/java-kryonet-servers-client-not-receiving-server-response

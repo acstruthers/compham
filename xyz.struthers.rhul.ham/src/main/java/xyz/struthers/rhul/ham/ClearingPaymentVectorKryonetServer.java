@@ -11,6 +11,7 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.nqzero.permit.Permit;
 
+import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.process.ClearingPaymentInputs;
 import xyz.struthers.rhul.ham.process.ClearingPaymentOutputs;
 
@@ -31,7 +32,7 @@ public class ClearingPaymentVectorKryonetServer {
 		Permit.godMode(); // allows reflection in Java 11
 
 		// create server
-		server = new Server();
+		server = new Server(Properties.NETWORK_BUFFER_BYTES, Properties.NETWORK_BUFFER_BYTES);
 
 		// For consistency, the classes to be sent over the network are
 		// registered by the same method for both the client and server.

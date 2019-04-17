@@ -70,6 +70,7 @@ public class Properties implements Serializable {
 	public static final int NETWORK_PORT_TCP = 1099; // 54555 default value
 	public static final int NETWORK_PORT_UDP = 54777;
 	public static final int NETWORK_TIMEOUT_MILLIS = 5000;
+	public static final int NETWORK_BUFFER_BYTES = 2000000000; // approx 2GB
 
 	public static final float ADI_HQLA_PROPORTION = 0.75f; // proportion of investments that are liquid
 	public static final boolean ALLOW_NEGATIVE_RATES = false; // allow negative interest rates?
