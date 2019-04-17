@@ -43,7 +43,7 @@ public class KryonetHelloServer {
 					KryonetHelloResponse response = new KryonetHelloResponse(request.getText());
 					response.setText(request.getText() + ", Kryonet world!");
 					server.sendToAllTCP(response);
-					c.sendTCP(response);
+					//c.sendTCP(response);
 					System.out.println(response.getText());
 				}
 			}
