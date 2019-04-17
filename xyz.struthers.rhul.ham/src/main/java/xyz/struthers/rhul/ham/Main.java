@@ -130,7 +130,7 @@ public class Main {
 			// economy = readFstEconomyFromFile(FILEPATH_AGENTS_INIT_FST); // using FST
 			// economy = readKryoObjectFromFile(FILEPATH_AGENTS_INIT_KRYO);
 
-			economy.updateOneMonth(iteration);
+			//economy.updateOneMonth(iteration);
 
 			System.gc();
 			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
