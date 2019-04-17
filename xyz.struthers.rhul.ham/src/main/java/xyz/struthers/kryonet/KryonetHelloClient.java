@@ -20,7 +20,7 @@ public class KryonetHelloClient {
 	static Thread t;
 	static String msg = "";
 
-	public KryonetHelloClient() {
+	public KryonetHelloClient(String message) {
 		super();
 		Permit.godMode(); // allows reflection in Java 11
 
@@ -55,8 +55,9 @@ public class KryonetHelloClient {
 					client.sendTCP("Hello to you too.");
 					msg = "I was set inside the listener";
 
-					// trying to return control to the main function below
-					Thread.currentThread().interrupt(); // will this return to the main method?
+					// return control to the main thread
+					client.removeListener(this);
+					client.stop();
 					return;
 				}
 			}
@@ -68,27 +69,16 @@ public class KryonetHelloClient {
 		});
 
 		KryonetHelloRequest request = new KryonetHelloRequest();
-		request.setText("Hello");
+		request.setText(message);
 		client.sendTCP(request);
 		System.out.println("request sent");
-
-		// We'll do the connect on a new thread so the ChatFrame can show a progress
-		// bar.
-		// Connecting to localhost is usually so fast you won't see the progress bar.
-		/*
-		 * new Thread("Connect") { public void run() { try {
-		 * client.connect(KryonetNetwork.NETWORK_TIMEOUT_MILLIS,
-		 * KryonetNetwork.IPADDRESS_SERVER, KryonetNetwork.NETWORK_PORT_TCP); // Server
-		 * communication after connection can go here, or in // Listener#connected(). }
-		 * catch (IOException ex) { ex.printStackTrace(); System.exit(1); } } }.start();
-		 */
 	}
 
 	public static void main(String[] args) {
 		// https://www.codejava.net/java-core/concurrency/how-to-use-threads-in-java-create-start-pause-interrupt-and-join
 
-		System.out.println("MAIN before first client creation.");
-		new KryonetHelloClient();
+		System.out.println("* * * MAIN START * * *");
+		new KryonetHelloClient("Hello");
 		try {
 			// wait for previous thread to terminate before continuing with execution
 			t.join();
@@ -97,8 +87,14 @@ public class KryonetHelloClient {
 		}
 		System.out.println(msg);
 		System.out.println("MAIN before second client creation.");
-		new KryonetHelloClient();
-		System.out.println("MAIN after second client creation.");
+		new KryonetHelloClient("Goodbye");
+		try {
+			// wait for previous thread to terminate before continuing with execution
+			t.join();
+		} catch (InterruptedException e) {
+			// do nothing
+		}
+		System.out.println("* * * MAIN FINISH * * *");
 	}
 
 }
