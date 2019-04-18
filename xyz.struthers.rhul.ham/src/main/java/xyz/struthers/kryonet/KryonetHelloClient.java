@@ -51,15 +51,15 @@ public class KryonetHelloClient {
 		client.addListener(new Listener() {
 			public void connected(Connection connection) {
 				System.out.println("client connected");
-				client.sendTCP("client connected");
+				//client.sendTCP("client connected");
 			}
 
 			public void received(Connection connection, Object object) {
-				System.out.println("Kryonet server responded.");
+				//System.out.println("Kryonet server responded.");
 				if (object instanceof KryonetHelloResponse) {
 					KryonetHelloResponse response = (KryonetHelloResponse) object;
 					System.out.println("Kryonet server response: " + response.getText());
-					client.sendTCP("Hello to you too.");
+					//client.sendTCP("Hello to you too.");
 					msg = "I was set inside the listener";
 
 					// return control to the main thread
@@ -92,7 +92,7 @@ public class KryonetHelloClient {
 
 		ClearingPaymentInputs cpvInputs = new ClearingPaymentInputs();
 		final int numAgents = 12500000;
-		final int numLinks = 20;
+		final int numLinks = 10;
 		List<List<Float>> liabilitiesAmounts = new ArrayList<List<Float>>(numAgents);
 		List<List<Integer>> liabilitiesIndices = new ArrayList<List<Integer>>(numAgents);
 		List<Float> operatingCashFlow = new ArrayList<Float>(numAgents);
@@ -108,6 +108,11 @@ public class KryonetHelloClient {
 			liquidAssets.add(0f);
 		}
 		int iteration = 0;
+		cpvInputs.setLiabilitiesAmounts(liabilitiesAmounts);
+		cpvInputs.setLiabilitiesIndices(liabilitiesIndices);
+		cpvInputs.setOperatingCashFlow(operatingCashFlow);
+		cpvInputs.setLiquidAssets(liquidAssets);
+		cpvInputs.setIteration(iteration);
 		System.out.println(new Date(System.currentTimeMillis())
 				+ ": CPV inputs calculated and being sent to Kryonet server.");
 		client.sendTCP(cpvInputs);

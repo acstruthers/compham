@@ -3,14 +3,21 @@
  */
 package xyz.struthers.rhul.ham;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
+import xyz.struthers.rhul.ham.process.ClearingPaymentInputs;
 import xyz.struthers.rhul.ham.process.ClearingPaymentOutputs;
 
 /**
@@ -29,6 +36,51 @@ public class ClearingPaymentVectorRmiServer implements ClearingPaymentVectorInte
 
 	public ClearingPaymentVectorRmiServer() {
 		super();
+	}
+
+	/**
+	 * Using compressed objects for input and output to speed up the serialization /
+	 * de-serialization and network transfer. All the third party libraries I've
+	 * tried using have failed, so now I'm trying to make Java's default RMI work
+	 * faster.
+	 */
+	public byte[] calculate(byte[] compressedBytes) throws RemoteException {
+		ClearingPaymentInputs cpvInputs = null;
+		try {
+			// uncompress CPV inputs
+			ByteArrayInputStream bais = new ByteArrayInputStream(compressedBytes);
+			GZIPInputStream gzipIn = new GZIPInputStream(bais);
+			ObjectInputStream objectIn = new ObjectInputStream(gzipIn);
+			cpvInputs = (ClearingPaymentInputs) objectIn.readObject();
+			objectIn.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		List<List<Float>> liabilitiesAmounts = cpvInputs.getLiabilitiesAmounts();
+		List<List<Integer>> liabilitiesIndices = cpvInputs.getLiabilitiesIndices();
+		List<Float> operatingCashFlow = cpvInputs.getOperatingCashFlow();
+		List<Float> liquidAssets = cpvInputs.getLiquidAssets();
+		int iteration = cpvInputs.getIteration();
+
+		// calculate CPV
+		ClearingPaymentOutputs cpvOutputs = this.calculate(liabilitiesAmounts, liabilitiesIndices, operatingCashFlow,
+				liquidAssets, iteration);
+
+		ByteArrayOutputStream baos = null;
+		try {
+			// compress outputs
+			baos = new ByteArrayOutputStream();
+			GZIPOutputStream gzipOut = new GZIPOutputStream(baos);
+			ObjectOutputStream objectOut = new ObjectOutputStream(gzipOut);
+			objectOut.writeObject(cpvOutputs);
+			objectOut.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		byte[] bytes = baos.toByteArray();
+		return bytes;
 	}
 
 	/*

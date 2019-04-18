@@ -3,14 +3,19 @@
  */
 package xyz.struthers.rhul.ham;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.text.DecimalFormat;
 import java.util.Date;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;
@@ -102,8 +107,48 @@ public class Main {
 			ClearingPaymentVectorInterface stub = (ClearingPaymentVectorInterface) registry
 					.lookup("ClearingPaymentVector");
 			System.out.println(new Date(System.currentTimeMillis()) + ": Invoking CPV via RMI.");
-			ClearingPaymentOutputs cpvOutputs = stub.calculate(cpvInputs.getLiabilitiesAmounts(),
-					cpvInputs.getLiabilitiesIndices(), cpvInputs.getOperatingCashFlow(), cpvInputs.getLiquidAssets(), iteration);
+			// #############################################
+			// using default Java RMI with original objects
+			/*
+			 * ClearingPaymentOutputs cpvOutputs =
+			 * stub.calculate(cpvInputs.getLiabilitiesAmounts(),
+			 * cpvInputs.getLiabilitiesIndices(), cpvInputs.getOperatingCashFlow(),
+			 * cpvInputs.getLiquidAssets(), iteration);
+			 */
+			// #############################################
+			// using default Java RMI with compressed objects
+			System.out.println("#############################################################");
+			ByteArrayOutputStream baos = null;
+			try {
+				// compress outputs
+				baos = new ByteArrayOutputStream();
+				GZIPOutputStream gzipOut = new GZIPOutputStream(baos);
+				ObjectOutputStream objectOut = new ObjectOutputStream(gzipOut);
+				objectOut.writeObject(cpvInputs);
+				objectOut.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			byte[] cpvInputBytes = baos.toByteArray();
+			System.out.println(new Date(System.currentTimeMillis()) + ": CPV inputs compressed.");
+			byte[] cpvOutputBytes = stub.calculate(cpvInputBytes);
+			System.out.println(new Date(System.currentTimeMillis()) + ": Outputs returned from CPV via RMI.");
+			ClearingPaymentOutputs cpvOutputs = null;
+			try {
+				// uncompress CPV outputs
+				ByteArrayInputStream bais = new ByteArrayInputStream(cpvOutputBytes);
+				GZIPInputStream gzipIn = new GZIPInputStream(bais);
+				ObjectInputStream objectIn = new ObjectInputStream(gzipIn);
+				cpvOutputs = (ClearingPaymentOutputs) objectIn.readObject();
+				objectIn.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			System.out.println(new Date(System.currentTimeMillis()) + ": CPV outputs decompressed.");
+			System.out.println("#############################################################");
+			// #############################################
 			System.out.println(new Date(System.currentTimeMillis()) + ": Outputs returned from CPV via RMI.");
 
 			/*
@@ -130,7 +175,7 @@ public class Main {
 			// economy = readFstEconomyFromFile(FILEPATH_AGENTS_INIT_FST); // using FST
 			// economy = readKryoObjectFromFile(FILEPATH_AGENTS_INIT_KRYO);
 
-			//economy.updateOneMonth(iteration);
+			// economy.updateOneMonth(iteration);
 
 			System.gc();
 			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
@@ -313,7 +358,7 @@ public class Main {
 	 * @param filePath
 	 * @return
 	 * 
-	 *         deprecated doesn't work in Java 9+ yet.
+	 * 		deprecated doesn't work in Java 9+ yet.
 	 */
 	public static AustralianEconomy readFstEconomyFromFile(String filePath) {
 		AustralianEconomy obj = null;
