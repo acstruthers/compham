@@ -608,9 +608,103 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 				// hasn't defaulted in a previous iteration
 				this.defaultIteration = iteration;
 				this.defaultOrder = defaultOrder;
+				this.makeAdiBankrupt(iteration);
+			}
+		} else {
+			// update financials
+			if ((this.bsCash + nodeEquity) > 0f) {
+				// cash is enough, so just update cash balance
+				this.bsCash += nodeEquity;
+			} else {
+				if ((this.bsCash + this.bsInvestments * Properties.ADI_HQLA_PROPORTION + nodeEquity) > 0f) {
+					// the ADI holds sufficient liquid assets, so liquidate the amount needed
+					nodeEquity += this.bsCash;
+					this.bsCash = 0f;
+					float newInvestmentIncome = this.pnlInvestmentIncome * (1f - (-nodeEquity / this.bsInvestments));
+					this.pnlInvestmentIncome = newInvestmentIncome;
+					this.bsInvestments += nodeEquity;
+				} else {
+					// the ADI holds insufficient liquid assets, so shut it down
+					this.makeAdiBankrupt(iteration);
+				}
 			}
 		}
-		// FIXME: process CPV output in Agent
+	}
+
+	private void makeAdiBankrupt(int iteration) {
+		// ADI is bankrupt, so fire all employees
+		for (Individual employee : this.employees) {
+			employee.fireEmployee();
+		}
+
+		// assign everyone to a new bank
+		// apply the Financial Claims Scheme to all depositors
+		// interest payments were processed by the CPV, now we're distributing "capital"
+		for (int adiIdx = 0; adiIdx < this.adiInvestors.size(); adiIdx++) {
+			// under the FCS legislation it could be inferred that secured creditors take
+			// precedence over depositors, so we process them first.
+			AuthorisedDepositTakingInstitution adi = this.adiInvestors.get(adiIdx);
+			float liquidationValue = this.adiInvestorAmounts.get(adiIdx) * Properties.INVESTMENT_HAIRCUT;
+			float newCashBalance = adi.getBsCash() + liquidationValue;
+			adi.setBsCash(newCashBalance);
+		}
+		// calculate FCS limit
+		float fcsAdiLimit = Properties.FCS_LIMIT_PER_ADI;
+		float totalDeposits = this.bsDepositsAtCall + this.bsDepositsTerm + this.bsDepositsAdiRepoEligible;
+		float fcsGuaranteedRatio = totalDeposits > fcsAdiLimit ? fcsAdiLimit / totalDeposits : 1f;
+		// distribute deposits to
+		for (Household household : this.retailDepositors) {
+			float newDepositBal = Math.min(household.getBsBankDeposits() * fcsGuaranteedRatio,
+					Properties.FCS_LIMIT_PER_DEPOSITOR);
+			household.setBsBankDeposits(newDepositBal);
+			// FIXME: UP TO HERE 18/4/18: process CPV output in Agent
+			// TODO assign randomly to new ADI, weighted by deposit balance 
+			// we can't re-assign depositors to other ADIs from within this ADI
+			// need to do that from within the AustralianEconomy class.
+		}
+		for (Business business : this.commercialDepositors) {
+			float newDepositBal = Math.min(business.getBankDeposits() * fcsGuaranteedRatio,
+					Properties.FCS_LIMIT_PER_DEPOSITOR);
+			business.setBankDeposits(newDepositBal);
+			// TODO assign randomly to new ADI, weighted by business loan balance
+			
+		}
+
+		// ADI is bankrupt, so zero out all its financials
+		// it will have no financial impact on any other agent in future iterations
+		// P&L
+		this.pnlInterestIncome = 0f;
+		this.pnlInterestExpense = 0f;
+		this.pnlTradingIncome = 0f;
+		this.pnlInvestmentIncome = 0f;
+		this.pnlOtherIncome = 0f;
+		this.pnlPersonnelExpenses = 0f;
+		this.pnlLoanImpairmentExpense = 0f;
+		this.pnlCommittedLiquidityFacilityFees = 0f;
+		this.pnlDepreciationAmortisation = 0f;
+		this.pnlOtherExpenses = 0f;
+		this.pnlIncomeTaxExpense = 0f;
+
+		// Bal Sht
+		this.bsCash = 0f;
+		this.bsTradingSecurities = 0f;
+		this.bsDerivativeAssets = 0f;
+		this.bsInvestments = 0f;
+		this.bsLoansPersonal = 0f;
+		this.bsLoansHome = 0f;
+		this.bsLoansBusiness = 0f;
+		this.bsLoansADI = 0f;
+		this.bsLoansGovernment = 0f;
+		this.bsOtherNonFinancialAssets = 0f;
+		this.bsDepositsAtCall = 0f;
+		this.bsDepositsTerm = 0f;
+		this.bsDepositsAdiRepoEligible = 0f;
+		this.bsDerivativeLiabilities = 0f;
+		this.bsBondsNotesBorrowings = 0f;
+		this.bsOtherLiabilities = 0f;
+		this.bsRetainedEarnings = 0f;
+		this.bsReserves = 0f;
+		this.bsOtherEquity = 0f;
 	}
 
 	/**

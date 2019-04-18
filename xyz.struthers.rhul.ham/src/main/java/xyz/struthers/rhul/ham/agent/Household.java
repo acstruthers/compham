@@ -278,6 +278,24 @@ public class Household extends Agent {
 		return this.defaultOrder;
 	}
 
+	/**
+	 * Australians can draw down on their superannuation savings if they find
+	 * themselves in financial hardship and unable to meet their mortgage
+	 * repayments. However, they are not obliged to, so if drawing down on their
+	 * superannuation is not enough to get them out of financial hardship then they
+	 * can leave their superannuation intact and declare bankruptcy instead.
+	 * 
+	 * Assume that equity and debt markets are illiquid due to the financial crisis
+	 * and so liquidating equities or borrowing to get through a period of negative
+	 * cash flow are not possible in the current circumstances.
+	 * 
+	 * If they have to sell their house, any equity is consumed by bank fees and
+	 * legal fees, and they switch to rent payments at a percentage of the former
+	 * mortgage repayments.
+	 * 
+	 * If they have defaulted then they are assumed to cut out all discretionary
+	 * spending, so any donations to charities cease too.
+	 */
 	@Override
 	public void processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder) {
 		// update default details
@@ -287,53 +305,44 @@ public class Household extends Agent {
 				// hasn't defaulted in a previous iteration
 				this.defaultIteration = iteration;
 				this.defaultOrder = defaultOrder;
+				this.makeHouseholdBankrupt(iteration);
 			}
-		}
-
-		/**
-		 * Australians can draw down on their superannuation savings if they find
-		 * themselves in financial hardship and unable to meet their mortgage
-		 * repayments. However, they are not obliged to, so if drawing down on their
-		 * superannuation is not enough to get them out of financial hardship then they
-		 * can leave their superannuation intact and declare bankruptcy instead.
-		 * 
-		 * Assume that equity and debt markets are illiquid due to the financial crisis
-		 * and so liquidating equities or borrowing to get through a period of negative
-		 * cash flow are not possible in the current circumstances.
-		 * 
-		 * If they have to sell their house, any equity is consumed by bank fees and
-		 * legal fees, and they switch to rent payments at a percentage of the former
-		 * mortgage repayments.
-		 * 
-		 * If they have defaulted then they are assumed to cut out all discretionary
-		 * spending, so any donations to charities cease too.
-		 */
-		// update financials
-		if ((this.bsBankDeposits + nodeEquity) > 0f) {
-			this.bsBankDeposits += nodeEquity;
 		} else {
-			// negative cashflow is greater than bank balance
-			if ((this.bsBankDeposits + this.bsSuperannuation * (1f - Properties.SUPERANNUATION_HAIRCUT)
-					+ nodeEquity) > 0f) {
-				// drawing down on superannuation will be enough to avoid bankruptcy
-				this.bsSuperannuation += (nodeEquity + this.bsBankDeposits) * (1f + Properties.SUPERANNUATION_HAIRCUT);
-				this.bsBankDeposits = 0f;
+			// update financials
+			if ((this.bsBankDeposits + nodeEquity) > 0f) {
+				this.bsBankDeposits += nodeEquity;
 			} else {
-				// leave superannuation alone because it's not enough to avoid bankruptcy
-				this.bsBankDeposits = 0f;
-				if (this.pnlMortgageRepayments > 0f) {
-					// home owner, so sell home and switch to renting
-					this.bsResidentialLandAndDwellings = 0f;
-					this.pnlRentExpense = this.pnlMortgageRepayments * Properties.MTG_RENT_CONVERSION_RATIO;
-					this.pnlMortgageRepayments = 0f;
+				// negative cashflow is greater than bank balance
+				if ((this.bsBankDeposits + this.bsSuperannuation * (1f - Properties.SUPERANNUATION_HAIRCUT)
+						+ nodeEquity) > 0f) {
+					// drawing down on superannuation will be enough to avoid bankruptcy
+					this.bsSuperannuation += (nodeEquity + this.bsBankDeposits)
+							* (1f + Properties.SUPERANNUATION_HAIRCUT);
+					this.bsBankDeposits = 0f;
+				} else {
+					this.makeHouseholdBankrupt(iteration);
 				}
+				// cut down on discretionary spending too
+				this.pnlOtherDiscretionaryExpenses = 0f;
+				this.pnlDonations = 0f;
 			}
-			// cut down on discretionary spending too
-			this.pnlOtherDiscretionaryExpenses = 0f;
-			this.pnlDonations = 0f;
 		}
 	}
 
+	private void makeHouseholdBankrupt(int iteration) {
+		// leave superannuation alone because it's not enough to avoid bankruptcy
+		this.bsBankDeposits = 0f;
+		if (this.pnlMortgageRepayments > 0f) {
+			// home owner, so sell home and switch to renting
+			this.bsResidentialLandAndDwellings = 0f;
+			this.pnlRentExpense = this.pnlMortgageRepayments * Properties.MTG_RENT_CONVERSION_RATIO;
+			this.pnlMortgageRepayments = 0f;
+		}
+		// cut down on discretionary spending too
+		this.pnlOtherDiscretionaryExpenses = 0f;
+		this.pnlDonations = 0f;
+	}
+	
 	/**
 	 * Calculates the interest component of the loan repayment due to bank. Assumes
 	 * home loans are principal and interest, while investment property loans are

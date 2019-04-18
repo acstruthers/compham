@@ -59,9 +59,9 @@ public class AustralianEconomy implements Serializable {
 
 	public static final boolean DEBUG_RAM_USAGE = true;
 
-	public static final float BUFFER_COUNTRY = 1000000f;
-	public static final float BUFFER_GOVT = 1000000f;
-	public static final float BUFFER_RBA = 1000000f;
+	public static final float BUFFER_COUNTRY = Float.MAX_VALUE / 2f;
+	public static final float BUFFER_GOVT = Float.MAX_VALUE / 2f;
+	public static final float BUFFER_RBA = Float.MAX_VALUE / 2f;
 
 	// Agents
 	Household[] households;
@@ -346,7 +346,8 @@ public class AustralianEconomy implements Serializable {
 			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
 
 			// calculate liquid assets
-			float liquid = household.getBsBankDeposits();
+			float liquid = household.getBsBankDeposits()
+					+ household.getBsSuperannuation() * (1f - Properties.SUPERANNUATION_HAIRCUT);
 			this.liquidAssets.set(paymentClearingIndex, liquid);
 		}
 
@@ -372,7 +373,9 @@ public class AustralianEconomy implements Serializable {
 			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
 
 			// calculate liquid assets
-			float liquid = business.getBankDeposits();
+			float liquid = business.getBankDeposits()
+					+ business.getOtherFinancialAssets() * (1f - Properties.INVESTMENT_HAIRCUT)
+					+ business.getForeignEquities() * (1f - Properties.FOREIGN_INVESTMENT_HAIRCUT);
 			this.liquidAssets.set(paymentClearingIndex, liquid);
 		}
 

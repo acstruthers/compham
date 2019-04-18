@@ -6,6 +6,7 @@ package xyz.struthers.rhul.ham.agent;
 import java.text.DecimalFormat;
 import java.util.List;
 
+import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.process.Employer;
 import xyz.struthers.rhul.ham.process.NodePayment;
 
@@ -240,7 +241,34 @@ public final class Individual extends Agent {
 	 * cut out all discretionary spending.
 	 */
 	public void fireEmployee() {
-		// FIXME: fire employee - update Individual, and flow through to Household
+		// fire employee - update Individual, and flow through to Household
+		if (this.household != null) {
+			// subtract any cash flows related to employment
+			float newValue = Math.max(0f, this.household.getPnlWagesSalaries() - this.pnlWagesSalaries);
+			this.household.setPnlWagesSalaries(newValue);
+			newValue = Math.max(0f, this.household.getPnlIncomeTaxExpense() - this.pnlIncomeTaxExpense);
+			this.household.setPnlIncomeTaxExpense(newValue);
+			newValue = Math.max(0f, this.household.getPnlWorkRelatedExpenses() - this.pnlWorkRelatedExpenses);
+			this.household.setPnlWorkRelatedExpenses(newValue);
+
+			// add back income from unemployment benefits
+			newValue = household.getPnlUnemploymentBenefits() + Properties.UNEMPLOYMENT_BENEFIT_PER_PERSON;
+			this.household.setPnlUnemploymentBenefits(newValue);
+
+			// cut back on discretionary spending
+			this.household.setPnlDonations(0f);
+			this.household.setPnlOtherDiscretionaryExpenses(0f);
+		}
+		// subtract any cash flows related to employment
+		this.pnlWagesSalaries = 0f;
+		this.pnlIncomeTaxExpense = 0f;
+		this.pnlWorkRelatedExpenses = 0f;
+
+		// add back income from unemployment benefits
+		this.pnlUnemploymentBenefits = Properties.UNEMPLOYMENT_BENEFIT_PER_PERSON;
+
+		// cut back on discretionary spending
+		this.pnlDonations = 0f;
 	}
 
 	protected void init() {

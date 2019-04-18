@@ -49,6 +49,14 @@ public class Properties implements Serializable {
 	 * fallen and agents must subtract this haircut from it when realising the cash.
 	 */
 	public static final float FOREIGN_INVESTMENT_HAIRCUT = 0.75f;
+	/**
+	 * If an Individual loses their job, their wages income is replaced by
+	 * unemployment benefits. The monthly amount of these unemployment benefits is
+	 * defined by this constant.
+	 * 
+	 * It is currently about $600 per fortnight.
+	 */
+	public static final float UNEMPLOYMENT_BENEFIT_PER_PERSON = 600f / 14f * 365f / 12f;
 
 	// static config constants
 	/*
@@ -72,6 +80,8 @@ public class Properties implements Serializable {
 	public static final int NETWORK_TIMEOUT_MILLIS = 5000;
 	public static final int NETWORK_BUFFER_BYTES = 2000000000; // approx 2GB
 
+	public static final float FCS_LIMIT_PER_ADI = 15000000000f; // AUD 15Bn limit per ADI
+	public static final float FCS_LIMIT_PER_DEPOSITOR = 250000f; // AUD 250k limit per depositor
 	public static final float ADI_HQLA_PROPORTION = 0.75f; // proportion of investments that are liquid
 	public static final boolean ALLOW_NEGATIVE_RATES = false; // allow negative interest rates?
 	public static final float SUPERANNUATION_RATE = 0.095f; // 9.5%
