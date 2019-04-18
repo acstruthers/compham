@@ -4,11 +4,18 @@
 package xyz.struthers.kryonet;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.nqzero.permit.Permit;
+
+import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.process.ClearingPaymentInputs;
+import xyz.struthers.rhul.ham.process.ClearingPaymentOutputs;
 
 /**
  * @author acstr
@@ -25,7 +32,7 @@ public class KryonetHelloClient {
 		Permit.godMode(); // allows reflection in Java 11
 
 		// create client
-		client = new Client();
+		client = new Client(Properties.NETWORK_BUFFER_BYTES, Properties.NETWORK_BUFFER_BYTES);
 		// client.start();
 		t = new Thread(client);
 		t.start();
@@ -59,6 +66,15 @@ public class KryonetHelloClient {
 					client.removeListener(this);
 					client.stop();
 					return;
+				} else if (object instanceof KryonetHelloResponse) {
+					System.out.println("CPV outputs received at " + new Date(System.currentTimeMillis()) + ".");
+					ClearingPaymentOutputs cpvOutputs = (ClearingPaymentOutputs) object;
+					System.out.println("CPV outputs unmarshalled at " + new Date(System.currentTimeMillis()) + ".");
+
+					// return control to the main thread
+					client.removeListener(this);
+					client.stop();
+					return;
 				}
 			}
 
@@ -68,10 +84,33 @@ public class KryonetHelloClient {
 			}
 		});
 
-		KryonetHelloRequest request = new KryonetHelloRequest();
-		request.setText(message);
-		client.sendTCP(request);
-		System.out.println("request sent");
+		/*
+		 * KryonetHelloRequest request = new KryonetHelloRequest();
+		 * request.setText(message); client.sendTCP(request);
+		 * System.out.println("request sent");
+		 */
+
+		ClearingPaymentInputs cpvInputs = new ClearingPaymentInputs();
+		final int numAgents = 12500000;
+		final int numLinks = 20;
+		List<List<Float>> liabilitiesAmounts = new ArrayList<List<Float>>(numAgents);
+		List<List<Integer>> liabilitiesIndices = new ArrayList<List<Integer>>(numAgents);
+		List<Float> operatingCashFlow = new ArrayList<Float>(numAgents);
+		List<Float> liquidAssets = new ArrayList<Float>(numAgents);
+		for (int i = 0; i < numAgents; i++) {
+			liabilitiesAmounts.add(new ArrayList<Float>(numLinks));
+			liabilitiesIndices.add(new ArrayList<Integer>(numLinks));
+			for (int j = 0; j < numLinks; j++) {
+				liabilitiesAmounts.get(i).add(0f);
+				liabilitiesIndices.get(i).add(i);
+			}
+			operatingCashFlow.add(0f);
+			liquidAssets.add(0f);
+		}
+		int iteration = 0;
+		System.out.println(new Date(System.currentTimeMillis())
+				+ ": CPV inputs calculated and being sent to Kryonet server.");
+		client.sendTCP(cpvInputs);
 	}
 
 	public static void main(String[] args) {
