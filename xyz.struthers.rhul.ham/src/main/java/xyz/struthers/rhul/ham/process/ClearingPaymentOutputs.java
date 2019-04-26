@@ -3,6 +3,7 @@
  */
 package xyz.struthers.rhul.ham.process;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -12,7 +13,9 @@ import java.util.List;
  * @author Adam Struthers
  * @since 15-Apr-2019
  */
-public class ClearingPaymentOutputs {
+public class ClearingPaymentOutputs implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	// net cash flow of each node after paying liabilities
 	private List<Float> equityOfNode;

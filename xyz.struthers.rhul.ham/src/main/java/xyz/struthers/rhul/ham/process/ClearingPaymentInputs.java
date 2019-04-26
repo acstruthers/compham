@@ -3,6 +3,7 @@
  */
 package xyz.struthers.rhul.ham.process;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -12,8 +13,10 @@ import java.util.List;
  * @author Adam Struthers
  * @since 10-Apr-2019
  */
-public class ClearingPaymentInputs {
+public class ClearingPaymentInputs implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	private List<List<Float>> liabilitiesAmounts;
 	private List<List<Integer>> liabilitiesIndices;
 	private List<Float> operatingCashFlow;
