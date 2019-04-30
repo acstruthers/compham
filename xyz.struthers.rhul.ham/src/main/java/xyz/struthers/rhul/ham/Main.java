@@ -196,6 +196,7 @@ public class Main {
 			// save summary to file
 			economy.saveSummaryToFile(iteration);
 			iteration++;
+			// FIXME: 2019-04-30 iteration is 1, but RBA cash rate is only one element long
 			economy.saveDetailsToFile(iteration); // details after being updated with CPV output
 
 			ctx.close();
