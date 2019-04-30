@@ -32,6 +32,7 @@ import xyz.struthers.rhul.ham.agent.ForeignCountry;
 import xyz.struthers.rhul.ham.agent.Household;
 import xyz.struthers.rhul.ham.agent.Individual;
 import xyz.struthers.rhul.ham.agent.ReserveBankOfAustralia;
+import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.config.SpringConfiguration;
 import xyz.struthers.rhul.ham.data.Currencies;
 import xyz.struthers.rhul.ham.data.Currency;
@@ -121,7 +122,7 @@ public class Main {
 			ByteArrayOutputStream baos = null;
 			try {
 				// compress outputs
-				baos = new ByteArrayOutputStream();
+				baos = new ByteArrayOutputStream(Properties.NETWORK_BUFFER_BYTES);
 				GZIPOutputStream gzipOut = new GZIPOutputStream(baos);
 				ObjectOutputStream objectOut = new ObjectOutputStream(gzipOut);
 				objectOut.writeObject(cpvInputs);

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.process.ClearingPaymentInputs;
 import xyz.struthers.rhul.ham.process.ClearingPaymentOutputs;
 
@@ -75,7 +76,7 @@ public class ClearingPaymentVectorRmiServer implements ClearingPaymentVectorInte
 		ByteArrayOutputStream baos = null;
 		try {
 			// compress outputs
-			baos = new ByteArrayOutputStream();
+			baos = new ByteArrayOutputStream(Properties.NETWORK_BUFFER_BYTES);
 			GZIPOutputStream gzipOut = new GZIPOutputStream(baos);
 			ObjectOutputStream objectOut = new ObjectOutputStream(gzipOut);
 			objectOut.writeObject(cpvOutputs);
