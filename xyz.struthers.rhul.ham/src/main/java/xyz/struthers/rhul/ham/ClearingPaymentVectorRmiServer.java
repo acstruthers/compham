@@ -45,6 +45,7 @@ public class ClearingPaymentVectorRmiServer implements ClearingPaymentVectorInte
 	 * faster.
 	 */
 	public byte[] calculate(byte[] compressedBytes) throws RemoteException {
+		System.out.println(new Date(System.currentTimeMillis()) + ": " + compressedBytes.length + " bytes received.");
 		ClearingPaymentInputs cpvInputs = null;
 		try {
 			// uncompress CPV inputs
@@ -58,16 +59,19 @@ public class ClearingPaymentVectorRmiServer implements ClearingPaymentVectorInte
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+		System.out.println(new Date(System.currentTimeMillis()) + ": CPV inputs unmarshalled.");
 		List<List<Float>> liabilitiesAmounts = cpvInputs.getLiabilitiesAmounts();
 		List<List<Integer>> liabilitiesIndices = cpvInputs.getLiabilitiesIndices();
 		List<Float> operatingCashFlow = cpvInputs.getOperatingCashFlow();
 		List<Float> liquidAssets = cpvInputs.getLiquidAssets();
 		int iteration = cpvInputs.getIteration();
+		System.out.println(new Date(System.currentTimeMillis()) + ": CPV inputs split into separate lists.");
 
 		// calculate CPV
 		ClearingPaymentOutputs cpvOutputs = this.calculate(liabilitiesAmounts, liabilitiesIndices, operatingCashFlow,
 				liquidAssets, iteration);
 
+		System.out.println(new Date(System.currentTimeMillis()) + ": compressing CPV outputs.");
 		ByteArrayOutputStream baos = null;
 		try {
 			// compress outputs
@@ -80,6 +84,7 @@ public class ClearingPaymentVectorRmiServer implements ClearingPaymentVectorInte
 			e.printStackTrace();
 		}
 		byte[] bytes = baos.toByteArray();
+		System.out.println(new Date(System.currentTimeMillis()) + ": sending CPV outputs (" + bytes.length + " bytes).");
 		return bytes;
 	}
 

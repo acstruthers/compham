@@ -130,9 +130,11 @@ public class Main {
 				e.printStackTrace();
 			}
 			byte[] cpvInputBytes = baos.toByteArray();
-			System.out.println(new Date(System.currentTimeMillis()) + ": CPV inputs compressed.");
+			System.out.println(new Date(System.currentTimeMillis()) + ": CPV inputs compressed to "
+					+ cpvInputBytes.length + " bytes.");
 			byte[] cpvOutputBytes = stub.calculate(cpvInputBytes);
-			System.out.println(new Date(System.currentTimeMillis()) + ": Outputs returned from CPV via RMI.");
+			System.out.println(new Date(System.currentTimeMillis()) + ": " + cpvOutputBytes.length
+					+ " bytes of output returned from CPV via RMI.");
 			ClearingPaymentOutputs cpvOutputs = null;
 			try {
 				// uncompress CPV outputs
