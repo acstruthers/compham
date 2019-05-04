@@ -55,7 +55,7 @@ public class KryonetClient {
 		// create listener to process any messages received
 		client.addListener(new Listener() {
 			public void connected(Connection connection) {
-				System.out.println("Kryonet CPV client connected.");
+				System.out.println("Kryonet CPV client connected at: " + new Date(System.currentTimeMillis()) + ".");
 			}
 
 			public void received(Connection connection, Object object) {
@@ -72,7 +72,7 @@ public class KryonetClient {
 			}
 
 			public void disconnected(Connection connection) {
-				System.out.println("Kryonet CPV client disconnected.");
+				System.out.println("Kryonet CPV client disconnected at: " + new Date(System.currentTimeMillis()) + ".");
 				// System.exit(0);
 			}
 		});
