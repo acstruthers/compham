@@ -40,14 +40,15 @@ public class ClearingPaymentVectorKryonetServer {
 
 		server.addListener(new Listener() {
 			public void connected(Connection connection) {
-				System.out.println("Kryonet CPV server connected.");
+				System.out.println("Kryonet CPV server connected at: " + new Date(System.currentTimeMillis()) + ".");
 			}
 
 			public void received(Connection conn, Object object) {
 				if (object instanceof ClearingPaymentInputs) {
 					System.out.println("CPV inputs received at " + new Date(System.currentTimeMillis()) + ".");
 					ClearingPaymentInputs cpvInputs = (ClearingPaymentInputs) object;
-					System.out.println("CPV inputs received at " + new Date(System.currentTimeMillis()) + " (unmarshalled).");
+					System.out.println(
+							"CPV inputs received at " + new Date(System.currentTimeMillis()) + " (unmarshalled).");
 					System.out.println("Calculating Clearing Payment Vector now.");
 
 					RunSimulation sim = new RunSimulation();
@@ -65,7 +66,7 @@ public class ClearingPaymentVectorKryonetServer {
 			}
 
 			public void disconnected(Connection c) {
-				System.out.println("Kryonet CPV server disconnected.");
+				System.out.println("Kryonet CPV server disconnected at: " + new Date(System.currentTimeMillis()) + ".");
 			}
 		});
 
