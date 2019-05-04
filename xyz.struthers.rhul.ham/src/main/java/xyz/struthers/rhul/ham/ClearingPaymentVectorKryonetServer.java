@@ -45,8 +45,9 @@ public class ClearingPaymentVectorKryonetServer {
 
 			public void received(Connection conn, Object object) {
 				if (object instanceof ClearingPaymentInputs) {
-					ClearingPaymentInputs cpvInputs = (ClearingPaymentInputs) object;
 					System.out.println("CPV inputs received at " + new Date(System.currentTimeMillis()) + ".");
+					ClearingPaymentInputs cpvInputs = (ClearingPaymentInputs) object;
+					System.out.println("CPV inputs received at " + new Date(System.currentTimeMillis()) + " (unmarshalled).");
 					System.out.println("Calculating Clearing Payment Vector now.");
 
 					RunSimulation sim = new RunSimulation();

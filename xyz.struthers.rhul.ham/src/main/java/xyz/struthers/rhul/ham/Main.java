@@ -24,6 +24,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.nqzero.permit.Permit;
 
 import xyz.struthers.rhul.ham.agent.AustralianGovernment;
 import xyz.struthers.rhul.ham.agent.AuthorisedDepositTakingInstitution;
@@ -67,7 +68,7 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		// work around Java 9+ reflection illegal access exceptions
-		// Permit.godMode();
+		Permit.godMode();
 
 		try {
 			DecimalFormat formatter = new DecimalFormat("#,##0.00");
@@ -118,7 +119,7 @@ public class Main {
 			 */
 			// #############################################
 			// using default Java RMI with compressed objects
-			System.out.println("#############################################################");
+			System.out.println("########################### BEFORE ##################################");
 			ByteArrayOutputStream baos = null;
 			try {
 				// compress outputs
@@ -150,7 +151,7 @@ public class Main {
 				e.printStackTrace();
 			}
 			System.out.println(new Date(System.currentTimeMillis()) + ": CPV outputs decompressed.");
-			System.out.println("#############################################################");
+			System.out.println("############################## AFTER ###############################");
 			// #############################################
 			System.out.println(new Date(System.currentTimeMillis()) + ": Outputs returned from CPV via RMI.");
 

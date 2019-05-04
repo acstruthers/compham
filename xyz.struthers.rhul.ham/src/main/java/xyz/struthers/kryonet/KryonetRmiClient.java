@@ -8,25 +8,25 @@ import com.nqzero.permit.Permit;
 
 public class KryonetRmiClient {
 
-	Client client;
+	Client kryonetClient;
 	KryonetRmiHelloInterface serverHelloObject;
 
 	public KryonetRmiClient() {
 		Permit.godMode();
 		
-		client = new Client();
-		client.start();
+		kryonetClient = new Client();
+		kryonetClient.start();
 
 		// Register the classes that will be sent over the network.
-		KryonetRmiNetwork.register(client);
+		KryonetRmiNetwork.register(kryonetClient);
 
 		// Get the object on the other end of the connection.
 		// This allows the client to call methods on the server.
-		serverHelloObject = ObjectSpace.getRemoteObject(client, KryonetRmiNetwork.HELLO,
+		serverHelloObject = ObjectSpace.getRemoteObject(kryonetClient, KryonetRmiNetwork.HELLO,
 				KryonetRmiHelloInterface.class);
 
 		try {
-			client.connect(KryonetRmiNetwork.NETWORK_TIMEOUT_MILLIS, KryonetRmiNetwork.IPADDRESS_SERVER,
+			kryonetClient.connect(KryonetRmiNetwork.NETWORK_TIMEOUT_MILLIS, KryonetRmiNetwork.IPADDRESS_SERVER,
 					KryonetRmiNetwork.NETWORK_PORT_TCP);
 			// Server communication after connection can go here, or in
 			// Listener#connected().
