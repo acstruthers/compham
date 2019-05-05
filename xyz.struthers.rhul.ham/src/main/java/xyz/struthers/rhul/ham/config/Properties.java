@@ -57,6 +57,8 @@ public class Properties implements Serializable {
 	 * It is currently about $600 per fortnight.
 	 */
 	public static final float UNEMPLOYMENT_BENEFIT_PER_PERSON = 600f / 14f * 365f / 12f;
+	public static final float ADI_HQLA_PROPORTION = 0.75f; // proportion of investments that are liquid
+	public static final boolean ALLOW_NEGATIVE_RATES = false; // allow negative interest rates?
 
 	// static config constants
 	/*
@@ -66,28 +68,21 @@ public class Properties implements Serializable {
 	 * Foobar.class.getResourceAsStream(
 	 * "/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_ACT.csv");
 	 */
-	public static final String HOME_DIRECTORY = "F:\\OneDrive\\Dissertation\\STS\\xyz.struthers.rhul.ham"; // lappy
-	// public static final String HOME_DIRECTORY =
-	// "D:\\Git\\compham\\xyz.struthers.rhul.ham"; // NUC
+	public static final String HOME_DIRECTORY = "D:\\Git\\compham\\xyz.struthers.rhul.ham"; // NUC and new lappy
 	public static final String RESOURCE_DIRECTORY = HOME_DIRECTORY + "\\src\\main\\resources";
 	public static final String OUTPUT_DIRECTORY = "C:\\tmp\\";
 	public static final String CSV_SEPARATOR = ",";
 
-	// Kryonet networking parameters
-	public static final String NETWORK_IPADDRESS_SERVER = "192.168.1.74";
-	public static final int NETWORK_PORT_TCP = 1099; // 54555 default value
-	public static final int NETWORK_PORT_UDP = 54777;
-	public static final int NETWORK_TIMEOUT_MILLIS = 5000;
+	// JDK RMI networking parameters
+	public static final String RMI_HOST = "Adam-E590";
+	public static final int RMI_PORT = 1099;
 	public static final int NETWORK_BUFFER_BYTES = 2000000000; // approx 2GB
 
+	// unchanging simulation parameters
 	public static final float FCS_LIMIT_PER_ADI = 15000000000f; // AUD 15Bn limit per ADI
 	public static final float FCS_LIMIT_PER_DEPOSITOR = 250000f; // AUD 250k limit per depositor
-	public static final float ADI_HQLA_PROPORTION = 0.75f; // proportion of investments that are liquid
-	public static final boolean ALLOW_NEGATIVE_RATES = false; // allow negative interest rates?
 	public static final float SUPERANNUATION_RATE = 0.095f; // 9.5%
 	public static final long RANDOM_SEED = 20190315L;
-
-	// static data fields
 	public static int peoplePerAgent = 1; // change to 1000 if 1 is too slow.
 	public static int totalPopulationAU = 25000000;
 	public static String timestamp;

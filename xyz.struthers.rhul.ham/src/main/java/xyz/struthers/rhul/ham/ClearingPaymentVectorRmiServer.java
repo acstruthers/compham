@@ -32,9 +32,6 @@ import xyz.struthers.rhul.ham.process.ClearingPaymentOutputs;
  */
 public class ClearingPaymentVectorRmiServer implements ClearingPaymentVectorInterface {
 
-	public static final String RMI_HOST = "Adam-E590";
-	public static final int RMI_PORT = 1099;
-
 	public ClearingPaymentVectorRmiServer() {
 		super();
 	}
@@ -85,7 +82,8 @@ public class ClearingPaymentVectorRmiServer implements ClearingPaymentVectorInte
 			e.printStackTrace();
 		}
 		byte[] bytes = baos.toByteArray();
-		System.out.println(new Date(System.currentTimeMillis()) + ": sending CPV outputs (" + bytes.length + " bytes).");
+		System.out
+				.println(new Date(System.currentTimeMillis()) + ": sending CPV outputs (" + bytes.length + " bytes).");
 		return bytes;
 	}
 
@@ -122,8 +120,8 @@ public class ClearingPaymentVectorRmiServer implements ClearingPaymentVectorInte
 	public static void main(String[] args) {
 		try {
 			// Create RMI Registry
-			System.setProperty("java.rmi.server.hostname", RMI_HOST);
-			LocateRegistry.createRegistry(RMI_PORT);
+			System.setProperty("java.rmi.server.hostname", Properties.RMI_HOST);
+			LocateRegistry.createRegistry(Properties.RMI_PORT);
 
 			// register object
 			ClearingPaymentVectorRmiServer obj = new ClearingPaymentVectorRmiServer();
@@ -131,7 +129,7 @@ public class ClearingPaymentVectorRmiServer implements ClearingPaymentVectorInte
 					0);
 
 			// Bind the remote object's stub in the registry
-			Registry registry = LocateRegistry.getRegistry(RMI_HOST, RMI_PORT);
+			Registry registry = LocateRegistry.getRegistry(Properties.RMI_HOST, Properties.RMI_PORT);
 			registry.bind("ClearingPaymentVector", stub);
 
 			System.err.println("ClearingPaymentVector server ready");

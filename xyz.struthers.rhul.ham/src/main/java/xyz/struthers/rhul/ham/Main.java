@@ -49,10 +49,6 @@ import xyz.struthers.rhul.ham.process.NodePayment;
  */
 public class Main {
 
-	public static final String FILEPATH_AGENTS_INIT = "C:\\tmp\\Agents\\Agents_init.ser";
-	public static final String FILEPATH_AGENTS_INIT_FST = "C:\\tmp\\Agents\\Agents_init.fst";
-	public static final String FILEPATH_AGENTS_INIT_KRYO = "C:\\tmp\\Agents\\Agents_init.kryo";
-
 	public static final String RMI_HOST = "Adam-E590";
 	public static final int RMI_PORT = 1099;
 
@@ -83,13 +79,6 @@ public class Main {
 			InitialiseEconomy init = new InitialiseEconomy();
 			ClearingPaymentInputs cpvInputs = init.initialiseEconomy(ctx);
 			AustralianEconomy economy = init.getEconomy();
-			// writeObjectToFile(economy, FILEPATH_AGENTS_INIT);
-			// writeFstEconomyToFile(economy, FILEPATH_AGENTS_INIT_FST); // using FST
-			// serialization
-			// writeKryoObjectToFile(economy, FILEPATH_AGENTS_INIT_KRYO);
-
-			// economy.close(); // clearing RAM for serialization solution
-			// economy = null;
 			System.gc();
 
 			long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
@@ -103,23 +92,12 @@ public class Main {
 			memoryBefore = memoryAfter;
 
 			int iteration = 0;
-			// FIXME: Kryonet --- update from Java RMI
 			// Get RMI registry for Clearing Payment Vector calculation
-			Registry registry = LocateRegistry.getRegistry(RMI_HOST, RMI_PORT);
+			Registry registry = LocateRegistry.getRegistry(Properties.RMI_HOST, Properties.RMI_PORT);
 			ClearingPaymentVectorInterface stub = (ClearingPaymentVectorInterface) registry
 					.lookup("ClearingPaymentVector");
 			System.out.println(new Date(System.currentTimeMillis()) + ": Invoking CPV via RMI.");
-			// #############################################
-			// using default Java RMI with original objects
-			/*
-			 * ClearingPaymentOutputs cpvOutputs =
-			 * stub.calculate(cpvInputs.getLiabilitiesAmounts(),
-			 * cpvInputs.getLiabilitiesIndices(), cpvInputs.getOperatingCashFlow(),
-			 * cpvInputs.getLiquidAssets(), iteration);
-			 */
-			// #############################################
 			// using default Java RMI with compressed objects
-			System.out.println("########################### BEFORE ##################################");
 			ByteArrayOutputStream baos = null;
 			try {
 				// compress outputs
@@ -151,16 +129,6 @@ public class Main {
 				e.printStackTrace();
 			}
 			System.out.println(new Date(System.currentTimeMillis()) + ": CPV outputs decompressed.");
-			System.out.println("############################## AFTER ###############################");
-			// #############################################
-			System.out.println(new Date(System.currentTimeMillis()) + ": Outputs returned from CPV via RMI.");
-
-			/*
-			 * RunSimulation sim = new RunSimulation(); Map<String, Object> cpvOutputs =
-			 * sim.calculateClearingPaymentVector(cpvInputs.getLiabilitiesAmounts(),
-			 * cpvInputs.getLiabilitiesIndices(), cpvInputs.getOperatingCashFlow(),
-			 * iteration);
-			 */
 
 			cpvInputs.clear();
 			cpvInputs = null;
@@ -174,31 +142,24 @@ public class Main {
 			memoryBefore = memoryAfter;
 
 			// TODO process CPV outputs
-			// read agents back in from object file, then update financial statements
-			// economy = (AustralianEconomy) readObjectFromFile(FILEPATH_AGENTS_INIT);
-			// economy = readFstEconomyFromFile(FILEPATH_AGENTS_INIT_FST); // using FST
-			// economy = readKryoObjectFromFile(FILEPATH_AGENTS_INIT_KRYO);
-
-			// economy.updateOneMonth(iteration);
+			// update financial statements
+			economy.updateOneMonth(cpvOutputs);
 
 			System.gc();
 			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 			megabytesAfter = memoryAfter / 1024f / 1024f;
 			System.out.println("################################################");
-			System.out.println(
-					new Date(System.currentTimeMillis()) + ": MEMORY USAGE IN MAIN AFTER DESERIALIZING ECONOMY: "
-							+ formatter.format(megabytesAfter) + "MB)");
 			System.out.println(new Date(System.currentTimeMillis())
 					+ ": MEMORY USAGE IN MAIN AFTER UPDATING ECONOMY WITH CPV OUTPUTS: "
 					+ formatter.format(megabytesAfter) + "MB)");
 			System.out.println("################################################");
 			memoryBefore = memoryAfter;
 
-			// save summary to file
+			// details after being updated with CPV output
+			// save data to file for later analysis
 			economy.saveSummaryToFile(iteration);
+			economy.saveDetailsToFile(iteration);
 			iteration++;
-			// FIXME: 2019-04-30 iteration is 1, but RBA cash rate is only one element long
-			economy.saveDetailsToFile(iteration); // details after being updated with CPV output
 
 			ctx.close();
 
@@ -363,7 +324,7 @@ public class Main {
 	 * @param filePath
 	 * @return
 	 * 
-	 * 		deprecated doesn't work in Java 9+ yet.
+	 *         deprecated doesn't work in Java 9+ yet.
 	 */
 	public static AustralianEconomy readFstEconomyFromFile(String filePath) {
 		AustralianEconomy obj = null;

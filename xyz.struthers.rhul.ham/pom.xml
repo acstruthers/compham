@@ -64,6 +64,7 @@
 		<version.com.esotericsoftware.kryo>5.0.0-RC4-SNAPSHOT</version.com.esotericsoftware.kryo>
 		<version.kryonet.kryonet>2.21</version.kryonet.kryonet>
 		<version.com.nqzero.permit-reflect>0.3</version.com.nqzero.permit-reflect>
+		<version.net.sf.trove4j>3.1.0</version.net.sf.trove4j>
 
 		<version.mysql>8.0.15</version.mysql>
 		<version.eclipse.persistence.eclipselink>2.7.4</version.eclipse.persistence.eclipselink>
@@ -118,6 +119,12 @@
 			</dependency>
 
 			<!-- Simulation-specific libraries -->
+			<!-- Trove implements JAva Collections for primitives -->
+			<dependency>
+				<groupId>net.sf.trove4j</groupId>
+				<artifactId>core</artifactId>
+				<version>${version.net.sf.trove4j}</version>
+			</dependency>
 			<dependency>
 				<groupId>edu.gmu.cs</groupId>
 				<artifactId>mason</artifactId>
@@ -148,7 +155,7 @@
 				<artifactId>permit-reflect</artifactId>
 				<version>${version.com.nqzero.permit-reflect}</version>
 			</dependency>
-			
+
 
 			<!-- Matrix maths -->
 			<!-- http://ejml.org/wiki/index.php?title=Main_Page -->
@@ -307,6 +314,10 @@
 		</dependency>
 
 		<!-- Simulation-specific libraries -->
+		<dependency>
+			<groupId>net.sf.trove4j</groupId>
+			<artifactId>core</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>edu.gmu.cs</groupId>
 			<artifactId>mason</artifactId>

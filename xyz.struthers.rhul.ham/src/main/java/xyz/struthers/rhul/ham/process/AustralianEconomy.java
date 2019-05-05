@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -43,10 +42,9 @@ import xyz.struthers.rhul.ham.data.Currencies;
  * A class to hold all the Agents so they're all available in the one place.
  * Also allows the memory consumed by the initial calibration data load to be
  * freed up once the agents have been created.
- * 
- * TODO: This class will probably implement the MASON library, but only know
- * about a single step in the simulation. Some other class will drive the
- * simulation process itself.
+ * <p>
+ * This class only knows about a single step in the simulation. Some other class
+ * will drive the simulation process itself.
  * 
  * @author Adam Struthers
  * @since 02-Feb-2019

@@ -6,10 +6,12 @@ import com.esotericsoftware.kryonet.rmi.ObjectSpace;
 
 public class KryonetRmiNetwork {
 
+	// Kryonet networking parameters
 	public static final String IPADDRESS_SERVER = "192.168.1.74";
 	public static final int NETWORK_PORT_TCP = 1099; // 54555 default value
 	public static final int NETWORK_PORT_UDP = 54777;
 	public static final int NETWORK_TIMEOUT_MILLIS = 5000;
+	public static final int NETWORK_BUFFER_BYTES = 2000000000; // approx 2GB
 
 	// These IDs are used to register objects in ObjectSpaces.
 	static public final short HELLO = 1;
