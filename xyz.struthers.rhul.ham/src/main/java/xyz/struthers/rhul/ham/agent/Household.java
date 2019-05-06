@@ -7,6 +7,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import gnu.trove.list.array.TFloatArrayList;
 import xyz.struthers.lang.CustomMath;
 import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.process.NodePayment;
@@ -36,7 +37,8 @@ public class Household extends Agent {
 
 	private AuthorisedDepositTakingInstitution loanAdi; // can be null if no loan
 	private ArrayList<Business> suppliers; // household spending goes to these per ABS 6530.0
-	private ArrayList<Float> supplierRatios; // per ABS 6530.0
+	// private ArrayList<Float> supplierRatios; // per ABS 6530.0
+	private TFloatArrayList supplierRatios; // per ABS 6530.0
 	private Household landlord;
 	private AustralianGovernment govt;
 	private int defaultIteration;
@@ -342,7 +344,7 @@ public class Household extends Agent {
 		this.pnlOtherDiscretionaryExpenses = 0f;
 		this.pnlDonations = 0f;
 	}
-	
+
 	/**
 	 * Calculates the interest component of the loan repayment due to bank. Assumes
 	 * home loans are principal and interest, while investment property loans are
@@ -550,14 +552,26 @@ public class Household extends Agent {
 	 * @return the supplierRatios
 	 */
 	public ArrayList<Float> getSupplierRatios() {
-		return supplierRatios;
+		// return supplierRatios;
+		float[] primitiveArray = this.supplierRatios.toArray();
+		ArrayList<Float> boxedList = new ArrayList<Float>(primitiveArray.length);
+		for (Float node : primitiveArray) {
+			boxedList.add(node);
+		}
+		return boxedList;
 	}
 
 	/**
 	 * @param supplierRatios the supplierRatios to set
 	 */
 	public void setSupplierRatios(ArrayList<Float> supplierRatios) {
-		this.supplierRatios = supplierRatios;
+		// this.supplierRatios = supplierRatios;
+		float[] primitiveArray = new float[supplierRatios.size()];
+		int i = 0;
+		for (Float node : supplierRatios) {
+			primitiveArray[i++] = (node != null ? node : 0f);
+		}
+		this.supplierRatios = TFloatArrayList.wrap(primitiveArray);
 	}
 
 	/**

@@ -174,14 +174,6 @@ public class AustralianEconomy implements Serializable {
 							+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
 		}
 
-		// drops data to reduce memory footprint
-		/*
-		 * this.households = null; this.individuals = null; this.businesses = null;
-		 * this.adis = null; this.countries = null; this.currencies = null; this.rba =
-		 * null; this.government = null;
-		 */
-		System.gc();
-
 		return cpvInputs;
 	}
 

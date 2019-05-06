@@ -61,6 +61,13 @@ public class ClearingPaymentOutputs implements Serializable {
 	}
 
 	/**
+	 * @param equityOfNode the equityOfNode to set
+	 */
+	public void setEquityOfNode(TFloatArrayList equityOfNode) {
+		this.equityOfNode = equityOfNode;
+	}
+
+	/**
 	 * @return the defaultOrderOfNode
 	 */
 	public List<Integer> getDefaultOrderOfNode() {
@@ -84,6 +91,13 @@ public class ClearingPaymentOutputs implements Serializable {
 			primitiveArray[i++] = (node != null ? node : 0);
 		}
 		this.defaultOrderOfNode = TIntArrayList.wrap(primitiveArray);
+	}
+
+	/**
+	 * @param defaultOrderOfNode the defaultOrderOfNode to set
+	 */
+	public void setDefaultOrderOfNode(TIntArrayList defaultOrderOfNode) {
+		this.defaultOrderOfNode = defaultOrderOfNode;
 	}
 
 	/**

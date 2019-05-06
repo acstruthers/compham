@@ -6,11 +6,12 @@ package xyz.struthers.rhul.ham.process;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.list.array.TIntArrayList;
 
 /**
  * Based on Eisenberg & Noe (2001), with the following extensions:<br>
@@ -61,9 +62,14 @@ public class ClearingPaymentVector implements Serializable {
 
 	// We know the size in advance, so can use arrays to improve speed & reduce
 	// memory usage because these don't change
-	private List<Float> exogeneousNominalCashFlow; // Non-negative cash inflows (i.e. income).
-	private List<List<Float>> nominalLiabilitiesAmount; // payments owed in this time period only
-	private List<List<Float>> relativeLiabilitiesAmount;
+	// private List<Float> exogeneousNominalCashFlow; // Non-negative cash inflows
+	// (i.e. income).
+	private TFloatArrayList exogeneousNominalCashFlow; // Non-negative cash inflows (i.e. income).
+	// private List<List<Float>> nominalLiabilitiesAmount; // payments owed in this
+	// time period only
+	private List<TFloatArrayList> nominalLiabilitiesAmount; // payments owed in this time period only
+	// private List<List<Float>> relativeLiabilitiesAmount;
+	private List<TFloatArrayList> relativeLiabilitiesAmount;
 	/**
 	 * Index of the agent that payments are owed to for nominal liabilities,
 	 * relative liabilities, and clearing payments.
@@ -71,21 +77,32 @@ public class ClearingPaymentVector implements Serializable {
 	 * It's more efficient to store this in a separate List than to store Maps in
 	 * each of the other lists.
 	 */
-	private List<List<Integer>> liabilitiesIndex;
-	private List<Float> totalLiabilitiesOfNode; // total obligation vector
+	// private List<List<Integer>> liabilitiesIndex;
+	private List<TIntArrayList> liabilitiesIndex;
+	// private List<Float> totalLiabilitiesOfNode; // total obligation vector
+	private TFloatArrayList totalLiabilitiesOfNode; // total obligation vector
 	/**
 	 * The node link details to easily identify which nodes owe money to this node.
 	 */
 	private ArrayList<ArrayList<NodeLink>> receivablesIndex;
-	private List<Float> totalOwedToNode; // amount owed to node, assuming no defaults
-	private List<List<Float>> clearingPaymentAmount; // to work out the exact amounts being paid between parties
-	private List<Float> clearingPaymentVector; // sum of the rows in the clearingPaymentMatrix
-	private List<Float> equityOfNode; // net cash flow of each node after paying liabilities
+	// private List<Float> totalOwedToNode; // amount owed to node, assuming no
+	// defaults
+	private TFloatArrayList totalOwedToNode; // amount owed to node, assuming no defaults
+	/// private List<List<Float>> clearingPaymentAmount; // to work out the exact
+	/// amounts being paid between parties
+	private List<TFloatArrayList> clearingPaymentAmount; // to work out the exact amounts being paid between parties
+	// private List<Float> clearingPaymentVector; // sum of the rows in the
+	// clearingPaymentMatrix
+	private TFloatArrayList clearingPaymentVector; // sum of the rows in the clearingPaymentMatrix
+	// private List<Float> equityOfNode; // net cash flow of each node after paying
+	// liabilities
+	private TFloatArrayList equityOfNode; // net cash flow of each node after paying liabilities
 	/**
 	 * Which round of the clearing vector algorithm caused the node to default.<br>
 	 * (0 = no default)
 	 */
-	private List<Integer> defaultOrderOfNode;
+	// private List<Integer> defaultOrderOfNode;
+	private TIntArrayList defaultOrderOfNode;
 	private int agentCount; // the number of agents in the clearing algorithm
 
 	public ClearingPaymentVector() {
@@ -108,6 +125,47 @@ public class ClearingPaymentVector implements Serializable {
 		this.agentCount = 0;
 	}
 
+	
+	public ClearingPaymentOutputs calculate(List<List<Float>> liabilitiesAmounts,
+			List<List<Integer>> liabilitiesIndices, List<Float> operatingCashFlow, List<Float> liquidAssets) {
+		
+		List<TFloatArrayList> troveLiabilitiesAmounts = new ArrayList<TFloatArrayList>(liabilitiesAmounts.size());
+		for (int i = 0; i < liabilitiesAmounts.size(); i++) {
+			float[] liabAmtArray = new float[liabilitiesAmounts.get(i).size()];
+			int j = 0;
+			for (Float node : liabilitiesAmounts.get(i)) {
+				liabAmtArray[j++] = (node != null ? node : 0f);
+			}
+			troveLiabilitiesAmounts.add(TFloatArrayList.wrap(liabAmtArray));
+		}
+		
+		List<TIntArrayList> troveLiabilitiesIndices = new ArrayList<TIntArrayList>(liabilitiesIndices.size());
+		for (int i = 0; i < liabilitiesIndices.size(); i++) {
+			int[] liabIdxArray = new int[liabilitiesIndices.get(i).size()];
+			int j = 0;
+			for (Integer node : liabilitiesIndices.get(i)) {
+				liabIdxArray[j++] = (node != null ? node : 0);
+			}
+			troveLiabilitiesIndices.add(TIntArrayList.wrap(liabIdxArray));
+		}
+		
+		float[] primitiveArray = new float[operatingCashFlow.size()];
+		int i = 0;
+		for (Float node : operatingCashFlow) {
+			primitiveArray[i++] = (node != null ? node : 0f);
+		}
+		TFloatArrayList troveOperatingCashFlow = TFloatArrayList.wrap(primitiveArray);
+		
+		float[] assetsArray = new float[liquidAssets.size()];
+		i = 0;
+		for (Float node : liquidAssets) {
+			assetsArray[i++] = (node != null ? node : 0f);
+		}
+		TFloatArrayList troveLiquidAssets = TFloatArrayList.wrap(assetsArray);
+		
+		return this.calculate(troveLiabilitiesAmounts, troveLiabilitiesIndices, troveOperatingCashFlow, troveLiquidAssets);
+	}
+	
 	/**
 	 * Calculates the payments that will clear the whole economy, noting in which
 	 * order nodes defaulted.
@@ -137,8 +195,8 @@ public class ClearingPaymentVector implements Serializable {
 	 * @author Adam Struthers
 	 * @since 2019-03-18
 	 */
-	public ClearingPaymentOutputs calculate(List<List<Float>> liabilitiesAmounts,
-			List<List<Integer>> liabilitiesIndices, List<Float> operatingCashFlow, List<Float> liquidAssets) {
+	public ClearingPaymentOutputs calculate(List<TFloatArrayList> liabilitiesAmounts,
+			List<TIntArrayList> liabilitiesIndices, TFloatArrayList operatingCashFlow, TFloatArrayList liquidAssets) {
 		System.gc();
 
 		ClearingPaymentOutputs result = null;
@@ -294,9 +352,12 @@ public class ClearingPaymentVector implements Serializable {
 		System.gc(); // it's a memory hog, so clean up first
 
 		// initialise variables, making copies so we don't alter the originals
-		List<Float> oldPaymentClearingVector = new ArrayList<Float>(this.totalLiabilitiesOfNode);
-		this.clearingPaymentVector = new ArrayList<Float>(this.totalLiabilitiesOfNode);
-		this.defaultOrderOfNode = new ArrayList<Integer>(Collections.nCopies(this.agentCount, 0)); // no default
+		TFloatArrayList oldPaymentClearingVector = new TFloatArrayList(this.totalLiabilitiesOfNode);
+		this.clearingPaymentVector = new TFloatArrayList(this.totalLiabilitiesOfNode);
+		int[] zeros = new int[this.agentCount];
+		Arrays.fill(zeros, 0);
+		// for (int i = 0; i < this.agentCount; i++) { zeros[i] = 0; }
+		this.defaultOrderOfNode = new TIntArrayList(zeros); // no default
 
 		// iteratively calculate payment clearing vector
 		boolean systemCleared = true;
@@ -339,16 +400,16 @@ public class ClearingPaymentVector implements Serializable {
 			}
 			if (!systemCleared) {
 				// reset old payment clearing vector ready for the next round
-				oldPaymentClearingVector = new ArrayList<Float>(this.clearingPaymentVector);
+				oldPaymentClearingVector = new TFloatArrayList(this.clearingPaymentVector);
 			}
 		}
 
 		// calculate payment clearing matrix and equity of each node
-		this.clearingPaymentAmount = new ArrayList<List<Float>>(this.agentCount);
+		this.clearingPaymentAmount = new ArrayList<TFloatArrayList>(this.agentCount);
 		for (int fromIdx = 0; fromIdx < this.agentCount; fromIdx++) {
-			this.clearingPaymentAmount.add(new ArrayList<Float>(this.nominalLiabilitiesAmount.get(fromIdx).size()));
+			this.clearingPaymentAmount.add(new TFloatArrayList(this.nominalLiabilitiesAmount.get(fromIdx).size()));
 		}
-		this.equityOfNode = new ArrayList<Float>(this.agentCount);
+		this.equityOfNode = new TFloatArrayList(this.agentCount);
 		for (int fromIdx = 0; fromIdx < this.agentCount; fromIdx++) {
 			// amounts paid by this node
 			for (int to = 0; to < this.nominalLiabilitiesAmount.get(fromIdx).size(); to++) {
@@ -380,13 +441,13 @@ public class ClearingPaymentVector implements Serializable {
 	 */
 	private void calculateLiabilities() {
 		this.enforceLiabilityMatrixConstraints();
-		this.totalOwedToNode = new ArrayList<Float>(this.agentCount);
-		this.totalLiabilitiesOfNode = new ArrayList<Float>(this.agentCount);
-		this.relativeLiabilitiesAmount = new ArrayList<List<Float>>(this.agentCount);
+		this.totalOwedToNode = new TFloatArrayList(this.agentCount);
+		this.totalLiabilitiesOfNode = new TFloatArrayList(this.agentCount);
+		this.relativeLiabilitiesAmount = new ArrayList<TFloatArrayList>(this.agentCount);
 		for (int fromIdx = 0; fromIdx < this.agentCount; fromIdx++) {
 			// initialise array
 			int toSize = this.liabilitiesIndex.get(fromIdx).size();
-			this.relativeLiabilitiesAmount.add(new ArrayList<Float>(toSize));
+			this.relativeLiabilitiesAmount.add(new TFloatArrayList(toSize));
 		}
 		for (int fromIdx = 0; fromIdx < this.agentCount; fromIdx++) {
 			// calculate contractual liabilities
