@@ -32,7 +32,10 @@ public class ClearingPaymentInputs implements Serializable {
 	private int iteration;
 
 	public ClearingPaymentInputs() {
-		super();
+		// super-class is not serializable, which causes an exception
+		// SOURCE:
+		// https://stackoverflow.com/questions/12067405/deserializing-an-arraylist-no-valid-constructor
+		// super(); 
 	}
 
 	public ClearingPaymentInputs(List<List<Float>> liabilitiesAmounts, List<List<Integer>> liabilitiesIndices,
