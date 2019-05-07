@@ -14,9 +14,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.text.DecimalFormat;
 import java.util.Date;
-import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
+import java.util.zip.InflaterOutputStream;
 
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;
@@ -103,8 +103,9 @@ public class Main {
 			try {
 				// compress outputs
 				baos = new ByteArrayOutputStream(Properties.NETWORK_BUFFER_BYTES);
-				GZIPOutputStream gzipOut = new GZIPOutputStream(baos);
-				ObjectOutputStream objectOut = new ObjectOutputStream(gzipOut);
+				// GZIPOutputStream zipOut = new GZIPOutputStream(baos);
+				DeflaterOutputStream zipOut = new DeflaterOutputStream(baos);
+				ObjectOutputStream objectOut = new ObjectOutputStream(zipOut);
 				objectOut.writeObject(cpvInputs);
 				objectOut.close();
 			} catch (IOException e) {
@@ -112,27 +113,7 @@ public class Main {
 			}
 			byte[] cpvInputBytes = baos.toByteArray();
 			System.out.println(new Date(System.currentTimeMillis()) + ": CPV inputs compressed to "
-					+ cpvInputBytes.length + " bytes using GZIP.");
-
-			// TODO: testing Deflator to see how small it zips the data
-			// Compress the bytes
-			try {
-				// compress outputs
-				baos = new ByteArrayOutputStream(1000000000);
-				ObjectOutputStream objectOut = new ObjectOutputStream(baos);
-				objectOut.writeObject(cpvInputs);
-				objectOut.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			byte[] output = new byte[1000000000];
-			Deflater compresser = new Deflater();
-			compresser.setInput(baos.toByteArray()); // uncompressed CPV inputs
-			compresser.finish();
-			int compressedDataLength = compresser.deflate(output);
-			compresser.end();
-			System.out.println(new Date(System.currentTimeMillis()) + ": CPV inputs compressed to "
-					+ compressedDataLength + " bytes using Deflator.");
+					+ cpvInputBytes.length + " bytes.");
 
 			byte[] cpvOutputBytes = stub.calculate(cpvInputBytes);
 			System.out.println(new Date(System.currentTimeMillis()) + ": " + cpvOutputBytes.length
@@ -346,7 +327,7 @@ public class Main {
 	 * @param filePath
 	 * @return
 	 * 
-	 *         deprecated doesn't work in Java 9+ yet.
+	 * 		deprecated doesn't work in Java 9+ yet.
 	 */
 	public static AustralianEconomy readFstEconomyFromFile(String filePath) {
 		AustralianEconomy obj = null;
