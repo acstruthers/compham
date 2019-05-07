@@ -14,6 +14,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.text.DecimalFormat;
 import java.util.Date;
+import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -111,7 +112,28 @@ public class Main {
 			}
 			byte[] cpvInputBytes = baos.toByteArray();
 			System.out.println(new Date(System.currentTimeMillis()) + ": CPV inputs compressed to "
-					+ cpvInputBytes.length + " bytes.");
+					+ cpvInputBytes.length + " bytes using GZIP.");
+
+			// TODO: testing Deflator to see how small it zips the data
+			// Compress the bytes
+			try {
+				// compress outputs
+				baos = new ByteArrayOutputStream(1000000000);
+				ObjectOutputStream objectOut = new ObjectOutputStream(baos);
+				objectOut.writeObject(cpvInputs);
+				objectOut.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			byte[] output = new byte[1000000000];
+			Deflater compresser = new Deflater();
+			compresser.setInput(baos.toByteArray()); // uncompressed CPV inputs
+			compresser.finish();
+			int compressedDataLength = compresser.deflate(output);
+			compresser.end();
+			System.out.println(new Date(System.currentTimeMillis()) + ": CPV inputs compressed to "
+					+ compressedDataLength + " bytes using Deflator.");
+
 			byte[] cpvOutputBytes = stub.calculate(cpvInputBytes);
 			System.out.println(new Date(System.currentTimeMillis()) + ": " + cpvOutputBytes.length
 					+ " bytes of output returned from CPV via RMI.");
