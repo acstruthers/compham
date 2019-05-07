@@ -14,9 +14,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.text.DecimalFormat;
 import java.util.Date;
+import java.util.zip.DeflaterInputStream;
 import java.util.zip.DeflaterOutputStream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.InflaterOutputStream;
+import java.util.zip.InflaterInputStream;
 
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;
@@ -122,8 +122,9 @@ public class Main {
 			try {
 				// uncompress CPV outputs
 				ByteArrayInputStream bais = new ByteArrayInputStream(cpvOutputBytes);
-				GZIPInputStream gzipIn = new GZIPInputStream(bais);
-				ObjectInputStream objectIn = new ObjectInputStream(gzipIn);
+				// GZIPInputStream zipIn = new GZIPInputStream(bais);
+				DeflaterInputStream zipIn = new DeflaterInputStream(bais);
+				ObjectInputStream objectIn = new ObjectInputStream(zipIn);
 				cpvOutputs = (ClearingPaymentOutputs) objectIn.readObject();
 				objectIn.close();
 			} catch (IOException e) {
@@ -327,7 +328,7 @@ public class Main {
 	 * @param filePath
 	 * @return
 	 * 
-	 * 		deprecated doesn't work in Java 9+ yet.
+	 *         deprecated doesn't work in Java 9+ yet.
 	 */
 	public static AustralianEconomy readFstEconomyFromFile(String filePath) {
 		AustralianEconomy obj = null;

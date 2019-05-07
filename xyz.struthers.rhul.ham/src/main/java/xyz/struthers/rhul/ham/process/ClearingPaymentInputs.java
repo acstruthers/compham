@@ -5,6 +5,7 @@ package xyz.struthers.rhul.ham.process;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import gnu.trove.list.array.TFloatArrayList;
@@ -21,21 +22,30 @@ public class ClearingPaymentInputs implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	// using JDK Collections (slow)
 	// private List<List<Float>> liabilitiesAmounts;
 	// private List<List<Integer>> liabilitiesIndices;
 	// private List<Float> operatingCashFlow;
 	// private List<Float> liquidAssets;
-	private List<TFloatArrayList> liabilitiesAmounts;
-	private List<TIntArrayList> liabilitiesIndices;
-	private TFloatArrayList operatingCashFlow;
-	private TFloatArrayList liquidAssets;
+
+	// using Trove (serialization fails)
+	// private List<TFloatArrayList> liabilitiesAmounts;
+	// private List<TIntArrayList> liabilitiesIndices;
+	// private TFloatArrayList operatingCashFlow;
+	// private TFloatArrayList liquidAssets;
+
+	// using primitives
+	private float[][] liabilitiesAmounts;
+	private int[][] liabilitiesIndices;
+	private float[] operatingCashFlow;
+	private float[] liquidAssets;
 	private int iteration;
 
 	public ClearingPaymentInputs() {
 		// super-class is not serializable, which causes an exception
 		// SOURCE:
 		// https://stackoverflow.com/questions/12067405/deserializing-an-arraylist-no-valid-constructor
-		// super(); 
+		// super();
 	}
 
 	public ClearingPaymentInputs(List<List<Float>> liabilitiesAmounts, List<List<Integer>> liabilitiesIndices,
@@ -46,66 +56,88 @@ public class ClearingPaymentInputs implements Serializable {
 		// this.liquidAssets = liquidAssets;
 		this.iteration = iteration;
 
-		this.liabilitiesAmounts = new ArrayList<TFloatArrayList>(liabilitiesAmounts.size());
+		// using Trove collections
+		/*
+		 * this.liabilitiesAmounts = new
+		 * ArrayList<TFloatArrayList>(liabilitiesAmounts.size()); for (int i = 0; i <
+		 * liabilitiesAmounts.size(); i++) { float[] liabAmtArray = new
+		 * float[liabilitiesAmounts.get(i).size()]; int j = 0; for (Float node :
+		 * liabilitiesAmounts.get(i)) { liabAmtArray[j++] = (node != null ? node : 0f);
+		 * } this.liabilitiesAmounts.add(TFloatArrayList.wrap(liabAmtArray)); }
+		 * this.liabilitiesIndices = new
+		 * ArrayList<TIntArrayList>(liabilitiesIndices.size()); for (int i = 0; i <
+		 * liabilitiesIndices.size(); i++) { int[] liabIdxArray = new
+		 * int[liabilitiesIndices.get(i).size()]; int j = 0; for (Integer node :
+		 * liabilitiesIndices.get(i)) { liabIdxArray[j++] = (node != null ? node : 0); }
+		 * this.liabilitiesIndices.add(TIntArrayList.wrap(liabIdxArray)); } float[]
+		 * cashflowArray = new float[operatingCashFlow.size()]; int i = 0; for (Float
+		 * node : operatingCashFlow) { cashflowArray[i++] = (node != null ? node : 0f);
+		 * } this.operatingCashFlow = TFloatArrayList.wrap(cashflowArray); float[]
+		 * assetsArray = new float[liquidAssets.size()]; i = 0; for (Float node :
+		 * liquidAssets) { assetsArray[i++] = (node != null ? node : 0f); }
+		 * this.liquidAssets = TFloatArrayList.wrap(assetsArray);
+		 */
+
+		// using primitives
+		this.liabilitiesAmounts = new float[liabilitiesAmounts.size()][];
 		for (int i = 0; i < liabilitiesAmounts.size(); i++) {
-			float[] liabAmtArray = new float[liabilitiesAmounts.get(i).size()];
-			int j = 0;
-			for (Float node : liabilitiesAmounts.get(i)) {
-				liabAmtArray[j++] = (node != null ? node : 0f);
+			this.liabilitiesAmounts[i] = new float[liabilitiesAmounts.get(i).size()];
+			for (int j = 0; j < liabilitiesAmounts.get(i).size(); j++) {
+				this.liabilitiesAmounts[i][j] = liabilitiesAmounts.get(i).get(j);
 			}
-			this.liabilitiesAmounts.add(TFloatArrayList.wrap(liabAmtArray));
 		}
-		this.liabilitiesIndices = new ArrayList<TIntArrayList>(liabilitiesIndices.size());
+		this.liabilitiesIndices = new int[liabilitiesIndices.size()][];
 		for (int i = 0; i < liabilitiesIndices.size(); i++) {
-			int[] liabIdxArray = new int[liabilitiesIndices.get(i).size()];
-			int j = 0;
-			for (Integer node : liabilitiesIndices.get(i)) {
-				liabIdxArray[j++] = (node != null ? node : 0);
+			this.liabilitiesIndices[i] = new int[liabilitiesIndices.get(i).size()];
+			for (int j = 0; j < liabilitiesIndices.get(i).size(); j++) {
+				this.liabilitiesIndices[i][j] = liabilitiesIndices.get(i).get(j);
 			}
-			this.liabilitiesIndices.add(TIntArrayList.wrap(liabIdxArray));
 		}
-		float[] cashflowArray = new float[operatingCashFlow.size()];
-		int i = 0;
-		for (Float node : operatingCashFlow) {
-			cashflowArray[i++] = (node != null ? node : 0f);
+		this.operatingCashFlow = new float[operatingCashFlow.size()];
+		for (int i = 0; i < operatingCashFlow.size(); i++) {
+			this.operatingCashFlow[i] = operatingCashFlow.get(i);
 		}
-		this.operatingCashFlow = TFloatArrayList.wrap(cashflowArray);
-		float[] assetsArray = new float[liquidAssets.size()];
-		i = 0;
-		for (Float node : liquidAssets) {
-			assetsArray[i++] = (node != null ? node : 0f);
+		this.liquidAssets = new float[liquidAssets.size()];
+		for (int i = 0; i < liquidAssets.size(); i++) {
+			this.liquidAssets[i] = liquidAssets.get(i);
 		}
-		this.liquidAssets = TFloatArrayList.wrap(assetsArray);
 	}
 
 	public void clear() {
-		for (int i = 0; i < this.liabilitiesAmounts.size(); i++) {
-			this.liabilitiesAmounts.get(i).clear();
-			this.liabilitiesAmounts.set(i, null);
-		}
-		this.liabilitiesAmounts.clear();
-		this.liabilitiesAmounts = null;
-		for (int i = 0; i < this.liabilitiesIndices.size(); i++) {
-			this.liabilitiesIndices.get(i).clear();
-			this.liabilitiesIndices.set(i, null);
-		}
-		this.liabilitiesIndices.clear();
-		this.liabilitiesIndices = null;
-		this.operatingCashFlow.clear();
-		this.operatingCashFlow = null;
+		/*
+		 * for (int i = 0; i < this.liabilitiesAmounts.size(); i++) {
+		 * this.liabilitiesAmounts.get(i).clear(); this.liabilitiesAmounts.set(i, null);
+		 * } this.liabilitiesAmounts.clear(); this.liabilitiesAmounts = null; for (int i
+		 * = 0; i < this.liabilitiesIndices.size(); i++) {
+		 * this.liabilitiesIndices.get(i).clear(); this.liabilitiesIndices.set(i, null);
+		 * } this.liabilitiesIndices.clear(); this.liabilitiesIndices = null;
+		 * this.operatingCashFlow.clear(); this.operatingCashFlow = null;
+		 */
 	}
 
 	/**
 	 * @return the liabilitiesAmounts
 	 */
 	public List<List<Float>> getLiabilitiesAmounts() {
+		// using JDK Collections
 		// return liabilitiesAmounts;
-		List<List<Float>> boxedList = new ArrayList<List<Float>>(liabilitiesAmounts.size());
-		for (int i = 0; i < liabilitiesAmounts.size(); i++) {
-			float[] primitiveArray = this.liabilitiesAmounts.get(i).toArray();
-			List<Float> boxed = new ArrayList<Float>(primitiveArray.length);
-			for (Float node : primitiveArray) {
-				boxed.add(node);
+
+		// using Trove
+		/*
+		 * List<List<Float>> boxedList = new
+		 * ArrayList<List<Float>>(this.liabilitiesAmounts.size()); for (int i = 0; i <
+		 * this.liabilitiesAmounts.size(); i++) { float[] primitiveArray =
+		 * this.liabilitiesAmounts.get(i).toArray(); List<Float> boxed = new
+		 * ArrayList<Float>(primitiveArray.length); for (Float node : primitiveArray) {
+		 * boxed.add(node); } boxedList.add(boxed); } return boxedList;
+		 */
+
+		// using primitives
+		List<List<Float>> boxedList = new ArrayList<List<Float>>(this.liabilitiesAmounts.length);
+		for (int i = 0; i < this.liabilitiesAmounts.length; i++) {
+			List<Float> boxed = new ArrayList<Float>(this.liabilitiesAmounts[i].length);
+			for (int j = 0; j < this.liabilitiesAmounts[i].length; j++) {
+				boxed.add(this.liabilitiesAmounts[i][j]);
 			}
 			boxedList.add(boxed);
 		}
@@ -116,15 +148,26 @@ public class ClearingPaymentInputs implements Serializable {
 	 * @param liabilitiesAmounts the liabilitiesAmounts to set
 	 */
 	public void setLiabilitiesAmounts(List<List<Float>> liabilitiesAmounts) {
+		// using JDK Collections
 		// this.liabilitiesAmounts = liabilitiesAmounts;
-		this.liabilitiesAmounts = new ArrayList<TFloatArrayList>(liabilitiesAmounts.size());
+
+		// using Trove
+		/*
+		 * this.liabilitiesAmounts = new
+		 * ArrayList<TFloatArrayList>(liabilitiesAmounts.size()); for (int i = 0; i <
+		 * liabilitiesAmounts.size(); i++) { float[] liabAmtArray = new
+		 * float[liabilitiesAmounts.get(i).size()]; int j = 0; for (Float node :
+		 * liabilitiesAmounts.get(i)) { liabAmtArray[j++] = (node != null ? node : 0f);
+		 * } this.liabilitiesAmounts.add(TFloatArrayList.wrap(liabAmtArray)); }
+		 */
+
+		// using primitives
+		this.liabilitiesAmounts = new float[liabilitiesAmounts.size()][];
 		for (int i = 0; i < liabilitiesAmounts.size(); i++) {
-			float[] liabAmtArray = new float[liabilitiesAmounts.get(i).size()];
-			int j = 0;
-			for (Float node : liabilitiesAmounts.get(i)) {
-				liabAmtArray[j++] = (node != null ? node : 0f);
+			this.liabilitiesAmounts[i] = new float[liabilitiesAmounts.get(i).size()];
+			for (int j = 0; j < liabilitiesAmounts.get(i).size(); j++) {
+				this.liabilitiesAmounts[i][j] = liabilitiesAmounts.get(i).get(j);
 			}
-			this.liabilitiesAmounts.add(TFloatArrayList.wrap(liabAmtArray));
 		}
 	}
 
@@ -132,13 +175,26 @@ public class ClearingPaymentInputs implements Serializable {
 	 * @return the liabilitiesIndices
 	 */
 	public List<List<Integer>> getLiabilitiesIndices() {
+		// using JDK Collections
 		// return liabilitiesIndices;
-		List<List<Integer>> boxedList = new ArrayList<List<Integer>>(liabilitiesIndices.size());
-		for (int i = 0; i < liabilitiesIndices.size(); i++) {
-			int[] primitiveArray = this.liabilitiesIndices.get(i).toArray();
-			List<Integer> boxed = new ArrayList<Integer>(primitiveArray.length);
-			for (Integer node : primitiveArray) {
-				boxed.add(node);
+
+		// using Trove
+		/*
+		 * List<List<Integer>> boxedList = new
+		 * ArrayList<List<Integer>>(liabilitiesIndices.size()); for (int i = 0; i <
+		 * liabilitiesIndices.size(); i++) { int[] primitiveArray =
+		 * this.liabilitiesIndices.get(i).toArray(); List<Integer> boxed = new
+		 * ArrayList<Integer>(primitiveArray.length); for (Integer node :
+		 * primitiveArray) { boxed.add(node); } boxedList.add(boxed); } return
+		 * boxedList;
+		 */
+
+		// using primitives
+		List<List<Integer>> boxedList = new ArrayList<List<Integer>>(this.liabilitiesIndices.length);
+		for (int i = 0; i < this.liabilitiesIndices.length; i++) {
+			List<Integer> boxed = new ArrayList<Integer>(this.liabilitiesIndices[i].length);
+			for (int j = 0; j < this.liabilitiesIndices[i].length; j++) {
+				boxed.add(this.liabilitiesIndices[i][j]);
 			}
 			boxedList.add(boxed);
 		}
@@ -149,15 +205,26 @@ public class ClearingPaymentInputs implements Serializable {
 	 * @param liabilitiesIndices the liabilitiesIndices to set
 	 */
 	public void setLiabilitiesIndices(List<List<Integer>> liabilitiesIndices) {
+		// using JDK Collections
 		// this.liabilitiesIndices = liabilitiesIndices;
-		this.liabilitiesIndices = new ArrayList<TIntArrayList>(liabilitiesIndices.size());
+
+		// using Trove
+		/*
+		 * this.liabilitiesIndices = new
+		 * ArrayList<TIntArrayList>(liabilitiesIndices.size()); for (int i = 0; i <
+		 * liabilitiesIndices.size(); i++) { int[] liabIdxArray = new
+		 * int[liabilitiesIndices.get(i).size()]; int j = 0; for (Integer node :
+		 * liabilitiesIndices.get(i)) { liabIdxArray[j++] = (node != null ? node : 0); }
+		 * this.liabilitiesIndices.add(TIntArrayList.wrap(liabIdxArray)); }
+		 */
+
+		// using primitives
+		this.liabilitiesIndices = new int[liabilitiesIndices.size()][];
 		for (int i = 0; i < liabilitiesIndices.size(); i++) {
-			int[] liabIdxArray = new int[liabilitiesIndices.get(i).size()];
-			int j = 0;
-			for (Integer node : liabilitiesIndices.get(i)) {
-				liabIdxArray[j++] = (node != null ? node : 0);
+			this.liabilitiesIndices[i] = new int[liabilitiesIndices.get(i).size()];
+			for (int j = 0; j < liabilitiesIndices.get(i).size(); j++) {
+				this.liabilitiesIndices[i][j] = liabilitiesIndices.get(i).get(j);
 			}
-			this.liabilitiesIndices.add(TIntArrayList.wrap(liabIdxArray));
 		}
 	}
 
@@ -165,11 +232,20 @@ public class ClearingPaymentInputs implements Serializable {
 	 * @return the operatingCashFlow
 	 */
 	public List<Float> getOperatingCashFlow() {
+		// using JDK Collections
 		// return operatingCashFlow;
-		float[] primitiveArray = this.operatingCashFlow.toArray();
-		List<Float> boxedList = new ArrayList<Float>(primitiveArray.length);
-		for (Float node : primitiveArray) {
-			boxedList.add(node);
+
+		// using Trove
+		/*
+		 * float[] primitiveArray = this.operatingCashFlow.toArray(); List<Float>
+		 * boxedList = new ArrayList<Float>(primitiveArray.length); for (Float node :
+		 * primitiveArray) { boxedList.add(node); } return boxedList;
+		 */
+
+		// using primitives
+		List<Float> boxedList = new ArrayList<Float>(this.operatingCashFlow.length);
+		for (int i = 0; i < this.operatingCashFlow.length; i++) {
+			boxedList.add(this.operatingCashFlow[i]);
 		}
 		return boxedList;
 	}
@@ -178,24 +254,41 @@ public class ClearingPaymentInputs implements Serializable {
 	 * @param operatingCashFlow the operatingCashFlow to set
 	 */
 	public void setOperatingCashFlow(List<Float> operatingCashFlow) {
+		// using JDK Collections
 		// this.operatingCashFlow = operatingCashFlow;
-		float[] cashflowArray = new float[operatingCashFlow.size()];
-		int i = 0;
-		for (Float node : operatingCashFlow) {
-			cashflowArray[i++] = (node != null ? node : 0f);
+
+		// using Trove
+		/*
+		 * float[] cashflowArray = new float[operatingCashFlow.size()]; int i = 0; for
+		 * (Float node : operatingCashFlow) { cashflowArray[i++] = (node != null ? node
+		 * : 0f); } this.operatingCashFlow = TFloatArrayList.wrap(cashflowArray);
+		 */
+
+		// using primitives
+		this.operatingCashFlow = new float[operatingCashFlow.size()];
+		for (int i = 0; i < operatingCashFlow.size(); i++) {
+			this.operatingCashFlow[i] = operatingCashFlow.get(i);
 		}
-		this.operatingCashFlow = TFloatArrayList.wrap(cashflowArray);
 	}
 
 	/**
 	 * @return the liquidAssets
 	 */
 	public List<Float> getLiquidAssets() {
+		// using JDK Collections
 		// return liquidAssets;
-		float[] primitiveArray = this.liquidAssets.toArray();
-		List<Float> boxedList = new ArrayList<Float>(primitiveArray.length);
-		for (Float node : primitiveArray) {
-			boxedList.add(node);
+
+		// using Trove
+		/*
+		 * float[] primitiveArray = this.liquidAssets.toArray(); List<Float> boxedList =
+		 * new ArrayList<Float>(primitiveArray.length); for (Float node :
+		 * primitiveArray) { boxedList.add(node); } return boxedList;
+		 */
+
+		// using primitives
+		List<Float> boxedList = new ArrayList<Float>(this.liquidAssets.length);
+		for (int i = 0; i < this.liquidAssets.length; i++) {
+			boxedList.add(this.liquidAssets[i]);
 		}
 		return boxedList;
 	}
@@ -204,13 +297,21 @@ public class ClearingPaymentInputs implements Serializable {
 	 * @param liquidAssets the liquidAssets to set
 	 */
 	public void setLiquidAssets(List<Float> liquidAssets) {
+		// using JDK Collections
 		// this.liquidAssets = liquidAssets;
-		float[] assetsArray = new float[liquidAssets.size()];
-		int i = 0;
-		for (Float node : liquidAssets) {
-			assetsArray[i++] = (node != null ? node : 0f);
+
+		// using Trove
+		/*
+		 * float[] assetsArray = new float[liquidAssets.size()]; int i = 0; for (Float
+		 * node : liquidAssets) { assetsArray[i++] = (node != null ? node : 0f); }
+		 * this.liquidAssets = TFloatArrayList.wrap(assetsArray);
+		 */
+
+		// using primitives
+		this.liquidAssets = new float[liquidAssets.size()];
+		for (int i = 0; i < liquidAssets.size(); i++) {
+			this.liquidAssets[i] = liquidAssets.get(i);
 		}
-		this.liquidAssets = TFloatArrayList.wrap(assetsArray);
 	}
 
 	/**

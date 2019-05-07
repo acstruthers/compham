@@ -24,10 +24,12 @@ public class ClearingPaymentOutputs implements Serializable {
 	// net cash flow of each node after paying liabilities
 	// private List<Float> equityOfNode;
 	private TFloatArrayList equityOfNode;
+	// private float[] equityOfNode;
 
 	// Which round of the CPV algorithm caused the node to default. (0 = no default)
 	// private List<Integer> defaultOrderOfNode;
 	private TIntArrayList defaultOrderOfNode;
+	// private int[] defaultOrderOfNode;
 
 	private int iteration;
 

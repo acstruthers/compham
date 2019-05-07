@@ -14,8 +14,8 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Date;
 import java.util.List;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
+import java.util.zip.DeflaterInputStream;
+import java.util.zip.DeflaterOutputStream;
 
 import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.process.ClearingPaymentInputs;
@@ -48,8 +48,9 @@ public class ClearingPaymentVectorRmiServer implements ClearingPaymentVectorInte
 		try {
 			// uncompress CPV inputs
 			ByteArrayInputStream bais = new ByteArrayInputStream(compressedBytes);
-			GZIPInputStream gzipIn = new GZIPInputStream(bais);
-			ObjectInputStream objectIn = new ObjectInputStream(gzipIn);
+			// GZIPInputStream zipIn = new GZIPInputStream(bais);
+			DeflaterInputStream zipIn = new DeflaterInputStream(bais);
+			ObjectInputStream objectIn = new ObjectInputStream(zipIn);
 			cpvInputs = (ClearingPaymentInputs) objectIn.readObject();
 			objectIn.close();
 		} catch (IOException e) {
@@ -74,8 +75,9 @@ public class ClearingPaymentVectorRmiServer implements ClearingPaymentVectorInte
 		try {
 			// compress outputs
 			baos = new ByteArrayOutputStream(Properties.NETWORK_BUFFER_BYTES);
-			GZIPOutputStream gzipOut = new GZIPOutputStream(baos);
-			ObjectOutputStream objectOut = new ObjectOutputStream(gzipOut);
+			// GZIPOutputStream zipOut = new GZIPOutputStream(baos);
+			DeflaterOutputStream zipOut = new DeflaterOutputStream(baos);
+			ObjectOutputStream objectOut = new ObjectOutputStream(zipOut);
 			objectOut.writeObject(cpvOutputs);
 			objectOut.close();
 		} catch (IOException e) {
