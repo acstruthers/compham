@@ -5,7 +5,9 @@ package xyz.struthers.rhul.ham.process;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
@@ -23,18 +25,18 @@ public class ClearingPaymentOutputs implements Serializable {
 
 	// net cash flow of each node after paying liabilities
 	// private List<Float> equityOfNode;
-	private TFloatArrayList equityOfNode;
-	// private float[] equityOfNode;
+	// private TFloatArrayList equityOfNode;
+	private float[] equityOfNode;
 
 	// Which round of the CPV algorithm caused the node to default. (0 = no default)
 	// private List<Integer> defaultOrderOfNode;
-	private TIntArrayList defaultOrderOfNode;
-	// private int[] defaultOrderOfNode;
+	// private TIntArrayList defaultOrderOfNode;
+	private int[] defaultOrderOfNode;
 
 	private int iteration;
 
 	public ClearingPaymentOutputs() {
-		// super-class is not serializable, which causes an exception
+		// if super-class is not serializable it will cause an exception
 		// SOURCE:
 		// https://stackoverflow.com/questions/12067405/deserializing-an-arraylist-no-valid-constructor
 		// super();
@@ -45,10 +47,14 @@ public class ClearingPaymentOutputs implements Serializable {
 	 */
 	public List<Float> getEquityOfNode() {
 		// public TFloatArrayList getEquityOfNode() {
-		float[] primitiveArray = this.equityOfNode.toArray();
-		List<Float> boxedList = new ArrayList<Float>(primitiveArray.length);
-		for (Float node : primitiveArray) {
-			boxedList.add(node);
+		/*
+		 * float[] primitiveArray = this.equityOfNode.toArray(); List<Float> boxedList =
+		 * new ArrayList<Float>(primitiveArray.length); for (Float node :
+		 * primitiveArray) { boxedList.add(node); } return boxedList;
+		 */
+		List<Float> boxedList = new ArrayList<Float>(this.equityOfNode.length);
+		for (float i : this.equityOfNode) {
+			boxedList.add(i);
 		}
 		return boxedList;
 	}
@@ -62,14 +68,21 @@ public class ClearingPaymentOutputs implements Serializable {
 		for (Float node : equityOfNode) {
 			primitiveArray[i++] = (node != null ? node : 0f);
 		}
-		this.equityOfNode = TFloatArrayList.wrap(primitiveArray);
+		// usingTrove
+		// this.equityOfNode = TFloatArrayList.wrap(primitiveArray);
+		// using primitives
+		this.equityOfNode = primitiveArray;
 	}
 
 	/**
 	 * @param equityOfNode the equityOfNode to set
 	 */
 	public void setEquityOfNode(TFloatArrayList equityOfNode) {
-		this.equityOfNode = equityOfNode;
+		// using Trove
+		// this.equityOfNode = equityOfNode;
+
+		// using primitives
+		this.equityOfNode = equityOfNode.toArray(this.equityOfNode);
 	}
 
 	/**
@@ -77,11 +90,16 @@ public class ClearingPaymentOutputs implements Serializable {
 	 */
 	public List<Integer> getDefaultOrderOfNode() {
 		// public TIntArrayList getDefaultOrderOfNode() {
-		int[] primitiveArray = this.defaultOrderOfNode.toArray();
-		List<Integer> boxedList = new ArrayList<Integer>(primitiveArray.length);
-		for (Integer node : primitiveArray) {
-			boxedList.add(node);
-		}
+
+		// using Trove
+		/*
+		 * int[] primitiveArray = this.defaultOrderOfNode.toArray(); List<Integer>
+		 * boxedList = new ArrayList<Integer>(primitiveArray.length); for (Integer node
+		 * : primitiveArray) { boxedList.add(node); } return boxedList;
+		 */
+
+		// using primitives
+		List<Integer> boxedList = Arrays.stream(this.defaultOrderOfNode).boxed().collect(Collectors.toList());
 		return boxedList;
 	}
 
@@ -95,14 +113,21 @@ public class ClearingPaymentOutputs implements Serializable {
 		for (Integer node : defaultOrderOfNode) {
 			primitiveArray[i++] = (node != null ? node : 0);
 		}
-		this.defaultOrderOfNode = TIntArrayList.wrap(primitiveArray);
+		// using Trove
+		// this.defaultOrderOfNode = TIntArrayList.wrap(primitiveArray);
+		// using primitives
+		this.defaultOrderOfNode = primitiveArray;
 	}
 
 	/**
 	 * @param defaultOrderOfNode the defaultOrderOfNode to set
 	 */
 	public void setDefaultOrderOfNode(TIntArrayList defaultOrderOfNode) {
-		this.defaultOrderOfNode = defaultOrderOfNode;
+		// using Trove
+		// this.defaultOrderOfNode = defaultOrderOfNode;
+
+		// using primitives
+		this.defaultOrderOfNode = defaultOrderOfNode.toArray(this.defaultOrderOfNode);
 	}
 
 	/**

@@ -28,7 +28,7 @@ public class GzipCpvHelloClient {
 
 	public static final String HOST = "Adam-E590";
 	public static final int PORT = 1099;
-	public static final int NUM_AGENTS = 1000000;
+	public static final int NUM_AGENTS = 1000;
 	public static final int NUM_LINKS_PER_AGENT = 100;
 
 	public GzipCpvHelloClient() {
