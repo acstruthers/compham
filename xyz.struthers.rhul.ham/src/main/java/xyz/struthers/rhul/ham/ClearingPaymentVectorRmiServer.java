@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.zip.DeflaterInputStream;
 import java.util.zip.DeflaterOutputStream;
 
+import com.esotericsoftware.kryonet.Serialization;
+
 import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.process.ClearingPaymentInputs;
 import xyz.struthers.rhul.ham.process.ClearingPaymentOutputs;

@@ -73,6 +73,13 @@ public class Properties implements Serializable {
 	public static final String OUTPUT_DIRECTORY = "C:\\tmp\\";
 	public static final String CSV_SEPARATOR = ",";
 
+	// Socket networking parameters
+	public static final String CPV_SERVER_HOST = "Adam-E590";
+	public static final String ECONOMY_CLIENT_HOST = "Adam-NUC";
+	public static final int CPV_SERVER_PORT = 1100;
+	public static final int ECONOMY_CLIENT_PORT = 1100;
+	public static final int SOCKET_BUFFER_BYTES = 2000000000; // approx 2GB
+	
 	// JDK RMI networking parameters
 	public static final String RMI_HOST = "Adam-E590";
 	public static final int RMI_PORT = 1099;
