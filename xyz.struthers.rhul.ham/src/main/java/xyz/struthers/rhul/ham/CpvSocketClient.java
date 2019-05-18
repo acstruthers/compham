@@ -17,6 +17,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import com.esotericsoftware.kryonet.Client;
 
 import xyz.struthers.io.Serialization;
+import xyz.struthers.io.Serialization.CompressionType;
 import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.config.SpringConfiguration;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
@@ -109,54 +110,39 @@ public class CpvSocketClient {
 			// OUTBOUND
 			// send CPV inputs to server for processing
 			System.out.println(new Date(System.currentTimeMillis()) + ": serializing CPV inputs.");
-			byte[] bytes = null;
-			byte compression = 1;
-			switch (compression) {
-			case 1:
-				// GZIP compression
-				bytes = Serialization.toBytesGZIP(cpvInputs, Properties.SOCKET_BUFFER_BYTES);
-				break;
-			case 2:
-				// Deflater compression
-				bytes = Serialization.toBytesDeflater(cpvInputs, Properties.SOCKET_BUFFER_BYTES);
-				break;
-			default:
-				// no compression
-				bytes = Serialization.toBytes(cpvInputs, Properties.SOCKET_BUFFER_BYTES);
-				break;
-			}
-
-			System.out.println(new Date(System.currentTimeMillis()) + ": sending CPV inputs to server.");
-			dos.writeInt(bytes.length);
-			dos.writeByte(compression);
-			dos.write(bytes);
-			dos.flush(); // don't know if I really need this, but it probably can't hurt
+			Serialization.writeToDataStream(dos, cpvInputs, Properties.SOCKET_BUFFER_BYTES, Properties.SOCKET_MSG_BYTES,
+					CompressionType.GZIP);
+			/*
+			 * byte[] bytes = null; byte compression = 1; switch (compression) { case 1: //
+			 * GZIP compression bytes = Serialization.toBytesGZIP(cpvInputs,
+			 * Properties.SOCKET_BUFFER_BYTES); break; case 2: // Deflater compression bytes
+			 * = Serialization.toBytesDeflater(cpvInputs, Properties.SOCKET_BUFFER_BYTES);
+			 * break; default: // no compression bytes = Serialization.toBytes(cpvInputs,
+			 * Properties.SOCKET_BUFFER_BYTES); break; }
+			 * 
+			 * System.out.println(new Date(System.currentTimeMillis()) +
+			 * ": sending CPV inputs to server."); dos.writeInt(bytes.length);
+			 * dos.writeByte(compression); dos.write(bytes); dos.flush(); // don't know if I
+			 * really need this, but it probably can't hurt
+			 */
 			System.out.println(new Date(System.currentTimeMillis()) + ": CPV inputs sent to server.");
 
 			// INBOUND
 			// receive CPV outputs from server
 			System.out.println(new Date(System.currentTimeMillis()) + ": receiving CPV outputs from server.");
-			int size = dis.readInt();
-			compression = dis.readByte();
-			bytes = new byte[size];
-			dis.readFully(bytes);
-
-			// deserialize bytes to CPV input
-			System.out.println(new Date(System.currentTimeMillis()) + ": deserializing CPV outputs.");
-			switch (compression) {
-			case 1:
-				// GZIP compression
-				cpvOutputs = (ClearingPaymentOutputs) Serialization.toObjectFromGZIP(bytes);
-				break;
-			case 2:
-				// Deflater compression
-				cpvOutputs = (ClearingPaymentOutputs) Serialization.toObjectFromDeflater(bytes);
-				break;
-			default:
-				// no compression
-				cpvOutputs = (ClearingPaymentOutputs) Serialization.toObject(bytes);
-				break;
-			}
+			cpvOutputs = (ClearingPaymentOutputs) Serialization.readObjectFromStream(dis);
+			/*
+			 * int size = dis.readInt(); compression = dis.readByte(); bytes = new
+			 * byte[size]; dis.readFully(bytes);
+			 * 
+			 * // deserialize bytes to CPV input System.out.println(new
+			 * Date(System.currentTimeMillis()) + ": deserializing CPV outputs."); switch
+			 * (compression) { case 1: // GZIP compression cpvOutputs =
+			 * (ClearingPaymentOutputs) Serialization.toObjectFromGZIP(bytes); break; case
+			 * 2: // Deflater compression cpvOutputs = (ClearingPaymentOutputs)
+			 * Serialization.toObjectFromDeflater(bytes); break; default: // no compression
+			 * cpvOutputs = (ClearingPaymentOutputs) Serialization.toObject(bytes); break; }
+			 */
 		} catch (IOException e) {
 			System.err.println(
 					"Error connecting to : " + Properties.CPV_SERVER_HOST + " on port: " + Properties.CPV_SERVER_PORT);
@@ -210,13 +196,9 @@ public class CpvSocketClient {
 		// new CpvSocketClient();
 		ClearingPaymentOutputs cpvOutputs = runCpvOnServer(cpvInputs);
 		/*
-		try {
-			// wait for CPV listener to terminate before continuing with execution
-			t.join();
-		} catch (InterruptedException e) {
-			// do nothing
-		}
-		*/
+		 * try { // wait for CPV listener to terminate before continuing with execution
+		 * t.join(); } catch (InterruptedException e) { // do nothing }
+		 */
 		cpvInputs.clear();
 		cpvInputs = null;
 
