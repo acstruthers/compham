@@ -82,6 +82,7 @@ public class ClearingPaymentOutputs implements Serializable {
 		// this.equityOfNode = equityOfNode;
 
 		// using primitives
+		this.equityOfNode = new float[equityOfNode.size()];
 		this.equityOfNode = equityOfNode.toArray(this.equityOfNode);
 	}
 
@@ -127,6 +128,7 @@ public class ClearingPaymentOutputs implements Serializable {
 		// this.defaultOrderOfNode = defaultOrderOfNode;
 
 		// using primitives
+		this.defaultOrderOfNode = new int[defaultOrderOfNode.size()];
 		this.defaultOrderOfNode = defaultOrderOfNode.toArray(this.defaultOrderOfNode);
 	}
 

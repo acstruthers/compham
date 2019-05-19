@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import xyz.struthers.io.Serialization;
+import xyz.struthers.io.Serialization.CompressionType;
 import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.process.ClearingPaymentInputs;
 import xyz.struthers.rhul.ham.process.ClearingPaymentOutputs;
@@ -35,13 +36,13 @@ public class CpvSocketClientHandler extends Thread {
 	public void run() {
 		ClearingPaymentInputs cpvInputs = null;
 		ClearingPaymentOutputs cpvOutputs = null;
-		byte compression = Byte.valueOf(null); // use the same compression for input & output
+		//byte compression = Byte.valueOf(null); // use the same compression for input & output
 
 		// receive CPV input from client
 		try {
 			// read stream
 			System.out.println(new Date(System.currentTimeMillis()) + ": receiving CPV inputs.");
-			int size = this.dis.readInt();
+			/*int size = this.dis.readInt();
 			compression = this.dis.readByte();
 			byte[] bytes = new byte[size];
 			this.dis.readFully(bytes);
@@ -61,9 +62,11 @@ public class CpvSocketClientHandler extends Thread {
 				cpvInputs = (ClearingPaymentInputs) Serialization.toObject(bytes);
 				break;
 			}
-		} catch (IOException ioe) {
+			*/
+			cpvInputs = (ClearingPaymentInputs) Serialization.readObjectFromStream(dis);
+		} catch (IOException e) {
 			cpvInputs = null;
-			ioe.printStackTrace();
+			e.printStackTrace();
 			return;
 		}
 
@@ -83,7 +86,7 @@ public class CpvSocketClientHandler extends Thread {
 		System.out.println(new Date(System.currentTimeMillis()) + ": compressing CPV outputs.");
 		try {
 			// serialize data to byte array
-			byte[] bytes = null;
+			/*byte[] bytes = null;
 			switch (compression) {
 			case 1:
 				// GZIP compression
@@ -105,6 +108,9 @@ public class CpvSocketClientHandler extends Thread {
 			dos.writeByte(compression);
 			dos.write(bytes);
 			dos.flush(); // don't know if I really need this, but it probably can't hurt
+			*/
+			Serialization.writeToDataStream(dos, cpvOutputs, Properties.SOCKET_BUFFER_BYTES, Properties.SOCKET_MSG_BYTES,
+					CompressionType.GZIP);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
