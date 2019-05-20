@@ -233,10 +233,12 @@ public class CpvSocketClient {
 		memoryBefore = memoryAfter;
 
 		// save summary to file
-		int iteration = cpvOutputs.getIteration() + 1;
+		int iteration = cpvOutputs.getIteration();
 		economy.saveSummaryToFile(iteration);
 		economy.saveDetailsToFile(iteration); // details after being updated with CPV output
 
+		iteration++;
+		
 		ctx.close();
 	}
 

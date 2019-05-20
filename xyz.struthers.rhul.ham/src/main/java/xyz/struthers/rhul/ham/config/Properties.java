@@ -78,7 +78,7 @@ public class Properties implements Serializable {
 	public static final String ECONOMY_CLIENT_HOST = "Adam-NUC";
 	public static final int CPV_SERVER_PORT = 1100;
 	public static final int ECONOMY_CLIENT_PORT = 1100;
-	public static final int SOCKET_BUFFER_BYTES = 2000000000; // approx 2GB
+	public static final int SOCKET_BUFFER_BYTES = 1000000000; // approx 2GB
 	public static final int SOCKET_MSG_BYTES = 10 * 1024 * 1024; // 10MB
 
 	// JDK RMI networking parameters
