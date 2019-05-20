@@ -111,7 +111,7 @@ public class CpvSocketClient {
 			// send CPV inputs to server for processing
 			System.out.println(new Date(System.currentTimeMillis()) + ": serializing CPV inputs.");
 			Serialization.writeToDataStream(dos, cpvInputs, Properties.SOCKET_BUFFER_BYTES, Properties.SOCKET_MSG_BYTES,
-					CompressionType.GZIP);
+					CompressionType.NO_COMPRESSION);
 			/*
 			 * byte[] bytes = null; byte compression = 1; switch (compression) { case 1: //
 			 * GZIP compression bytes = Serialization.toBytesGZIP(cpvInputs,

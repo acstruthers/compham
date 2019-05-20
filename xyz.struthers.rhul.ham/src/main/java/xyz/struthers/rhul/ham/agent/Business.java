@@ -492,8 +492,10 @@ public class Business extends Agent implements Employer {
 
 	private void makeBusinessBankrupt(int iteration) {
 		// business is bankrupt, so fire all employees
-		for (Individual employee : this.employees) {
-			employee.fireEmployee();
+		if (this.employees != null) {
+			for (Individual employee : this.employees) {
+				employee.fireEmployee();
+			}
 		}
 
 		// remove business deposits from bank's balances
