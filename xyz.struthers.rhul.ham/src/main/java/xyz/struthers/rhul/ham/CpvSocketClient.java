@@ -235,10 +235,12 @@ public class CpvSocketClient {
 		// save summary to file
 		int iteration = cpvOutputs.getIteration();
 		economy.saveSummaryToFile(iteration);
-		economy.saveDetailsToFile(iteration); // details after being updated with CPV output
+		// details after being updated with CPV output
+		// 6.32GB of CSV files (takes 4 minutes to write to disk)
+		// economy.saveDetailsToFile(iteration); 
 
 		iteration++;
-		
+
 		ctx.close();
 	}
 
