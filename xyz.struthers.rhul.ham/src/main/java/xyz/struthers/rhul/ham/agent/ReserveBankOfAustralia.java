@@ -179,7 +179,6 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
 		sb.append(wholeNumber.format(this.employees != null ? this.employees.size() : 0) + separator);
 		sb.append(wholeNumber.format(this.adiDepositors != null ? this.adiDepositors.size() : 0) + separator);
-		// FIXME: 2019-04-30 & 2019-05-20 Index 1 out of bounds for length 1 (on next line)
 		sb.append(percent.format(this.cashRate != null ? this.cashRate.get(iteration) : 0) + separator);
 		sb.append(decimal.format(this.pnlInterestIncome) + separator);
 		sb.append(decimal.format(this.pnlInterestExpense) + separator);
@@ -204,6 +203,34 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 		sb.append(decimal.format(this.bsReserves));
 
 		return sb.toString();
+	}
+
+	/**
+	 * Gets the summary column headings, to write to CSV file.
+	 * <p>
+	 * The intention is for this data to form the basis of a statistical analysis
+	 * (for example, using R).
+	 * 
+	 * @param separator
+	 * @return a CSV list of the column headings
+	 */
+	public String toCsvSummaryStringHeaders(String separator) {
+		// RBA is small enough I'll just save all the details
+		return this.toCsvStringHeaders(separator);
+	}
+
+	/**
+	 * Gets the summary data, to write to CSV file.
+	 * <p>
+	 * The intention is for this data to form the basis of a statistical analysis
+	 * (for example, using R).
+	 * 
+	 * @param separator
+	 * @return a CSV list of the data
+	 */
+	public String toCsvSummaryString(String separator, int iteration) {
+		// AU Government is small enough I'll just save all the details
+		return this.toCsvString(separator, iteration);
 	}
 
 	@Override

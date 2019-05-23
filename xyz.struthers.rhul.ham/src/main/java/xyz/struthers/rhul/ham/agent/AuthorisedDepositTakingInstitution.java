@@ -456,6 +456,26 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		return sb.toString();
 	}
 
+	/**
+	 * Gets the summary column headings, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the column headings
+	 */
+	public String toCsvSummaryStringHeaders(String separator) {
+		return this.toCsvStringHeaders(separator);
+	}
+
+	/**
+	 * Gets the summary data, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the data
+	 */
+	public String toCsvSummaryString(String separator, int iteration) {
+		return this.toCsvString(separator, iteration);
+	}
+
 	@Override
 	public ArrayList<Individual> getEmployees() {
 		return this.employees;
@@ -658,7 +678,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 					Properties.FCS_LIMIT_PER_DEPOSITOR);
 			household.setBsBankDeposits(newDepositBal);
 			// FIXME: UP TO HERE 18/4/18: process CPV output in Agent
-			// TODO assign randomly to new ADI, weighted by deposit balance 
+			// TODO assign randomly to new ADI, weighted by deposit balance
 			// we can't re-assign depositors to other ADIs from within this ADI
 			// need to do that from within the AustralianEconomy class.
 		}
@@ -667,7 +687,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 					Properties.FCS_LIMIT_PER_DEPOSITOR);
 			business.setBankDeposits(newDepositBal);
 			// TODO assign randomly to new ADI, weighted by business loan balance
-			
+
 		}
 
 		// ADI is bankrupt, so zero out all its financials

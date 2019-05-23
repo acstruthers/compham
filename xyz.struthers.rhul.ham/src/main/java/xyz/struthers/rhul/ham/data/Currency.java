@@ -4,6 +4,7 @@
 package xyz.struthers.rhul.ham.data;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -40,6 +41,50 @@ public class Currency implements Serializable {
 		this.stdev5yr = standardDeviation5yr;
 		this.exchangeRate = new ArrayList<Float>();
 		this.exchangeRate.add(fxRate);
+	}
+
+	/**
+	 * Gets the summary column headings, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the column headings
+	 */
+	public String toCsvSummaryStringHeaders(String separator) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("ISO4217Code" + separator);
+		sb.append("Name" + separator);
+		sb.append("Mean1yr" + separator);
+		sb.append("StdDev1yr" + separator);
+		sb.append("StdDev5yr" + separator);
+		sb.append("CurrentRate" + separator);
+		sb.append("Iteration" + separator);
+
+		return sb.toString();
+	}
+
+	/**
+	 * Gets the summary data, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the data
+	 */
+	public String toCsvSummaryString(String separator, int iteration) {
+		StringBuilder sb = new StringBuilder();
+
+		DecimalFormat decimal = new DecimalFormat("###0.0000000000");
+		DecimalFormat wholeNumber = new DecimalFormat("###0");
+		DecimalFormat percent = new DecimalFormat("###0.0000");
+
+		sb.append(this.iso4217code + separator);
+		sb.append(this.name + separator);
+		sb.append(decimal.format(this.avg1yr) + separator);
+		sb.append(decimal.format(this.stdev1yr) + separator);
+		sb.append(decimal.format(this.stdev5yr) + separator);
+		sb.append(decimal.format(this.exchangeRate.get(iteration)) + separator);
+		sb.append(wholeNumber.format(iteration));
+
+		return sb.toString();
 	}
 
 	/**

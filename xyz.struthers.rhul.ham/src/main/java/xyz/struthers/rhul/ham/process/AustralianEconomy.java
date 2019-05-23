@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -37,6 +38,7 @@ import xyz.struthers.rhul.ham.agent.Individual;
 import xyz.struthers.rhul.ham.agent.ReserveBankOfAustralia;
 import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.data.Currencies;
+import xyz.struthers.rhul.ham.data.Currency;
 
 /**
  * A class to hold all the Agents so they're all available in the one place.
@@ -534,12 +536,29 @@ public class AustralianEconomy implements Serializable {
 	 * @param iteration
 	 * @return
 	 */
-	public String saveSummaryToFile(int iteration) {
-		String filename = "summary.csv";
-
+	public Set<String> saveSummaryToFile(int iteration) {
 		// FIXME: implement saveSummaryToFile(int)
+		Set<String> filenames = new HashSet<String>((int) Math.ceil(8 / 0.75) + 1);
 
-		return filename;
+		String filename = this.saveGovernmentSummaryToFile(iteration);
+		filenames.add(filename);
+		filename = this.saveRbaSummaryToFile(iteration);
+		filenames.add(filename);
+		filename = this.saveAdiSummaryToFile(iteration);
+		filenames.add(filename);
+		filename = this.saveForeignCountrySummaryToFile(iteration);
+		filenames.add(filename);
+		filename = this.saveBusinessSummaryToFile(iteration);
+		filenames.add(filename);
+		filename = this.saveHouseholdSummaryToFile(iteration);
+		filenames.add(filename);
+		filename = this.saveIndividualSummaryToFile(iteration);
+		filenames.add(filename);
+
+		filename = this.saveCurrencySummaryToFile(iteration);
+		filenames.add(filename);
+
+		return filenames;
 	}
 
 	/**
@@ -572,7 +591,7 @@ public class AustralianEconomy implements Serializable {
 	}
 
 	/**
-	 * Save Individual to CSV.
+	 * Save Household to CSV.
 	 * 
 	 * @return the output filename
 	 */
@@ -593,6 +612,42 @@ public class AustralianEconomy implements Serializable {
 			for (int row = 0; row < this.households.length; row++) {
 				entries = (iteration + Properties.CSV_SEPARATOR
 						+ this.households[row].toCsvString(Properties.CSV_SEPARATOR, iteration))
+								.split(Properties.CSV_SEPARATOR);
+				csvWriter.writeNext(entries);
+			}
+			writer.close();
+		} catch (IOException e) {
+			// new FileWriter
+			e.printStackTrace();
+		} finally {
+			writer = null;
+		}
+		return filename;
+	}
+
+	/**
+	 * Save Household summary to CSV.
+	 * 
+	 * @return the output filename
+	 */
+	public String saveHouseholdSummaryToFile(int iteration) {
+		// get data
+		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
+				+ this.households[0].toCsvSummaryStringHeaders(Properties.CSV_SEPARATOR))
+						.split(Properties.CSV_SEPARATOR);
+
+		// save CSV file
+		DecimalFormat wholeNumber = new DecimalFormat("000");
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_SUMMARY_Household_"
+				+ wholeNumber.format(iteration) + ".csv";
+		Writer writer;
+		try {
+			writer = new FileWriter(filename);
+			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
+			csvWriter.writeNext(entries);
+			for (int row = 0; row < this.households.length; row++) {
+				entries = (iteration + Properties.CSV_SEPARATOR
+						+ this.households[row].toCsvSummaryString(Properties.CSV_SEPARATOR, iteration))
 								.split(Properties.CSV_SEPARATOR);
 				csvWriter.writeNext(entries);
 			}
@@ -642,6 +697,42 @@ public class AustralianEconomy implements Serializable {
 	}
 
 	/**
+	 * Save Individual summary to CSV.
+	 * 
+	 * @return the output filename
+	 */
+	public String saveIndividualSummaryToFile(int iteration) {
+		// get data
+		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
+				+ this.individuals[0].toCsvSummaryStringHeaders(Properties.CSV_SEPARATOR))
+						.split(Properties.CSV_SEPARATOR);
+
+		// save CSV file
+		DecimalFormat wholeNumber = new DecimalFormat("000");
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_SUMMARY_Individual_"
+				+ wholeNumber.format(iteration) + ".csv";
+		Writer writer;
+		try {
+			writer = new FileWriter(filename);
+			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
+			csvWriter.writeNext(entries);
+			for (int row = 0; row < this.individuals.length; row++) {
+				entries = (iteration + Properties.CSV_SEPARATOR
+						+ this.individuals[row].toCsvSummaryString(Properties.CSV_SEPARATOR, iteration))
+								.split(Properties.CSV_SEPARATOR);
+				csvWriter.writeNext(entries);
+			}
+			writer.close();
+		} catch (IOException e) {
+			// new FileWriter
+			e.printStackTrace();
+		} finally {
+			writer = null;
+		}
+		return filename;
+	}
+
+	/**
 	 * Save Business to CSV.
 	 * 
 	 * @return the output filename
@@ -663,6 +754,42 @@ public class AustralianEconomy implements Serializable {
 			for (int row = 0; row < this.businesses.length; row++) {
 				entries = (iteration + Properties.CSV_SEPARATOR
 						+ this.businesses[row].toCsvString(Properties.CSV_SEPARATOR, iteration))
+								.split(Properties.CSV_SEPARATOR);
+				csvWriter.writeNext(entries);
+			}
+			writer.close();
+		} catch (IOException e) {
+			// new FileWriter
+			e.printStackTrace();
+		} finally {
+			writer = null;
+		}
+		return filename;
+	}
+
+	/**
+	 * Save Business summary to CSV.
+	 * 
+	 * @return the output filename
+	 */
+	public String saveBusinessSummaryToFile(int iteration) {
+		// get data
+		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
+				+ this.businesses[0].toCsvSummaryStringHeaders(Properties.CSV_SEPARATOR))
+						.split(Properties.CSV_SEPARATOR);
+
+		// save CSV file
+		DecimalFormat wholeNumber = new DecimalFormat("000");
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_SUMMARY_Business_"
+				+ wholeNumber.format(iteration) + ".csv";
+		Writer writer;
+		try {
+			writer = new FileWriter(filename);
+			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
+			csvWriter.writeNext(entries);
+			for (int row = 0; row < this.businesses.length; row++) {
+				entries = (iteration + Properties.CSV_SEPARATOR
+						+ this.businesses[row].toCsvSummaryString(Properties.CSV_SEPARATOR, iteration))
 								.split(Properties.CSV_SEPARATOR);
 				csvWriter.writeNext(entries);
 			}
@@ -712,6 +839,41 @@ public class AustralianEconomy implements Serializable {
 	}
 
 	/**
+	 * Save AuthorisedDepositTakingInstitution to CSV.
+	 * 
+	 * @return the output filename
+	 */
+	public String saveAdiSummaryToFile(int iteration) {
+		// get data
+		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
+				+ this.adis[0].toCsvSummaryStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
+
+		// save CSV file
+		DecimalFormat wholeNumber = new DecimalFormat("000");
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_SUMMARY_ADI_"
+				+ wholeNumber.format(iteration) + ".csv";
+		Writer writer;
+		try {
+			writer = new FileWriter(filename);
+			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
+			csvWriter.writeNext(entries);
+			for (int row = 0; row < this.adis.length; row++) {
+				entries = (iteration + Properties.CSV_SEPARATOR
+						+ this.adis[row].toCsvSummaryString(Properties.CSV_SEPARATOR, iteration))
+								.split(Properties.CSV_SEPARATOR);
+				csvWriter.writeNext(entries);
+			}
+			writer.close();
+		} catch (IOException e) {
+			// new FileWriter
+			e.printStackTrace();
+		} finally {
+			writer = null;
+		}
+		return filename;
+	}
+
+	/**
 	 * Save ForeignCountry to CSV.
 	 * 
 	 * @return the output filename
@@ -733,6 +895,42 @@ public class AustralianEconomy implements Serializable {
 			for (int row = 0; row < this.countries.length; row++) {
 				entries = (iteration + Properties.CSV_SEPARATOR
 						+ this.countries[row].toCsvString(Properties.CSV_SEPARATOR, iteration))
+								.split(Properties.CSV_SEPARATOR);
+				csvWriter.writeNext(entries);
+			}
+			writer.close();
+		} catch (IOException e) {
+			// new FileWriter
+			e.printStackTrace();
+		} finally {
+			writer = null;
+		}
+		return filename;
+	}
+
+	/**
+	 * Save ForeignCountry summary to CSV.
+	 * 
+	 * @return the output filename
+	 */
+	public String saveForeignCountrySummaryToFile(int iteration) {
+		// get data
+		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
+				+ this.countries[0].toCsvSummaryStringHeaders(Properties.CSV_SEPARATOR))
+						.split(Properties.CSV_SEPARATOR);
+
+		// save CSV file
+		DecimalFormat wholeNumber = new DecimalFormat("000");
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_SUMMARY_ForeignCountry_"
+				+ wholeNumber.format(iteration) + ".csv";
+		Writer writer;
+		try {
+			writer = new FileWriter(filename);
+			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
+			csvWriter.writeNext(entries);
+			for (int row = 0; row < this.countries.length; row++) {
+				entries = (iteration + Properties.CSV_SEPARATOR
+						+ this.countries[row].toCsvSummaryString(Properties.CSV_SEPARATOR, iteration))
 								.split(Properties.CSV_SEPARATOR);
 				csvWriter.writeNext(entries);
 			}
@@ -778,6 +976,48 @@ public class AustralianEconomy implements Serializable {
 	}
 
 	/**
+	 * Save Currencies summary to CSV.
+	 * 
+	 * @return the output filename
+	 */
+	public String saveCurrencySummaryToFile(int iteration) {
+		// get data
+		Map<String, Currency> currenciesMap = this.currencies.getAllCurrencies();
+		
+		// save CSV file
+		boolean headerWritten = false;
+		DecimalFormat wholeNumber = new DecimalFormat("000");
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_SUMMARY_Currencies_"
+				+ wholeNumber.format(iteration) + ".csv";
+		Writer writer;
+		String[] entries = null;
+		try {
+			writer = new FileWriter(filename);
+			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
+			csvWriter.writeNext(entries); // writes column titles
+			for (String currencyCode : currenciesMap.keySet()) {
+				if(!headerWritten) {
+					entries = ("IterationNo" + Properties.CSV_SEPARATOR
+							+ currenciesMap.get(currencyCode).toCsvSummaryStringHeaders(Properties.CSV_SEPARATOR))
+									.split(Properties.CSV_SEPARATOR);
+					headerWritten = true;
+				}
+				entries = (iteration + Properties.CSV_SEPARATOR
+						+ currenciesMap.get(currencyCode).toCsvSummaryString(Properties.CSV_SEPARATOR, iteration))
+								.split(Properties.CSV_SEPARATOR);
+				csvWriter.writeNext(entries);
+			}
+			writer.close();
+		} catch (IOException e) {
+			// new FileWriter
+			e.printStackTrace();
+		} finally {
+			writer = null;
+		}
+		return filename;
+	}
+
+	/**
 	 * Save ReserveBankOfAustralia to CSV.
 	 * 
 	 * @return the output filename
@@ -810,6 +1050,38 @@ public class AustralianEconomy implements Serializable {
 	}
 
 	/**
+	 * Save ReserveBankOfAustralia to CSV.
+	 * 
+	 * @return the output filename
+	 */
+	public String saveRbaSummaryToFile(int iteration) {
+		// get data
+		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
+				+ this.rba.toCsvSummaryStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
+
+		// save CSV file
+		DecimalFormat wholeNumber = new DecimalFormat("000");
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_SUMMARY_RBA_"
+				+ wholeNumber.format(iteration) + ".csv";
+		Writer writer;
+		try {
+			writer = new FileWriter(filename);
+			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
+			csvWriter.writeNext(entries);
+			entries = (iteration + Properties.CSV_SEPARATOR
+					+ this.rba.toCsvSummaryString(Properties.CSV_SEPARATOR, iteration)).split(Properties.CSV_SEPARATOR);
+			csvWriter.writeNext(entries);
+			writer.close();
+		} catch (IOException e) {
+			// new FileWriter
+			e.printStackTrace();
+		} finally {
+			writer = null;
+		}
+		return filename;
+	}
+
+	/**
 	 * Save AustralianGovernment to CSV.
 	 * 
 	 * @return the output filename
@@ -830,6 +1102,39 @@ public class AustralianEconomy implements Serializable {
 			csvWriter.writeNext(entries);
 			entries = (iteration + Properties.CSV_SEPARATOR
 					+ this.government.toCsvString(Properties.CSV_SEPARATOR, iteration)).split(Properties.CSV_SEPARATOR);
+			csvWriter.writeNext(entries);
+			writer.close();
+		} catch (IOException e) {
+			// new FileWriter
+			e.printStackTrace();
+		} finally {
+			writer = null;
+		}
+		return filename;
+	}
+
+	/**
+	 * Save AustralianGovernment summary to CSV.
+	 * 
+	 * @return the output filename
+	 */
+	public String saveGovernmentSummaryToFile(int iteration) {
+		// get data
+		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
+				+ this.government.toCsvSummaryStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
+
+		// save CSV file
+		DecimalFormat wholeNumber = new DecimalFormat("000");
+		String filename = Properties.OUTPUT_DIRECTORY + Properties.timestamp + "_SUMMARY_Govt_"
+				+ wholeNumber.format(iteration) + ".csv";
+		Writer writer;
+		try {
+			writer = new FileWriter(filename);
+			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
+			csvWriter.writeNext(entries);
+			entries = (iteration + Properties.CSV_SEPARATOR
+					+ this.government.toCsvSummaryString(Properties.CSV_SEPARATOR, iteration))
+							.split(Properties.CSV_SEPARATOR);
 			csvWriter.writeNext(entries);
 			writer.close();
 		} catch (IOException e) {

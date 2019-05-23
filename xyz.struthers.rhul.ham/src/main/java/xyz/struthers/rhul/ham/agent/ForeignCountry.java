@@ -324,6 +324,26 @@ public final class ForeignCountry extends Agent {
 		return sb.toString();
 	}
 
+	/**
+	 * Gets the column summary headings, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the column headings
+	 */
+	public String toCsvSummaryStringHeaders(String separator) {
+		return this.toCsvStringHeaders(separator);
+	}
+
+	/**
+	 * Gets the summary data, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the data
+	 */
+	public String toCsvSummaryString(String separator, int iteration) {
+		return this.toCsvString(separator, iteration);
+	}
+
 	@Override
 	public int getPaymentClearingIndex() {
 		return this.paymentClearingIndex;

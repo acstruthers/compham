@@ -201,6 +201,34 @@ public final class AustralianGovernment extends Agent implements Employer {
 		return sb.toString();
 	}
 
+	/**
+	 * Gets the summary column headings, to write to CSV file.
+	 * <p>
+	 * The intention is for this data to form the basis of a statistical analysis
+	 * (for example, using R).
+	 * 
+	 * @param separator
+	 * @return a CSV list of the column headings
+	 */
+	public String toCsvSummaryStringHeaders(String separator) {
+		// AU Government is small enough I'll just save all the details
+		return this.toCsvStringHeaders(separator);
+	}
+
+	/**
+	 * Gets the summary data, to write to CSV file.
+	 * <p>
+	 * The intention is for this data to form the basis of a statistical analysis
+	 * (for example, using R).
+	 * 
+	 * @param separator
+	 * @return a CSV list of the data
+	 */
+	public String toCsvSummaryString(String separator, int iteration) {
+		// AU Government is small enough I'll just save all the details
+		return this.toCsvString(separator, iteration);
+	}
+
 	@Override
 	public ArrayList<Individual> getEmployees() {
 		return this.employees;
