@@ -41,6 +41,12 @@ public class ClearingPaymentOutputs implements Serializable {
 		// https://stackoverflow.com/questions/12067405/deserializing-an-arraylist-no-valid-constructor
 		// super();
 	}
+	
+	public void close() {
+		this.equityOfNode = null;
+		this.defaultOrderOfNode = null;
+		this.iteration = -999;
+	}
 
 	/**
 	 * @return the equityOfNode

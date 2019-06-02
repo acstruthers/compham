@@ -53,6 +53,7 @@ public class KryonetHelloServer {
 					System.out.println(response.getText());
 				} else if (object instanceof ClearingPaymentInputs) {
 					System.out.println("CPV inputs received at " + new Date(System.currentTimeMillis()) + ".");
+					@SuppressWarnings("unused")
 					ClearingPaymentInputs cpvInputs = (ClearingPaymentInputs) object;
 					System.out.println("CPV inputs unmarshalled at " + new Date(System.currentTimeMillis()) + ".");
 

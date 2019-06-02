@@ -25,6 +25,7 @@ public class Business extends Agent implements Employer {
 
 	private static final long serialVersionUID = 1L;
 	private static final float YEAR_MONTHS = 12;
+	private static final boolean USE_ACTUAL_WAGES = true;
 
 	/**
 	 * Identifies agents that were calibrated using the same industry / size / state
@@ -42,6 +43,7 @@ public class Business extends Agent implements Employer {
 
 	protected String state; // 2 or 3 chars
 	protected String lgaCode; // 5 chars
+	protected boolean isGccsa; // state & capital city needed for payroll tax calcs
 	protected char size; // S = small, M = medium, L = large
 
 	// exporter fields
@@ -248,7 +250,7 @@ public class Business extends Agent implements Employer {
 
 		DecimalFormat decimal = new DecimalFormat("###0.00");
 		DecimalFormat wholeNumber = new DecimalFormat("###0");
-		DecimalFormat percent = new DecimalFormat("###0.0000");
+		// DecimalFormat percent = new DecimalFormat("###0.0000");
 
 		sb.append(this.name + separator);
 		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
@@ -345,7 +347,7 @@ public class Business extends Agent implements Employer {
 
 		DecimalFormat decimal = new DecimalFormat("###0.00");
 		DecimalFormat wholeNumber = new DecimalFormat("###0");
-		DecimalFormat percent = new DecimalFormat("###0.0000");
+		// DecimalFormat percent = new DecimalFormat("###0.0000");
 
 		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
 		sb.append(wholeNumber.format(this.businessTypeId) + separator);
@@ -387,7 +389,18 @@ public class Business extends Agent implements Employer {
 		this.employees.add(employee);
 		this.employees.trimToSize();
 
-		// FIXME: re-calc wage exp, super exp, payroll tax (and total exp)
+		if (USE_ACTUAL_WAGES) {
+			// re-calc wage exp, super exp, payroll tax (and total exp)
+			float wages = 0f;
+			float superannuation = 0f;
+			for (Individual staff : this.employees) {
+				wages += staff.getPnlWagesSalaries();
+				superannuation += staff.getPnlWagesSalaries() * Properties.SUPERANNUATION_RATE;
+			}
+			this.wageExpenses = wages;
+			this.superannuationExpense = superannuation;
+			this.payrollTaxExpense = Tax.calculatePayrollTax(wages, this.state, this.isGccsa);
+		}
 	}
 
 	@Override
@@ -826,6 +839,20 @@ public class Business extends Agent implements Employer {
 	 */
 	public void setLgaCode(String lgaCode) {
 		this.lgaCode = lgaCode;
+	}
+
+	/**
+	 * @return the isGccsa
+	 */
+	public boolean isGccsa() {
+		return isGccsa;
+	}
+
+	/**
+	 * @param isGccsa the isGccsa to set
+	 */
+	public void setGccsa(boolean isGccsa) {
+		this.isGccsa = isGccsa;
 	}
 
 	/**

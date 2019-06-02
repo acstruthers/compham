@@ -136,7 +136,7 @@ public class KryonetClient {
 		// update economy here
 		// ideally loop through this logic a few times
 
-		// TODO process CPV outputs
+		// TO DO: process CPV outputs
 		// read agents back in from object file, then update financial statements
 		// economy = (AustralianEconomy) readObjectFromFile(FILEPATH_AGENTS_INIT);
 		// economy = readFstEconomyFromFile(FILEPATH_AGENTS_INIT_FST); // using FST
@@ -156,8 +156,8 @@ public class KryonetClient {
 
 		// save summary to file
 		int iteration = cpvOutputs.getIteration() + 1;
-		economy.saveSummaryToFile(iteration);
-		economy.saveDetailsToFile(iteration); // details after being updated with CPV output
+		economy.saveSummaryToFile(iteration, "Kryonet");
+		economy.saveDetailsToFile(iteration, "Kryonet"); // details after being updated with CPV output
 
 		ctx.close();
 	}

@@ -5,11 +5,7 @@ package xyz.struthers.rhul.ham.process;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import gnu.trove.list.array.TFloatArrayList;
-import gnu.trove.list.array.TIntArrayList;
 
 /**
  * Just a data structure so it's easy to return all three variables from a

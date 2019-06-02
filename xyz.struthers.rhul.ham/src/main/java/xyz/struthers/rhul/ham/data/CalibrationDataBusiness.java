@@ -65,7 +65,6 @@ public class CalibrationDataBusiness {
 	public static final String ATO_COMPANY_T4B = "ATO_CompanyTable4B";
 
 	// beans
-	private AreaMapping area;
 	private CalibrationData sharedData;
 
 	// shared data from beans
@@ -1714,14 +1713,6 @@ public class CalibrationDataBusiness {
 			this.loadData();
 		}
 		return atoCompanyTable4b;
-	}
-
-	/**
-	 * @param area the area to set
-	 */
-	@Autowired
-	public void setArea(AreaMapping area) {
-		this.area = area;
 	}
 
 	/**

@@ -59,6 +59,7 @@ public class GzipCpvHelloServer implements IHello, GzipCpvInterface {
 
 		// decompress CPV input
 		System.out.println(new Date(System.currentTimeMillis()) + ": " + cpvInputBytes.length + " bytes received.");
+		@SuppressWarnings("unused")
 		ClearingPaymentInputs cpvInputs = null;
 		ByteArrayInputStream bais = new ByteArrayInputStream(cpvInputBytes);
 		GZIPInputStream gzipIn;

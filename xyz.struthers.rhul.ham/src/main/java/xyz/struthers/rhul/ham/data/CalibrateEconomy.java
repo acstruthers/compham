@@ -372,13 +372,14 @@ public class CalibrateEconomy {
 	 * links the Employer to the Individual, then it's the responsibility of the
 	 * Payment Clearing Vector algorithm's driver to consolidate these at a
 	 * Household level.
+	 * 
+	 * MAYBE: refactor later to assign employees to employers who are based closer
+	 * to the employee's LGA.
 	 */
 	private void linkEmployees() {
 		if (!this.indicesAssigned) {
 			this.assignPaymentClearingIndices();
 		}
-
-		// FIXME think about how ADIs are linked to employees given ADIs have no LGA
 
 		// link to employees
 		// get total wages expense by industry division

@@ -74,7 +74,7 @@ public class Currency implements Serializable {
 
 		DecimalFormat decimal = new DecimalFormat("###0.0000000000");
 		DecimalFormat wholeNumber = new DecimalFormat("###0");
-		DecimalFormat percent = new DecimalFormat("###0.0000");
+		//DecimalFormat percent = new DecimalFormat("###0.0000");
 
 		sb.append(this.iso4217code + separator);
 		sb.append(this.name + separator);

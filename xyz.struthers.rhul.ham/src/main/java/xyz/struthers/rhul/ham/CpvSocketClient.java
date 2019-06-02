@@ -14,8 +14,6 @@ import java.util.Date;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import com.esotericsoftware.kryonet.Client;
-
 import xyz.struthers.io.Serialization;
 import xyz.struthers.io.Serialization.CompressionType;
 import xyz.struthers.rhul.ham.config.Properties;
@@ -32,6 +30,9 @@ import xyz.struthers.rhul.ham.process.ClearingPaymentOutputs;
  */
 public class CpvSocketClient {
 
+	// FIXME: update this for each scenario
+	public final static String SCENARIO_NAME = "Baseline"; 
+	
 	static Thread t;
 	// static Client client = null;
 	// static ClearingPaymentInputs cpvInputs = null;
@@ -169,6 +170,7 @@ public class CpvSocketClient {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+
 		DecimalFormat formatter = new DecimalFormat("#,##0.00");
 		long memoryBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 		float megabytesBefore = memoryBefore / 1024f / 1024f;
@@ -234,10 +236,10 @@ public class CpvSocketClient {
 
 		// save summary to file
 		int iteration = cpvOutputs.getIteration();
-		economy.saveSummaryToFile(iteration);
+		economy.saveSummaryToFile(iteration, SCENARIO_NAME);
 		// details after being updated with CPV output
 		// 6.32GB of CSV files (takes 4 minutes to write to disk)
-		// economy.saveDetailsToFile(iteration); 
+		// economy.saveDetailsToFile(iteration);
 
 		iteration++;
 

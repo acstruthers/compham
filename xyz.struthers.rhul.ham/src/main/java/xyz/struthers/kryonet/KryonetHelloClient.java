@@ -68,6 +68,7 @@ public class KryonetHelloClient {
 					return;
 				} else if (object instanceof KryonetHelloResponse) {
 					System.out.println("CPV outputs received at " + new Date(System.currentTimeMillis()) + ".");
+					@SuppressWarnings("unused")
 					ClearingPaymentOutputs cpvOutputs = (ClearingPaymentOutputs) object;
 					System.out.println("CPV outputs unmarshalled at " + new Date(System.currentTimeMillis()) + ".");
 

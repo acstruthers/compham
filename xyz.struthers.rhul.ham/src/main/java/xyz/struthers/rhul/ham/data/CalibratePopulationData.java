@@ -31,7 +31,6 @@ import xyz.struthers.lang.CollectionTools;
 public class CalibratePopulationData {
 
 	// beans
-	private CalibrationData data;
 	private AreaMapping mapping;
 
 	// field variables
@@ -107,14 +106,6 @@ public class CalibratePopulationData {
 	private void init() {
 		this.peopleByLga = null;
 		this.peopleByLgaPercent = null;
-	}
-
-	/**
-	 * @param data the data to set
-	 */
-	@Autowired
-	public void setData(CalibrationData data) {
-		this.data = data;
 	}
 
 	/**

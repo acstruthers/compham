@@ -6,17 +6,11 @@ package xyz.struthers.rhul.ham;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Date;
-import java.util.List;
 
-import xyz.struthers.io.Serialization;
 import xyz.struthers.rhul.ham.config.Properties;
-import xyz.struthers.rhul.ham.process.ClearingPaymentInputs;
-import xyz.struthers.rhul.ham.process.ClearingPaymentOutputs;
 
 /**
  * @author Adam Struthers
@@ -185,6 +179,7 @@ public class CpvSocketServer {
 		// new CpvSocketServer().run();
 
 		// server is listening on specified port
+		@SuppressWarnings("resource")
 		ServerSocket ss = new ServerSocket(Properties.CPV_SERVER_PORT);
 
 		// running infinite loop for getting client request

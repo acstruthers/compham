@@ -34,18 +34,18 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	protected String shortName;
 	protected String adiCategory;
 	protected char industryDivisionCode;
-	protected String state; // FIXME: implement state in ADIs
-	protected boolean isGccsa; // FIXME: implement capital city in ADIs
+	protected String state; // MAYBE: implement state in ADIs
+	protected boolean isGccsa; // MAYBE: implement capital city in ADIs
 
 	// agent relationships
 	protected int paymentClearingIndex;
 	protected ArrayList<Individual> employees; // calculate wages & super
 	protected ArrayList<Business> domesticSuppliers;
 	protected ArrayList<Float> domesticSupplierRatios;
-	protected ArrayList<Household> retailDepositors; // TODO: implement me
-	protected ArrayList<Business> commercialDepositors;// TODO: implement me
-	protected ArrayList<AuthorisedDepositTakingInstitution> adiInvestors;// TODO: implement me
-	protected ArrayList<Float> adiInvestorAmounts;// TODO: implement me
+	protected ArrayList<Household> retailDepositors;
+	protected ArrayList<Business> commercialDepositors;
+	protected ArrayList<AuthorisedDepositTakingInstitution> adiInvestors;
+	protected ArrayList<Float> adiInvestorAmounts;
 	protected AustralianGovernment govt;
 	protected ReserveBankOfAustralia rba;
 	protected int defaultIteration;

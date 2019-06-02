@@ -78,6 +78,7 @@ public class GzipCpvHelloClient {
 
 			System.out.println(new Date(System.currentTimeMillis()) + ": sending CPV inputs (" + cpvInputBytes.length
 					+ " bytes).");
+			@SuppressWarnings("unused")
 			ClearingPaymentOutputs cpvOutputs = null;
 			ByteArrayInputStream bais = new ByteArrayInputStream(cpvOutputBytes);
 			GZIPInputStream gzipIn;

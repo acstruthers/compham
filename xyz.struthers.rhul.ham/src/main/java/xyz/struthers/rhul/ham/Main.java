@@ -16,7 +16,6 @@ import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.zip.DeflaterInputStream;
 import java.util.zip.DeflaterOutputStream;
-import java.util.zip.InflaterInputStream;
 
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;
@@ -46,7 +45,7 @@ import xyz.struthers.rhul.ham.process.NodePayment;
 
 /**
  * @author acstr
- *
+ * @deprecated
  */
 public class Main {
 
@@ -145,7 +144,7 @@ public class Main {
 			System.out.println("################################################");
 			memoryBefore = memoryAfter;
 
-			// TODO process CPV outputs
+			// TO DO: process CPV outputs
 			// update financial statements
 			economy.updateOneMonth(cpvOutputs);
 
@@ -161,8 +160,8 @@ public class Main {
 
 			// details after being updated with CPV output
 			// save data to file for later analysis
-			economy.saveSummaryToFile(iteration);
-			economy.saveDetailsToFile(iteration);
+			economy.saveSummaryToFile(iteration, "Main_DEPRECATED");
+			economy.saveDetailsToFile(iteration, "Main_DEPRECATED");
 			iteration++;
 
 			ctx.close();

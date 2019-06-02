@@ -125,10 +125,9 @@ public class ClearingPaymentVector implements Serializable {
 		this.agentCount = 0;
 	}
 
-	
 	public ClearingPaymentOutputs calculate(List<List<Float>> liabilitiesAmounts,
 			List<List<Integer>> liabilitiesIndices, List<Float> operatingCashFlow, List<Float> liquidAssets) {
-		
+
 		List<TFloatArrayList> troveLiabilitiesAmounts = new ArrayList<TFloatArrayList>(liabilitiesAmounts.size());
 		for (int i = 0; i < liabilitiesAmounts.size(); i++) {
 			float[] liabAmtArray = new float[liabilitiesAmounts.get(i).size()];
@@ -138,7 +137,7 @@ public class ClearingPaymentVector implements Serializable {
 			}
 			troveLiabilitiesAmounts.add(TFloatArrayList.wrap(liabAmtArray));
 		}
-		
+
 		List<TIntArrayList> troveLiabilitiesIndices = new ArrayList<TIntArrayList>(liabilitiesIndices.size());
 		for (int i = 0; i < liabilitiesIndices.size(); i++) {
 			int[] liabIdxArray = new int[liabilitiesIndices.get(i).size()];
@@ -148,24 +147,25 @@ public class ClearingPaymentVector implements Serializable {
 			}
 			troveLiabilitiesIndices.add(TIntArrayList.wrap(liabIdxArray));
 		}
-		
+
 		float[] primitiveArray = new float[operatingCashFlow.size()];
 		int i = 0;
 		for (Float node : operatingCashFlow) {
 			primitiveArray[i++] = (node != null ? node : 0f);
 		}
 		TFloatArrayList troveOperatingCashFlow = TFloatArrayList.wrap(primitiveArray);
-		
+
 		float[] assetsArray = new float[liquidAssets.size()];
 		i = 0;
 		for (Float node : liquidAssets) {
 			assetsArray[i++] = (node != null ? node : 0f);
 		}
 		TFloatArrayList troveLiquidAssets = TFloatArrayList.wrap(assetsArray);
-		
-		return this.calculate(troveLiabilitiesAmounts, troveLiabilitiesIndices, troveOperatingCashFlow, troveLiquidAssets);
+
+		return this.calculate(troveLiabilitiesAmounts, troveLiabilitiesIndices, troveOperatingCashFlow,
+				troveLiquidAssets);
 	}
-	
+
 	/**
 	 * Calculates the payments that will clear the whole economy, noting in which
 	 * order nodes defaulted.
@@ -259,15 +259,13 @@ public class ClearingPaymentVector implements Serializable {
 			System.out.println(new Date(System.currentTimeMillis()) + ": CPV calculating payments");
 			this.calculatePayments();
 
-			// TODO: save output to file for analysis
+			// MAYBE: save output to file for analysis
 
 			/**
 			 * I only really care about total cash in & out of each node ... maybe even only
 			 * the net amount. Can probably exclude the indices and matrix from the return
 			 * value. Reducing the amount of data returned will help both memory footprint
 			 * and speed.
-			 * 
-			 * FIXME: simplify CPV outputs
 			 */
 
 			// return output to caller
@@ -284,7 +282,7 @@ public class ClearingPaymentVector implements Serializable {
 	}
 
 	public String saveCpvOutoutsToFile(int iteration) {
-		// FIXME: implement saveCpvOutoutsToFile(int)
+		// MAYBE: implement saveCpvOutoutsToFile(int)
 		String filename = "CPV_output" + iteration + ".csv";
 
 		return filename;

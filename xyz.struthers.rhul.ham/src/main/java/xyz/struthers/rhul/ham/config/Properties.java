@@ -90,7 +90,7 @@ public class Properties implements Serializable {
 	public static final float FCS_LIMIT_PER_ADI = 15000000000f; // AUD 15Bn limit per ADI
 	public static final float FCS_LIMIT_PER_DEPOSITOR = 250000f; // AUD 250k limit per depositor
 	public static final float SUPERANNUATION_RATE = 0.095f; // 9.5%
-	public static final long RANDOM_SEED = 20190315L;
+	public static final long RANDOM_SEED = 20180630L;
 	public static int peoplePerAgent = 1; // change to 1000 if 1 is too slow.
 	public static int totalPopulationAU = 25000000;
 	public static String timestamp;

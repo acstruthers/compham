@@ -65,8 +65,6 @@ public class CalibrationDataIndividual {
 
 	// data
 	private boolean dataLoaded;
-	private Map<Date, Integer> totalPopulation;
-	private Map<String, Integer> adjustedPeopleByLga;
 	private Map<String, List<String>> title;
 	private Map<String, List<String>> unitType;
 	private Map<String, Map<String, String>> abs1292_0_55_002ANZSIC; // ANZSIC industry code mapping
@@ -128,8 +126,6 @@ public class CalibrationDataIndividual {
 	public void close() {
 		this.area = null;
 		this.sharedData = null;
-		this.totalPopulation = null;
-		this.adjustedPeopleByLga = null;
 		this.abs1292_0_55_002ANZSIC = null;
 
 		if (this.title != null) {
@@ -1177,8 +1173,6 @@ public class CalibrationDataIndividual {
 	@PostConstruct
 	private void init() {
 		this.dataLoaded = false;
-		this.totalPopulation = null;
-		this.adjustedPeopleByLga = null;
 
 		this.title = null;
 		this.unitType = null;

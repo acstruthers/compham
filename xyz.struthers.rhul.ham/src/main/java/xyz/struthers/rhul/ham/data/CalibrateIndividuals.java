@@ -26,7 +26,6 @@ import org.springframework.stereotype.Component;
 import xyz.struthers.lang.CustomMath;
 import xyz.struthers.rhul.ham.agent.Individual;
 import xyz.struthers.rhul.ham.config.Properties;
-import xyz.struthers.rhul.ham.process.AustralianEconomy;
 
 /**
  * Calibrates the P&L and Bal Shts of individuals. These are later grouped
@@ -43,13 +42,13 @@ public class CalibrateIndividuals {
 
 	private static final boolean DEBUG = true;
 	private static final boolean DEBUG_DETAIL = false;
-	private static final boolean DEBUG_ZEROS = false;
+	// private static final boolean DEBUG_ZEROS = false;
 	private static final boolean DEBUG_ZEROS2 = false;
 	private static final boolean DEBUG_ZEROS1129 = false;
 	private static final boolean DEBUG_ZEROS1241 = false;
-	private static final boolean DEBUG_ZEROS1328 = false;
-	private static final boolean DEBUG_BIG_NUM = false;
-	private static final boolean DEBUG_BIG_NUM2 = false;
+	// private static final boolean DEBUG_ZEROS1328 = false;
+	// private static final boolean DEBUG_BIG_NUM = false;
+	// private static final boolean DEBUG_BIG_NUM2 = false;
 
 	// CONSTANTS
 	private static final float EPSILON = 0.1f; // to round business counts so the integer sums match
@@ -105,8 +104,10 @@ public class CalibrateIndividuals {
 	private static final String ATO_2A_TITLE_TAXABLE_COUNT = "Taxable income or loss3 no.";
 	private static final String ATO_2A_TITLE_TAXABLE_AMOUNT = "Taxable income or loss3 $";
 
-	private static final String ATO_3A_TITLE_TAXABLE_COUNT = "Taxable income or loss2 no.";
-	private static final String ATO_3A_TITLE_TAXABLE_AMOUNT = "Taxable income or loss2 $";
+	// private static final String ATO_3A_TITLE_TAXABLE_COUNT = "Taxable income or
+	// loss2 no.";
+	// private static final String ATO_3A_TITLE_TAXABLE_AMOUNT = "Taxable income or
+	// loss2 $";
 	private static final String ATO_3A_TITLE_TOTAL_INCOME_COUNT = "Total Income or Loss2 no.";
 	private static final String ATO_3A_TITLE_TOTAL_INCOME_AMOUNT = "Total Income or Loss2 $";
 	private static final String ATO_3A_TITLE_SALARY_COUNT = "Salary or wages no.";
@@ -131,8 +132,10 @@ public class CalibrateIndividuals {
 	private static final String ATO_3A_TITLE_DIVIDENDS_FRANKED_AMOUNT = "Dividends franked $";
 	private static final String ATO_3A_TITLE_WORK_RELATED_EXP_COUNT = "Total work related expenses no.";
 	private static final String ATO_3A_TITLE_WORK_RELATED_EXP_AMOUNT = "Total work related expenses $";
-	private static final String ATO_3A_TITLE_INTEREST_DEDUCTIONS_COUNT = "Interest deductions no.";
-	private static final String ATO_3A_TITLE_INTEREST_DEDUCTIONS_AMOUNT = "Interest deductions $";
+	// private static final String ATO_3A_TITLE_INTEREST_DEDUCTIONS_COUNT =
+	// "Interest deductions no.";
+	// private static final String ATO_3A_TITLE_INTEREST_DEDUCTIONS_AMOUNT =
+	// "Interest deductions $";
 	private static final String ATO_3A_TITLE_DONATIONS_COUNT = "Gifts or donations no.";
 	private static final String ATO_3A_TITLE_DONATIONS_AMOUNT = "Gifts or donations $";
 	private static final String ATO_3A_TITLE_FOREIGN_INCOME_COUNT = "Foreign source income assessable foreign source income no.";
@@ -159,9 +162,7 @@ public class CalibrateIndividuals {
 
 	// beans
 	private AreaMapping area;
-	private CalibrationData commonData;
 	private CalibrationDataIndividual individualData;
-	private AustralianEconomy economy;
 	private Properties properties;
 
 	// field variables
@@ -179,11 +180,9 @@ public class CalibrateIndividuals {
 	private Map<String, Map<String, Map<String, ArrayList<Individual>>>> individualMap;
 	// private ArrayList<Individual> individualAgents;
 	private Date calibrationDateAto;
-	private Date calibrationDateRba;
 	private int totalPopulationAU;
 	private float populationMultiplier;
-	private Map<String, Integer> lgaPeopleCount; // adjusted to 2018
-	private Map<String, Integer> lgaDwellingsCount; // adjusted to 2018
+	// private Map<String, Integer> lgaPeopleCount; // adjusted to 2018
 	private Map<String, Integer> poaIndexMap;
 
 	private static int agentId = 0;
@@ -219,7 +218,7 @@ public class CalibrateIndividuals {
 	 * "Group Code to Division Code"<br>
 	 * "Subdivision Code to Division Code"<br>
 	 */
-	private Map<String, Map<String, String>> abs1292_0_55_002ANZSIC;
+	// private Map<String, Map<String, String>> abs1292_0_55_002ANZSIC;
 	/**
 	 * ATO Individuals Table 2A<br>
 	 * Contains P&L and people count by sex and 5-year age range.<br>
@@ -265,13 +264,10 @@ public class CalibrateIndividuals {
 	private void init() {
 		this.individualMatrix = null;
 		this.individualMap = null;
-		// this.individualAgents = null;
 		this.calibrationDateAto = null;
-		this.calibrationDateRba = null;
 		this.totalPopulationAU = 0;
 		this.populationMultiplier = 0f;
-		this.lgaPeopleCount = null;
-		this.lgaDwellingsCount = null;
+		// this.lgaPeopleCount = null;
 		this.poaIndexMap = null;
 
 		// data sources
@@ -297,10 +293,9 @@ public class CalibrateIndividuals {
 		// just make these null because the classes they came from will do a deep delete
 		// at an appropriate time
 		this.area = null;
-		this.commonData = null;
 		this.properties = null;
 		this.random = null;
-		this.abs1292_0_55_002ANZSIC = null;
+		// this.abs1292_0_55_002ANZSIC = null;
 		this.atoIndividualTable2a = null;
 		this.atoIndividualTable3a = null;
 		this.atoIndividualTable6b = null;
@@ -464,13 +459,13 @@ public class CalibrateIndividuals {
 		DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
 		try {
 			this.calibrationDateAto = sdf.parse(CALIBRATION_DATE_ATO);
-			this.calibrationDateRba = sdf.parse(CALIBRATION_DATE_RBA);
+			// this.calibrationDateRba = sdf.parse(CALIBRATION_DATE_RBA);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
 
 		// get raw calibration data
-		this.abs1292_0_55_002ANZSIC = this.commonData.getAbs1292_0_55_002ANZSIC();
+		// this.abs1292_0_55_002ANZSIC = this.commonData.getAbs1292_0_55_002ANZSIC();
 		this.atoIndividualTable2a = this.individualData.getAtoIndividualTable2a();
 		this.atoIndividualTable3a = this.individualData.getAtoIndividualTable3a();
 		this.atoIndividualTable6b = this.individualData.getAtoIndividualTable6b();
@@ -478,11 +473,13 @@ public class CalibrateIndividuals {
 		this.censusSEXP_POA_AGE5P_INDP_INCP = this.individualData.getCensusSEXP_POA_AGE5P_INDP_INCP();
 
 		// get key metrics that will be used across all the data
-		this.lgaPeopleCount = this.area.getAdjustedPeopleByLga(this.calibrationDateAto);
-		this.lgaDwellingsCount = this.area.getAdjustedDwellingsByLga(this.calibrationDateAto);
+		// this.lgaPeopleCount =
+		// this.area.getAdjustedPeopleByLga(this.calibrationDateAto);
+		// this.lgaDwellingsCount =
+		// this.area.getAdjustedDwellingsByLga(this.calibrationDateAto);
 		this.totalPopulationAU = this.area.getTotalPopulation(this.calibrationDateAto);
 		this.populationMultiplier = this.area.getPopulationMultiplier(this.calibrationDateAto);
-		Set<String> lgaCodes = this.lgaPeopleCount.keySet();
+		// Set<String> lgaCodes = this.lgaPeopleCount.keySet();
 
 		/*
 		 * ------------------------------------------------------------------------<br>
@@ -1985,14 +1982,6 @@ public class CalibrateIndividuals {
 	}
 
 	/**
-	 * @param data the data to set
-	 */
-	@Autowired
-	public void setCommonData(CalibrationData commonData) {
-		this.commonData = commonData;
-	}
-
-	/**
 	 * @param individualData the individualData to set
 	 */
 	@Autowired
@@ -2006,14 +1995,6 @@ public class CalibrateIndividuals {
 	@Autowired
 	public void setArea(AreaMapping area) {
 		this.area = area;
-	}
-
-	/**
-	 * @param economy the economy to set
-	 */
-	@Autowired
-	public void setEconomy(AustralianEconomy economy) {
-		this.economy = economy;
 	}
 
 	/**

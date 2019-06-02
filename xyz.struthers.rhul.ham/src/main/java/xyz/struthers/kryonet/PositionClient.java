@@ -83,6 +83,7 @@ public class PositionClient {
 		client.sendTCP(login);*/
 
 		while (true) {
+			@SuppressWarnings("unused")
 			int ch;
 			try {
 				ch = System.in.read();
@@ -113,6 +114,7 @@ public class PositionClient {
 	}
 
 	static class UI {
+		@SuppressWarnings({ "rawtypes", "unchecked" })
 		HashMap<Integer, Character> characters = new HashMap();
 
 		public String inputHost () {

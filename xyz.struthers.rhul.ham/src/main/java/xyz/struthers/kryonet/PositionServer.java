@@ -22,6 +22,7 @@ import com.esotericsoftware.minlog.Log;
 
 public class PositionServer {
 	Server server;
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	HashSet<Character> loggedIn = new HashSet();
 
 	public PositionServer() throws IOException {
@@ -41,6 +42,7 @@ public class PositionServer {
 			public void received(Connection c, Object object) {
 				// We know all connections for this server are actually CharacterConnections.
 				CharacterConnection connection = (CharacterConnection) c;
+				@SuppressWarnings("unused")
 				Character character = connection.character;
 
 				/*if (object instanceof Login) {
@@ -139,6 +141,7 @@ public class PositionServer {
 				}*/
 			}
 
+			@SuppressWarnings("unused")
 			private boolean isValid(String value) {
 				if (value == null)
 					return false;
@@ -167,7 +170,7 @@ public class PositionServer {
 		c.character = character;
 
 		// Add existing characters to new logged in connection.
-		for (Character other : loggedIn) {
+		for (@SuppressWarnings("unused") Character other : loggedIn) {
 			/*AddCharacter addCharacter = new AddCharacter();
 			addCharacter.character = other;
 			c.sendTCP(addCharacter);*/

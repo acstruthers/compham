@@ -72,8 +72,9 @@ public class App {
 			memoryBefore = memoryAfter;
 
 			System.out.println("Started MeshblockMapping: " + new Date(System.currentTimeMillis()));
-			AreaMapping mb = ctx.getBean(AreaMapping.class);
+			
 			/*
+			 * AreaMapping mb = ctx.getBean(AreaMapping.class);
 			 * String gccsa = mb.getGccsaCodeFromLga("10050");
 			 * System.out.println("GCCSA is: " + gccsa + " (should be 1RNSW)"); gccsa =
 			 * mb.getGccsaCodeFromLga("16350"); System.out.println("GCCSA is: " + gccsa +
@@ -169,7 +170,7 @@ public class App {
 			System.out.println(new Date(System.currentTimeMillis()) + ": Starting export of agents to CSV");
 			AustralianEconomy auEconomy = ctx.getBean(AustralianEconomy.class);
 			int iteration = 0;
-			Set<String> filenames = auEconomy.saveDetailsToFile(iteration);
+			Set<String> filenames = auEconomy.saveDetailsToFile(iteration, "App DEPRECATED");
 			System.out.println(filenames.size() + " DETAILED FILES SAVED TO:");
 			for (String file : filenames) {
 				System.out.println(file);
@@ -213,7 +214,7 @@ public class App {
 
 			// removing pointers so garbage collector should work within the simulation to
 			// drop the agents
-			mb = null;
+			//mb = null;
 			calGov = null;
 			calRba = null;
 			calAdi = null;

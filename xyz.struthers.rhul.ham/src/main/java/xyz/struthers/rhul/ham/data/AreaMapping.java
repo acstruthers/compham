@@ -52,7 +52,7 @@ public class AreaMapping {
 	// column headings in CSV files
 	private static final String ABS_GCCSA_CODE = "GCCSA_CODE_2016";
 	private static final String LGA_LGA_CODE = "LGA_CODE_2018";
-	private static final String LGA_STATE_NAME = "STATE_NAME_2016";
+	//private static final String LGA_STATE_NAME = "STATE_NAME_2016";
 	private static final String POA_POA_CODE = "POA_CODE_2016";
 	private static final int INDEX_COUNT_PERSON = 0;
 	private static final int INDEX_COUNT_DWELLING = 1;
@@ -419,8 +419,6 @@ public class AreaMapping {
 		return this.mapLgaCodeToState.get(lgaCode);
 	}
 
-	// TODO: boolean isInGccsa(String lgaCode)
-
 	/**
 	 * Generates meshblock mapping between LGA, POA and GCCSA.
 	 * 
@@ -435,7 +433,7 @@ public class AreaMapping {
 				this.mapLgaToGccsa);
 
 		// map POA to LGA
-		// TODO: extend this to map LGA to POA too (any POA code within the LGA is fine)
+		// MAYBE: extend this to map LGA to POA too (any POA code within the LGA is fine)
 		Set<String> poaSet = new HashSet<String>(this.poaData.get(AreaMapping.POA_POA_CODE).values());
 		this.mapPoaToLga = new HashMap<String, String>(poaSet.size());
 		this.mapSmallToBigArea(this.poaData, AreaMapping.POA_POA_CODE, this.lgaData, AreaMapping.LGA_LGA_CODE,

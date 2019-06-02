@@ -71,6 +71,7 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 
 	private float bsCapital;
 	private float bsReserves;
+	private float bsCurrentYearEarnings;
 
 	/**
 	 * 
@@ -287,9 +288,11 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 			liabilities.add(new NodePayment(index, balance * rate / NUMBER_MONTHS));
 		}
 
-		// TODO: RBA pays its net profit to govt annually
+		// RBA pays its net profit to govt annually
 		if (iteration % 12 == 0) {
-			// TODO: we need a current year earnings variable, which is added to monthly
+			// current year earnings is added to monthly, and paid to the govt annually
+			liabilities.add(new NodePayment(this.govt.getPaymentClearingIndex(), this.bsCurrentYearEarnings));
+			this.bsCurrentYearEarnings = 0f;
 		}
 
 		liabilities.trimToSize();
@@ -334,6 +337,7 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 		} else {
 			this.bsCash += nodeEquity;
 		}
+		this.bsCurrentYearEarnings += nodeEquity;
 	}
 
 	/**
@@ -513,6 +517,7 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 
 		this.bsCapital = 0f;
 		this.bsReserves = 0f;
+		this.bsCurrentYearEarnings = 0f;
 	}
 
 	/**
@@ -813,6 +818,20 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 	 */
 	public void setBsReserves(float bsReserves) {
 		this.bsReserves = bsReserves;
+	}
+
+	/**
+	 * @return the bsCurrentYearEarnings
+	 */
+	public float getBsCurrentYearEarnings() {
+		return bsCurrentYearEarnings;
+	}
+
+	/**
+	 * @param bsCurrentYearEarnings the bsCurrentYearEarnings to set
+	 */
+	public void setBsCurrentYearEarnings(float bsCurrentYearEarnings) {
+		this.bsCurrentYearEarnings = bsCurrentYearEarnings;
 	}
 
 }

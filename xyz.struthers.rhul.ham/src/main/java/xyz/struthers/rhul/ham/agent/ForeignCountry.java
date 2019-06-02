@@ -232,7 +232,7 @@ public final class ForeignCountry extends Agent {
 		DecimalFormat decimal = new DecimalFormat("###0.00");
 		DecimalFormat rate = new DecimalFormat("###0.000000");
 		DecimalFormat wholeNumber = new DecimalFormat("###0");
-		DecimalFormat percent = new DecimalFormat("###0.0000");
+		//DecimalFormat percent = new DecimalFormat("###0.0000");
 
 		sb.append(this.name.replace(",", " ") + separator);
 		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);

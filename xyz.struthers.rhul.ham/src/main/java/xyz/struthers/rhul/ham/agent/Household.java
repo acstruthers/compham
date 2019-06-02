@@ -56,6 +56,8 @@ public class Household extends Agent {
 	private float pnlIncomeTaxExpense;
 
 	private float pnlLivingExpenses; // Henderson poverty line (excl. housing costs)
+	// set at CalibrateHouseholds line 809
+	
 	private float pnlRentExpense;
 	private float pnlMortgageRepayments;
 	private float pnlWorkRelatedExpenses;
@@ -164,7 +166,7 @@ public class Household extends Agent {
 
 		DecimalFormat decimal = new DecimalFormat("###0.00");
 		DecimalFormat wholeNumber = new DecimalFormat("###0");
-		DecimalFormat percent = new DecimalFormat("###0.0000");
+		// DecimalFormat percent = new DecimalFormat("###0.0000");
 
 		sb.append(this.name + separator);
 		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
@@ -204,6 +206,233 @@ public class Household extends Agent {
 		sb.append(decimal.format(this.bsNetWorth));
 
 		return sb.toString();
+	}
+
+	/**
+	 * Gets the column headings, to write to summary CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the column headings
+	 */
+	public String toCsvSummaryStringHeaders(String separator) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("PaymentClearingIndex" + separator);
+		sb.append("LgaCode" + separator);
+		sb.append("ChildCount" + separator);
+		sb.append("AdultCount" + separator);
+		sb.append("AdultMeanAge" + separator);
+
+		sb.append("GrossIncome" + separator);
+		sb.append("ForeignIncome" + separator);
+		sb.append("IncomeTaxExpense" + separator);
+
+		sb.append("LivingExpenses" + separator);
+		sb.append("RentExpense" + separator);
+		sb.append("MortgageRepayments" + separator);
+		sb.append("Donations" + separator);
+
+		sb.append("TotalAssets" + separator);
+		sb.append("Loans" + separator);
+		sb.append("StudentLoans" + separator);
+		sb.append("TotalLiabilities");
+
+		return sb.toString();
+	}
+
+	/**
+	 * Gets the data, to write to summary CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the data
+	 */
+	public String toCsvSummaryString(String separator, int iteration) {
+		StringBuilder sb = new StringBuilder();
+
+		DecimalFormat decimal = new DecimalFormat("###0.00");
+		DecimalFormat wholeNumber = new DecimalFormat("###0");
+		// DecimalFormat percent = new DecimalFormat("###0.0000");
+
+		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
+		sb.append(this.lgaCode + separator);
+		sb.append(wholeNumber.format(this.numChildren) + separator);
+		sb.append(wholeNumber.format(this.numAdults) + separator);
+		float adultMeanAge = 0f;
+		int adultCount = 0;
+		for (Individual person : this.individuals) {
+			if (person.getAge() > 18) {
+				adultMeanAge += person.getAge();
+				adultCount++;
+			}
+		}
+		adultMeanAge = adultMeanAge / (adultCount > 0 ? adultCount : 1);
+		sb.append(decimal.format(adultMeanAge) + separator);
+
+		// GrossIncome
+		sb.append(decimal.format(this.pnlWagesSalaries + this.pnlUnemploymentBenefits
+				+ this.pnlOtherSocialSecurityIncome + this.pnlInvestmentIncome + this.pnlInterestIncome
+				+ this.pnlRentIncome + this.pnlForeignIncome + this.pnlOtherIncome) + separator);
+		sb.append(decimal.format(this.pnlForeignIncome) + separator);
+		sb.append(decimal.format(this.pnlIncomeTaxExpense) + separator);
+
+		sb.append(decimal.format(this.pnlLivingExpenses) + separator);
+		sb.append(decimal.format(this.pnlRentExpense) + separator);
+		sb.append(decimal.format(this.pnlMortgageRepayments) + separator);
+		sb.append(decimal.format(this.pnlDonations) + separator);
+
+		sb.append(decimal.format(this.bsTotalAssets) + separator);
+		sb.append(decimal.format(this.bsLoans) + separator);
+		sb.append(decimal.format(this.bsStudentLoans) + separator);
+		sb.append(decimal.format(this.bsTotalLiabilities));
+
+		return sb.toString();
+	}
+
+	/**
+	 * Gets the column headings, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the column headings
+	 */
+	public String toCsvIncomeBySourceStringHeaders(String separator) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("PaymentClearingIndex" + separator);
+		sb.append("LgaCode" + separator);
+
+		sb.append("Income" + separator);
+		sb.append("Source" + separator);
+
+		return sb.toString();
+	}
+
+	/**
+	 * Gets the data, to write to summary CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the data
+	 */
+	public List<String> toCsvIncomeBySourceString(String separator, int iteration) {
+		DecimalFormat decimal = new DecimalFormat("###0.00");
+		DecimalFormat wholeNumber = new DecimalFormat("###0");
+		// DecimalFormat percent = new DecimalFormat("###0.0000");
+
+		StringBuilder sb = new StringBuilder();
+		List<String> strings = new ArrayList<String>(5);
+
+		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
+		sb.append(this.lgaCode + separator);
+		String identifier = sb.toString();
+
+		if (this.pnlWagesSalaries > 0f) {
+			sb = new StringBuilder(identifier);
+			sb.append(decimal.format(this.pnlWagesSalaries) + separator);
+			sb.append("Wages");
+			strings.add(sb.toString());
+		}
+
+		if (this.pnlUnemploymentBenefits > 0f) {
+			sb = new StringBuilder(identifier);
+			sb.append(decimal.format(this.pnlUnemploymentBenefits) + separator);
+			sb.append("Unemployment");
+			strings.add(sb.toString());
+		}
+
+		if (this.pnlOtherSocialSecurityIncome > 0f) {
+			sb = new StringBuilder(identifier);
+			sb.append(decimal.format(this.pnlOtherSocialSecurityIncome) + separator);
+			sb.append("OtherSocialSecurity");
+			strings.add(sb.toString());
+		}
+
+		if (this.pnlInvestmentIncome > 0f) {
+			sb = new StringBuilder(identifier);
+			sb.append(decimal.format(this.pnlInvestmentIncome) + separator);
+			sb.append("Investment");
+			strings.add(sb.toString());
+		}
+
+		if (this.pnlInterestIncome > 0f) {
+			sb = new StringBuilder(identifier);
+			sb.append(decimal.format(this.pnlInterestIncome) + separator);
+			sb.append("Interest");
+			strings.add(sb.toString());
+		}
+
+		if (this.pnlRentIncome > 0f) {
+			sb = new StringBuilder(identifier);
+			sb.append(decimal.format(this.pnlRentIncome) + separator);
+			sb.append("Rent");
+			strings.add(sb.toString());
+		}
+
+		if (this.pnlForeignIncome > 0f) {
+			sb = new StringBuilder(identifier);
+			sb.append(decimal.format(this.pnlForeignIncome) + separator);
+			sb.append("Foreign");
+			strings.add(sb.toString());
+		}
+
+		if (this.pnlOtherIncome > 0f) {
+			sb = new StringBuilder(identifier);
+			sb.append(decimal.format(this.pnlOtherIncome) + separator);
+			sb.append("Other");
+			strings.add(sb.toString());
+		}
+
+		return strings;
+	}
+
+	/**
+	 * Gets the column headings, to write to CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the column headings
+	 */
+	public String toCsvSalaryByIndustryStringHeaders(String separator) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("PaymentClearingIndex" + separator);
+		sb.append("LgaCode" + separator);
+
+		sb.append("Salary" + separator);
+		sb.append("IndustryDivisionCode" + separator);
+		sb.append("EmployeeAge" + separator);
+
+		return sb.toString();
+	}
+
+	/**
+	 * Gets the data, to write to summary CSV file.
+	 * 
+	 * @param separator
+	 * @return a CSV list of the data
+	 */
+	public List<String> toCsvSalaryByIndustryString(String separator, int iteration) {
+		DecimalFormat decimal = new DecimalFormat("###0.00");
+		DecimalFormat wholeNumber = new DecimalFormat("###0");
+		// DecimalFormat percent = new DecimalFormat("###0.0000");
+
+		StringBuilder sb = new StringBuilder();
+		List<String> strings = new ArrayList<String>(5);
+
+		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
+		sb.append(this.lgaCode + separator);
+		String identifier = sb.toString();
+
+		// add salary by industry for each person in household
+		for (Individual person : this.individuals) {
+			if (person.getPnlWagesSalaries() > 0f) {
+				// person is employee
+				sb = new StringBuilder(identifier);
+				sb.append(decimal.format(this.pnlWagesSalaries) + separator);
+				sb.append(person.getEmploymentIndustry() + separator);
+				sb.append(person.getAge());
+				strings.add(sb.toString());
+			}
+		}
+
+		return strings;
 	}
 
 	@Override
@@ -370,6 +599,9 @@ public class Household extends Agent {
 	 * 
 	 * Does not set living expenses because the Henderson Poverty Line has already
 	 * been calculated and set when the Household was instantiated.
+	 * 
+	 * The caller sets balance sheet amounts based on ratios after this method has
+	 * finished adding the P&L data which it needs.
 	 */
 	public void initialiseFinancialsFromIndividuals() {
 		for (Individual i : this.individuals) {
@@ -392,8 +624,6 @@ public class Household extends Agent {
 			this.bsBankDeposits += i.getBsBankDeposits();
 			this.bsStudentLoans += i.getBsStudentLoans();
 		}
-
-		// TODO calculate Henderson, Bal Sht ratios, etc.
 	}
 
 	public float getGrossIncome() {

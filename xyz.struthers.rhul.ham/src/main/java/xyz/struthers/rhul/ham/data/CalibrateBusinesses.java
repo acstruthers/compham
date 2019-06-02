@@ -65,7 +65,6 @@ public class CalibrateBusinesses {
 	private static final float EPSILON = 0.1f; // to round business counts so the integer sums match
 
 	// beans
-	private Properties properties;
 	private CalibrationData data;
 	private CalibrationDataBusiness businessData;
 	private AreaMapping area;
@@ -555,7 +554,7 @@ public class CalibrateBusinesses {
 		for (int i = 0; i < numIndustryCodeKeys; i++) {
 			int count = 0;
 			float amount = 0f;
-			float amountPerCompany = 0f;
+			//float amountPerCompany = 0f;
 			String key = industryCodes[i];
 			int fineIndustryIndex = fineIndustryKeyIndex.get(key.substring(0, 3));
 
@@ -998,7 +997,7 @@ public class CalibrateBusinesses {
 				int divisionCodeIndex8155 = divisionCodeKeyIndex.get(divisionCode);
 				for (int idxState = 0; idxState < states.length; idxState++) {
 					for (int idxSize = 0; idxSize < sizes.length; idxSize++) {
-						float empMult = employmentCountMultiplier[idxState][divisionCodeIndex8155][idxSize];
+						//float empMult = employmentCountMultiplier[idxState][divisionCodeIndex8155][idxSize];
 						float wageMult = wagesMultiplier[idxState][divisionCodeIndex8155][idxSize];
 						float saleMult = salesMultiplier[idxState][divisionCodeIndex8155][idxSize];
 						float incMult = totalIncomeMultiplier[idxState][divisionCodeIndex8155][idxSize];
@@ -1013,7 +1012,7 @@ public class CalibrateBusinesses {
 						float agentForeignIncome = foreignIncome[idxIndustryCode] * incMult;
 
 						float agentTotalExpense = totalExpense[idxIndustryCode] * expMult;
-						float agentCostOfSales = costOfSales[idxIndustryCode] * expMult;
+						//float agentCostOfSales = costOfSales[idxIndustryCode] * expMult;
 						float agentRentLeaseExpense = rentLeaseExpense[idxIndustryCode] * expMult;
 						float agentInterestExpense = interestExpense[idxIndustryCode] * expMult;
 						float agentForeignInterestExpense = foreignInterestExpense[idxIndustryCode] * expMult;
@@ -1358,7 +1357,12 @@ public class CalibrateBusinesses {
 							if (agentMatrix[idxState][idxIndustryCode][2] != null) {
 								Business businessAgent = new Business(agentMatrix[idxState][idxIndustryCode][2]);
 								businessAgent.setLgaCode(lgaCode);
-
+								String gccsaCode = this.area.getGccsaCodeFromLga(lgaCode);
+								boolean isGccsa = false;
+								if (gccsaCode.equals("8ACTE") || gccsaCode.substring(1, 2).equals("G")) {
+									isGccsa = true;
+								}
+								businessAgent.setGccsa(isGccsa);
 								// if a Business has no Other Expenses, assign 5% of Total Expenses
 								if (businessAgent.getOtherExpenses() <= 0f) {
 									float totalExp = businessAgent.getTotalExpenses();
@@ -1453,14 +1457,6 @@ public class CalibrateBusinesses {
 		this.businessData.close();
 		this.businessData = null;
 		System.gc();
-	}
-
-	/**
-	 * @param properties the properties to set
-	 */
-	@Autowired
-	public void setProperties(Properties properties) {
-		this.properties = properties;
 	}
 
 	/**

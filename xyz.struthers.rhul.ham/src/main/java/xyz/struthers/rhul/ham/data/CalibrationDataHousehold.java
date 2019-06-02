@@ -65,12 +65,9 @@ public class CalibrationDataHousehold {
 
 	// beans
 	private AreaMapping area;
-	private CalibrationData sharedData;
 
 	// data
 	private boolean dataLoaded;
-	private Map<Date, Integer> totalPopulation;
-	private Map<String, Integer> adjustedPeopleByLga;
 	private Map<String, List<String>> title;
 	private Map<String, List<String>> unitType;
 
@@ -140,9 +137,7 @@ public class CalibrationDataHousehold {
 
 	private void init() {
 		this.dataLoaded = false;
-		this.totalPopulation = null;
-		this.adjustedPeopleByLga = null;
-
+		
 		this.title = null;
 		this.unitType = null;
 
@@ -170,12 +165,9 @@ public class CalibrationDataHousehold {
 	public void close() {
 
 		this.area = null;
-		this.sharedData = null;
 
 		this.dataLoaded = false;
-		this.totalPopulation = null;
-		this.adjustedPeopleByLga = null;
-
+		
 		if (this.title != null) {
 			for (String key : this.title.keySet()) {
 				this.title.get(key).clear();
@@ -703,7 +695,7 @@ public class CalibrationDataHousehold {
 	 * @param data                 - the data map that the values are returned in.
 	 *                             Keys are: Year, Series ID, LGA.
 	 */
-	private void loadAbsDataCsv_1410_0(String fileResourceLocation, String catalogueName, int[] columnsToImport,
+	/*private void loadAbsDataCsv_1410_0(String fileResourceLocation, String catalogueName, int[] columnsToImport,
 			String[] yearsToImport, Map<String, List<String>> titles, Map<String, List<String>> units,
 			Map<String, Map<String, Map<String, Float>>> data) {
 
@@ -780,7 +772,7 @@ public class CalibrationDataHousehold {
 			// read next
 			e.printStackTrace();
 		}
-	}
+	}*/
 
 	/**
 	 * Loads ABS Census Table Builder tables with one row series, two column series,
@@ -973,11 +965,4 @@ public class CalibrationDataHousehold {
 		this.area = area;
 	}
 
-	/**
-	 * @param sharedData the sharedData to set
-	 */
-	@Autowired
-	public void setSharedData(CalibrationData sharedData) {
-		this.sharedData = sharedData;
-	}
 }
