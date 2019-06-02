@@ -9,6 +9,7 @@ import java.util.List;
 
 import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.data.CalibrateEconomy;
+import xyz.struthers.rhul.ham.process.Clearable;
 import xyz.struthers.rhul.ham.process.Employer;
 import xyz.struthers.rhul.ham.process.NodePayment;
 import xyz.struthers.rhul.ham.process.Tax;
@@ -517,7 +518,8 @@ public class Business extends Agent implements Employer {
 	}
 
 	@Override
-	public void processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder) {
+	public int processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder) {
+		int status = Clearable.OK;
 		// update default details
 		if (defaultOrder > 0) {
 			// update default details unless it defaulted in a previous iteration
@@ -525,7 +527,7 @@ public class Business extends Agent implements Employer {
 				// hasn't defaulted in a previous iteration
 				this.defaultIteration = iteration;
 				this.defaultOrder = defaultOrder;
-				this.makeBusinessBankrupt(iteration);
+				status = this.makeBusinessBankrupt(iteration);
 			}
 		} else {
 			// update financials
@@ -572,13 +574,14 @@ public class Business extends Agent implements Employer {
 						this.bankDeposits += nodeEquity;
 					}
 				} else {
-					this.makeBusinessBankrupt(iteration);
+					status = this.makeBusinessBankrupt(iteration);
 				}
 			}
 		}
+		return status;
 	}
 
-	private void makeBusinessBankrupt(int iteration) {
+	private int makeBusinessBankrupt(int iteration) {
 		// business is bankrupt, so fire all employees
 		if (this.employees != null) {
 			for (Individual employee : this.employees) {
@@ -633,6 +636,8 @@ public class Business extends Agent implements Employer {
 		this.otherNonCurrentLiabilities = 0f;
 
 		this.totalEquity = 0f;
+
+		return Clearable.BANKRUPT;
 	}
 
 	/**

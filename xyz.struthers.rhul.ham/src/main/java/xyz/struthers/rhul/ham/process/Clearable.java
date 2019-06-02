@@ -14,6 +14,9 @@ import java.util.List;
  */
 public interface Clearable {
 
+	public static final int BANKRUPT = -1;
+	public static final int OK = 0;
+	
 	/**
 	 * Gets the Unique ID that is the Agent's array index number in the Payments
 	 * Clearing Vector algorithm. This number should never change.
@@ -94,7 +97,8 @@ public interface Clearable {
 	 * @param iteration    - the iteration number.
 	 * @param defaultOrder - the order that the node defaulted in this iteration (0
 	 *                     if node did not default).
+	 * @return default status: -1 if the node defaulted, 0 otherwise
 	 */
-	public void processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder);
-	
+	public int processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder);
+
 }

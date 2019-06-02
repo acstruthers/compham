@@ -10,6 +10,7 @@ import java.util.Map;
 
 import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.data.CalibrateEconomy;
+import xyz.struthers.rhul.ham.process.Clearable;
 import xyz.struthers.rhul.ham.process.Employer;
 import xyz.struthers.rhul.ham.process.NodePayment;
 import xyz.struthers.rhul.ham.process.Tax;
@@ -620,7 +621,8 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	}
 
 	@Override
-	public void processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder) {
+	public int processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder) {
+		int status = Clearable.OK;
 		// update default details
 		if (defaultOrder > 0) {
 			// update default details unless it defaulted in a previous iteration
@@ -628,7 +630,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 				// hasn't defaulted in a previous iteration
 				this.defaultIteration = iteration;
 				this.defaultOrder = defaultOrder;
-				this.makeAdiBankrupt(iteration);
+				status = this.makeAdiBankrupt(iteration);
 			}
 		} else {
 			// update financials
@@ -645,13 +647,14 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 					this.bsInvestments += nodeEquity;
 				} else {
 					// the ADI holds insufficient liquid assets, so shut it down
-					this.makeAdiBankrupt(iteration);
+					status = this.makeAdiBankrupt(iteration);
 				}
 			}
 		}
+		return status;
 	}
 
-	private void makeAdiBankrupt(int iteration) {
+	private int makeAdiBankrupt(int iteration) {
 		// ADI is bankrupt, so fire all employees
 		for (Individual employee : this.employees) {
 			employee.fireEmployee();
@@ -677,8 +680,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 			float newDepositBal = Math.min(household.getBsBankDeposits() * fcsGuaranteedRatio,
 					Properties.FCS_LIMIT_PER_DEPOSITOR);
 			household.setBsBankDeposits(newDepositBal);
-			// FIXME: UP TO HERE 18/4/18: process CPV output in Agent
-			// TODO assign randomly to new ADI, weighted by deposit balance
+			// FIXME assign randomly to new ADI, weighted by deposit balance (18/4/18)
 			// we can't re-assign depositors to other ADIs from within this ADI
 			// need to do that from within the AustralianEconomy class.
 		}
@@ -686,7 +688,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 			float newDepositBal = Math.min(business.getBankDeposits() * fcsGuaranteedRatio,
 					Properties.FCS_LIMIT_PER_DEPOSITOR);
 			business.setBankDeposits(newDepositBal);
-			// TODO assign randomly to new ADI, weighted by business loan balance
+			// FIXME assign randomly to new ADI, weighted by business loan balance (18/4)
 
 		}
 
@@ -725,6 +727,8 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		this.bsRetainedEarnings = 0f;
 		this.bsReserves = 0f;
 		this.bsOtherEquity = 0f;
+		
+		return Clearable.BANKRUPT;
 	}
 
 	/**

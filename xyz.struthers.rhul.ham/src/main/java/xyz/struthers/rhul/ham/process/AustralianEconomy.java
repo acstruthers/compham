@@ -581,8 +581,6 @@ public class AustralianEconomy implements Serializable {
 	public Set<String> saveSummaryToFile(int iteration, String scenarioName) {
 		Set<String> filenames = new HashSet<String>((int) Math.ceil(8 / 0.75) + 1);
 
-		// FIXME: lose the timestamp and replace with a scenario name
-
 		String filename = this.saveGovernmentSummaryToFile(iteration, scenarioName);
 		filenames.add(filename);
 		filename = this.saveRbaSummaryToFile(iteration, scenarioName);
@@ -910,8 +908,8 @@ public class AustralianEconomy implements Serializable {
 
 		// save CSV file
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_Agents_ADI_"
-				+ wholeNumber.format(iteration) + ".csv";
+		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_Agents_ADI_" + wholeNumber.format(iteration)
+				+ ".csv";
 		Writer writer;
 		try {
 			writer = new FileWriter(filename);
@@ -1124,8 +1122,8 @@ public class AustralianEconomy implements Serializable {
 
 		// save CSV file
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_Agents_RBA_"
-				+ wholeNumber.format(iteration) + ".csv";
+		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_Agents_RBA_" + wholeNumber.format(iteration)
+				+ ".csv";
 		Writer writer;
 		try {
 			writer = new FileWriter(filename);
@@ -1188,8 +1186,8 @@ public class AustralianEconomy implements Serializable {
 
 		// save CSV file
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_Agents_Govt_"
-				+ wholeNumber.format(iteration) + ".csv";
+		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_Agents_Govt_" + wholeNumber.format(iteration)
+				+ ".csv";
 		Writer writer;
 		try {
 			writer = new FileWriter(filename);

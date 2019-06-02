@@ -7,6 +7,7 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.process.Clearable;
 import xyz.struthers.rhul.ham.process.Employer;
 import xyz.struthers.rhul.ham.process.NodePayment;
 
@@ -229,9 +230,10 @@ public final class Individual extends Agent {
 	}
 
 	@Override
-	public void processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder) {
+	public int processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder) {
 		// CPV output is processed at a Household level
 		// so there's nothing to do in here
+		return Clearable.OK;
 	}
 
 	/**

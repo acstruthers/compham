@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import xyz.struthers.rhul.ham.data.Currency;
+import xyz.struthers.rhul.ham.process.Clearable;
 import xyz.struthers.rhul.ham.process.NodePayment;
 
 /**
@@ -232,7 +233,7 @@ public final class ForeignCountry extends Agent {
 		DecimalFormat decimal = new DecimalFormat("###0.00");
 		DecimalFormat rate = new DecimalFormat("###0.000000");
 		DecimalFormat wholeNumber = new DecimalFormat("###0");
-		//DecimalFormat percent = new DecimalFormat("###0.0000");
+		// DecimalFormat percent = new DecimalFormat("###0.0000");
 
 		sb.append(this.name.replace(",", " ") + separator);
 		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
@@ -414,7 +415,7 @@ public final class ForeignCountry extends Agent {
 	}
 
 	@Override
-	public void processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder) {
+	public int processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder) {
 		// update default details
 		if (defaultOrder > 0) {
 			// update default details unless it defaulted in a previous iteration
@@ -427,6 +428,8 @@ public final class ForeignCountry extends Agent {
 
 		// foreign countries are exogeneous to the model and so don't have any
 		// financials to update at the end of each round of the CPV algorithm
+
+		return Clearable.OK; // assume foreign countries never default
 	}
 
 	protected void init() {

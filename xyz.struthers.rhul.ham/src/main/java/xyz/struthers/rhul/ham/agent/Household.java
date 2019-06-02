@@ -10,6 +10,7 @@ import java.util.List;
 import gnu.trove.list.array.TFloatArrayList;
 import xyz.struthers.lang.CustomMath;
 import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.process.Clearable;
 import xyz.struthers.rhul.ham.process.NodePayment;
 import xyz.struthers.rhul.ham.process.Tax;
 
@@ -528,7 +529,8 @@ public class Household extends Agent {
 	 * spending, so any donations to charities cease too.
 	 */
 	@Override
-	public void processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder) {
+	public int processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder) {
+		int status = Clearable.OK;
 		// update default details
 		if (defaultOrder > 0) {
 			// update default details unless it defaulted in a previous iteration
@@ -536,7 +538,7 @@ public class Household extends Agent {
 				// hasn't defaulted in a previous iteration
 				this.defaultIteration = iteration;
 				this.defaultOrder = defaultOrder;
-				this.makeHouseholdBankrupt(iteration);
+				status = this.makeHouseholdBankrupt(iteration);
 			}
 		} else {
 			// update financials
@@ -551,16 +553,17 @@ public class Household extends Agent {
 							* (1f + Properties.SUPERANNUATION_HAIRCUT);
 					this.bsBankDeposits = 0f;
 				} else {
-					this.makeHouseholdBankrupt(iteration);
+					status = this.makeHouseholdBankrupt(iteration);
 				}
 				// cut down on discretionary spending too
 				this.pnlOtherDiscretionaryExpenses = 0f;
 				this.pnlDonations = 0f;
 			}
 		}
+		return status;
 	}
 
-	private void makeHouseholdBankrupt(int iteration) {
+	private int makeHouseholdBankrupt(int iteration) {
 		// leave superannuation alone because it's not enough to avoid bankruptcy
 		this.bsBankDeposits = 0f;
 		if (this.pnlMortgageRepayments > 0f) {
@@ -572,6 +575,8 @@ public class Household extends Agent {
 		// cut down on discretionary spending too
 		this.pnlOtherDiscretionaryExpenses = 0f;
 		this.pnlDonations = 0f;
+		
+		return Clearable.BANKRUPT;
 	}
 
 	/**

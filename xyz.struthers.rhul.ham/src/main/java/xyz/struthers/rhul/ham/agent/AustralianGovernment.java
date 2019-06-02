@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.process.Clearable;
 import xyz.struthers.rhul.ham.process.Employer;
 import xyz.struthers.rhul.ham.process.NodePayment;
 
@@ -319,7 +320,7 @@ public final class AustralianGovernment extends Agent implements Employer {
 	}
 
 	@Override
-	public void processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder) {
+	public int processClearingPaymentVectorOutput(float nodeEquity, int iteration, int defaultOrder) {
 		// update default details
 		if (defaultOrder > 0) {
 			// update default details unless it defaulted in a previous iteration
@@ -332,6 +333,8 @@ public final class AustralianGovernment extends Agent implements Employer {
 
 		// update financials
 		this.bsCash += nodeEquity;
+		
+		return Clearable.OK; // assume government never defaults
 	}
 
 	/**
