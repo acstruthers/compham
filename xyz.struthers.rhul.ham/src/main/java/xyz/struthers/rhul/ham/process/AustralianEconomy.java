@@ -19,6 +19,7 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -72,7 +73,8 @@ public class AustralianEconomy implements Serializable {
 	Currencies currencies;
 	ReserveBankOfAustralia rba;
 	AustralianGovernment government;
-
+	Properties properties;
+	
 	// Process
 	ClearingPaymentVector payments;
 	List<List<Float>> liabilitiesAmounts;
@@ -186,13 +188,33 @@ public class AustralianEconomy implements Serializable {
 		}
 
 		// generate the FX rates for this iteration using the desired strategy
-		this.currencies.prepareFxRatesSame(iteration);
+		if (Properties.FX_RATE_STRATEGY == Currencies.RANDOM_1YR) {
+			this.currencies.prepareFxRatesRandom1yr(iteration, this.properties.getRandom());
+		} else if (Properties.FX_RATE_STRATEGY == Currencies.RANDOM_1YR_UP) {
+			this.currencies.prepareFxRatesRandom1yrUp(iteration, this.properties.getRandom());
+		} else if (Properties.FX_RATE_STRATEGY == Currencies.RANDOM_1YR_DOWN) {
+			this.currencies.prepareFxRatesRandom1yrDown(iteration, this.properties.getRandom());
+		} else if (Properties.FX_RATE_STRATEGY == Currencies.RANDOM_5YR) {
+			this.currencies.prepareFxRatesRandom5yr(iteration, this.properties.getRandom());
+		} else if (Properties.FX_RATE_STRATEGY == Currencies.RANDOM_5YR_UP) {
+			this.currencies.prepareFxRatesRandom5yrUp(iteration, this.properties.getRandom());
+		} else if (Properties.FX_RATE_STRATEGY == Currencies.RANDOM_5YR_DOWN) {
+			this.currencies.prepareFxRatesRandom5yrDown(iteration, this.properties.getRandom());
+		} else {
+			// same FX rates for all iterations
+			this.currencies.prepareFxRatesSame(iteration);
+		}
 		for (ForeignCountry country : this.countries) {
 			country.updateExchangeRates(); // applies currency FX rates to country
 		}
 
 		// generate interest rates for this iteration using the desired strategy
-		this.rba.setCashRateSame(iteration);
+		if(Properties.INTEREST_RATE_STRATEGY == ReserveBankOfAustralia.RATES_CUSTOM) {
+			this.rba.setCashRateCustomPath(iteration, Properties.INTEREST_RATE_CUSTOM_PATH);
+		} else {
+			// same interest rates for all iterations
+			this.rba.setCashRateSame(iteration);
+		}
 		for (AuthorisedDepositTakingInstitution adi : this.adis) {
 			adi.setRba(this.rba);
 			adi.setLoanRate(iteration);
@@ -1349,6 +1371,14 @@ public class AustralianEconomy implements Serializable {
 	 */
 	public void setGovernment(AustralianGovernment government) {
 		this.government = government;
+	}
+
+	/**
+	 * @param properties the properties to set
+	 */
+	@Autowired
+	public void setProperties(Properties properties) {
+		this.properties = properties;
 	}
 
 	/**

@@ -29,6 +29,8 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 
 	// interest rate scenarios
 	public static final float OCR_INITIAL = 0.015f;
+	public static final int RATES_SAME = 0;
+	public static final int RATES_CUSTOM = 1;
 
 	// RBA details
 	protected char industryDivisionCode;
@@ -429,11 +431,39 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 		}
 		float interestRate = 0f;
 		if (this.cashRate.size() >= iteration) {
-			float prevInterestRate = iteration == 0 ? OCR_INITIAL : this.cashRate.get(iteration - 1);
-			this.cashRate.set(iteration, prevInterestRate);
+			interestRate = (iteration == 0 ? OCR_INITIAL : this.cashRate.get(iteration - 1));
+			this.cashRate.set(iteration, interestRate);
 		} else if (this.cashRate.size() == (iteration - 1)) {
-			float prevInterestRate = iteration == 0 ? OCR_INITIAL : this.cashRate.get(iteration - 1);
-			this.cashRate.add(prevInterestRate);
+			interestRate = (iteration == 0 ? OCR_INITIAL : this.cashRate.get(iteration - 1));
+			this.cashRate.add(interestRate);
+		} else {
+			interestRate = OCR_INITIAL;
+		}
+		return interestRate;
+	}
+	
+	public float setCashRateCustomPath(int iteration, float[] customRates) {
+		if (this.cashRate == null) {
+			this.cashRate = new ArrayList<Float>(customRates.length); // assume we model at least a year
+			this.cashRate.add(OCR_INITIAL);
+		}
+		float interestRate = 0f;
+		if (this.cashRate.size() >= iteration) {
+			if(customRates.length > iteration) {
+				interestRate = (iteration == 0 ? OCR_INITIAL : customRates[iteration]);
+			} else {
+				// iteration would read past end of the array, so use the previous rate
+				interestRate = (iteration == 0 ? OCR_INITIAL : this.cashRate.get(iteration - 1));
+			}
+			this.cashRate.set(iteration, interestRate);
+		} else if (this.cashRate.size() == (iteration - 1)) {
+			if(customRates.length > iteration) {
+				interestRate = (iteration == 0 ? OCR_INITIAL : customRates[iteration]);
+			}else{
+				// iteration would read past end of the array, so use the previous rate
+				interestRate = (iteration == 0 ? OCR_INITIAL : this.cashRate.get(iteration - 1));
+			}
+			this.cashRate.add(interestRate);
 		} else {
 			interestRate = OCR_INITIAL;
 		}

@@ -77,7 +77,8 @@ public class Main {
 
 			AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfiguration.class);
 			InitialiseEconomy init = new InitialiseEconomy();
-			ClearingPaymentInputs cpvInputs = init.initialiseEconomy(ctx);
+			init.initialiseEconomy(ctx);
+			//cpvInputs = economy.prepareOneMonth(iteration);
 			AustralianEconomy economy = init.getEconomy();
 			System.gc();
 
@@ -105,7 +106,7 @@ public class Main {
 				// GZIPOutputStream zipOut = new GZIPOutputStream(baos);
 				DeflaterOutputStream zipOut = new DeflaterOutputStream(baos);
 				ObjectOutputStream objectOut = new ObjectOutputStream(zipOut);
-				objectOut.writeObject(cpvInputs);
+				//objectOut.writeObject(cpvInputs);
 				objectOut.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -133,8 +134,8 @@ public class Main {
 			}
 			System.out.println(new Date(System.currentTimeMillis()) + ": CPV outputs decompressed.");
 
-			cpvInputs.clear();
-			cpvInputs = null;
+			//cpvInputs.clear();
+			//cpvInputs = null;
 			System.gc();
 			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 			megabytesAfter = memoryAfter / 1024f / 1024f;

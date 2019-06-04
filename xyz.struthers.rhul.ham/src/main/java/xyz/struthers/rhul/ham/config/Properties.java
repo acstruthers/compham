@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import it.unimi.dsi.util.XoRoShiRo128PlusRandom;
+import xyz.struthers.rhul.ham.agent.ReserveBankOfAustralia;
+import xyz.struthers.rhul.ham.data.Currencies;
 
 /**
  * @author Adam Struthers
@@ -23,6 +25,7 @@ public class Properties implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	// TODO: re-factor to read scenario parameters from a *.properties file
 	// scenario parameters
 	/**
 	 * In the event of Household default mortgage repayments are switched over to be
@@ -59,6 +62,12 @@ public class Properties implements Serializable {
 	public static final float UNEMPLOYMENT_BENEFIT_PER_PERSON = 600f / 14f * 365f / 12f;
 	public static final float ADI_HQLA_PROPORTION = 0.75f; // proportion of investments that are liquid
 	public static final boolean ALLOW_NEGATIVE_RATES = false; // allow negative interest rates?
+	public static final float FCS_LIMIT_PER_ADI = 15000000000f; // AUD 15Bn limit per ADI
+	public static final float FCS_LIMIT_PER_DEPOSITOR = 250000f; // AUD 250k limit per depositor
+	public static int FX_RATE_STRATEGY = Currencies.SAME;
+	public static int INTEREST_RATE_STRATEGY = ReserveBankOfAustralia.RATES_SAME;
+	public static final float[] INTEREST_RATE_CUSTOM_PATH = new float[] { 1.50f, 1.50f, 1.50f, 1.25f, 1.25f, 1.00f, 1.00f,
+			0.75f, 0.75f, 0.50f, 0.50f, 0.25f, 0.25f };
 
 	// static config constants
 	/*
@@ -87,8 +96,6 @@ public class Properties implements Serializable {
 	public static final int NETWORK_BUFFER_BYTES = 2000000000; // approx 2GB
 
 	// unchanging simulation parameters
-	public static final float FCS_LIMIT_PER_ADI = 15000000000f; // AUD 15Bn limit per ADI
-	public static final float FCS_LIMIT_PER_DEPOSITOR = 250000f; // AUD 250k limit per depositor
 	public static final float SUPERANNUATION_RATE = 0.095f; // 9.5%
 	public static final long RANDOM_SEED = 20180630L;
 	public static int peoplePerAgent = 1; // change to 1000 if 1 is too slow.

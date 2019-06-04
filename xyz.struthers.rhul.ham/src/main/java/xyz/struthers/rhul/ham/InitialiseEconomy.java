@@ -42,7 +42,7 @@ public class InitialiseEconomy {
 		super();
 	}
 
-	public ClearingPaymentInputs initialiseEconomy(AnnotationConfigApplicationContext ctx) {
+	public void initialiseEconomy(AnnotationConfigApplicationContext ctx) {
 		ClearingPaymentInputs cpvInputs = null;
 
 		DecimalFormat formatter = new DecimalFormat("#,##0.00");
@@ -182,7 +182,8 @@ public class InitialiseEconomy {
 
 		this.economy = ctx.getBean(AustralianEconomy.class);
 		// economy.simulateOneMonth(0);
-		cpvInputs = economy.prepareOneMonth(0);
+		// move this up into the CPV socket so it can be done in a loop
+		// cpvInputs = economy.prepareOneMonth(0); 
 
 		System.gc();
 		memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
@@ -193,8 +194,6 @@ public class InitialiseEconomy {
 		memoryBefore = memoryAfter;
 
 		// ctx.close();
-
-		return cpvInputs;
 	}
 
 	/**

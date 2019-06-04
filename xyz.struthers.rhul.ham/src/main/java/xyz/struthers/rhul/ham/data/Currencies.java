@@ -20,6 +20,15 @@ import org.springframework.stereotype.Component;
 public class Currencies implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	
+	// FX rate change strategies
+	public static final int SAME = 0;
+	public static final int RANDOM_1YR = 1;
+	public static final int RANDOM_1YR_UP = 2;
+	public static final int RANDOM_1YR_DOWN = 3;
+	public static final int RANDOM_5YR = 4;
+	public static final int RANDOM_5YR_UP = 5;
+	public static final int RANDOM_5YR_DOWN = 6;
 
 	Map<String, Currency> currencies; // key is ISO-4217 Code (e.g. USD)
 
@@ -66,7 +75,7 @@ public class Currencies implements Serializable {
 		}
 	}
 
-	public void prepareFxRatesRandom5yDown(int iteration, Random random) {
+	public void prepareFxRatesRandom5yrDown(int iteration, Random random) {
 		for (String ccyCode : this.currencies.keySet()) {
 			this.currencies.get(ccyCode).setExchangeRateRandom5yrDown(iteration, random);
 		}

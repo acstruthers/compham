@@ -30,9 +30,10 @@ import xyz.struthers.rhul.ham.process.ClearingPaymentOutputs;
  */
 public class CpvSocketClient {
 
-	// FIXME: update this for each scenario
-	public final static String SCENARIO_NAME = "Baseline"; 
-	
+	// TODO: update name & iterations for each scenario (in properties file)
+	public final static String SCENARIO_NAME = "Baseline";
+	public final static int NUM_ITERATIONS = 2; // first iteration is zero
+
 	static Thread t;
 	// static Client client = null;
 	// static ClearingPaymentInputs cpvInputs = null;
@@ -181,7 +182,7 @@ public class CpvSocketClient {
 
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfiguration.class);
 		InitialiseEconomy init = new InitialiseEconomy();
-		ClearingPaymentInputs cpvInputs = init.initialiseEconomy(ctx); // iteration 0
+		init.initialiseEconomy(ctx); // iteration 0
 		AustralianEconomy economy = init.getEconomy();
 		System.gc();
 
@@ -194,54 +195,52 @@ public class CpvSocketClient {
 		System.out.println("################################################");
 		memoryBefore = memoryAfter;
 
-		// send to CpvSocketServer to calculate CPV
-		// new CpvSocketClient();
-		ClearingPaymentOutputs cpvOutputs = runCpvOnServer(cpvInputs);
-		/*
-		 * try { // wait for CPV listener to terminate before continuing with execution
-		 * t.join(); } catch (InterruptedException e) { // do nothing }
-		 */
-		cpvInputs.clear();
-		cpvInputs = null;
+		int iteration = 0;
+		for (iteration = 0; iteration < NUM_ITERATIONS; iteration++) {
+			// prepare CPV inputs inside loop
+			ClearingPaymentInputs cpvInputs = economy.prepareOneMonth(iteration);
 
-		System.gc();
-		memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-		megabytesAfter = memoryAfter / 1024f / 1024f;
-		System.out.println("################################################");
-		System.out.println(new Date(System.currentTimeMillis()) + ": MEMORY USAGE IN MAIN AFTER CALCULATING CPV: "
-				+ formatter.format(megabytesAfter) + "MB)");
-		System.out.println("################################################");
-		memoryBefore = memoryAfter;
+			// send to CpvSocketServer to calculate CPV
+			// new CpvSocketClient();
+			ClearingPaymentOutputs cpvOutputs = runCpvOnServer(cpvInputs);
+			/*
+			 * try { // wait for CPV listener to terminate before continuing with execution
+			 * t.join(); } catch (InterruptedException e) { // do nothing }
+			 */
 
-		// update economy here
-		// ideally loop through this logic a few times
+			System.gc();
+			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			megabytesAfter = memoryAfter / 1024f / 1024f;
+			System.out.println("################################################");
+			System.out.println(new Date(System.currentTimeMillis()) + ": MEMORY USAGE IN MAIN AFTER CALCULATING CPV: "
+					+ formatter.format(megabytesAfter) + "MB)");
+			System.out.println("################################################");
+			memoryBefore = memoryAfter;
 
-		// TODO process CPV outputs
-		// read agents back in from object file, then update financial statements
-		// economy = (AustralianEconomy) readObjectFromFile(FILEPATH_AGENTS_INIT);
-		// economy = readFstEconomyFromFile(FILEPATH_AGENTS_INIT_FST); // using FST
-		// economy = readKryoObjectFromFile(FILEPATH_AGENTS_INIT_KRYO);
+			// update financial statements
+			economy.updateOneMonth(cpvOutputs);
+			cpvInputs.clear();
+			cpvInputs = null;
+			cpvOutputs.close();
+			cpvOutputs = null;
 
-		economy.updateOneMonth(cpvOutputs);
+			System.gc();
+			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			megabytesAfter = memoryAfter / 1024f / 1024f;
+			System.out.println("################################################");
+			System.out.println(new Date(System.currentTimeMillis())
+					+ ": MEMORY USAGE IN MAIN AFTER UPDATING ECONOMY WITH CPV OUTPUTS: "
+					+ formatter.format(megabytesAfter) + "MB)");
+			System.out.println("################################################");
+			memoryBefore = memoryAfter;
 
-		System.gc();
-		memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-		megabytesAfter = memoryAfter / 1024f / 1024f;
-		System.out.println("################################################");
-		System.out.println(new Date(System.currentTimeMillis())
-				+ ": MEMORY USAGE IN MAIN AFTER UPDATING ECONOMY WITH CPV OUTPUTS: " + formatter.format(megabytesAfter)
-				+ "MB)");
-		System.out.println("################################################");
-		memoryBefore = memoryAfter;
+			// save summary to file
+			economy.saveSummaryToFile(iteration, SCENARIO_NAME);
 
-		// save summary to file
-		int iteration = cpvOutputs.getIteration();
-		economy.saveSummaryToFile(iteration, SCENARIO_NAME);
-		// details after being updated with CPV output
-		// 6.32GB of CSV files (takes 4 minutes to write to disk)
-		// economy.saveDetailsToFile(iteration);
-
-		iteration++;
+			// details after being updated with CPV output
+			// 6.32GB of CSV files (takes 4 minutes to write to disk)
+			// economy.saveDetailsToFile(iteration);
+		}
 
 		ctx.close();
 	}

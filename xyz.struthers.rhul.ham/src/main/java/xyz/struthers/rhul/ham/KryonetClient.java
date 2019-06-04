@@ -100,7 +100,8 @@ public class KryonetClient {
 
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfiguration.class);
 		InitialiseEconomy init = new InitialiseEconomy();
-		cpvInputs = init.initialiseEconomy(ctx); // iteration 0
+		init.initialiseEconomy(ctx); // iteration 0
+		//cpvInputs = economy.prepareOneMonth(iteration);
 		AustralianEconomy economy = init.getEconomy();
 		System.gc();
 
