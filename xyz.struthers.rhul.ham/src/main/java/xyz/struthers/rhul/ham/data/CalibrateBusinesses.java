@@ -1359,7 +1359,7 @@ public class CalibrateBusinesses {
 								businessAgent.setLgaCode(lgaCode);
 								String gccsaCode = this.area.getGccsaCodeFromLga(lgaCode);
 								boolean isGccsa = false;
-								if (gccsaCode.equals("8ACTE") || gccsaCode.substring(1, 2).equals("G")) {
+								if (gccsaCode != null && (gccsaCode.equals("8ACTE") || gccsaCode.substring(1, 2).equals("G"))) {
 									isGccsa = true;
 								}
 								businessAgent.setGccsa(isGccsa);
