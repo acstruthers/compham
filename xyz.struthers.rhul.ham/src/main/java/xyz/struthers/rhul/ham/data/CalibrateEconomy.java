@@ -419,7 +419,8 @@ public class CalibrateEconomy {
 		employers.add(this.govt); // government has employees
 		employers.trimToSize();
 		// get list of all Households with employees, by industry division
-		System.out.println(new Date(System.currentTimeMillis()) + ": get list of all Households with employees, by industry division");
+		System.out.println(new Date(System.currentTimeMillis())
+				+ ": get list of all Households with employees, by industry division");
 		List<Household> employeeHouseholds = Arrays.asList(this.households).stream()
 				.filter(o -> o.getPnlWagesSalaries() > 0f).collect(Collectors.toList());
 		Map<String, ArrayList<Household>> employeeHouseholdsByDiv = new HashMap<String, ArrayList<Household>>(
@@ -442,7 +443,8 @@ public class CalibrateEconomy {
 			employeeHouseholdsByDiv.get(div).trimToSize();
 		}
 		// get list of all Individual employees, by industry division
-		System.out.println(new Date(System.currentTimeMillis()) + ": get list of all Individual employees, by industry division");
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": get list of all Individual employees, by industry division");
 		List<Individual> employees = Arrays.asList(this.individuals).stream().filter(o -> o.getPnlWagesSalaries() > 0f)
 				.collect(Collectors.toList());
 		Map<String, ArrayList<Individual>> employeesByDiv = new HashMap<String, ArrayList<Individual>>(
@@ -459,7 +461,8 @@ public class CalibrateEconomy {
 			employeesByDiv.get(div).trimToSize();
 		}
 		// for each division, calculate employer ratio and multiply by employee count
-		System.out.println(new Date(System.currentTimeMillis()) + ": for each division, calculate employer ratio and multiply by employee count");
+		System.out.println(new Date(System.currentTimeMillis())
+				+ ": for each division, calculate employer ratio and multiply by employee count");
 		Map<String, ArrayList<Integer>> shuffledEmployerIndicesByDiv = new HashMap<String, ArrayList<Integer>>(
 				(int) Math.ceil(totalWagesExpenseByDiv.size() / 0.75f));
 		for (int i = 0; i < employers.size(); i++) {
@@ -488,14 +491,20 @@ public class CalibrateEconomy {
 		System.out.println(new Date(System.currentTimeMillis()) + ": assign employees to employers");
 		// FIXME: it gets stuck here and never makes it to releasing memory
 		for (int employeeIdx = 0; employeeIdx < employees.size(); employeeIdx++) {
-			System.out.println(new Date(System.currentTimeMillis()) + ": employeeIdx = " + employeeIdx);
+			if ((employeeIdx % 100000) == 0) {
+				System.out.println(new Date(System.currentTimeMillis()) + ": employeeIdx = " + employeeIdx);
+			}
 			Individual employee = employees.get(employeeIdx);
 			String div = employee.getEmploymentIndustry();
 			int nextIdx = nextDivIdx.get(div);
 			Employer employer = employers.get(shuffledEmployerIndicesByDiv.get(div).get(nextIdx));
-			System.out.println(new Date(System.currentTimeMillis()) + ": adding employee");
+			if ((employeeIdx % 100000) == 0) {
+				System.out.println(new Date(System.currentTimeMillis()) + ": adding employee");
+			}
 			employer.addEmployee(employee);
-			System.out.println(new Date(System.currentTimeMillis()) + ": employee added");
+			if ((employeeIdx % 100000) == 0) {
+				System.out.println(new Date(System.currentTimeMillis()) + ": employee added");
+			}
 			nextIdx = (nextIdx + 1) % shuffledEmployerIndicesByDiv.get(div).size();
 			nextDivIdx.put(div, nextIdx);
 		}

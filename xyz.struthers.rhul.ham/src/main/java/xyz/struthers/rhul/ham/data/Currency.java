@@ -148,7 +148,7 @@ public class Currency implements Serializable {
 	 */
 	public float setExchangeRateSame(int iteration) {
 		float fxRate = 0f;
-		if (this.exchangeRate.size() >= iteration) {
+		if (this.exchangeRate.size() > iteration) {
 			float prevFxRate = iteration == 0 ? this.avg1yr : this.exchangeRate.get(iteration - 1);
 			this.exchangeRate.set(iteration, prevFxRate);
 		} else if (this.exchangeRate.size() == (iteration - 1)) {
@@ -256,7 +256,7 @@ public class Currency implements Serializable {
 		} else {
 			fxRate = prevFxRate + (float) random.nextGaussian() * stdDev;
 		}
-		if (this.exchangeRate.size() >= iteration) {
+		if (this.exchangeRate.size() > iteration) {
 			this.exchangeRate.set(iteration, fxRate);
 		} else {
 			for (int i = this.exchangeRate.size(); i < iteration; i++) {

@@ -107,8 +107,6 @@ public class AustralianEconomy implements Serializable {
 
 	@PostConstruct
 	private void init() {
-		this.random = this.properties.getRandom();
-
 		// Agents
 		this.households = null;
 		this.individuals = null;
@@ -180,6 +178,10 @@ public class AustralianEconomy implements Serializable {
 	}
 
 	public ClearingPaymentInputs prepareOneMonth(int iteration) {
+		if (this.random == null) {
+			this.random = this.properties.getRandom();
+		}
+
 		long memoryBefore = 0L;
 		long memoryAfter = 0L;
 		DecimalFormat formatter = new DecimalFormat("#,##0.00");
@@ -194,17 +196,17 @@ public class AustralianEconomy implements Serializable {
 
 		// generate the FX rates for this iteration using the desired strategy
 		if (Properties.FX_RATE_STRATEGY == Currencies.RANDOM_1YR) {
-			this.currencies.prepareFxRatesRandom1yr(iteration, this.properties.getRandom());
+			this.currencies.prepareFxRatesRandom1yr(iteration, this.random);
 		} else if (Properties.FX_RATE_STRATEGY == Currencies.RANDOM_1YR_UP) {
-			this.currencies.prepareFxRatesRandom1yrUp(iteration, this.properties.getRandom());
+			this.currencies.prepareFxRatesRandom1yrUp(iteration, this.random);
 		} else if (Properties.FX_RATE_STRATEGY == Currencies.RANDOM_1YR_DOWN) {
-			this.currencies.prepareFxRatesRandom1yrDown(iteration, this.properties.getRandom());
+			this.currencies.prepareFxRatesRandom1yrDown(iteration, this.random);
 		} else if (Properties.FX_RATE_STRATEGY == Currencies.RANDOM_5YR) {
-			this.currencies.prepareFxRatesRandom5yr(iteration, this.properties.getRandom());
+			this.currencies.prepareFxRatesRandom5yr(iteration, this.random);
 		} else if (Properties.FX_RATE_STRATEGY == Currencies.RANDOM_5YR_UP) {
-			this.currencies.prepareFxRatesRandom5yrUp(iteration, this.properties.getRandom());
+			this.currencies.prepareFxRatesRandom5yrUp(iteration, this.random);
 		} else if (Properties.FX_RATE_STRATEGY == Currencies.RANDOM_5YR_DOWN) {
-			this.currencies.prepareFxRatesRandom5yrDown(iteration, this.properties.getRandom());
+			this.currencies.prepareFxRatesRandom5yrDown(iteration, this.random);
 		} else {
 			// same FX rates for all iterations
 			this.currencies.prepareFxRatesSame(iteration);
@@ -609,6 +611,10 @@ public class AustralianEconomy implements Serializable {
 	 * @param failedAdi
 	 */
 	private void reassignCustomersToAnotherAdi(AuthorisedDepositTakingInstitution failedAdi) {
+		if (this.random == null) {
+			this.random = this.properties.getRandom();
+		}
+		
 		// Assign businesses randomly to new ADI, weighted by business loan balance
 
 		// link to ADI (loans & deposits with same ADI)
@@ -655,7 +661,8 @@ public class AustralianEconomy implements Serializable {
 		// weighted by deposit balance
 
 		// link to retail depositors (Households)
-		// get total deposits for entire ADI industry (bankrupt ADI is already zeroed out)
+		// get total deposits for entire ADI industry (bankrupt ADI is already zeroed
+		// out)
 		float totalDepositBal = (float) Arrays.asList(this.adis).stream().mapToDouble(o -> o.getBsDepositsAtCall())
 				.sum();
 		totalDepositBal += (float) Arrays.asList(this.adis).stream().mapToDouble(o -> o.getBsDepositsTerm()).sum();
