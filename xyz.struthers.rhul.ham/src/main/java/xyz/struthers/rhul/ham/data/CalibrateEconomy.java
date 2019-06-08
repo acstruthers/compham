@@ -493,7 +493,9 @@ public class CalibrateEconomy {
 			String div = employee.getEmploymentIndustry();
 			int nextIdx = nextDivIdx.get(div);
 			Employer employer = employers.get(shuffledEmployerIndicesByDiv.get(div).get(nextIdx));
+			System.out.println(new Date(System.currentTimeMillis()) + ": adding employee");
 			employer.addEmployee(employee);
+			System.out.println(new Date(System.currentTimeMillis()) + ": employee added");
 			nextIdx = (nextIdx + 1) % shuffledEmployerIndicesByDiv.get(div).size();
 			nextDivIdx.put(div, nextIdx);
 		}

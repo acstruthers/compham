@@ -10,10 +10,12 @@ import java.io.Writer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -74,7 +76,8 @@ public class AustralianEconomy implements Serializable {
 	ReserveBankOfAustralia rba;
 	AustralianGovernment government;
 	Properties properties;
-	
+	Random random;
+
 	// Process
 	ClearingPaymentVector payments;
 	List<List<Float>> liabilitiesAmounts;
@@ -104,6 +107,8 @@ public class AustralianEconomy implements Serializable {
 
 	@PostConstruct
 	private void init() {
+		this.random = this.properties.getRandom();
+
 		// Agents
 		this.households = null;
 		this.individuals = null;
@@ -209,7 +214,7 @@ public class AustralianEconomy implements Serializable {
 		}
 
 		// generate interest rates for this iteration using the desired strategy
-		if(Properties.INTEREST_RATE_STRATEGY == ReserveBankOfAustralia.RATES_CUSTOM) {
+		if (Properties.INTEREST_RATE_STRATEGY == ReserveBankOfAustralia.RATES_CUSTOM) {
 			this.rba.setCashRateCustomPath(iteration, Properties.INTEREST_RATE_CUSTOM_PATH);
 		} else {
 			// same interest rates for all iterations
@@ -243,93 +248,85 @@ public class AustralianEconomy implements Serializable {
 		return cpvInputs;
 	}
 
-	public void simulateOneMonth(int iteration) {
-		long memoryBefore = 0L;
-		long memoryAfter = 0L;
-		DecimalFormat formatter = new DecimalFormat("#,##0.00");
-		if (DEBUG_RAM_USAGE) {
-			System.gc();
-			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			float megabytesAfter = memoryAfter / 1024f / 1024f;
-			System.out.println(new Date(System.currentTimeMillis()) + ": MEMORY USAGE BEFORE SIMULATION ROUND "
-					+ iteration + ": " + formatter.format(megabytesAfter) + "MB");
-			memoryBefore = memoryAfter;
-		}
-
-		// generate the FX rates for this iteration using the desired strategy
-		this.currencies.prepareFxRatesSame(iteration);
-		for (ForeignCountry country : this.countries) {
-			country.updateExchangeRates(); // applies currency FX rates to country
-		}
-
-		// generate interest rates for this iteration using the desired strategy
-		this.rba.setCashRateSame(iteration);
-		for (AuthorisedDepositTakingInstitution adi : this.adis) {
-			adi.setRba(this.rba);
-			adi.setLoanRate(iteration);
-			adi.setDepositRate(iteration);
-			adi.setBorrowingsRate(iteration);
-			adi.setGovtBondRate(iteration);
-		}
-
-		// prepare the inputs to the Clearing Payments Vector algorithm
-		this.preparePaymentsClearingVectorInputs(iteration);
-
-		if (DEBUG_RAM_USAGE) {
-			System.gc();
-			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			float megabytesAfter = memoryAfter / 1024f / 1024f;
-			float megabytesBefore = memoryBefore / 1024f / 1024f;
-			System.out
-					.println(new Date(System.currentTimeMillis()) + ": MEMORY CONSUMED PREPARING CPV INPUTS FOR ROUND "
-							+ iteration + ": " + formatter.format(megabytesAfter - megabytesBefore)
-							+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
-		}
-
-		// drops all agents to reduce memory footprint
-		/*
-		 * this.households = null; this.individuals = null; this.businesses = null;
-		 * this.adis = null; this.countries = null; this.currencies = null; this.rba =
-		 * null; this.government = null;
-		 */
-		System.gc();
-
-		if (DEBUG_RAM_USAGE) {
-			System.gc();
-			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			float megabytesAfter = memoryAfter / 1024f / 1024f;
-			float megabytesBefore = memoryBefore / 1024f / 1024f;
-			System.out.println(new Date(System.currentTimeMillis()) + ": MEMORY CLEARED DUMPING AGENTS FOR ROUND "
-					+ iteration + ": " + formatter.format(megabytesAfter - megabytesBefore) + "MB (CURRENT TOTAL IS: "
-					+ formatter.format(megabytesAfter) + "MB)");
-		}
-
-		this.clearingPaymentVectorOutput = this.payments.calculate(this.liabilitiesAmounts, this.liabilitiesIndices,
-				this.operatingCashFlow, this.liquidAssets);
-
-		if (DEBUG_RAM_USAGE) {
-			System.gc();
-			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			float megabytesAfter = memoryAfter / 1024f / 1024f;
-			float megabytesBefore = memoryBefore / 1024f / 1024f;
-			System.out.println(new Date(System.currentTimeMillis()) + ": MEMORY CONSUMED BY SIMULATION ROUND "
-					+ iteration + ": " + formatter.format(megabytesAfter - megabytesBefore) + "MB (CURRENT TOTAL IS: "
-					+ formatter.format(megabytesAfter) + "MB)");
-		}
-
-		this.processPaymentsClearingVectorOutputs();
-
-		if (DEBUG_RAM_USAGE) {
-			System.gc();
-			memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			float megabytesAfter = memoryAfter / 1024f / 1024f;
-			float megabytesBefore = memoryBefore / 1024f / 1024f;
-			System.out.println(
-					new Date(System.currentTimeMillis()) + ": MEMORY CONSUMED AFTER PROCESSING CPV OUTPUTS FOR ROUND "
-							+ iteration + ": " + formatter.format(megabytesAfter - megabytesBefore)
-							+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
-		}
-	}
+	/**
+	 * Pretty sure this is deprecated?
+	 * 
+	 * @deprecated
+	 * 
+	 * @param iteration
+	 */
+	/*
+	 * public void simulateOneMonth(int iteration) { long memoryBefore = 0L; long
+	 * memoryAfter = 0L; DecimalFormat formatter = new DecimalFormat("#,##0.00"); if
+	 * (DEBUG_RAM_USAGE) { System.gc(); memoryAfter =
+	 * Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory(); float
+	 * megabytesAfter = memoryAfter / 1024f / 1024f; System.out.println(new
+	 * Date(System.currentTimeMillis()) + ": MEMORY USAGE BEFORE SIMULATION ROUND "
+	 * + iteration + ": " + formatter.format(megabytesAfter) + "MB"); memoryBefore =
+	 * memoryAfter; }
+	 * 
+	 * // generate the FX rates for this iteration using the desired strategy
+	 * this.currencies.prepareFxRatesSame(iteration); for (ForeignCountry country :
+	 * this.countries) { country.updateExchangeRates(); // applies currency FX rates
+	 * to country }
+	 * 
+	 * // generate interest rates for this iteration using the desired strategy
+	 * this.rba.setCashRateSame(iteration); for (AuthorisedDepositTakingInstitution
+	 * adi : this.adis) { adi.setRba(this.rba); adi.setLoanRate(iteration);
+	 * adi.setDepositRate(iteration); adi.setBorrowingsRate(iteration);
+	 * adi.setGovtBondRate(iteration); }
+	 * 
+	 * // prepare the inputs to the Clearing Payments Vector algorithm
+	 * this.preparePaymentsClearingVectorInputs(iteration);
+	 * 
+	 * if (DEBUG_RAM_USAGE) { System.gc(); memoryAfter =
+	 * Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory(); float
+	 * megabytesAfter = memoryAfter / 1024f / 1024f; float megabytesBefore =
+	 * memoryBefore / 1024f / 1024f; System.out .println(new
+	 * Date(System.currentTimeMillis()) +
+	 * ": MEMORY CONSUMED PREPARING CPV INPUTS FOR ROUND " + iteration + ": " +
+	 * formatter.format(megabytesAfter - megabytesBefore) + "MB (CURRENT TOTAL IS: "
+	 * + formatter.format(megabytesAfter) + "MB)"); }
+	 * 
+	 * // drops all agents to reduce memory footprint //this.households = null;
+	 * //this.individuals = null; //this.businesses = null; //this.adis = null;
+	 * //this.countries = null; //this.currencies = null; //this.rba = null;
+	 * //this.government = null;
+	 * 
+	 * System.gc();
+	 * 
+	 * if (DEBUG_RAM_USAGE) { System.gc(); memoryAfter =
+	 * Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory(); float
+	 * megabytesAfter = memoryAfter / 1024f / 1024f; float megabytesBefore =
+	 * memoryBefore / 1024f / 1024f; System.out.println(new
+	 * Date(System.currentTimeMillis()) +
+	 * ": MEMORY CLEARED DUMPING AGENTS FOR ROUND " + iteration + ": " +
+	 * formatter.format(megabytesAfter - megabytesBefore) + "MB (CURRENT TOTAL IS: "
+	 * + formatter.format(megabytesAfter) + "MB)"); }
+	 * 
+	 * this.clearingPaymentVectorOutput =
+	 * this.payments.calculate(this.liabilitiesAmounts, this.liabilitiesIndices,
+	 * this.operatingCashFlow, this.liquidAssets);
+	 * 
+	 * if (DEBUG_RAM_USAGE) { System.gc(); memoryAfter =
+	 * Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory(); float
+	 * megabytesAfter = memoryAfter / 1024f / 1024f; float megabytesBefore =
+	 * memoryBefore / 1024f / 1024f; System.out.println(new
+	 * Date(System.currentTimeMillis()) + ": MEMORY CONSUMED BY SIMULATION ROUND " +
+	 * iteration + ": " + formatter.format(megabytesAfter - megabytesBefore) +
+	 * "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)"); }
+	 * 
+	 * this.processPaymentsClearingVectorOutputs();
+	 * 
+	 * if (DEBUG_RAM_USAGE) { System.gc(); memoryAfter =
+	 * Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory(); float
+	 * megabytesAfter = memoryAfter / 1024f / 1024f; float megabytesBefore =
+	 * memoryBefore / 1024f / 1024f; System.out.println( new
+	 * Date(System.currentTimeMillis()) +
+	 * ": MEMORY CONSUMED AFTER PROCESSING CPV OUTPUTS FOR ROUND " + iteration +
+	 * ": " + formatter.format(megabytesAfter - megabytesBefore) +
+	 * "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)"); } }
+	 */
 
 	/**
 	 * Updates agents with the output from the CPV.
@@ -581,9 +578,14 @@ public class AustralianEconomy implements Serializable {
 						equityOfNode.get(cpvIdx), iteration, defaultOrderOfNode.get(cpvIdx));
 			} else if (cpvIdx < (this.adis.length + this.businesses.length + this.households.length + 2)) {
 				// ADIs
-				this.adis[cpvIdx - 2 - this.households.length - this.businesses.length]
+				int adiStatus = this.adis[cpvIdx - 2 - this.households.length - this.businesses.length]
 						.processClearingPaymentVectorOutput(equityOfNode.get(cpvIdx), iteration,
 								defaultOrderOfNode.get(cpvIdx));
+				if (adiStatus == -1) {
+					// assign ADI customers to other ADIs if it defaults
+					this.reassignCustomersToAnotherAdi(
+							this.adis[cpvIdx - 2 - this.households.length - this.businesses.length]);
+				}
 			} else {
 				// foreign countries
 				this.countries[cpvIdx - 2 - this.households.length - this.businesses.length - this.adis.length]
@@ -591,6 +593,97 @@ public class AustralianEconomy implements Serializable {
 								defaultOrderOfNode.get(cpvIdx));
 			}
 		}
+	}
+
+	/**
+	 * Assigns customers of a failed ADI to another ADI. Assumes the FCS has already
+	 * been applied, so doesn't change deposit balances - just transfers them to the
+	 * new ADI.
+	 * 
+	 * Retail depositors (i.e. Households) are assigned randomly, weighted using the
+	 * deposit balances of the other ADIs.
+	 * 
+	 * Businesses are assigned randomly, weighted using the business loan balances
+	 * of the other ADIs.
+	 * 
+	 * @param failedAdi
+	 */
+	private void reassignCustomersToAnotherAdi(AuthorisedDepositTakingInstitution failedAdi) {
+		// Assign businesses randomly to new ADI, weighted by business loan balance
+
+		// link to ADI (loans & deposits with same ADI)
+		// get total business loans for entire ADI industry (bankrupt ADI is already
+		// zeroed out)
+		float totalLoanBal = (float) Arrays.asList(this.adis).stream().mapToDouble(o -> o.getBsLoansBusiness()).sum();
+		// populate indices with relative amounts of each ADI
+		ArrayList<Business> businessesToReallocate = failedAdi.getCommercialDepositors();
+		ArrayList<Integer> shuffledIndices = new ArrayList<Integer>(businessesToReallocate.size());
+		for (int i = 0; i < this.adis.length; i++) {
+			if (this.adis[i].getPaymentClearingIndex() != failedAdi.getPaymentClearingIndex()) {
+				// calculate ratio of ADI to total
+				float adiLoanBal = this.adis[i].getBsLoansBusiness();
+				if (adiLoanBal > 0f) {
+					// convert to indices, rounding up so we have at least enough
+					int adiCustomerCount = (int) Math.ceil(adiLoanBal / totalLoanBal * businessesToReallocate.size());
+					shuffledIndices.addAll(Collections.nCopies(adiCustomerCount, i));
+				}
+			}
+		}
+		// shuffle indices, and assign ADIs to Businesses
+		Collections.shuffle(shuffledIndices, this.random);
+		int nextShuffledIdx = 0;
+		for (int i = 0; i < businessesToReallocate.size(); i++) {
+			// Assign loan ADI to Business. It doesn't matter if the Business doesn't have a
+			// loan. We assume businesses only bank with ADIs who have business loans.
+			AuthorisedDepositTakingInstitution adi = this.adis[shuffledIndices.get(nextShuffledIdx++)];
+			businessesToReallocate.get(i).setAdi(adi);
+
+			// add business to ADI and increase loan & deposit balances
+			adi.addCommercialDepositor(businessesToReallocate.get(i)); // adds link to business
+			float businessDepositBalance = adi.getBsDepositsAtCall();
+			adi.setBsDepositsAtCall(businessDepositBalance + businessesToReallocate.get(i).getBankDeposits());
+			float businessLoanBalance = adi.getBsLoansBusiness();
+			adi.setBsLoansBusiness(businessLoanBalance + businessesToReallocate.get(i).getLoans());
+			// TODO update ADI's RWA? Or is it calculated elsewhere?
+		}
+		// release memory
+		shuffledIndices.clear();
+		shuffledIndices = null;
+
+		////////////////////////////////////////////////////////////////////////////////////
+		// FIXME assign retail depositors & borrowers (Households) randomly to new ADI,
+		// weighted by deposit balance
+
+		// link to retail depositors (Households)
+		// get total deposits for entire ADI industry (bankrupt ADI is already zeroed out)
+		float totalDepositBal = (float) Arrays.asList(this.adis).stream().mapToDouble(o -> o.getBsDepositsAtCall())
+				.sum();
+		totalDepositBal += (float) Arrays.asList(this.adis).stream().mapToDouble(o -> o.getBsDepositsTerm()).sum();
+		// populate indices with relative amounts of each ADI
+		shuffledIndices = new ArrayList<Integer>(this.households.length);
+		for (int i = 0; i < this.adis.length; i++) {
+			// calculate ratio of ADI to total
+			float adiDepositBal = this.adis[i].getBsDepositsAtCall() + this.adis[i].getBsDepositsTerm();
+			if (adiDepositBal > 0f) {
+				// convert to indices, rounding up so we have at least enough
+				int adiCustomerCount = (int) Math.ceil(adiDepositBal / totalDepositBal * this.households.length);
+				shuffledIndices.addAll(Collections.nCopies(adiCustomerCount, i));
+			}
+		}
+		// shuffle indices, and assign ADIs to Households
+		shuffledIndices.trimToSize();
+		Collections.shuffle(shuffledIndices, this.random);
+		nextShuffledIdx = 0;
+		for (int i = 0; i < this.households.length; i++) {
+			if (this.households[i].getBsLoans() > 0f) {
+				// assign depositor Household to ADI
+				this.adis[shuffledIndices.get(nextShuffledIdx++)].addRetailDepositor(this.households[i]);
+				nextShuffledIdx = (nextShuffledIdx + 1) % shuffledIndices.size();
+			}
+		}
+		// release memory
+		shuffledIndices.clear();
+		shuffledIndices = null;
 	}
 
 	/**

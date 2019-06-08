@@ -680,16 +680,11 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 			float newDepositBal = Math.min(household.getBsBankDeposits() * fcsGuaranteedRatio,
 					Properties.FCS_LIMIT_PER_DEPOSITOR);
 			household.setBsBankDeposits(newDepositBal);
-			// FIXME assign randomly to new ADI, weighted by deposit balance (18/4/18)
-			// we can't re-assign depositors to other ADIs from within this ADI
-			// need to do that from within the AustralianEconomy class.
 		}
 		for (Business business : this.commercialDepositors) {
 			float newDepositBal = Math.min(business.getBankDeposits() * fcsGuaranteedRatio,
 					Properties.FCS_LIMIT_PER_DEPOSITOR);
 			business.setBankDeposits(newDepositBal);
-			// FIXME assign randomly to new ADI, weighted by business loan balance (18/4)
-
 		}
 
 		// ADI is bankrupt, so zero out all its financials

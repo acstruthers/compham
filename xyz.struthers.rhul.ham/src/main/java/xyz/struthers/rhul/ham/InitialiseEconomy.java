@@ -8,7 +8,6 @@ import java.util.Date;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import xyz.struthers.rhul.ham.data.AreaMapping;
 import xyz.struthers.rhul.ham.data.CalibrateAdis;
 import xyz.struthers.rhul.ham.data.CalibrateBusinesses;
 import xyz.struthers.rhul.ham.data.CalibrateCountries;
@@ -19,7 +18,6 @@ import xyz.struthers.rhul.ham.data.CalibrateHouseholds;
 import xyz.struthers.rhul.ham.data.CalibrateIndividuals;
 import xyz.struthers.rhul.ham.data.CalibrateRba;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
-import xyz.struthers.rhul.ham.process.ClearingPaymentInputs;
 
 /**
  * Initialises the agents and economy, based on raw CSV data.
@@ -43,8 +41,6 @@ public class InitialiseEconomy {
 	}
 
 	public void initialiseEconomy(AnnotationConfigApplicationContext ctx) {
-		ClearingPaymentInputs cpvInputs = null;
-
 		DecimalFormat formatter = new DecimalFormat("#,##0.00");
 		long memoryBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 		float megabytesBefore = memoryBefore / 1024f / 1024f;
@@ -74,7 +70,7 @@ public class InitialiseEconomy {
 		memoryBefore = memoryAfter;
 
 		System.out.println("Started MeshblockMapping: " + new Date(System.currentTimeMillis()));
-		AreaMapping mb = ctx.getBean(AreaMapping.class);
+		//AreaMapping mb = ctx.getBean(AreaMapping.class);
 		/*
 		 * String gccsa = mb.getGccsaCodeFromLga("10050");
 		 * System.out.println("GCCSA is: " + gccsa + " (should be 1RNSW)"); gccsa =
@@ -183,7 +179,7 @@ public class InitialiseEconomy {
 		this.economy = ctx.getBean(AustralianEconomy.class);
 		// economy.simulateOneMonth(0);
 		// move this up into the CPV socket so it can be done in a loop
-		// cpvInputs = economy.prepareOneMonth(0); 
+		// cpvInputs = economy.prepareOneMonth(0);
 
 		System.gc();
 		memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
