@@ -79,7 +79,7 @@ public class Properties implements Serializable {
 	 */
 	public static final String HOME_DIRECTORY = "D:\\Git\\compham\\xyz.struthers.rhul.ham"; // NUC and new lappy
 	public static final String RESOURCE_DIRECTORY = HOME_DIRECTORY + "\\src\\main\\resources";
-	public static final String OUTPUT_DIRECTORY = "C:\\tmp\\";
+	public static final String OUTPUT_DIRECTORY = "D:\\compham-output\\";
 	public static final String CSV_SEPARATOR = ",";
 
 	// Socket networking parameters

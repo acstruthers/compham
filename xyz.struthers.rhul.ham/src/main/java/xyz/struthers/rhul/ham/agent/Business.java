@@ -472,7 +472,7 @@ public class Business extends Agent implements Employer {
 				// add in the effect of FX rate movements
 				ArrayList<Float> exchangeRates = supplier.getExchangeRates();
 				float currentExchangeRate = exchangeRates.get(0);
-				if (exchangeRates.size() >= iteration && exchangeRates.get(iteration) != null) {
+				if (exchangeRates.size() > iteration && exchangeRates.get(iteration) != null) {
 					currentExchangeRate = exchangeRates.get(iteration);
 				}
 				// adjust in the opposite direction to exports

@@ -556,6 +556,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		// calculate amount due to retail depositors
 		for (Household depositor : this.retailDepositors) {
 			int index = depositor.getPaymentClearingIndex();
+			// FIXME: index error on next line. Prob need to set next ADI interest rate.
 			float monthlyInterest = depositor.getBsBankDeposits() * this.depositRate.get(iteration) / NUMBER_MONTHS;
 			liabilities.add(new NodePayment(index, monthlyInterest));
 		}
@@ -722,7 +723,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		this.bsRetainedEarnings = 0f;
 		this.bsReserves = 0f;
 		this.bsOtherEquity = 0f;
-		
+
 		return Clearable.BANKRUPT;
 	}
 
