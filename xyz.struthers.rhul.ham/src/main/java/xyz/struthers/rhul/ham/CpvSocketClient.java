@@ -32,7 +32,7 @@ public class CpvSocketClient {
 
 	// TODO: update name & iterations for each scenario (in properties file)
 	public final static String SCENARIO_NAME = "Baseline";
-	public final static int NUM_ITERATIONS = 2; // first iteration is zero
+	public final static int NUM_ITERATIONS = 13; // first iteration is zero
 
 	static Thread t;
 	// static Client client = null;
