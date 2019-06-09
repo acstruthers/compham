@@ -208,17 +208,23 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 
 	public float setDepositRate(int iteration) {
 		if (this.depositRate == null) {
-			this.depositRate = new ArrayList<Float>();
-			this.depositRate.add(this.rateTotalDeposits);
+			this.depositRate = new ArrayList<Float>(iteration + 1);
+			for (int i = 0; i < iteration; i++) {
+				this.depositRate.add(this.rateTotalDeposits);
+			}
 		}
 		float rate = 0f;
-		if (this.depositRate != null && this.depositRate.size() > iteration && this.rba != null) {
+		if (this.depositRate != null && this.rba != null) {
 			// assume rates can't be negative
 			rate = this.depositRate.get(0) + this.rba.getCashRateChange(iteration);
 			if (!Properties.ALLOW_NEGATIVE_RATES) {
 				rate = Math.max(0f, rate);
 			}
-			this.depositRate.set(iteration, rate);
+			if (this.depositRate.size() > iteration) {
+				this.depositRate.set(iteration, rate);
+			} else {
+				this.depositRate.add(rate);
+			}
 		}
 		return rate;
 	}
@@ -233,17 +239,23 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 
 	public float setLoanRate(int iteration) {
 		if (this.loanRate == null) {
-			this.loanRate = new ArrayList<Float>();
-			this.loanRate.add(this.rateTotalLoans);
+			this.loanRate = new ArrayList<Float>(iteration + 1);
+			for (int i = 0; i < iteration; i++) {
+				this.loanRate.add(this.rateTotalLoans);
+			}
 		}
 		float rate = 0f;
-		if (this.loanRate != null && this.loanRate.size() > iteration && this.rba != null) {
+		if (this.loanRate != null && this.rba != null) {
 			// assume rates can't be negative
 			rate = this.loanRate.get(0) + this.rba.getCashRateChange(iteration);
 			if (!Properties.ALLOW_NEGATIVE_RATES) {
 				rate = Math.max(0f, rate);
 			}
-			this.loanRate.set(iteration, rate);
+			if (this.loanRate.size() > iteration) {
+				this.loanRate.set(iteration, rate);
+			} else {
+				this.loanRate.add(rate);
+			}
 		}
 		return rate;
 	}
@@ -259,16 +271,22 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	public float setBorrowingsRate(int iteration) {
 		if (this.borrowingsRate == null) {
 			this.borrowingsRate = new ArrayList<Float>();
-			this.borrowingsRate.add(this.rateBondsNotesBorrowings);
+			for (int i = 0; i < iteration; i++) {
+				this.borrowingsRate.add(this.rateBondsNotesBorrowings);
+			}
 		}
 		float rate = 0f;
-		if (this.borrowingsRate != null && this.borrowingsRate.size() > iteration && this.rba != null) {
+		if (this.borrowingsRate != null && this.rba != null) {
 			// assume rates can't be negative
 			rate = this.borrowingsRate.get(0) + this.rba.getCashRateChange(iteration);
 			if (!Properties.ALLOW_NEGATIVE_RATES) {
 				rate = Math.max(0f, rate);
 			}
-			this.borrowingsRate.set(iteration, rate);
+			if (this.borrowingsRate.size() > iteration) {
+				this.borrowingsRate.set(iteration, rate);
+			} else {
+				this.borrowingsRate.add(rate);
+			}
 		}
 		return rate;
 	}
@@ -284,16 +302,22 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	public float setGovtBondRate(int iteration) {
 		if (this.govtBondRate == null) {
 			this.govtBondRate = new ArrayList<Float>();
-			this.govtBondRate.add(this.rateGovernmentLoan);
+			for (int i = 0; i < iteration; i++) {
+				this.govtBondRate.add(this.rateGovernmentLoan);
+			}
 		}
 		float rate = 0f;
-		if (this.govtBondRate != null && this.govtBondRate.size() > iteration && this.rba != null) {
+		if (this.govtBondRate != null && this.rba != null) {
 			// assume rates can't be negative
 			rate = this.govtBondRate.get(0) + this.rba.getCashRateChange(iteration);
 			if (!Properties.ALLOW_NEGATIVE_RATES) {
 				rate = Math.max(0f, rate);
 			}
-			this.govtBondRate.set(iteration, rate);
+			if (this.govtBondRate.size() > iteration) {
+				this.govtBondRate.set(iteration, rate);
+			} else {
+				this.govtBondRate.add(rate);
+			}
 		}
 		return rate;
 	}
