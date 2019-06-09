@@ -487,9 +487,8 @@ public class CalibrateEconomy {
 			Collections.shuffle(shuffledEmployerIndicesByDiv.get(div), this.random);
 			nextDivIdx.put(div, 0);
 		}
-		// assign employees to employers
+		// assign employees to employers (takes about 31 minutes)
 		System.out.println(new Date(System.currentTimeMillis()) + ": assign employees to employers");
-		// FIXME: it gets stuck here and never makes it to releasing memory
 		for (int employeeIdx = 0; employeeIdx < employees.size(); employeeIdx++) {
 			if ((employeeIdx % 100000) == 0) {
 				System.out.println(new Date(System.currentTimeMillis()) + ": employeeIdx = " + employeeIdx);
