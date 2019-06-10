@@ -373,7 +373,7 @@ public final class ForeignCountry extends Agent {
 		 * decrease foreign demand and result in a drop in sales.
 		 */
 		float currentExchangeRate = this.exchangeRates.get(0);
-		if (this.exchangeRates.size() >= iteration && this.exchangeRates.get(iteration) != null) {
+		if (this.exchangeRates.size() > iteration && this.exchangeRates.get(iteration) != null) {
 			currentExchangeRate = this.exchangeRates.get(iteration);
 		}
 		float exchRateAdjustment = this.exchangeRates.get(0) / currentExchangeRate;

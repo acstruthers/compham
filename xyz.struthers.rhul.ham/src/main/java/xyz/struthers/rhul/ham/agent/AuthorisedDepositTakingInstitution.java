@@ -216,7 +216,11 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		float rate = 0f;
 		if (this.depositRate != null && this.rba != null) {
 			// assume rates can't be negative
-			rate = this.depositRate.get(0) + this.rba.getCashRateChange(iteration);
+			if (this.depositRate.size() > 0) {
+				rate = this.depositRate.get(0) + this.rba.getCashRateChange(iteration);
+			} else {
+				rate = this.rateTotalDeposits + this.rba.getCashRateChange(iteration);
+			}
 			if (!Properties.ALLOW_NEGATIVE_RATES) {
 				rate = Math.max(0f, rate);
 			}
@@ -247,7 +251,11 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		float rate = 0f;
 		if (this.loanRate != null && this.rba != null) {
 			// assume rates can't be negative
-			rate = this.loanRate.get(0) + this.rba.getCashRateChange(iteration);
+			if (this.loanRate.size() > 0) {
+				rate = this.loanRate.get(0) + this.rba.getCashRateChange(iteration);
+			} else {
+				rate = this.rateTotalLoans + this.rba.getCashRateChange(iteration);
+			}
 			if (!Properties.ALLOW_NEGATIVE_RATES) {
 				rate = Math.max(0f, rate);
 			}
@@ -278,7 +286,11 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		float rate = 0f;
 		if (this.borrowingsRate != null && this.rba != null) {
 			// assume rates can't be negative
-			rate = this.borrowingsRate.get(0) + this.rba.getCashRateChange(iteration);
+			if (this.borrowingsRate.size() > 0) {
+				rate = this.borrowingsRate.get(0) + this.rba.getCashRateChange(iteration);
+			} else {
+				rate = this.rateBondsNotesBorrowings + this.rba.getCashRateChange(iteration);
+			}
 			if (!Properties.ALLOW_NEGATIVE_RATES) {
 				rate = Math.max(0f, rate);
 			}
@@ -309,7 +321,11 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		float rate = 0f;
 		if (this.govtBondRate != null && this.rba != null) {
 			// assume rates can't be negative
-			rate = this.govtBondRate.get(0) + this.rba.getCashRateChange(iteration);
+			if (this.govtBondRate.size() > 0) {
+				rate = this.govtBondRate.get(0) + this.rba.getCashRateChange(iteration);
+			} else {
+				rate = this.rateGovernmentLoan + this.rba.getCashRateChange(iteration);
+			}
 			if (!Properties.ALLOW_NEGATIVE_RATES) {
 				rate = Math.max(0f, rate);
 			}
