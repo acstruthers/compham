@@ -600,7 +600,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 			int index = depositor.getPaymentClearingIndex();
 			if (DEBUG) {
 				if (this.depositRate != null) {
-					System.out.print("depositRate = ");
+					System.out.print(this.shortName + " depositRate = ");
 					for (int i = 0; i < this.depositRate.size(); i++) {
 						System.out.print(this.depositRate.get(i) + ",");
 					}
