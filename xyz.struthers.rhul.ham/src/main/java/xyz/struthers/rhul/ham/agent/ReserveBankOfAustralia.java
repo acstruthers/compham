@@ -23,6 +23,8 @@ import xyz.struthers.rhul.ham.process.NodePayment;
  */
 public final class ReserveBankOfAustralia extends Agent implements Employer {
 
+	private static boolean DEBUG = true;
+	
 	private static final long serialVersionUID = 1L;
 
 	private final float NUMBER_MONTHS = 12f;
@@ -183,6 +185,18 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
 		sb.append(wholeNumber.format(this.employees != null ? this.employees.size() : 0) + separator);
 		sb.append(wholeNumber.format(this.adiDepositors != null ? this.adiDepositors.size() : 0) + separator);
+		if (DEBUG) {
+			if (this.cashRate != null) {
+				System.out.print("RBA cashRate for iteration " + iteration + " = ");
+				for (int i = 0; i < this.cashRate.size(); i++) {
+					System.out.print(this.cashRate.get(i) + ",");
+				}
+				System.out.println(".");
+			} else {
+				System.out.println("cashRate is null");
+			}
+		}
+		// FIXME On next line: Exception: Index 1 out of bounds for length 1
 		sb.append(percent.format(this.cashRate != null ? this.cashRate.get(iteration) : 0) + separator);
 		sb.append(decimal.format(this.pnlInterestIncome) + separator);
 		sb.append(decimal.format(this.pnlInterestExpense) + separator);
@@ -441,7 +455,7 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 		}
 		return interestRate;
 	}
-	
+
 	public float setCashRateCustomPath(int iteration, float[] customRates) {
 		if (this.cashRate == null) {
 			this.cashRate = new ArrayList<Float>(customRates.length); // assume we model at least a year
@@ -449,7 +463,7 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 		}
 		float interestRate = 0f;
 		if (this.cashRate.size() > iteration) {
-			if(customRates.length > iteration) {
+			if (customRates.length > iteration) {
 				interestRate = (iteration == 0 ? OCR_INITIAL : customRates[iteration]);
 			} else {
 				// iteration would read past end of the array, so use the previous rate
@@ -457,15 +471,16 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 			}
 			this.cashRate.set(iteration, interestRate);
 		} else if (this.cashRate.size() == (iteration - 1)) {
-			if(customRates.length > iteration) {
+			if (customRates.length > iteration) {
 				interestRate = (iteration == 0 ? OCR_INITIAL : customRates[iteration]);
-			}else{
+			} else {
 				// iteration would read past end of the array, so use the previous rate
 				interestRate = (iteration == 0 ? OCR_INITIAL : this.cashRate.get(iteration - 1));
 			}
 			this.cashRate.add(interestRate);
 		} else {
 			interestRate = OCR_INITIAL;
+			this.cashRate.add(interestRate);
 		}
 		return interestRate;
 	}
