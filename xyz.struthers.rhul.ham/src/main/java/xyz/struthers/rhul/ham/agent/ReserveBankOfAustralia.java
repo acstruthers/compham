@@ -24,7 +24,7 @@ import xyz.struthers.rhul.ham.process.NodePayment;
 public final class ReserveBankOfAustralia extends Agent implements Employer {
 
 	private static boolean DEBUG = true;
-	
+
 	private static final long serialVersionUID = 1L;
 
 	private final float NUMBER_MONTHS = 12f;
@@ -195,6 +195,7 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 			} else {
 				System.out.println("cashRate is null");
 			}
+			// RBA cashRate for iteration 1 = 0.015,.
 		}
 		// FIXME On next line: Exception: Index 1 out of bounds for length 1
 		sb.append(percent.format(this.cashRate != null ? this.cashRate.get(iteration) : 0) + separator);
@@ -439,6 +440,7 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 	}
 
 	public float setCashRateSame(int iteration) {
+		// FIXME: this isn't adding a cash rate for iteration 1 (only 1 element)
 		if (this.cashRate == null) {
 			this.cashRate = new ArrayList<Float>(12); // assume we model at least a year
 			this.cashRate.add(OCR_INITIAL);

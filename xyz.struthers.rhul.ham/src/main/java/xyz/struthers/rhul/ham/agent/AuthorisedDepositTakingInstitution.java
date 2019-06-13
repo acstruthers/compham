@@ -26,7 +26,7 @@ import xyz.struthers.rhul.ham.process.Tax;
  */
 public abstract class AuthorisedDepositTakingInstitution extends Agent implements Employer {
 
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 
 	private static final long serialVersionUID = 1L;
 
