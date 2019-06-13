@@ -26,6 +26,8 @@ import xyz.struthers.rhul.ham.process.Tax;
  */
 public abstract class AuthorisedDepositTakingInstitution extends Agent implements Employer {
 
+	private static final boolean DEBUG = true;
+
 	private static final long serialVersionUID = 1L;
 
 	public static final float NUMBER_MONTHS = 12f; // for interest calcs
@@ -596,6 +598,17 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		// calculate amount due to retail depositors
 		for (Household depositor : this.retailDepositors) {
 			int index = depositor.getPaymentClearingIndex();
+			if (DEBUG) {
+				if (this.depositRate != null) {
+					System.out.print("depositRate = ");
+					for (int i = 0; i < this.depositRate.size(); i++) {
+						System.out.print(this.depositRate.get(i) + ",");
+					}
+					System.out.println(".");
+				} else {
+					System.out.println("depositRate is null");
+				}
+			}
 			// FIXME: index error on next line. Prob need to set next ADI interest rate.
 			float monthlyInterest = depositor.getBsBankDeposits() * this.depositRate.get(iteration) / NUMBER_MONTHS;
 			liabilities.add(new NodePayment(index, monthlyInterest));
