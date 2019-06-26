@@ -32,7 +32,9 @@ public class CpvSocketClient {
 
 	// TODO: update name & iterations for each scenario (in properties file)
 	public final static String SCENARIO_NAME = "Baseline";
-	public final static int NUM_ITERATIONS = 13; // first iteration is zero
+	public final static boolean[] SAVE_ITERATION_SUMMARY = new boolean[] { true, false, false, false, false, false,
+			false, false, false, false, false, false, true };
+	public final static int NUM_ITERATIONS = SAVE_ITERATION_SUMMARY.length; // first iteration is zero
 
 	static Thread t;
 	// static Client client = null;
@@ -235,8 +237,9 @@ public class CpvSocketClient {
 			memoryBefore = memoryAfter;
 
 			// save summary to file
-			economy.saveSummaryToFile(iteration, SCENARIO_NAME);
-
+			if (SAVE_ITERATION_SUMMARY[iteration]) {
+				economy.saveSummaryToFile(iteration, SCENARIO_NAME);
+			}
 			// details after being updated with CPV output
 			// 6.32GB of CSV files (takes 4 minutes to write to disk)
 			// economy.saveDetailsToFile(iteration);
