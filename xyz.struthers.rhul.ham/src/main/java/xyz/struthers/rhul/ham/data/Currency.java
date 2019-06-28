@@ -135,6 +135,7 @@ public class Currency implements Serializable {
 			this.exchangeRate.add(exchangeRate);
 		} else {
 			result = 1;
+			//this.exchangeRate.add(result);
 		}
 		return result;
 	}
@@ -156,6 +157,7 @@ public class Currency implements Serializable {
 			this.exchangeRate.add(prevFxRate);
 		} else {
 			fxRate = 1f;
+			//this.exchangeRate.add(fxRate);
 		}
 		return fxRate;
 	}
@@ -289,10 +291,10 @@ public class Currency implements Serializable {
 		float newFxRate = 0f;
 		if (use5yrStdDev) {
 			// use 5-year standard deviation
-			oldFxRate = (float) (oldFxRate + numStdDevs * this.stdev5yr);
+			newFxRate = (float) (oldFxRate + numStdDevs * this.stdev5yr);
 		} else {
 			// use 1-year standard deviation
-			oldFxRate = (float) (oldFxRate + numStdDevs * this.stdev1yr);
+			newFxRate = (float) (oldFxRate + numStdDevs * this.stdev1yr);
 		}
 		return newFxRate;
 	}

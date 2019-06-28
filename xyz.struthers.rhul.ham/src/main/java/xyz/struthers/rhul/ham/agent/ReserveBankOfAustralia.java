@@ -449,11 +449,12 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 		if (this.cashRate.size() > iteration) {
 			interestRate = (iteration == 0 ? OCR_INITIAL : this.cashRate.get(iteration - 1));
 			this.cashRate.set(iteration, interestRate);
-		} else if (this.cashRate.size() == (iteration - 1)) {
+		} else if (this.cashRate.size() == iteration) {
 			interestRate = (iteration == 0 ? OCR_INITIAL : this.cashRate.get(iteration - 1));
 			this.cashRate.add(interestRate);
 		} else {
 			interestRate = OCR_INITIAL;
+			this.cashRate.add(interestRate);
 		}
 		return interestRate;
 	}
@@ -472,7 +473,7 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 				interestRate = (iteration == 0 ? OCR_INITIAL : this.cashRate.get(iteration - 1));
 			}
 			this.cashRate.set(iteration, interestRate);
-		} else if (this.cashRate.size() == (iteration - 1)) {
+		} else if (this.cashRate.size() == iteration) {
 			if (customRates.length > iteration) {
 				interestRate = (iteration == 0 ? OCR_INITIAL : customRates[iteration]);
 			} else {
