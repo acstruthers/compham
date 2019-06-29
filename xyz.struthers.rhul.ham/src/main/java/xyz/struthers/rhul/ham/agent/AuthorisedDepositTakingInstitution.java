@@ -609,7 +609,6 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 					System.out.println("depositRate is null");
 				}
 			}
-			// FIXME: index error on next line. Prob need to set next ADI interest rate.
 			float monthlyInterest = depositor.getBsBankDeposits() * this.depositRate.get(iteration) / NUMBER_MONTHS;
 			liabilities.add(new NodePayment(index, monthlyInterest));
 		}

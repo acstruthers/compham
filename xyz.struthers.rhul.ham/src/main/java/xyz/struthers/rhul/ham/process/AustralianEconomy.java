@@ -614,7 +614,7 @@ public class AustralianEconomy implements Serializable {
 		if (this.random == null) {
 			this.random = this.properties.getRandom();
 		}
-		
+
 		// Assign businesses randomly to new ADI, weighted by business loan balance
 
 		// link to ADI (loans & deposits with same ADI)
@@ -623,38 +623,45 @@ public class AustralianEconomy implements Serializable {
 		float totalLoanBal = (float) Arrays.asList(this.adis).stream().mapToDouble(o -> o.getBsLoansBusiness()).sum();
 		// populate indices with relative amounts of each ADI
 		ArrayList<Business> businessesToReallocate = failedAdi.getCommercialDepositors();
-		ArrayList<Integer> shuffledIndices = new ArrayList<Integer>(businessesToReallocate.size());
-		for (int i = 0; i < this.adis.length; i++) {
-			if (this.adis[i].getPaymentClearingIndex() != failedAdi.getPaymentClearingIndex()) {
-				// calculate ratio of ADI to total
-				float adiLoanBal = this.adis[i].getBsLoansBusiness();
-				if (adiLoanBal > 0f) {
-					// convert to indices, rounding up so we have at least enough
-					int adiCustomerCount = (int) Math.ceil(adiLoanBal / totalLoanBal * businessesToReallocate.size());
-					shuffledIndices.addAll(Collections.nCopies(adiCustomerCount, i));
+		ArrayList<Integer> shuffledIndices = null;
+		int nextShuffledIdx = 0;
+		if (businessesToReallocate != null) {
+			shuffledIndices = new ArrayList<Integer>(businessesToReallocate.size());
+			for (int i = 0; i < this.adis.length; i++) {
+				if (this.adis[i].getPaymentClearingIndex() != failedAdi.getPaymentClearingIndex()) {
+					// calculate ratio of ADI to total
+					float adiLoanBal = this.adis[i].getBsLoansBusiness();
+					if (adiLoanBal > 0f) {
+						// convert to indices, rounding up so we have at least enough
+						int adiCustomerCount = (int) Math
+								.ceil(adiLoanBal / totalLoanBal * businessesToReallocate.size());
+						shuffledIndices.addAll(Collections.nCopies(adiCustomerCount, i));
+					}
 				}
 			}
-		}
-		// shuffle indices, and assign ADIs to Businesses
-		Collections.shuffle(shuffledIndices, this.random);
-		int nextShuffledIdx = 0;
-		for (int i = 0; i < businessesToReallocate.size(); i++) {
-			// Assign loan ADI to Business. It doesn't matter if the Business doesn't have a
-			// loan. We assume businesses only bank with ADIs who have business loans.
-			AuthorisedDepositTakingInstitution adi = this.adis[shuffledIndices.get(nextShuffledIdx++)];
-			businessesToReallocate.get(i).setAdi(adi);
+			// shuffle indices, and assign ADIs to Businesses
+			Collections.shuffle(shuffledIndices, this.random);
+			nextShuffledIdx = 0;
+			for (int i = 0; i < businessesToReallocate.size(); i++) {
+				// Assign loan ADI to Business. It doesn't matter if the Business doesn't have a
+				// loan. We assume businesses only bank with ADIs who have business loans.
+				AuthorisedDepositTakingInstitution adi = this.adis[shuffledIndices.get(nextShuffledIdx++)];
+				businessesToReallocate.get(i).setAdi(adi);
 
-			// add business to ADI and increase loan & deposit balances
-			adi.addCommercialDepositor(businessesToReallocate.get(i)); // adds link to business
-			float businessDepositBalance = adi.getBsDepositsAtCall();
-			adi.setBsDepositsAtCall(businessDepositBalance + businessesToReallocate.get(i).getBankDeposits());
-			float businessLoanBalance = adi.getBsLoansBusiness();
-			adi.setBsLoansBusiness(businessLoanBalance + businessesToReallocate.get(i).getLoans());
-			// TODO update ADI's RWA? Or is it calculated elsewhere?
+				// add business to ADI and increase loan & deposit balances
+				adi.addCommercialDepositor(businessesToReallocate.get(i)); // adds link to business
+				float businessDepositBalance = adi.getBsDepositsAtCall();
+				adi.setBsDepositsAtCall(businessDepositBalance + businessesToReallocate.get(i).getBankDeposits());
+				float businessLoanBalance = adi.getBsLoansBusiness();
+				adi.setBsLoansBusiness(businessLoanBalance + businessesToReallocate.get(i).getLoans());
+				// TODO update ADI's RWA? Or is it calculated elsewhere?
+			}
+			// release memory
+			if (shuffledIndices != null) {
+				shuffledIndices.clear();
+				shuffledIndices = null;
+			}
 		}
-		// release memory
-		shuffledIndices.clear();
-		shuffledIndices = null;
 
 		////////////////////////////////////////////////////////////////////////////////////
 		// FIXME assign retail depositors & borrowers (Households) randomly to new ADI,
