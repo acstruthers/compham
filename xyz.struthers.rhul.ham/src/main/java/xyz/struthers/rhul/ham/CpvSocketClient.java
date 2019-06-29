@@ -32,8 +32,8 @@ public class CpvSocketClient {
 
 	// TODO: update name & iterations for each scenario (in properties file)
 	public final static String SCENARIO_NAME = "Baseline";
-	public final static boolean[] SAVE_ITERATION_SUMMARY = new boolean[] { true, false, false, false, false, false,
-			false, false, false, false, false, false, true };
+	public final static boolean[] SAVE_ITERATION_SUMMARY = new boolean[] { true, true, true, true, true, true,
+			true, true, true, true, true, true, true };
 	public final static int NUM_ITERATIONS = SAVE_ITERATION_SUMMARY.length; // first iteration is zero
 
 	static Thread t;
