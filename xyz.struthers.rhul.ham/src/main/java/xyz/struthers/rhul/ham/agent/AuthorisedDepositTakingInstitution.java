@@ -730,15 +730,19 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		float totalDeposits = this.bsDepositsAtCall + this.bsDepositsTerm + this.bsDepositsAdiRepoEligible;
 		float fcsGuaranteedRatio = totalDeposits > fcsAdiLimit ? fcsAdiLimit / totalDeposits : 1f;
 		// distribute deposits to
-		for (Household household : this.retailDepositors) {
-			float newDepositBal = Math.min(household.getBsBankDeposits() * fcsGuaranteedRatio,
-					Properties.FCS_LIMIT_PER_DEPOSITOR);
-			household.setBsBankDeposits(newDepositBal);
+		if (this.retailDepositors != null) {
+			for (Household household : this.retailDepositors) {
+				float newDepositBal = Math.min(household.getBsBankDeposits() * fcsGuaranteedRatio,
+						Properties.FCS_LIMIT_PER_DEPOSITOR);
+				household.setBsBankDeposits(newDepositBal);
+			}
 		}
-		for (Business business : this.commercialDepositors) {
-			float newDepositBal = Math.min(business.getBankDeposits() * fcsGuaranteedRatio,
-					Properties.FCS_LIMIT_PER_DEPOSITOR);
-			business.setBankDeposits(newDepositBal);
+		if (this.commercialDepositors != null) {
+			for (Business business : this.commercialDepositors) {
+				float newDepositBal = Math.min(business.getBankDeposits() * fcsGuaranteedRatio,
+						Properties.FCS_LIMIT_PER_DEPOSITOR);
+				business.setBankDeposits(newDepositBal);
+			}
 		}
 
 		// ADI is bankrupt, so zero out all its financials
@@ -778,6 +782,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		this.bsOtherEquity = 0f;
 
 		return Clearable.BANKRUPT;
+
 	}
 
 	/**
