@@ -333,7 +333,7 @@ public final class AustralianGovernment extends Agent implements Employer {
 
 		// update financials
 		this.bsCash += nodeEquity;
-		
+
 		return Clearable.OK; // assume government never defaults
 	}
 
@@ -465,6 +465,10 @@ public final class AustralianGovernment extends Agent implements Employer {
 		result.put("Other liabilities", this.bsOtherLiabilities);
 
 		return result;
+	}
+
+	public float getTotalIncome() {
+		return this.pnlTaxIncome + this.pnlSaleOfGoodsAndServices + this.pnlInterestIncome + this.pnlOtherIncome;
 	}
 
 	protected void init() {

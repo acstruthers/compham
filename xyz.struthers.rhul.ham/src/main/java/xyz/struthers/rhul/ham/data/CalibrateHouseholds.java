@@ -29,6 +29,7 @@ import xyz.struthers.rhul.ham.agent.Household;
 import xyz.struthers.rhul.ham.agent.Individual;
 import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
+import xyz.struthers.rhul.ham.process.Tax;
 
 /**
  * Calibrates the P&L and Bal Shts of households by grouping together the P&L
@@ -44,12 +45,12 @@ public class CalibrateHouseholds {
 	private static final boolean DEBUG = true;
 
 	// CONSTANTS
-	//private static final float MILLION = 1000000f;
-	//private static final float THOUSAND = 1000f;
+	// private static final float MILLION = 1000000f;
+	// private static final float THOUSAND = 1000f;
 	private static final float PERCENT = 0.01f;
 
-	//private static final float NUM_MONTHS = 12f;
-	//private static final float NUM_WEEKS = 365f / 7f;
+	// private static final float NUM_MONTHS = 12f;
+	// private static final float NUM_WEEKS = 365f / 7f;
 
 	public static final String ABS_1410_YEAR = "2016";
 	public static final String CALIBRATION_DATE_ABS = "01/06/2018";
@@ -157,13 +158,19 @@ public class CalibrateHouseholds {
 	private static final String RBA_E2_SERIESID_DEBT_TO_INCOME = "BHFDDIT";
 	private static final String RBA_E2_SERIESID_ASSETS_TO_INCOME = "BHFADIT";
 
-	//private static final String ABS_1410_ECONOMY_HOUSE_COUNT = "Houses - number of transfers";
-	//private static final String ABS_1410_ECONOMY_HOUSE_AMOUNT = "Houses - median sale price";
-	//private static final String ABS_1410_ECONOMY_UNIT_COUNT = "Attached Dwellings - number of transfers";
-	//private static final String ABS_1410_ECONOMY_UNIT_AMOUNT = "Attached Dwellings - median sale price";
+	// private static final String ABS_1410_ECONOMY_HOUSE_COUNT = "Houses - number
+	// of transfers";
+	// private static final String ABS_1410_ECONOMY_HOUSE_AMOUNT = "Houses - median
+	// sale price";
+	// private static final String ABS_1410_ECONOMY_UNIT_COUNT = "Attached Dwellings
+	// - number of transfers";
+	// private static final String ABS_1410_ECONOMY_UNIT_AMOUNT = "Attached
+	// Dwellings - median sale price";
 
-	//private static final String ABS_1410_FAMILY_MRERD_OVER_30 = "Households with mortgage repayments greater than or equal to 30% of household income";
-	//private static final String ABS_1410_FAMILY_RNTRD_OVER_30 = "Households with rent payments greater than or equal to 30% of household income";
+	// private static final String ABS_1410_FAMILY_MRERD_OVER_30 = "Households with
+	// mortgage repayments greater than or equal to 30% of household income";
+	// private static final String ABS_1410_FAMILY_RNTRD_OVER_30 = "Households with
+	// rent payments greater than or equal to 30% of household income";
 
 	// beans
 	private CalibrationData commonData;
@@ -175,16 +182,16 @@ public class CalibrateHouseholds {
 
 	// field variables
 	private Random random;
-	//private Date calibrationDateAbs;
+	// private Date calibrationDateAbs;
 	private Date calibrationDateRba;
 	private int totalPopulationAU;
-	//private float populationMultiplier;
-	//private Map<String, Integer> lgaPeopleCount; // adjusted to 2018
-	//private Map<String, Integer> lgaDwellingsCount; // adjusted to 2018
+	// private float populationMultiplier;
+	// private Map<String, Integer> lgaPeopleCount; // adjusted to 2018
+	// private Map<String, Integer> lgaDwellingsCount; // adjusted to 2018
 	private Map<String, Integer> poaIndexMap; // from Individual agent data
-	//private Map<String, Integer> lgaIndexMap;
+	// private Map<String, Integer> lgaIndexMap;
 
-	//private static int agentNo = 0;
+	// private static int agentNo = 0;
 	private static int nullIndividualNo = 0;
 	private static int rawFamilyCount = 0;
 
@@ -235,7 +242,7 @@ public class CalibrateHouseholds {
 	 * 
 	 * Keys: Year (yyyy), LGA code, Series Title
 	 */
-	//private Map<String, Map<String, Map<String, Float>>> abs1410_0Economy;
+	// private Map<String, Map<String, Map<String, Float>>> abs1410_0Economy;
 	/**
 	 * Data by LGA: Family
 	 * 
@@ -245,7 +252,7 @@ public class CalibrateHouseholds {
 	 * 
 	 * Keys: Year (yyyy), LGA code, Series Title
 	 */
-	//private Map<String, Map<String, Map<String, Float>>> abs1410_0Family;
+	// private Map<String, Map<String, Map<String, Float>>> abs1410_0Family;
 	/**
 	 * ABS Census Table Builder data:<br>
 	 * HCFMD by LGA by HIND and RNTRD<br>
@@ -300,15 +307,15 @@ public class CalibrateHouseholds {
 		// set the calibration date
 		DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
 		try {
-			//this.calibrationDateAbs = sdf.parse(CALIBRATION_DATE_ABS);
+			// this.calibrationDateAbs = sdf.parse(CALIBRATION_DATE_ABS);
 			this.calibrationDateRba = sdf.parse(CALIBRATION_DATE_RBA);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
 
 		// get raw calibration data
-		//this.abs1410_0Economy = this.householdData.getAbs1410_0Economy();
-		//this.abs1410_0Family = this.householdData.getAbs1410_0Family();
+		// this.abs1410_0Economy = this.householdData.getAbs1410_0Economy();
+		// this.abs1410_0Family = this.householdData.getAbs1410_0Family();
 		this.rbaE1 = this.commonData.getRbaE1();
 		this.rbaE2 = this.householdData.getRbaE2();
 		this.censusHCFMD_LGA_HIND_RNTRD = this.householdData.getCensusHCFMD_LGA_HIND_RNTRD();
@@ -318,8 +325,10 @@ public class CalibrateHouseholds {
 		this.totalPopulationAU = this.calibrateIndividuals.getTotalPopulationAU();
 
 		// get key metrics that will be used across all the data
-		//this.lgaDwellingsCount = this.area.getAdjustedDwellingsByLga(this.calibrationDateAbs);
-		//this.populationMultiplier = this.area.getPopulationMultiplier(this.calibrationDateAbs);
+		// this.lgaDwellingsCount =
+		// this.area.getAdjustedDwellingsByLga(this.calibrationDateAbs);
+		// this.populationMultiplier =
+		// this.area.getPopulationMultiplier(this.calibrationDateAbs);
 
 		// create list of Individuals with enough initial capacity
 		if (this.individualAgents == null) {
@@ -817,6 +826,7 @@ public class CalibrateHouseholds {
 									household.setPnlRentExpense(ABS_RNTRD_MIDPOINT[attributeIdx]);
 
 									ArrayList<Individual> members = new ArrayList<Individual>(numAdults + numChildren);
+									ArrayList<Individual> adultMembers = new ArrayList<Individual>(numAdults);
 									int firstAdultIncpIdx = 0;
 									// assign adults
 									if (numAdults == 1) {
@@ -910,6 +920,7 @@ public class CalibrateHouseholds {
 													.get(nextIndividualIdx);
 										}
 										members.add(newFamilyMember);
+										adultMembers.add(newFamilyMember);
 									} else {
 										// multiple adults, so income brackets not so well behaved
 										for (int adultNo = 0; adultNo < numAdults; adultNo++) {
@@ -1384,6 +1395,7 @@ public class CalibrateHouseholds {
 														.get(nextIndividualIdx);
 											}
 											members.add(newFamilyMember);
+											adultMembers.add(newFamilyMember);
 										} // end Adult Number loop
 									} // end if numAdults == 1
 
@@ -1491,12 +1503,62 @@ public class CalibrateHouseholds {
 									household.setNumChildren(numChildren);
 									household.setIndividuals(members.toArray(Individual[]::new));
 
-									//add LGA Code and State to household
+									// add LGA Code and State to household
 									household.setLgaCode(lgaCode);
 									household.setState(this.area.getStateFromLgaCode(lgaCode));
-									
+
 									// consolidate Individual financials into Household financials
 									household.initialiseFinancialsFromIndividuals();
+
+									// adjust Other Income and Other Expenses so that net saving is 1.1%
+									float tmpIncome = household.getIncomeAfterTax();
+									float tmpExpense = household.getTotalExpenses();
+									if (tmpExpense > (tmpIncome * (1 - Properties.HOUSEHOLD_SAVING_RATIO))) {
+										// expenses already too high, so increase other income
+										float assumedMarginalTaxRate = 0.30f;
+										float tmpSavings = tmpIncome * Properties.HOUSEHOLD_SAVING_RATIO
+												/ (1f - assumedMarginalTaxRate);
+										float newIncome = tmpExpense + tmpSavings;
+										float tmpIncomeExclOther = tmpIncome - household.getPnlOtherIncome();
+										float newOtherIncome = tmpExpense + tmpSavings - tmpIncomeExclOther;
+
+										// assign other income back to individuals so tax is right
+										float otherIncomeDivisor = 0f;
+										float[] adultOtherIncome = new float[adultMembers.size()];
+										for (int otherIncomeIdx = 0; otherIncomeIdx < adultMembers
+												.size(); otherIncomeIdx++) {
+											adultOtherIncome[otherIncomeIdx] = adultMembers.get(otherIncomeIdx)
+													.getGrossIncome();
+											otherIncomeDivisor += adultMembers.get(otherIncomeIdx).getGrossIncome();
+										}
+										for (int otherIncomeIdx = 0; otherIncomeIdx < adultMembers
+												.size(); otherIncomeIdx++) {
+											// calculate this adult's share of other income
+											adultOtherIncome[otherIncomeIdx] = otherIncomeDivisor < 0.01f ? 0f
+													: adultOtherIncome[otherIncomeIdx] / otherIncomeDivisor;
+											// set other income in the Individual
+											adultMembers.get(otherIncomeIdx)
+													.setPnlOtherIncome(adultOtherIncome[otherIncomeIdx]);
+											// update individual income tax
+											adultMembers.get(otherIncomeIdx)
+													.setPnlIncomeTaxExpense(Tax.calculateIndividualIncomeTax(
+															adultMembers.get(otherIncomeIdx).getGrossIncome()));
+										}
+										// update household income tax
+										float tmpHouseholdIncomeTax = 0f;
+										for (Individual tmpMember : members) {
+											tmpHouseholdIncomeTax += tmpMember.getPnlIncomeTaxExpense();
+										}
+										household.setPnlIncomeTaxExpense(tmpHouseholdIncomeTax);
+									} else {
+										// income is sufficient, so increase discretionary spending
+										float tmpSavings = tmpIncome * Properties.HOUSEHOLD_SAVING_RATIO;
+										float newTotalExpenses = tmpIncome - tmpSavings;
+										float tmpExpenseExclOther = tmpExpense
+												- household.getPnlOtherDiscretionaryExpenses();
+										float newOtherExpenses = newTotalExpenses - tmpExpenseExclOther;
+										household.setPnlOtherDiscretionaryExpenses(newOtherExpenses);
+									}
 
 									// calibrate Bal Sht based on RBA data
 									// all ratios are based on gross income from P&L already calibrated
@@ -1627,18 +1689,18 @@ public class CalibrateHouseholds {
 		// calibration data
 		this.rbaE1 = null;
 		this.rbaE2 = null;
-		//this.abs1410_0Economy = null;
-		//this.abs1410_0Family = null;
+		// this.abs1410_0Economy = null;
+		// this.abs1410_0Family = null;
 		this.censusHCFMD_LGA_HIND_RNTRD = null;
 		this.censusHCFMD_LGA_HIND_MRERD = null;
 		this.censusHCFMF_LGA_FINF_CDCF = null;
 
 		// field variables
 		this.random = null;
-		//this.calibrationDateAbs = null;
+		// this.calibrationDateAbs = null;
 		this.calibrationDateRba = null;
-		//this.populationMultiplier = 0f;
-		//this.lgaDwellingsCount = null;
+		// this.populationMultiplier = 0f;
+		// this.lgaDwellingsCount = null;
 		this.poaIndexMap = null;
 
 		// agents
@@ -1664,12 +1726,12 @@ public class CalibrateHouseholds {
 		// at an appropriate time
 		this.properties = null;
 		this.random = null;
-		//this.calibrationDateAbs = null;
+		// this.calibrationDateAbs = null;
 		this.calibrationDateRba = null;
-		//this.lgaPeopleCount = null;
-		//this.lgaDwellingsCount = null;
+		// this.lgaPeopleCount = null;
+		// this.lgaDwellingsCount = null;
 		this.poaIndexMap = null;
-		//this.lgaIndexMap = null;
+		// this.lgaIndexMap = null;
 
 		// finished with Household-specific data, so perform a deep delete
 		this.householdData.close();

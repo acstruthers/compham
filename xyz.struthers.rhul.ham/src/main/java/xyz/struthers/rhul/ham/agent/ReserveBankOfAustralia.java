@@ -523,6 +523,11 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 		return result;
 	}
 
+	public float getTotalIncome() {
+		return this.pnlInterestIncome + this.pnlCommittedLiquidityFacilityFees + this.pnlForeignExchangeGainsLosses
+				+ this.pnlAudSecurities + this.pnlOtherIncome;
+	}
+
 	protected void init() {
 
 		// Agent details

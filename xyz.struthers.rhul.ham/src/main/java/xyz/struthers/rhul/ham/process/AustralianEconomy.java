@@ -371,12 +371,14 @@ public class AustralianEconomy implements Serializable {
 		this.liabilitiesIndices = new ArrayList<List<Integer>>(totalAgentCount);
 		this.operatingCashFlow = new ArrayList<Float>(totalAgentCount);
 		this.liquidAssets = new ArrayList<Float>(totalAgentCount);
+		ArrayList<Float> receivableFromAnotherAgent = new ArrayList<Float>(totalAgentCount);
 		for (int i = 0; i < totalAgentCount; i++) {
 			// initialise them so we can use set without getting index out of bounds errors
 			this.liabilitiesAmounts.add(new ArrayList<Float>());
 			this.liabilitiesIndices.add(new ArrayList<Integer>());
 			this.operatingCashFlow.add(0f);
 			this.liquidAssets.add(0f);
+			receivableFromAnotherAgent.add(0f);
 		}
 
 		// households
@@ -388,17 +390,20 @@ public class AustralianEconomy implements Serializable {
 			ArrayList<Float> liabilityAmounts = new ArrayList<Float>(nodePayments.size());
 			ArrayList<Integer> liabilityIndices = new ArrayList<Integer>(nodePayments.size());
 			for (int creditorIdx = 0; creditorIdx < nodePayments.size(); creditorIdx++) {
-				liabilityAmounts.add(nodePayments.get(creditorIdx).getLiabilityAmount());
-				liabilityIndices.add(nodePayments.get(creditorIdx).getRecipientIndex());
+				float liabAmt = nodePayments.get(creditorIdx).getLiabilityAmount();
+				liabilityAmounts.add(liabAmt);
+				int liabIdx = nodePayments.get(creditorIdx).getRecipientIndex();
+				liabilityIndices.add(liabIdx);
+
+				// add liabilities to recipient's receivables so we can calculate exogeneous
+				// cash flow. N.B. exogeneous cash flow calculated below after all liabilities
+				// are set
+				receivableFromAnotherAgent.set(liabIdx, receivableFromAnotherAgent.get(liabIdx) + liabAmt);
 			}
 			liabilityAmounts.trimToSize();
 			liabilityIndices.trimToSize();
 			this.liabilitiesAmounts.set(paymentClearingIndex, liabilityAmounts);
 			this.liabilitiesIndices.set(paymentClearingIndex, liabilityIndices);
-
-			// calculate exogeneous cash flow (i.e. not from another Agent)
-			float exogeneous = household.getPnlInvestmentIncome() + household.getPnlOtherIncome();
-			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
 
 			// calculate liquid assets
 			float liquid = household.getBsBankDeposits()
@@ -415,17 +420,20 @@ public class AustralianEconomy implements Serializable {
 			ArrayList<Float> liabilityAmounts = new ArrayList<Float>(nodePayments.size());
 			ArrayList<Integer> liabilityIndices = new ArrayList<Integer>(nodePayments.size());
 			for (int creditorIdx = 0; creditorIdx < nodePayments.size(); creditorIdx++) {
-				liabilityAmounts.add(nodePayments.get(creditorIdx).getLiabilityAmount());
-				liabilityIndices.add(nodePayments.get(creditorIdx).getRecipientIndex());
+				float liabAmt = nodePayments.get(creditorIdx).getLiabilityAmount();
+				liabilityAmounts.add(liabAmt);
+				int liabIdx = nodePayments.get(creditorIdx).getRecipientIndex();
+				liabilityIndices.add(liabIdx);
+
+				// add liabilities to recipient's receivables so we can calculate exogeneous
+				// cash flow. N.B. exogeneous cash flow calculated below after all liabilities
+				// are set
+				receivableFromAnotherAgent.set(liabIdx, receivableFromAnotherAgent.get(liabIdx) + liabAmt);
 			}
 			liabilityAmounts.trimToSize();
 			liabilityIndices.trimToSize();
 			this.liabilitiesAmounts.set(paymentClearingIndex, liabilityAmounts);
 			this.liabilitiesIndices.set(paymentClearingIndex, liabilityIndices);
-
-			// calculate exogeneous cash flow (i.e. not from another Agent)
-			float exogeneous = business.getOtherIncome();
-			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
 
 			// calculate liquid assets
 			float liquid = business.getBankDeposits()
@@ -443,24 +451,27 @@ public class AustralianEconomy implements Serializable {
 			ArrayList<Float> liabilityAmounts = new ArrayList<Float>(nodePayments.size());
 			ArrayList<Integer> liabilityIndices = new ArrayList<Integer>(nodePayments.size());
 			for (int creditorIdx = 0; creditorIdx < nodePayments.size(); creditorIdx++) {
-				liabilityAmounts.add(nodePayments.get(creditorIdx).getLiabilityAmount());
-				liabilityIndices.add(nodePayments.get(creditorIdx).getRecipientIndex());
+				float liabAmt = nodePayments.get(creditorIdx).getLiabilityAmount();
+				liabilityAmounts.add(liabAmt);
+				int liabIdx = nodePayments.get(creditorIdx).getRecipientIndex();
+				liabilityIndices.add(liabIdx);
+
+				// add liabilities to recipient's receivables so we can calculate exogeneous
+				// cash flow. N.B. exogeneous cash flow calculated below after all liabilities
+				// are set
+				receivableFromAnotherAgent.set(liabIdx, receivableFromAnotherAgent.get(liabIdx) + liabAmt);
 			}
 			liabilityAmounts.trimToSize();
 			liabilityIndices.trimToSize();
 			this.liabilitiesAmounts.set(paymentClearingIndex, liabilityAmounts);
 			this.liabilitiesIndices.set(paymentClearingIndex, liabilityIndices);
 
-			// calculate exogeneous cash flow (i.e. not from another Agent)
-			float exogeneous = adi.getPnlTradingIncome() + adi.getPnlInvestmentIncome() + adi.getPnlOtherIncome();
-			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
-
 			// calculate liquid assets
 			float liquid = adi.getBsCash() + adi.getBsInvestments() * Properties.ADI_HQLA_PROPORTION;
 			this.liquidAssets.set(paymentClearingIndex, liquid);
 		}
 
-		// countries
+		// foreign countries
 		for (ForeignCountry country : this.countries) {
 			int paymentClearingIndex = country.getPaymentClearingIndex();
 
@@ -469,8 +480,15 @@ public class AustralianEconomy implements Serializable {
 			ArrayList<Float> liabilityAmounts = new ArrayList<Float>(nodePayments.size());
 			ArrayList<Integer> liabilityIndices = new ArrayList<Integer>(nodePayments.size());
 			for (int creditorIdx = 0; creditorIdx < nodePayments.size(); creditorIdx++) {
-				liabilityAmounts.add(nodePayments.get(creditorIdx).getLiabilityAmount());
-				liabilityIndices.add(nodePayments.get(creditorIdx).getRecipientIndex());
+				float liabAmt = nodePayments.get(creditorIdx).getLiabilityAmount();
+				liabilityAmounts.add(liabAmt);
+				int liabIdx = nodePayments.get(creditorIdx).getRecipientIndex();
+				liabilityIndices.add(liabIdx);
+
+				// add liabilities to recipient's receivables so we can calculate exogeneous
+				// cash flow. N.B. exogeneous cash flow calculated below after all liabilities
+				// are set
+				receivableFromAnotherAgent.set(liabIdx, receivableFromAnotherAgent.get(liabIdx) + liabAmt);
 			}
 			liabilityAmounts.trimToSize();
 			liabilityIndices.trimToSize();
@@ -497,19 +515,20 @@ public class AustralianEconomy implements Serializable {
 			ArrayList<Float> liabilityAmounts = new ArrayList<Float>(nodePayments.size());
 			ArrayList<Integer> liabilityIndices = new ArrayList<Integer>(nodePayments.size());
 			for (int creditorIdx = 0; creditorIdx < nodePayments.size(); creditorIdx++) {
-				liabilityAmounts.add(nodePayments.get(creditorIdx).getLiabilityAmount());
-				liabilityIndices.add(nodePayments.get(creditorIdx).getRecipientIndex());
+				float liabAmt = nodePayments.get(creditorIdx).getLiabilityAmount();
+				liabilityAmounts.add(liabAmt);
+				int liabIdx = nodePayments.get(creditorIdx).getRecipientIndex();
+				liabilityIndices.add(liabIdx);
+
+				// add liabilities to recipient's receivables so we can calculate exogeneous
+				// cash flow. N.B. exogeneous cash flow calculated below after all liabilities
+				// are set
+				receivableFromAnotherAgent.set(liabIdx, receivableFromAnotherAgent.get(liabIdx) + liabAmt);
 			}
 			liabilityAmounts.trimToSize();
 			liabilityIndices.trimToSize();
 			this.liabilitiesAmounts.set(paymentClearingIndex, liabilityAmounts);
 			this.liabilitiesIndices.set(paymentClearingIndex, liabilityIndices);
-
-			// calculate exogeneous cash flow (i.e. not from another Agent)
-			// the government is assumed to never default
-			// whatever it is short by it simply borrows
-			float exogeneous = this.government.getPnlSaleOfGoodsAndServices() + this.government.getPnlOtherIncome();
-			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
 
 			// calculate liquid assets
 			float liquid = BUFFER_GOVT; // buffer so government never defaults
@@ -525,24 +544,94 @@ public class AustralianEconomy implements Serializable {
 			ArrayList<Float> liabilityAmounts = new ArrayList<Float>(nodePayments.size());
 			ArrayList<Integer> liabilityIndices = new ArrayList<Integer>(nodePayments.size());
 			for (int creditorIdx = 0; creditorIdx < nodePayments.size(); creditorIdx++) {
-				liabilityAmounts.add(nodePayments.get(creditorIdx).getLiabilityAmount());
-				liabilityIndices.add(nodePayments.get(creditorIdx).getRecipientIndex());
+				float liabAmt = nodePayments.get(creditorIdx).getLiabilityAmount();
+				liabilityAmounts.add(liabAmt);
+				int liabIdx = nodePayments.get(creditorIdx).getRecipientIndex();
+				liabilityIndices.add(liabIdx);
+
+				// add liabilities to recipient's receivables so we can calculate exogeneous
+				// cash flow. N.B. exogeneous cash flow calculated below after all liabilities
+				// are set
+				receivableFromAnotherAgent.set(liabIdx, receivableFromAnotherAgent.get(liabIdx) + liabAmt);
 			}
 			liabilityAmounts.trimToSize();
 			liabilityIndices.trimToSize();
 			this.liabilitiesAmounts.set(paymentClearingIndex, liabilityAmounts);
 			this.liabilitiesIndices.set(paymentClearingIndex, liabilityIndices);
 
-			// calculate exogeneous cash flow (i.e. not from another Agent)
-			// N.B. The RBA is assumed to never default.
-			// Whatever it is short by it simply borrows.
-			float exogeneous = this.rba.getPnlPersonnelExpenses() + this.rba.getPnlOtherExpenses()
-					+ this.rba.getPnlDistributionPayableToCommonwealth() + this.rba.getBsCash();
-			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
-
 			// calculate liquid assets
 			float liquid = BUFFER_RBA; // buffer so RBA never defaults
 			this.liquidAssets.set(paymentClearingIndex, liquid);
+		}
+
+		/*
+		 * SET EXOGENEOUS CASH FLOW
+		 * 
+		 * Take the cash income from the agent's P&L, and subtract the amounts
+		 * receivable from other agents. The difference is the agent's exogeneous cash
+		 * flow income.
+		 * 
+		 * TODO Exogeneous cash flow expenses must be handled via a dummy agent because
+		 * the CPV needs to be able to apply pro-rata payments to the exogeneous cash
+		 * flow expenses too if the agent defaults.
+		 */
+		// households
+		for (Household household : this.households) {
+			int paymentClearingIndex = household.getPaymentClearingIndex();
+
+			// calculate exogeneous cash flow (i.e. not from another Agent)
+			float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
+			float calibratedIncome = household.getGrossIncome();
+			float exogeneousIncome = calibratedIncome - receivable;
+			this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
+		}
+
+		// businesses
+		for (Business business : this.businesses) {
+			int paymentClearingIndex = business.getPaymentClearingIndex();
+
+			// calculate exogeneous cash flow (i.e. not from another Agent)
+			float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
+			float calibratedIncome = business.getTotalIncome();
+			float exogeneousIncome = calibratedIncome - receivable;
+			this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
+		}
+
+		// ADIs
+		for (AuthorisedDepositTakingInstitution adi : this.adis) {
+			int paymentClearingIndex = adi.getPaymentClearingIndex();
+
+			// calculate exogeneous cash flow (i.e. not from another Agent)
+			float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
+			float calibratedIncome = adi.getTotalIncome();
+			float exogeneousIncome = calibratedIncome - receivable;
+			this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
+		}
+
+		// government
+		{
+			int paymentClearingIndex = this.government.getPaymentClearingIndex();
+			// N.B. The government is assumed to never default.
+			// Whatever it is short by it simply borrows.
+
+			// calculate exogeneous cash flow (i.e. not from another Agent)
+			float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
+			float calibratedIncome = this.government.getTotalIncome();
+			float exogeneousIncome = calibratedIncome - receivable;
+			this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
+		}
+
+		// RBA
+		{
+			int paymentClearingIndex = this.rba.getPaymentClearingIndex();
+			// N.B. The RBA is assumed to never default.
+			// Whatever it is short by it simply borrows.
+
+			// calculate exogeneous cash flow (i.e. not from another Agent)
+			float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
+			float calibratedIncome = this.rba.getTotalIncome();
+			float exogeneousIncome = calibratedIncome - receivable;
+			this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
 		}
 	}
 

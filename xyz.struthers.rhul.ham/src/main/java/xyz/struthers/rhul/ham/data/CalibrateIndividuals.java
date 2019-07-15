@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 import xyz.struthers.lang.CustomMath;
 import xyz.struthers.rhul.ham.agent.Individual;
 import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.process.Tax;
 
 /**
  * Calibrates the P&L and Bal Shts of individuals. These are later grouped
@@ -1130,64 +1131,6 @@ public class CalibrateIndividuals {
 													+ this.atoIndividualTable3a.get(ATO_3A_TITLE_ALLOWANCES_AMOUNT)
 															.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
 													.longValue());
-									if (DEBUG_ZEROS1129) {
-										if (this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT).get(incomeRangeAto)
-												.get(age).get(sex).get(taxableStatus) > 0f) {
-											System.out.println("1127: incomeMapNum: " + incomeMapNum);
-											System.out.println("1128: atoCountEmployed.get(incomeMapNum): "
-													+ atoCountEmployed.get(incomeMapNum));
-											System.out.println("1130: atoAmountEmployed.get(incomeMapNum): "
-													+ atoAmountEmployed.get(incomeMapNum));
-											System.out.println(
-													"1132: ATO_3A_TITLE_SALARY_AMOUNT: " + ATO_3A_TITLE_SALARY_AMOUNT);
-											System.out.println("1134: incomeRangeAto: " + incomeRangeAto);
-											System.out.println("1135: age: " + age);
-											System.out.println("1136: sex: " + sex);
-											System.out.println("1137: taxableStatus: " + taxableStatus);
-											System.out.println(
-													"1138: this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_AMOUNT).get(incomeRangeAto).get(age).get(sex).get(taxableStatus): "
-															+ this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_AMOUNT)
-																	.get(incomeRangeAto).get(age).get(sex)
-																	.get(taxableStatus));
-											System.out.println(
-													"1148: this.atoIndividualTable3a.get(ATO_3A_TITLE_ALLOWANCES_AMOUNT).get(incomeRangeAto).get(age).get(sex).get(taxableStatus): "
-															+ this.atoIndividualTable3a
-																	.get(ATO_3A_TITLE_ALLOWANCES_AMOUNT)
-																	.get(incomeRangeAto).get(age).get(sex)
-																	.get(taxableStatus));
-											System.out.println(
-													"1156: this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT).get(incomeRangeAto).get(age).get(sex).get(taxableStatus): "
-															+ this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT)
-																	.get(incomeRangeAto).get(age).get(sex)
-																	.get(taxableStatus));
-											System.out.println(
-													"1161: this.atoIndividualTable3a.get(ATO_3A_TITLE_ALLOWANCES_COUNT).get(incomeRangeAto).get(age).get(sex).get(taxableStatus): "
-															+ this.atoIndividualTable3a
-																	.get(ATO_3A_TITLE_ALLOWANCES_COUNT)
-																	.get(incomeRangeAto).get(age).get(sex)
-																	.get(taxableStatus));
-											System.out.println(
-													"1166: atoCountEmployed.size(): " + atoCountEmployed.size());
-											System.out.println(
-													"1168: Math.max(this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT).get(incomeRangeAto).get(age).get(sex).get(taxableStatus),this.atoIndividualTable3a.get(ATO_3A_TITLE_ALLOWANCES_COUNT).get(incomeRangeAto).get(age).get(sex).get(taxableStatus)): "
-															+ Math.max(this.atoIndividualTable3a
-																	.get(ATO_3A_TITLE_SALARY_COUNT).get(incomeRangeAto)
-																	.get(age).get(sex).get(taxableStatus),
-																	this.atoIndividualTable3a
-																			.get(ATO_3A_TITLE_ALLOWANCES_COUNT)
-																			.get(incomeRangeAto).get(age).get(sex)
-																			.get(taxableStatus)));
-											System.out.println(
-													"1177: Math.round(Math.max(this.atoIndividualTable3a.get(ATO_3A_TITLE_SALARY_COUNT).get(incomeRangeAto).get(age).get(sex).get(taxableStatus),this.atoIndividualTable3a.get(ATO_3A_TITLE_ALLOWANCES_COUNT).get(incomeRangeAto).get(age).get(sex).get(taxableStatus))): "
-															+ Math.round(Math.max(this.atoIndividualTable3a
-																	.get(ATO_3A_TITLE_SALARY_COUNT).get(incomeRangeAto)
-																	.get(age).get(sex).get(taxableStatus),
-																	this.atoIndividualTable3a
-																			.get(ATO_3A_TITLE_ALLOWANCES_COUNT)
-																			.get(incomeRangeAto).get(age).get(sex)
-																			.get(taxableStatus))));
-										}
-									}
 									atoAmountUnemployed.set(incomeMapNum,
 											Float.valueOf(this.atoIndividualTable3a.get(ATO_3A_TITLE_GOVT_ALLOW_AMOUNT)
 													.get(incomeRangeAto).get(age).get(sex).get(taxableStatus))
@@ -1287,15 +1230,6 @@ public class CalibrateIndividuals {
 							atoPerPersonEmployed.add(atoCountEmployed.get(incomeMapNum) == 0 ? 0f
 									: ((float) atoAmountEmployed.get(incomeMapNum))
 											/ (float) atoCountEmployed.get(incomeMapNum));
-							if (DEBUG_ZEROS1241) {
-								System.out.println("1224: incomeMapNum: " + incomeMapNum);
-								System.out.println("1225: atoPerPersonEmployed.get(incomeMapNum): "
-										+ atoPerPersonEmployed.get(incomeMapNum));
-								System.out.println("1227: atoCountEmployed.get(incomeMapNum): "
-										+ atoCountEmployed.get(incomeMapNum));
-								System.out.println("1229: atoAmountEmployed.get(incomeMapNum): "
-										+ atoAmountEmployed.get(incomeMapNum));
-							}
 							atoPerPersonUnemployed.add(atoCountUnemployed.get(incomeMapNum) == 0 ? 0f
 									: ((float) atoAmountUnemployed.get(incomeMapNum))
 											/ (float) atoCountUnemployed.get(incomeMapNum));
@@ -1549,18 +1483,11 @@ public class CalibrateIndividuals {
 													individual.setLocalGovernmentAreaCode(
 															this.area.getLgaCodeFromPoa(poa));
 
+													// P&L
 													int incomeMapNum = CustomMath.sample(pdfAtoIncomeRange,
 															this.random);
 													int incomeSourceNum = CustomMath
 															.sample(pdfMainIncomeSource[incomeMapNum], this.random);
-													if (DEBUG_ZEROS2) {
-														if (incomeSourceNum == 0) {
-															System.out.println(
-																	"numAtoIncomeIndices: " + numAtoIncomeIndices);
-															System.out.println("pdfMainIncomeSource[incomeMapNum]: "
-																	+ pdfMainIncomeSource[incomeMapNum]);
-														}
-													}
 													switch (incomeSourceNum) {
 													case 0:
 														individual.setMainIncomeSource(0); // employed
@@ -1639,8 +1566,7 @@ public class CalibrateIndividuals {
 													}
 
 													// adjust other income if the sum of the income lines is less than
-													// total
-													// income
+													// total income
 													/*
 													 * if (individual.getGrossIncome() <
 													 * atoPerPersonAttributeTotalIncome.get(incomeMapNum)) { float
@@ -1649,6 +1575,10 @@ public class CalibrateIndividuals {
 													 * individual.getGrossIncome());
 													 * individual.setPnlOtherIncome(newOtherIncome); }
 													 */
+
+													// income tax
+													individual.setPnlIncomeTaxExpense(Tax
+															.calculateIndividualIncomeTax(individual.getGrossIncome()));
 
 													// Bal Sht
 													if (individual.getPnlInterestIncome() <= EPSILON) {
@@ -1697,8 +1627,7 @@ public class CalibrateIndividuals {
 
 													// add Individual to list (for payment clearing algorithm)
 													// CHANGE OF MIND: add the chosen Individuals as they are assigned
-													// into
-													// Households
+													// into Households
 													// this.individualAgents.add(individual);
 													agentId++;
 												} // end Individual creation loop

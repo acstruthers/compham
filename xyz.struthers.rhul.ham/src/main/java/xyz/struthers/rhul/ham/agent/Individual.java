@@ -154,7 +154,7 @@ public final class Individual extends Agent {
 
 		DecimalFormat decimal = new DecimalFormat("###0.00");
 		DecimalFormat wholeNumber = new DecimalFormat("###0");
-		//DecimalFormat percent = new DecimalFormat("###0.0000");
+		// DecimalFormat percent = new DecimalFormat("###0.0000");
 
 		sb.append(this.name + separator);
 		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);

@@ -68,7 +68,8 @@ public class Properties implements Serializable {
 	public static int INTEREST_RATE_STRATEGY = ReserveBankOfAustralia.RATES_SAME;
 	public static final float[] INTEREST_RATE_CUSTOM_PATH = new float[] { 1.50f, 1.50f, 1.50f, 1.25f, 1.25f, 1.00f, 1.00f,
 			0.75f, 0.75f, 0.50f, 0.50f, 0.25f, 0.25f };
-
+	public static final float HOUSEHOLD_SAVING_RATIO = 3298f / 299456f; // about 1.1% per ABS 5206.0 Table 20
+	
 	// static config constants
 	/*
 	 * Use a classpath resource loader instead. One of these two options:

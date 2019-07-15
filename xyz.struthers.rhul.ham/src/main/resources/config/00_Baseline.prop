@@ -1,0 +1,5 @@
+# CompHAM properties file
+# Scenario: Baseline
+
+SCENARIO_NAME = Baseline
+SAVE_ITERATION_SUMMARY = true, true, true, true, true, true, true, true, true, true, true, true, true

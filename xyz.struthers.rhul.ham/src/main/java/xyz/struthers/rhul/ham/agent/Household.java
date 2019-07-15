@@ -58,7 +58,7 @@ public class Household extends Agent {
 
 	private float pnlLivingExpenses; // Henderson poverty line (excl. housing costs)
 	// set at CalibrateHouseholds line 809
-	
+
 	private float pnlRentExpense;
 	private float pnlMortgageRepayments;
 	private float pnlWorkRelatedExpenses;
@@ -448,6 +448,8 @@ public class Household extends Agent {
 
 	@Override
 	public List<NodePayment> getAmountsPayable(int iteration) {
+		// MAYBE: donations don't currently go anywhere
+		
 		int numberOfCreditors = 1; // government
 		if (this.suppliers != null && this.pnlLivingExpenses > 0d) {
 			numberOfCreditors += this.suppliers.size();
@@ -575,7 +577,7 @@ public class Household extends Agent {
 		// cut down on discretionary spending too
 		this.pnlOtherDiscretionaryExpenses = 0f;
 		this.pnlDonations = 0f;
-		
+
 		return Clearable.BANKRUPT;
 	}
 
@@ -635,6 +637,16 @@ public class Household extends Agent {
 		return this.pnlWagesSalaries + this.pnlUnemploymentBenefits + this.pnlOtherSocialSecurityIncome
 				+ this.pnlInvestmentIncome + this.pnlInterestIncome + this.pnlRentIncome + this.pnlForeignIncome
 				+ this.pnlOtherIncome;
+	}
+	
+	public float getIncomeAfterTax() {
+		// TODO: check if the +/- sign is the right way for income tax
+		return this.getGrossIncome() - this.pnlIncomeTaxExpense;
+	}
+
+	public float getTotalExpenses() {
+		return this.pnlLivingExpenses + this.pnlRentExpense + this.pnlMortgageRepayments + this.pnlWorkRelatedExpenses
+				+ this.pnlRentInterestExpense + this.pnlDonations + this.pnlOtherDiscretionaryExpenses;
 	}
 
 	protected void init() {
