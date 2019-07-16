@@ -186,6 +186,8 @@ public class CpvSocketClient {
 		InitialiseEconomy init = new InitialiseEconomy();
 		init.initialiseEconomy(ctx); // iteration 0
 		AustralianEconomy economy = init.getEconomy();
+		init.close();
+		init = null;
 		System.gc();
 
 		long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();

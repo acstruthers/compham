@@ -16,10 +16,7 @@ import xyz.struthers.rhul.ham.process.Clearable;
 public abstract class Agent implements Serializable, Clearable {
 
 	private static final long serialVersionUID = 1L;
-	
-	// Agent details
-	protected String name;
-	
+
 	/**
 	 * Default constructor
 	 */
@@ -27,7 +24,7 @@ public abstract class Agent implements Serializable, Clearable {
 		super();
 		this.init();
 	}
-	
+
 	/**
 	 * Copy constructor
 	 * 
@@ -36,26 +33,10 @@ public abstract class Agent implements Serializable, Clearable {
 	public Agent(Agent agent) {
 		super();
 		this.init();
-
-		this.name = agent.name;
 	}
-	
+
 	protected void init() {
-		this.name = null;
-	}
-
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
+		// do nothing
 	}
 
 	/**
@@ -65,5 +46,4 @@ public abstract class Agent implements Serializable, Clearable {
 		return serialVersionUID;
 	}
 
-	
 }

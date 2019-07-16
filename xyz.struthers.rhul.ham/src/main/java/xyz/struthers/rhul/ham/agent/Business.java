@@ -253,7 +253,7 @@ public class Business extends Agent implements Employer {
 		DecimalFormat wholeNumber = new DecimalFormat("###0");
 		// DecimalFormat percent = new DecimalFormat("###0.0000");
 
-		sb.append(this.name + separator);
+		sb.append(separator); // name
 		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
 		sb.append(wholeNumber.format(this.businessTypeId) + separator);
 		sb.append(this.industryDivisionCode + separator);

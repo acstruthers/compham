@@ -28,6 +28,7 @@ public final class AustralianGovernment extends Agent implements Employer {
 	public static final float NUMBER_MONTHS = 12f; // for interest calcs
 
 	// Government details
+	protected String name;
 	protected char industryDivisionCode;
 
 	// agent relationships
@@ -353,6 +354,20 @@ public final class AustralianGovernment extends Agent implements Employer {
 		this.industryDivisionCode = industryDivisionCode;
 	}
 
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+	
 	/**
 	 * @return the welfareRecipients
 	 */

@@ -1045,7 +1045,7 @@ public class CalibrateBusinesses {
 
 						// create representative agent
 						Business agent = new Business();
-						agent.setName("Type " + businessTypeId + " business");
+						//agent.setName("Type " + businessTypeId + " business");
 						agent.setBusinessTypeId(businessTypeId++);
 						agent.setIndustryCode(industryCodes[idxIndustryCode]);
 						agent.setIndustryDivisionCode(divisionCode.charAt(0));

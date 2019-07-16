@@ -7,6 +7,8 @@ import java.net.Socket;
 import java.util.Date;
 import java.util.List;
 
+import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.list.array.TIntArrayList;
 import xyz.struthers.io.Serialization;
 import xyz.struthers.io.Serialization.CompressionType;
 import xyz.struthers.rhul.ham.config.Properties;
@@ -36,33 +38,24 @@ public class CpvSocketClientHandler extends Thread {
 	public void run() {
 		ClearingPaymentInputs cpvInputs = null;
 		ClearingPaymentOutputs cpvOutputs = null;
-		//byte compression = Byte.valueOf(null); // use the same compression for input & output
+		// byte compression = Byte.valueOf(null); // use the same compression for input
+		// & output
 
 		// receive CPV input from client
 		try {
 			// read stream
 			System.out.println(new Date(System.currentTimeMillis()) + ": receiving CPV inputs.");
-			/*int size = this.dis.readInt();
-			compression = this.dis.readByte();
-			byte[] bytes = new byte[size];
-			this.dis.readFully(bytes);
-
-			// deserialize bytes to CPV input
-			switch (compression) {
-			case 1:
-				// GZIP compression
-				cpvInputs = (ClearingPaymentInputs) Serialization.toObjectFromGZIP(bytes);
-				break;
-			case 2:
-				// Deflater compression
-				cpvInputs = (ClearingPaymentInputs) Serialization.toObjectFromDeflater(bytes);
-				break;
-			default:
-				// no compression
-				cpvInputs = (ClearingPaymentInputs) Serialization.toObject(bytes);
-				break;
-			}
-			*/
+			/*
+			 * int size = this.dis.readInt(); compression = this.dis.readByte(); byte[]
+			 * bytes = new byte[size]; this.dis.readFully(bytes);
+			 * 
+			 * // deserialize bytes to CPV input switch (compression) { case 1: // GZIP
+			 * compression cpvInputs = (ClearingPaymentInputs)
+			 * Serialization.toObjectFromGZIP(bytes); break; case 2: // Deflater compression
+			 * cpvInputs = (ClearingPaymentInputs)
+			 * Serialization.toObjectFromDeflater(bytes); break; default: // no compression
+			 * cpvInputs = (ClearingPaymentInputs) Serialization.toObject(bytes); break; }
+			 */
 			cpvInputs = (ClearingPaymentInputs) Serialization.readObjectFromStream(dis);
 		} catch (IOException e) {
 			cpvInputs = null;
@@ -72,10 +65,10 @@ public class CpvSocketClientHandler extends Thread {
 
 		// process CPV inputs
 		System.out.println(new Date(System.currentTimeMillis()) + ": CPV inputs unmarshalled.");
-		List<List<Float>> liabilitiesAmounts = cpvInputs.getLiabilitiesAmounts();
-		List<List<Integer>> liabilitiesIndices = cpvInputs.getLiabilitiesIndices();
-		List<Float> operatingCashFlow = cpvInputs.getOperatingCashFlow();
-		List<Float> liquidAssets = cpvInputs.getLiquidAssets();
+		List<TFloatArrayList> liabilitiesAmounts = cpvInputs.getLiabilitiesAmounts();
+		List<TIntArrayList> liabilitiesIndices = cpvInputs.getLiabilitiesIndices();
+		TFloatArrayList operatingCashFlow = cpvInputs.getOperatingCashFlow();
+		TFloatArrayList liquidAssets = cpvInputs.getLiquidAssets();
 		int iteration = cpvInputs.getIteration();
 		System.out.println(new Date(System.currentTimeMillis()) + ": CPV inputs split into separate lists.");
 
@@ -86,31 +79,21 @@ public class CpvSocketClientHandler extends Thread {
 		System.out.println(new Date(System.currentTimeMillis()) + ": compressing CPV outputs.");
 		try {
 			// serialize data to byte array
-			/*byte[] bytes = null;
-			switch (compression) {
-			case 1:
-				// GZIP compression
-				bytes = Serialization.toBytesGZIP(cpvOutputs, Properties.SOCKET_BUFFER_BYTES);
-				break;
-			case 2:
-				// Deflater compression
-				bytes = Serialization.toBytesDeflater(cpvOutputs, Properties.SOCKET_BUFFER_BYTES);
-				break;
-			default:
-				// no compression
-				bytes = Serialization.toBytes(cpvOutputs, Properties.SOCKET_BUFFER_BYTES);
-				break;
-			}
-
-			// write to stream
-			System.out.println(new Date(System.currentTimeMillis()) + ": writing CPV outputs to stream.");
-			dos.writeInt(bytes.length);
-			dos.writeByte(compression);
-			dos.write(bytes);
-			dos.flush(); // don't know if I really need this, but it probably can't hurt
-			*/
-			Serialization.writeToDataStream(dos, cpvOutputs, Properties.SOCKET_BUFFER_BYTES, Properties.SOCKET_MSG_BYTES,
-					CompressionType.GZIP);
+			/*
+			 * byte[] bytes = null; switch (compression) { case 1: // GZIP compression bytes
+			 * = Serialization.toBytesGZIP(cpvOutputs, Properties.SOCKET_BUFFER_BYTES);
+			 * break; case 2: // Deflater compression bytes =
+			 * Serialization.toBytesDeflater(cpvOutputs, Properties.SOCKET_BUFFER_BYTES);
+			 * break; default: // no compression bytes = Serialization.toBytes(cpvOutputs,
+			 * Properties.SOCKET_BUFFER_BYTES); break; }
+			 * 
+			 * // write to stream System.out.println(new Date(System.currentTimeMillis()) +
+			 * ": writing CPV outputs to stream."); dos.writeInt(bytes.length);
+			 * dos.writeByte(compression); dos.write(bytes); dos.flush(); // don't know if I
+			 * really need this, but it probably can't hurt
+			 */
+			Serialization.writeToDataStream(dos, cpvOutputs, Properties.SOCKET_BUFFER_BYTES,
+					Properties.SOCKET_MSG_BYTES, CompressionType.GZIP);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -135,8 +118,8 @@ public class CpvSocketClientHandler extends Thread {
 	 * @param iteration
 	 * @return
 	 */
-	public ClearingPaymentOutputs calculate(List<List<Float>> liabilitiesAmounts,
-			List<List<Integer>> liabilitiesIndices, List<Float> operatingCashFlow, List<Float> liquidAssets,
+	public ClearingPaymentOutputs calculate(List<TFloatArrayList> liabilitiesAmounts,
+			List<TIntArrayList> liabilitiesIndices, TFloatArrayList operatingCashFlow, TFloatArrayList liquidAssets,
 			int iteration) {
 
 		System.out.println(new Date(System.currentTimeMillis()) + ": CPV calculation invoked.");

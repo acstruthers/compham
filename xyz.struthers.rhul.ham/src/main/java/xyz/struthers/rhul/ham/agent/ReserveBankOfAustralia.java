@@ -35,6 +35,7 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 	public static final int RATES_CUSTOM = 1;
 
 	// RBA details
+	protected String name;
 	protected char industryDivisionCode;
 
 	// agent relationships
@@ -373,6 +374,20 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 	@Override
 	public void setIndustryDivisionCode(char industryDivisionCode) {
 		this.industryDivisionCode = industryDivisionCode;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**

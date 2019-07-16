@@ -56,9 +56,9 @@ public final class Individual extends Agent {
 	private float bsStudentLoans; // HELP debt
 
 	// Interest rates (24 bytes)
-	protected float interestRateDeposits;
-	protected float interestRateLoans;
-	protected float interestRateStudentLoans; // in Australia this is always CPI (by law)
+	//protected float interestRateDeposits;
+	//protected float interestRateLoans;
+	//protected float interestRateStudentLoans; // in Australia this is always CPI (by law)
 
 	/**
 	 * Default constructor
@@ -96,9 +96,9 @@ public final class Individual extends Agent {
 		this.pnlDonations = individual.pnlDonations;
 		this.bsBankDeposits = individual.bsBankDeposits;
 		this.bsStudentLoans = individual.bsStudentLoans;
-		this.interestRateDeposits = individual.interestRateDeposits;
-		this.interestRateLoans = individual.interestRateLoans;
-		this.interestRateStudentLoans = individual.interestRateStudentLoans;
+		//this.interestRateDeposits = individual.interestRateDeposits;
+		//this.interestRateLoans = individual.interestRateLoans;
+		//this.interestRateStudentLoans = individual.interestRateStudentLoans;
 	}
 
 	public float getGrossIncome() {
@@ -156,7 +156,7 @@ public final class Individual extends Agent {
 		DecimalFormat wholeNumber = new DecimalFormat("###0");
 		// DecimalFormat percent = new DecimalFormat("###0.0000");
 
-		sb.append(this.name + separator);
+		sb.append(separator); // name
 		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
 		sb.append(
 				wholeNumber.format(this.household != null ? this.household.getPaymentClearingIndex() : 0) + separator);
@@ -603,42 +603,42 @@ public final class Individual extends Agent {
 	/**
 	 * @return the interestRateDeposits
 	 */
-	public float getInterestRateDeposits() {
-		return interestRateDeposits;
-	}
+	//public float getInterestRateDeposits() {
+	//	return interestRateDeposits;
+	//}
 
 	/**
 	 * @param interestRateDeposits the interestRateDeposits to set
 	 */
-	public void setInterestRateDeposits(float interestRateDeposits) {
-		this.interestRateDeposits = interestRateDeposits;
-	}
+	//public void setInterestRateDeposits(float interestRateDeposits) {
+	//	this.interestRateDeposits = interestRateDeposits;
+	//}
 
 	/**
 	 * @return the interestRateLoans
 	 */
-	public float getInterestRateLoans() {
-		return interestRateLoans;
-	}
+	//public float getInterestRateLoans() {
+	//	return interestRateLoans;
+	//}
 
 	/**
 	 * @param interestRateLoans the interestRateLoans to set
 	 */
-	public void setInterestRateLoans(float interestRateLoans) {
-		this.interestRateLoans = interestRateLoans;
-	}
+	//public void setInterestRateLoans(float interestRateLoans) {
+	//	this.interestRateLoans = interestRateLoans;
+	//}
 
 	/**
 	 * @return the interestRateStudentLoans
 	 */
-	public float getInterestRateStudentLoans() {
-		return interestRateStudentLoans;
-	}
+	//public float getInterestRateStudentLoans() {
+	//	return interestRateStudentLoans;
+	//}
 
 	/**
 	 * @param interestRateStudentLoans the interestRateStudentLoans to set
 	 */
-	public void setInterestRateStudentLoans(float interestRateStudentLoans) {
-		this.interestRateStudentLoans = interestRateStudentLoans;
-	}
+	//public void setInterestRateStudentLoans(float interestRateStudentLoans) {
+	//	this.interestRateStudentLoans = interestRateStudentLoans;
+	//}
 }

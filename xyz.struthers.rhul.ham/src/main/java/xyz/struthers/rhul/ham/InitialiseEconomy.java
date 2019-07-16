@@ -198,5 +198,9 @@ public class InitialiseEconomy {
 	public AustralianEconomy getEconomy() {
 		return economy;
 	}
+	
+	public void close() {
+		this.economy = null;
+	}
 
 }

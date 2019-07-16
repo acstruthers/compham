@@ -7,6 +7,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.list.array.TIntArrayList;
+
 /**
  * Just a data structure so it's easy to return all three variables from a
  * single method call.
@@ -44,8 +47,8 @@ public class ClearingPaymentInputs implements Serializable {
 		// super();
 	}
 
-	public ClearingPaymentInputs(List<List<Float>> liabilitiesAmounts, List<List<Integer>> liabilitiesIndices,
-			List<Float> operatingCashFlow, List<Float> liquidAssets, int iteration) {
+	public ClearingPaymentInputs(List<TFloatArrayList> liabilitiesAmounts, List<TIntArrayList> liabilitiesIndices,
+			TFloatArrayList operatingCashFlow, TFloatArrayList liquidAssets, int iteration) {
 		// this.liabilitiesAmounts = liabilitiesAmounts;
 		// this.liabilitiesIndices = liabilitiesIndices;
 		// this.operatingCashFlow = operatingCashFlow;
@@ -100,21 +103,24 @@ public class ClearingPaymentInputs implements Serializable {
 	}
 
 	public void clear() {
-		/*
-		 * for (int i = 0; i < this.liabilitiesAmounts.size(); i++) {
-		 * this.liabilitiesAmounts.get(i).clear(); this.liabilitiesAmounts.set(i, null);
-		 * } this.liabilitiesAmounts.clear(); this.liabilitiesAmounts = null; for (int i
-		 * = 0; i < this.liabilitiesIndices.size(); i++) {
-		 * this.liabilitiesIndices.get(i).clear(); this.liabilitiesIndices.set(i, null);
-		 * } this.liabilitiesIndices.clear(); this.liabilitiesIndices = null;
-		 * this.operatingCashFlow.clear(); this.operatingCashFlow = null;
-		 */
+		for (int i = 0; i < this.liabilitiesAmounts.length; i++) {
+			this.liabilitiesAmounts[i] = null;
+		}
+		this.liabilitiesAmounts = null;
+		for (int i = 0; i < this.liabilitiesIndices.length; i++) {
+			this.liabilitiesIndices[i] = null;
+		}
+		this.liabilitiesIndices = null;
+		this.operatingCashFlow = null;
+		this.liquidAssets = null;
 	}
 
 	/**
 	 * @return the liabilitiesAmounts
 	 */
-	public List<List<Float>> getLiabilitiesAmounts() {
+	// public List<List<Float>> getLiabilitiesAmounts() {
+	public List<TFloatArrayList> getLiabilitiesAmounts() {
+
 		// using JDK Collections
 		// return liabilitiesAmounts;
 
@@ -128,10 +134,21 @@ public class ClearingPaymentInputs implements Serializable {
 		 * boxed.add(node); } boxedList.add(boxed); } return boxedList;
 		 */
 
-		// using primitives
-		List<List<Float>> boxedList = new ArrayList<List<Float>>(this.liabilitiesAmounts.length);
+		// using primitives, returning JDK Collections
+		/*
+		 * List<List<Float>> boxedList = new
+		 * ArrayList<List<Float>>(this.liabilitiesAmounts.length); for (int i = 0; i <
+		 * this.liabilitiesAmounts.length; i++) { List<Float> boxed = new
+		 * ArrayList<Float>(this.liabilitiesAmounts[i].length); for (int j = 0; j <
+		 * this.liabilitiesAmounts[i].length; j++) {
+		 * boxed.add(this.liabilitiesAmounts[i][j]); } boxedList.add(boxed); } return
+		 * boxedList;
+		 */
+
+		// using primitives, returning Trove
+		List<TFloatArrayList> boxedList = new ArrayList<TFloatArrayList>(this.liabilitiesAmounts.length);
 		for (int i = 0; i < this.liabilitiesAmounts.length; i++) {
-			List<Float> boxed = new ArrayList<Float>(this.liabilitiesAmounts[i].length);
+			TFloatArrayList boxed = new TFloatArrayList(this.liabilitiesAmounts[i].length);
 			for (int j = 0; j < this.liabilitiesAmounts[i].length; j++) {
 				boxed.add(this.liabilitiesAmounts[i][j]);
 			}
@@ -143,7 +160,7 @@ public class ClearingPaymentInputs implements Serializable {
 	/**
 	 * @param liabilitiesAmounts the liabilitiesAmounts to set
 	 */
-	public void setLiabilitiesAmounts(List<List<Float>> liabilitiesAmounts) {
+	public void setLiabilitiesAmounts(List<TFloatArrayList> liabilitiesAmounts) {
 		// using JDK Collections
 		// this.liabilitiesAmounts = liabilitiesAmounts;
 
@@ -170,7 +187,7 @@ public class ClearingPaymentInputs implements Serializable {
 	/**
 	 * @return the liabilitiesIndices
 	 */
-	public List<List<Integer>> getLiabilitiesIndices() {
+	public List<TIntArrayList> getLiabilitiesIndices() {
 		// using JDK Collections
 		// return liabilitiesIndices;
 
@@ -186,9 +203,9 @@ public class ClearingPaymentInputs implements Serializable {
 		 */
 
 		// using primitives
-		List<List<Integer>> boxedList = new ArrayList<List<Integer>>(this.liabilitiesIndices.length);
+		List<TIntArrayList> boxedList = new ArrayList<TIntArrayList>(this.liabilitiesIndices.length);
 		for (int i = 0; i < this.liabilitiesIndices.length; i++) {
-			List<Integer> boxed = new ArrayList<Integer>(this.liabilitiesIndices[i].length);
+			TIntArrayList boxed = new TIntArrayList(this.liabilitiesIndices[i].length);
 			for (int j = 0; j < this.liabilitiesIndices[i].length; j++) {
 				boxed.add(this.liabilitiesIndices[i][j]);
 			}
@@ -200,7 +217,7 @@ public class ClearingPaymentInputs implements Serializable {
 	/**
 	 * @param liabilitiesIndices the liabilitiesIndices to set
 	 */
-	public void setLiabilitiesIndices(List<List<Integer>> liabilitiesIndices) {
+	public void setLiabilitiesIndices(List<TIntArrayList> liabilitiesIndices) {
 		// using JDK Collections
 		// this.liabilitiesIndices = liabilitiesIndices;
 
@@ -227,7 +244,7 @@ public class ClearingPaymentInputs implements Serializable {
 	/**
 	 * @return the operatingCashFlow
 	 */
-	public List<Float> getOperatingCashFlow() {
+	public TFloatArrayList getOperatingCashFlow() {
 		// using JDK Collections
 		// return operatingCashFlow;
 
@@ -239,7 +256,7 @@ public class ClearingPaymentInputs implements Serializable {
 		 */
 
 		// using primitives
-		List<Float> boxedList = new ArrayList<Float>(this.operatingCashFlow.length);
+		TFloatArrayList boxedList = new TFloatArrayList(this.operatingCashFlow.length);
 		for (int i = 0; i < this.operatingCashFlow.length; i++) {
 			boxedList.add(this.operatingCashFlow[i]);
 		}
@@ -249,7 +266,7 @@ public class ClearingPaymentInputs implements Serializable {
 	/**
 	 * @param operatingCashFlow the operatingCashFlow to set
 	 */
-	public void setOperatingCashFlow(List<Float> operatingCashFlow) {
+	public void setOperatingCashFlow(TFloatArrayList operatingCashFlow) {
 		// using JDK Collections
 		// this.operatingCashFlow = operatingCashFlow;
 
@@ -270,7 +287,7 @@ public class ClearingPaymentInputs implements Serializable {
 	/**
 	 * @return the liquidAssets
 	 */
-	public List<Float> getLiquidAssets() {
+	public TFloatArrayList getLiquidAssets() {
 		// using JDK Collections
 		// return liquidAssets;
 
@@ -282,7 +299,7 @@ public class ClearingPaymentInputs implements Serializable {
 		 */
 
 		// using primitives
-		List<Float> boxedList = new ArrayList<Float>(this.liquidAssets.length);
+		TFloatArrayList boxedList = new TFloatArrayList(this.liquidAssets.length);
 		for (int i = 0; i < this.liquidAssets.length; i++) {
 			boxedList.add(this.liquidAssets[i]);
 		}
@@ -292,7 +309,7 @@ public class ClearingPaymentInputs implements Serializable {
 	/**
 	 * @param liquidAssets the liquidAssets to set
 	 */
-	public void setLiquidAssets(List<Float> liquidAssets) {
+	public void setLiquidAssets(TFloatArrayList liquidAssets) {
 		// using JDK Collections
 		// this.liquidAssets = liquidAssets;
 

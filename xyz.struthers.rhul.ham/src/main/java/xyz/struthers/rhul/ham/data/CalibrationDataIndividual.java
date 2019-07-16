@@ -24,6 +24,8 @@ import org.springframework.stereotype.Component;
 
 import com.opencsv.CSVReader;
 
+import gnu.trove.map.hash.TObjectFloatHashMap;
+
 /**
  * Loads CSV data downloaded using Table Builder from the ABS, RBA, APRA and
  * ATO. This class contains the data that is only needed when calibrating
@@ -101,7 +103,9 @@ public class CalibrationDataIndividual {
 	 * Keys: Age5, Industry Division, Personal Income, POA, Sex<br>
 	 * Values: Number of persons
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>> censusSEXP_POA_AGE5P_INDP_INCP;
+	// private Map<String, Map<String, Map<String, Map<String, Map<String,
+	// Float>>>>> censusSEXP_POA_AGE5P_INDP_INCP;
+	private Map<String, Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>> censusSEXP_POA_AGE5P_INDP_INCP;
 	private boolean initialisedCensusSEXP_POA_AGE5P_INDP_INCP;
 
 	/**
@@ -238,8 +242,7 @@ public class CalibrationDataIndividual {
 						for (String poa : this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).keySet()) {
 							for (String sex : this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).get(poa)
 									.keySet()) {
-								this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).get(poa).put(sex,
-										null);
+								this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).get(poa).put(sex, 0f); // null
 							} // end taxable status loop
 							this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).get(poa).clear();
 							this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(div).get(income).put(poa, null);
@@ -276,7 +279,7 @@ public class CalibrationDataIndividual {
 		// ABS Census SEXP by POA (UR) by AGE5P, INDP and INCP
 		System.out.print(new Date(System.currentTimeMillis())
 				+ ": Loading ABS Census SEXP by POA (UR) by AGE5P, INDP and INCP data");
-		this.censusSEXP_POA_AGE5P_INDP_INCP = new HashMap<String, Map<String, Map<String, Map<String, Map<String, Float>>>>>(
+		this.censusSEXP_POA_AGE5P_INDP_INCP = new HashMap<String, Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>>(
 				MAP_INIT_SIZE_AGE5P);
 		int fromColumnSEXP_POA_AGE5P_INDP_INCP = 1;
 		int toColumnSEXP_POA_AGE5P_INDP_INCP = 8229;
@@ -576,6 +579,128 @@ public class CalibrationDataIndividual {
 	 *                             INCP, LGA, SEXP)
 	 */
 	private void loadAbsCensusTableCsv3Columns1Wafer(String fileResourceLocation, boolean isInitialised,
+			int fromColumnIndex, int toColumnIndex,
+			Map<String, Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>> data, String lgaOrPoa) {
+
+		CSVReader reader = null;
+		try {
+			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
+			reader = new CSVReader(new InputStreamReader(is));
+			boolean header = true;
+			boolean footer = false;
+			int currentRow = 1;
+			int lastHeaderRow = 9; // the row before the first wafer's title row
+			boolean prevRowIsBlank = true; // there's a blank row before wafer names
+			String waferName = null;
+			int waferNumber = 0;
+			int columnSeriesNumber = Integer.MAX_VALUE;
+			final int columnSeriesMax = 3; // because the dataset contains 3 column series
+			String[][] columnTitles = new String[columnSeriesMax][toColumnIndex - fromColumnIndex];
+
+			String[] line = null;
+			while ((line = reader.readNext()) != null) {
+				if (header) {
+					if (currentRow++ == lastHeaderRow) {
+						header = false;
+					}
+				} else if (!footer) {
+					if (line[0].length() > 11 && line[0].substring(0, 11).equals("Data Source")) {
+						footer = true;
+					} else {
+						if (prevRowIsBlank && !line[0].isBlank()) {
+							// set wafer name
+							waferName = line[0].trim();
+							waferName = waferName.substring(0, 1); // wafer is sex, so just take the first letter (M, F)
+							columnSeriesNumber = 0;
+							waferNumber++;
+							prevRowIsBlank = false;
+						} else {
+							if (columnSeriesNumber < columnSeriesMax) {
+								// set series ID
+								String thisTitle = null;
+								for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
+									thisTitle = line[i + fromColumnIndex].isEmpty() ? thisTitle
+											: line[i + fromColumnIndex];
+									columnTitles[columnSeriesNumber][i] = thisTitle;
+								}
+								columnSeriesNumber++;
+							} else if (columnSeriesNumber == columnSeriesMax && !isInitialised) {
+								// add blank maps to data, so they can be populated below
+								if (waferNumber == 1) {
+									for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
+										if (!columnTitles[0][i].isBlank() && !data.containsKey(columnTitles[0][i])) {
+											// add column series 1 key
+											data.put(columnTitles[0][i],
+													new HashMap<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>(
+															MAP_INIT_SIZE_INDP));
+										}
+										String divCode = this.abs1292_0_55_002ANZSIC.get("Division to Division Code")
+												.get(columnTitles[1][i].toUpperCase());
+										if (!columnTitles[1][i].isBlank()
+												&& !data.get(columnTitles[0][i]).containsKey(divCode)) {
+											// add column series 2 key
+											// convert Industry Division Description to Code
+											data.get(columnTitles[0][i]).put(divCode,
+													new HashMap<String, Map<String, TObjectFloatHashMap<String>>>(
+															MAP_INIT_SIZE_INCP));
+										}
+										if (!columnTitles[2][i].isBlank() && !data.get(columnTitles[0][i]).get(divCode)
+												.containsKey(columnTitles[2][i])) {
+											// add column series 3 key
+											data.get(columnTitles[0][i]).get(divCode).put(columnTitles[2][i],
+													new HashMap<String, TObjectFloatHashMap<String>>(MAP_INIT_SIZE_LGA));
+										}
+									}
+								}
+								columnSeriesNumber++; // make sure this is only executed once
+							} else if (line.length > 1 && !line[1].isBlank()) {
+								// parse the body of the data
+								String areaCode = null;
+								if (lgaOrPoa.equalsIgnoreCase("LGA")) {
+									areaCode = this.area.getLgaCodeFromName(line[0]);
+								} else {
+									// assume it's POA in the format NNNN, SSS
+									if (!line[0].equalsIgnoreCase("Total")) {
+										areaCode = line[0].substring(0, line[0].indexOf(","));
+									}
+								}
+								if (areaCode != null) {
+									// null check excludes invalid LGAs
+									for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
+										String divCode = this.abs1292_0_55_002ANZSIC.get("Division to Division Code")
+												.get(columnTitles[1][i].toUpperCase());
+										if (waferNumber == 1) {
+											data.get(columnTitles[0][i]).get(divCode).get(columnTitles[2][i])
+													.put(areaCode, new TObjectFloatHashMap<String>(MAP_INIT_SIZE_SEXP));
+										}
+										float value = 0f;
+										try {
+											value = Float.valueOf(line[i + fromColumnIndex].trim().replace(",", ""));
+										} catch (NumberFormatException e) {
+											// do nothing and leave it as zero.
+										}
+										data.get(columnTitles[0][i]).get(divCode).get(columnTitles[2][i]).get(areaCode)
+												.put(waferName, value);
+									}
+								}
+							} else if (line[0].isBlank()) {
+								prevRowIsBlank = true;
+							}
+						}
+					}
+				}
+			}
+			reader.close();
+			reader = null;
+		} catch (FileNotFoundException e) {
+			// open file
+			e.printStackTrace();
+		} catch (IOException e) {
+			// read next
+			e.printStackTrace();
+		}
+	}
+	private void loadAbsCensusTableCsv3Columns1WaferJDK(String fileResourceLocation, boolean isInitialised,
 			int fromColumnIndex, int toColumnIndex,
 			Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>> data, String lgaOrPoa) {
 
@@ -1229,7 +1354,7 @@ public class CalibrationDataIndividual {
 	/**
 	 * @return the censusSEXP_POA_AGE5P_INDP_INCP
 	 */
-	public Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>> getCensusSEXP_POA_AGE5P_INDP_INCP() {
+	public Map<String, Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>> getCensusSEXP_POA_AGE5P_INDP_INCP() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}

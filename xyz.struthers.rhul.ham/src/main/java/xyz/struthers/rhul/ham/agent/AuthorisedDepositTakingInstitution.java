@@ -33,6 +33,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	public static final float NUMBER_MONTHS = 12f; // for interest calcs
 
 	// Company details (approx. 60 chars)
+	protected String name;
 	protected String australianBusinessNumber;
 	protected String shortName;
 	protected String adiCategory;
@@ -133,7 +134,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		super();
 
 		// Company details
-		super.name = adiLongName;
+		this.name = adiLongName;
 		this.shortName = adiShortName;
 		this.australianBusinessNumber = adiAustralianBusinessNumber;
 		this.adiCategory = adiType;
@@ -1045,6 +1046,20 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	 */
 	public void setEmployees(ArrayList<Individual> employees) {
 		this.employees = employees;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**

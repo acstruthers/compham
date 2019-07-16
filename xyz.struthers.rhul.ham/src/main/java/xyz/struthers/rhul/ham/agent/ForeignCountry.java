@@ -45,6 +45,7 @@ public final class ForeignCountry extends Agent {
 	private int defaultOrder;
 
 	// field variables
+	protected String name;
 	private Currency currency;
 	/**
 	 * Lists the exchange rates at each iteration. Index 0 is the initially
@@ -81,7 +82,7 @@ public final class ForeignCountry extends Agent {
 		super();
 		this.init();
 
-		super.name = countryName;
+		this.name = countryName;
 		this.currency = countryCurrency;
 	}
 
@@ -91,7 +92,7 @@ public final class ForeignCountry extends Agent {
 		super();
 		this.init();
 
-		super.name = countryName;
+		this.name = countryName;
 		this.currency = countryCurrency;
 		this.exchangeRates = new ArrayList<Float>();
 		this.exchangeRates.add(initialExchangeRate);
@@ -433,7 +434,7 @@ public final class ForeignCountry extends Agent {
 	}
 
 	protected void init() {
-		super.name = null;
+		this.name = null;
 
 		this.paymentClearingIndex = 0;
 		this.exporters = null;
@@ -450,6 +451,20 @@ public final class ForeignCountry extends Agent {
 		this.absImportsToAustraliaByState = null;
 		this.actualExportsFromAustraliaByState = null;
 		this.actualImportsToAustraliaByState = null;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**

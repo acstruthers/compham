@@ -32,6 +32,8 @@ import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
+import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.list.array.TIntArrayList;
 import xyz.struthers.rhul.ham.agent.AustralianGovernment;
 import xyz.struthers.rhul.ham.agent.AuthorisedDepositTakingInstitution;
 import xyz.struthers.rhul.ham.agent.Business;
@@ -80,10 +82,14 @@ public class AustralianEconomy implements Serializable {
 
 	// Process
 	ClearingPaymentVector payments;
-	List<List<Float>> liabilitiesAmounts;
-	List<List<Integer>> liabilitiesIndices;
-	List<Float> operatingCashFlow;
-	List<Float> liquidAssets; // cash at bank, etc.
+	// List<List<Float>> liabilitiesAmounts;
+	// List<List<Integer>> liabilitiesIndices;
+	// List<Float> operatingCashFlow;
+	// List<Float> liquidAssets; // cash at bank, etc.
+	List<TFloatArrayList> liabilitiesAmounts;
+	List<TIntArrayList> liabilitiesIndices;
+	TFloatArrayList operatingCashFlow;
+	TFloatArrayList liquidAssets; // cash at bank, etc.
 	/**
 	 * Clearing Payment Vector output is a map containing:<br>
 	 * List<Float> ClearingPaymentVector,<br>
@@ -367,15 +373,15 @@ public class AustralianEconomy implements Serializable {
 		// initialise local variables
 		int totalAgentCount = 1 + 1 + this.households.length + this.businesses.length + this.adis.length
 				+ this.countries.length;
-		this.liabilitiesAmounts = new ArrayList<List<Float>>(totalAgentCount);
-		this.liabilitiesIndices = new ArrayList<List<Integer>>(totalAgentCount);
-		this.operatingCashFlow = new ArrayList<Float>(totalAgentCount);
-		this.liquidAssets = new ArrayList<Float>(totalAgentCount);
+		this.liabilitiesAmounts = new ArrayList<TFloatArrayList>(totalAgentCount);
+		this.liabilitiesIndices = new ArrayList<TIntArrayList>(totalAgentCount);
+		this.operatingCashFlow = new TFloatArrayList(totalAgentCount);
+		this.liquidAssets = new TFloatArrayList(totalAgentCount);
 		ArrayList<Float> receivableFromAnotherAgent = new ArrayList<Float>(totalAgentCount);
 		for (int i = 0; i < totalAgentCount; i++) {
 			// initialise them so we can use set without getting index out of bounds errors
-			this.liabilitiesAmounts.add(new ArrayList<Float>());
-			this.liabilitiesIndices.add(new ArrayList<Integer>());
+			this.liabilitiesAmounts.add(new TFloatArrayList());
+			this.liabilitiesIndices.add(new TIntArrayList());
 			this.operatingCashFlow.add(0f);
 			this.liquidAssets.add(0f);
 			receivableFromAnotherAgent.add(0f);
@@ -387,8 +393,8 @@ public class AustralianEconomy implements Serializable {
 
 			// calculate liabilities
 			List<NodePayment> nodePayments = household.getAmountsPayable(iteration);
-			ArrayList<Float> liabilityAmounts = new ArrayList<Float>(nodePayments.size());
-			ArrayList<Integer> liabilityIndices = new ArrayList<Integer>(nodePayments.size());
+			TFloatArrayList liabilityAmounts = new TFloatArrayList(nodePayments.size());
+			TIntArrayList liabilityIndices = new TIntArrayList(nodePayments.size());
 			for (int creditorIdx = 0; creditorIdx < nodePayments.size(); creditorIdx++) {
 				float liabAmt = nodePayments.get(creditorIdx).getLiabilityAmount();
 				liabilityAmounts.add(liabAmt);
@@ -417,8 +423,8 @@ public class AustralianEconomy implements Serializable {
 
 			// calculate liabilities
 			List<NodePayment> nodePayments = business.getAmountsPayable(iteration);
-			ArrayList<Float> liabilityAmounts = new ArrayList<Float>(nodePayments.size());
-			ArrayList<Integer> liabilityIndices = new ArrayList<Integer>(nodePayments.size());
+			TFloatArrayList liabilityAmounts = new TFloatArrayList(nodePayments.size());
+			TIntArrayList liabilityIndices = new TIntArrayList(nodePayments.size());
 			for (int creditorIdx = 0; creditorIdx < nodePayments.size(); creditorIdx++) {
 				float liabAmt = nodePayments.get(creditorIdx).getLiabilityAmount();
 				liabilityAmounts.add(liabAmt);
@@ -448,8 +454,8 @@ public class AustralianEconomy implements Serializable {
 
 			// calculate liabilities
 			List<NodePayment> nodePayments = adi.getAmountsPayable(iteration);
-			ArrayList<Float> liabilityAmounts = new ArrayList<Float>(nodePayments.size());
-			ArrayList<Integer> liabilityIndices = new ArrayList<Integer>(nodePayments.size());
+			TFloatArrayList liabilityAmounts = new TFloatArrayList(nodePayments.size());
+			TIntArrayList liabilityIndices = new TIntArrayList(nodePayments.size());
 			for (int creditorIdx = 0; creditorIdx < nodePayments.size(); creditorIdx++) {
 				float liabAmt = nodePayments.get(creditorIdx).getLiabilityAmount();
 				liabilityAmounts.add(liabAmt);
@@ -477,8 +483,8 @@ public class AustralianEconomy implements Serializable {
 
 			// calculate liabilities
 			List<NodePayment> nodePayments = country.getAmountsPayable(iteration);
-			ArrayList<Float> liabilityAmounts = new ArrayList<Float>(nodePayments.size());
-			ArrayList<Integer> liabilityIndices = new ArrayList<Integer>(nodePayments.size());
+			TFloatArrayList liabilityAmounts = new TFloatArrayList(nodePayments.size());
+			TIntArrayList liabilityIndices = new TIntArrayList(nodePayments.size());
 			for (int creditorIdx = 0; creditorIdx < nodePayments.size(); creditorIdx++) {
 				float liabAmt = nodePayments.get(creditorIdx).getLiabilityAmount();
 				liabilityAmounts.add(liabAmt);
@@ -497,7 +503,13 @@ public class AustralianEconomy implements Serializable {
 
 			// calculate exogeneous cash flow (i.e. not from another Agent)
 			// foreign countries are assumed to never default
-			float totalLiabilities = (float) liabilityAmounts.stream().mapToDouble(o -> o).sum();
+			// float totalLiabilities = (float) liabilityAmounts.stream().mapToDouble(o ->
+			// o).sum();
+			float totalLiabilities = 0f;
+			for (int liabIdx = 0; liabIdx < liabilityAmounts.size(); liabIdx++) {
+				totalLiabilities += liabilityAmounts.get(liabIdx);
+			}
+			// (float) liabilityAmounts.stream().mapToDouble(o -> o).sum();
 			float exogeneous = totalLiabilities;
 			this.operatingCashFlow.set(paymentClearingIndex, exogeneous);
 
@@ -512,8 +524,8 @@ public class AustralianEconomy implements Serializable {
 
 			// calculate liabilities
 			List<NodePayment> nodePayments = this.government.getAmountsPayable(iteration);
-			ArrayList<Float> liabilityAmounts = new ArrayList<Float>(nodePayments.size());
-			ArrayList<Integer> liabilityIndices = new ArrayList<Integer>(nodePayments.size());
+			TFloatArrayList liabilityAmounts = new TFloatArrayList(nodePayments.size());
+			TIntArrayList liabilityIndices = new TIntArrayList(nodePayments.size());
 			for (int creditorIdx = 0; creditorIdx < nodePayments.size(); creditorIdx++) {
 				float liabAmt = nodePayments.get(creditorIdx).getLiabilityAmount();
 				liabilityAmounts.add(liabAmt);
@@ -541,8 +553,8 @@ public class AustralianEconomy implements Serializable {
 
 			// calculate liabilities
 			List<NodePayment> nodePayments = this.rba.getAmountsPayable(iteration);
-			ArrayList<Float> liabilityAmounts = new ArrayList<Float>(nodePayments.size());
-			ArrayList<Integer> liabilityIndices = new ArrayList<Integer>(nodePayments.size());
+			TFloatArrayList liabilityAmounts = new TFloatArrayList(nodePayments.size());
+			TIntArrayList liabilityIndices = new TIntArrayList(nodePayments.size());
 			for (int creditorIdx = 0; creditorIdx < nodePayments.size(); creditorIdx++) {
 				float liabAmt = nodePayments.get(creditorIdx).getLiabilityAmount();
 				liabilityAmounts.add(liabAmt);
@@ -584,6 +596,8 @@ public class AustralianEconomy implements Serializable {
 			float calibratedIncome = household.getGrossIncome();
 			float exogeneousIncome = calibratedIncome - receivable;
 			this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
+
+			// FIXME save ratio of exogeneous to total income to CSV so it can be graphed
 		}
 
 		// businesses
@@ -644,9 +658,9 @@ public class AustralianEconomy implements Serializable {
 	void processPaymentsClearingVectorOutputs() {
 		// unmarshall CPV outputs into their original data structures
 		// net cash flow of each node after paying liabilities
-		List<Float> equityOfNode = this.clearingPaymentVectorOutput.getEquityOfNode();
+		TFloatArrayList equityOfNode = this.clearingPaymentVectorOutput.getEquityOfNode();
 		// Which round of the CPV algorithm caused the node to default (0 = no default)
-		List<Integer> defaultOrderOfNode = this.clearingPaymentVectorOutput.getDefaultOrderOfNode();
+		TIntArrayList defaultOrderOfNode = this.clearingPaymentVectorOutput.getDefaultOrderOfNode();
 		int iteration = this.clearingPaymentVectorOutput.getIteration();
 
 		// update agents

@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import gnu.trove.map.hash.TObjectFloatHashMap;
 import xyz.struthers.lang.CustomMath;
 import xyz.struthers.rhul.ham.agent.Individual;
 import xyz.struthers.rhul.ham.config.Properties;
@@ -43,13 +44,6 @@ public class CalibrateIndividuals {
 
 	private static final boolean DEBUG = true;
 	private static final boolean DEBUG_DETAIL = false;
-	// private static final boolean DEBUG_ZEROS = false;
-	private static final boolean DEBUG_ZEROS2 = false;
-	private static final boolean DEBUG_ZEROS1129 = false;
-	private static final boolean DEBUG_ZEROS1241 = false;
-	// private static final boolean DEBUG_ZEROS1328 = false;
-	// private static final boolean DEBUG_BIG_NUM = false;
-	// private static final boolean DEBUG_BIG_NUM2 = false;
 
 	// CONSTANTS
 	private static final float EPSILON = 0.1f; // to round business counts so the integer sums match
@@ -252,7 +246,8 @@ public class CalibrateIndividuals {
 	 * Keys: Age5, Industry Division, Personal Income, POA, Sex<br>
 	 * Values: Number of persons
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>> censusSEXP_POA_AGE5P_INDP_INCP;
+	//private Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>> censusSEXP_POA_AGE5P_INDP_INCP;
+	private Map<String, Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>> censusSEXP_POA_AGE5P_INDP_INCP;
 
 	/**
 	 * 

@@ -31,8 +31,8 @@ public class Household extends Agent {
 	// Agent relationships (approx. 28 bytes)
 	protected int paymentClearingIndex;
 	private Individual[] individuals; // get employers from individuals
-	private int numAdults;
-	private int numChildren;
+	// private int numAdults; // calculate instead to reduce memory
+	// private int numChildren; // calculate instead to reduce memory
 	private String lgaCode;
 	private String state;
 
@@ -75,14 +75,14 @@ public class Household extends Agent {
 	private float bsResidentialLandAndDwellings;
 	private float bsOtherNonFinancialAssets;
 
-	private float bsTotalAssets;
+	// private float bsTotalAssets; // calculate instead to reduce memory
 
 	private float bsLoans;
 	private float bsStudentLoans; // HELP debt
 	private float bsOtherLiabilities;
-	private float bsTotalLiabilities;
+	// private float bsTotalLiabilities; // calculate instead to reduce memory
 
-	private float bsNetWorth;
+	// private float bsNetWorth; // calculate instead to reduce memory
 
 	// Loan details
 	private int loanCurrentMonth; // at calibration
@@ -169,10 +169,10 @@ public class Household extends Agent {
 		DecimalFormat wholeNumber = new DecimalFormat("###0");
 		// DecimalFormat percent = new DecimalFormat("###0.0000");
 
-		sb.append(this.name + separator);
+		sb.append(separator); // name
 		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
-		sb.append(wholeNumber.format(this.numAdults) + separator);
-		sb.append(wholeNumber.format(this.numChildren) + separator);
+		sb.append(wholeNumber.format(this.getNumAdults()) + separator);
+		sb.append(wholeNumber.format(this.getNumChildren()) + separator);
 		sb.append(wholeNumber.format(this.loanAdi != null ? this.loanAdi.getPaymentClearingIndex() : 0) + separator);
 		sb.append(wholeNumber.format(this.suppliers != null ? this.suppliers.size() : 0) + separator);
 		sb.append(wholeNumber.format(this.landlord != null ? this.landlord.getPaymentClearingIndex() : 0) + separator);
@@ -199,12 +199,12 @@ public class Household extends Agent {
 		sb.append(decimal.format(this.bsOtherFinancialAssets) + separator);
 		sb.append(decimal.format(this.bsResidentialLandAndDwellings) + separator);
 		sb.append(decimal.format(this.bsOtherNonFinancialAssets) + separator);
-		sb.append(decimal.format(this.bsTotalAssets) + separator);
+		sb.append(decimal.format(this.getBsTotalAssets()) + separator);
 		sb.append(decimal.format(this.bsLoans) + separator);
 		sb.append(decimal.format(this.bsStudentLoans) + separator);
 		sb.append(decimal.format(this.bsOtherLiabilities) + separator);
-		sb.append(decimal.format(this.bsTotalLiabilities) + separator);
-		sb.append(decimal.format(this.bsNetWorth));
+		sb.append(decimal.format(this.getBsTotalLiabilities()) + separator);
+		sb.append(decimal.format(this.getBsNetWorth()));
 
 		return sb.toString();
 	}
@@ -256,8 +256,8 @@ public class Household extends Agent {
 
 		sb.append(wholeNumber.format(this.paymentClearingIndex) + separator);
 		sb.append(this.lgaCode + separator);
-		sb.append(wholeNumber.format(this.numChildren) + separator);
-		sb.append(wholeNumber.format(this.numAdults) + separator);
+		sb.append(wholeNumber.format(this.getNumChildren()) + separator);
+		sb.append(wholeNumber.format(this.getNumAdults()) + separator);
 		float adultMeanAge = 0f;
 		int adultCount = 0;
 		for (Individual person : this.individuals) {
@@ -281,10 +281,10 @@ public class Household extends Agent {
 		sb.append(decimal.format(this.pnlMortgageRepayments) + separator);
 		sb.append(decimal.format(this.pnlDonations) + separator);
 
-		sb.append(decimal.format(this.bsTotalAssets) + separator);
+		sb.append(decimal.format(this.getBsTotalAssets()) + separator);
 		sb.append(decimal.format(this.bsLoans) + separator);
 		sb.append(decimal.format(this.bsStudentLoans) + separator);
-		sb.append(decimal.format(this.bsTotalLiabilities));
+		sb.append(decimal.format(this.getBsTotalLiabilities()));
 
 		return sb.toString();
 	}
@@ -449,7 +449,7 @@ public class Household extends Agent {
 	@Override
 	public List<NodePayment> getAmountsPayable(int iteration) {
 		// MAYBE: donations don't currently go anywhere
-		
+
 		int numberOfCreditors = 1; // government
 		if (this.suppliers != null && this.pnlLivingExpenses > 0d) {
 			numberOfCreditors += this.suppliers.size();
@@ -638,7 +638,7 @@ public class Household extends Agent {
 				+ this.pnlInvestmentIncome + this.pnlInterestIncome + this.pnlRentIncome + this.pnlForeignIncome
 				+ this.pnlOtherIncome;
 	}
-	
+
 	public float getIncomeAfterTax() {
 		// TODO: check if the +/- sign is the right way for income tax
 		return this.getGrossIncome() - this.pnlIncomeTaxExpense;
@@ -651,8 +651,8 @@ public class Household extends Agent {
 
 	protected void init() {
 		this.individuals = null;
-		this.numAdults = 0;
-		this.numChildren = 0;
+		// this.numAdults = 0;
+		// this.numChildren = 0;
 		this.lgaCode = null;
 		this.state = null;
 
@@ -687,14 +687,14 @@ public class Household extends Agent {
 		this.bsOtherFinancialAssets = 0f;
 		this.bsResidentialLandAndDwellings = 0f;
 		this.bsOtherNonFinancialAssets = 0f;
-		this.bsTotalAssets = 0f;
+		// this.bsTotalAssets = 0f;
 
 		this.bsLoans = 0f;
 		this.bsStudentLoans = 0f;
 		this.bsOtherLiabilities = 0f;
-		this.bsTotalLiabilities = 0f;
+		// this.bsTotalLiabilities = 0f;
 
-		this.bsNetWorth = 0f;
+		// this.bsNetWorth = 0f;
 	}
 
 	/**
@@ -715,28 +715,28 @@ public class Household extends Agent {
 	 * @return the numAdults
 	 */
 	public int getNumAdults() {
+		int numAdults = 0;
+		for (int i = 0; i < this.individuals.length; i++) {
+			if (this.individuals[i].getAge() > 17) {
+				// adults are 18+ years old
+				numAdults++;
+			}
+		}
 		return numAdults;
-	}
-
-	/**
-	 * @param numAdults the numAdults to set
-	 */
-	public void setNumAdults(int numAdults) {
-		this.numAdults = numAdults;
 	}
 
 	/**
 	 * @return the numChildren
 	 */
 	public int getNumChildren() {
+		int numChildren = 0;
+		for (int i = 0; i < this.individuals.length; i++) {
+			if (this.individuals[i].getAge() < 18) {
+				// children are under 18 years old
+				numChildren++;
+			}
+		}
 		return numChildren;
-	}
-
-	/**
-	 * @param numChildren the numChildren to set
-	 */
-	public void setNumChildren(int numChildren) {
-		this.numChildren = numChildren;
 	}
 
 	/**
@@ -1175,15 +1175,16 @@ public class Household extends Agent {
 	 * @return the bsTotalAssets
 	 */
 	public float getBsTotalAssets() {
-		return bsTotalAssets;
+		return this.bsBankDeposits + this.bsSuperannuation + this.bsEquities + this.bsOtherFinancialAssets
+				+ this.bsResidentialLandAndDwellings + this.bsOtherNonFinancialAssets;
 	}
 
 	/**
 	 * @param bsTotalAssets the bsTotalAssets to set
 	 */
-	public void setBsTotalAssets(float bsTotalAssets) {
-		this.bsTotalAssets = bsTotalAssets;
-	}
+	// public void setBsTotalAssets(float bsTotalAssets) {
+	// this.bsTotalAssets = bsTotalAssets;
+	// }
 
 	/**
 	 * @return the bsLoans
@@ -1231,28 +1232,28 @@ public class Household extends Agent {
 	 * @return the bsTotalLiabilities
 	 */
 	public float getBsTotalLiabilities() {
-		return bsTotalLiabilities;
+		return this.bsLoans + this.bsStudentLoans + this.bsOtherLiabilities;
 	}
 
 	/**
 	 * @param bsTotalLiabilities the bsTotalLiabilities to set
 	 */
-	public void setBsTotalLiabilities(float bsTotalLiabilities) {
-		this.bsTotalLiabilities = bsTotalLiabilities;
-	}
+	// public void setBsTotalLiabilities(float bsTotalLiabilities) {
+	// this.bsTotalLiabilities = bsTotalLiabilities;
+	// }
 
 	/**
 	 * @return the bsNetWorth
 	 */
 	public float getBsNetWorth() {
-		return bsNetWorth;
+		return this.getBsTotalAssets() - this.getBsTotalLiabilities();
 	}
 
 	/**
 	 * @param bsNetWorth the bsNetWorth to set
 	 */
-	public void setBsNetWorth(float bsNetWorth) {
-		this.bsNetWorth = bsNetWorth;
-	}
+	// public void setBsNetWorth(float bsNetWorth) {
+	// this.bsNetWorth = bsNetWorth;
+	// }
 
 }

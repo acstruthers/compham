@@ -4,10 +4,7 @@
 package xyz.struthers.rhul.ham.process;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
@@ -41,7 +38,7 @@ public class ClearingPaymentOutputs implements Serializable {
 		// https://stackoverflow.com/questions/12067405/deserializing-an-arraylist-no-valid-constructor
 		// super();
 	}
-	
+
 	public void close() {
 		this.equityOfNode = null;
 		this.defaultOrderOfNode = null;
@@ -51,14 +48,14 @@ public class ClearingPaymentOutputs implements Serializable {
 	/**
 	 * @return the equityOfNode
 	 */
-	public List<Float> getEquityOfNode() {
+	public TFloatArrayList getEquityOfNode() {
 		// public TFloatArrayList getEquityOfNode() {
 		/*
 		 * float[] primitiveArray = this.equityOfNode.toArray(); List<Float> boxedList =
 		 * new ArrayList<Float>(primitiveArray.length); for (Float node :
 		 * primitiveArray) { boxedList.add(node); } return boxedList;
 		 */
-		List<Float> boxedList = new ArrayList<Float>(this.equityOfNode.length);
+		TFloatArrayList boxedList = new TFloatArrayList(this.equityOfNode.length);
 		for (float i : this.equityOfNode) {
 			boxedList.add(i);
 		}
@@ -95,7 +92,7 @@ public class ClearingPaymentOutputs implements Serializable {
 	/**
 	 * @return the defaultOrderOfNode
 	 */
-	public List<Integer> getDefaultOrderOfNode() {
+	public TIntArrayList getDefaultOrderOfNode() {
 		// public TIntArrayList getDefaultOrderOfNode() {
 
 		// using Trove
@@ -106,7 +103,12 @@ public class ClearingPaymentOutputs implements Serializable {
 		 */
 
 		// using primitives
-		List<Integer> boxedList = Arrays.stream(this.defaultOrderOfNode).boxed().collect(Collectors.toList());
+		// List<Integer> boxedList =
+		// Arrays.stream(this.defaultOrderOfNode).boxed().collect(Collectors.toList());
+		TIntArrayList boxedList = new TIntArrayList(this.defaultOrderOfNode.length);
+		for (int i = 0; i < this.defaultOrderOfNode.length; i++) {
+			boxedList.add(this.defaultOrderOfNode[i]);
+		}
 		return boxedList;
 	}
 

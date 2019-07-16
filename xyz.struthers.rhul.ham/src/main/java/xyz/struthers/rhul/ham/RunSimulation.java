@@ -7,6 +7,8 @@ import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 
+import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.list.array.TIntArrayList;
 import xyz.struthers.rhul.ham.process.ClearingPaymentOutputs;
 import xyz.struthers.rhul.ham.process.ClearingPaymentVector;
 
@@ -46,8 +48,8 @@ public class RunSimulation {
 	 *         List<Float> NodeEquity, and<br>
 	 *         List<Integer> NodeDefaultOrder.
 	 */
-	public ClearingPaymentOutputs calculateClearingPaymentVector(List<List<Float>> liabilitiesAmounts,
-			List<List<Integer>> liabilitiesIndices, List<Float> operatingCashFlow, List<Float> liquidAssets,
+	public ClearingPaymentOutputs calculateClearingPaymentVector(List<TFloatArrayList> liabilitiesAmounts,
+			List<TIntArrayList> liabilitiesIndices, TFloatArrayList operatingCashFlow, TFloatArrayList liquidAssets,
 			int iteration) {
 
 		DecimalFormat formatter = new DecimalFormat("#,##0.00");

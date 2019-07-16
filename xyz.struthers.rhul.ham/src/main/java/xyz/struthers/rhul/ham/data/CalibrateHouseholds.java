@@ -793,8 +793,8 @@ public class CalibrateHouseholds {
 								for (int familyNum = 0; familyNum < numFamilies.get(cdcfSplit); familyNum++) {
 									Household household = new Household();
 
-									household.setNumAdults(numAdults);
-									household.setNumChildren(numChildren);
+									// household.setNumAdults(numAdults);
+									// household.setNumChildren(numChildren);
 
 									// determine Henderson poverty line based on family composition
 									float henderson = 0f;
@@ -1499,8 +1499,8 @@ public class CalibrateHouseholds {
 											numAdults++;
 										}
 									}
-									household.setNumAdults(numAdults);
-									household.setNumChildren(numChildren);
+									// household.setNumAdults(numAdults);
+									// household.setNumChildren(numChildren);
 									household.setIndividuals(members.toArray(Individual[]::new));
 
 									// add LGA Code and State to household
@@ -1518,7 +1518,7 @@ public class CalibrateHouseholds {
 										float assumedMarginalTaxRate = 0.30f;
 										float tmpSavings = tmpIncome * Properties.HOUSEHOLD_SAVING_RATIO
 												/ (1f - assumedMarginalTaxRate);
-										float newIncome = tmpExpense + tmpSavings;
+										// float newIncome = tmpExpense + tmpSavings;
 										float tmpIncomeExclOther = tmpIncome - household.getPnlOtherIncome();
 										float newOtherIncome = tmpExpense + tmpSavings - tmpIncomeExclOther;
 
@@ -1537,8 +1537,8 @@ public class CalibrateHouseholds {
 											adultOtherIncome[otherIncomeIdx] = otherIncomeDivisor < 0.01f ? 0f
 													: adultOtherIncome[otherIncomeIdx] / otherIncomeDivisor;
 											// set other income in the Individual
-											adultMembers.get(otherIncomeIdx)
-													.setPnlOtherIncome(adultOtherIncome[otherIncomeIdx]);
+											adultMembers.get(otherIncomeIdx).setPnlOtherIncome(
+													adultOtherIncome[otherIncomeIdx] * newOtherIncome);
 											// update individual income tax
 											adultMembers.get(otherIncomeIdx)
 													.setPnlIncomeTaxExpense(Tax.calculateIndividualIncomeTax(
@@ -1574,14 +1574,15 @@ public class CalibrateHouseholds {
 									float otherFinAssets = otherFinAssetsToAssetsRbaE1 * totalAssets;
 									float dwellings = dwellingsToAssetsRbaE1 * totalAssets;
 									float otherNonFinAssets = otherNonFinAssetsToAssetsRbaE1 * totalAssets;
-									float calculatedTotalAssets = totalAssets - cash + Math.max(cash, calculatedCash);
+									// float calculatedTotalAssets = totalAssets - cash + Math.max(cash,
+									// calculatedCash);
 									household.setBsBankDeposits(calculatedCash);
 									household.setBsSuperannuation(superannuation);
 									household.setBsEquities(equities);
 									household.setBsOtherFinancialAssets(otherFinAssets);
 									household.setBsResidentialLandAndDwellings(dwellings);
 									household.setBsOtherNonFinancialAssets(otherNonFinAssets);
-									household.setBsTotalAssets(calculatedTotalAssets);
+									// household.setBsTotalAssets(calculatedTotalAssets);
 
 									// set liabilities based on RBA ratios
 									float totalLiabilities = totalLiabilitiesToAssetsRbaE1 * totalAssets;
@@ -1591,11 +1592,11 @@ public class CalibrateHouseholds {
 											existingStudentLoans);
 									float calculatedOtherLiabilities = Math
 											.max(totalLiabilities - Math.max(totalDebt, existingStudentLoans), 0f);
-									float calculatedTotalLiabilities = calculatedLoanBal + existingStudentLoans
-											+ calculatedOtherLiabilities;
+									// float calculatedTotalLiabilities = calculatedLoanBal + existingStudentLoans
+									// + calculatedOtherLiabilities;
 									household.setBsLoans(calculatedLoanBal);
 									household.setBsOtherLiabilities(calculatedOtherLiabilities);
-									household.setBsTotalLiabilities(calculatedTotalLiabilities);
+									// household.setBsTotalLiabilities(calculatedTotalLiabilities);
 
 									// add Individuals and Households to more permanent data structures
 									// add to matrix so it has LGA data and can be used to calibrate topology
