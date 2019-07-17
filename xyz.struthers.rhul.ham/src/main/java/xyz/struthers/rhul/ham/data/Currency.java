@@ -5,8 +5,9 @@ package xyz.struthers.rhul.ham.data;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Random;
+
+import gnu.trove.list.array.TFloatArrayList;
 
 /**
  * @author Adam Struthers
@@ -21,14 +22,14 @@ public class Currency implements Serializable {
 	float avg1yr;
 	float stdev1yr;
 	float stdev5yr;
-	ArrayList<Float> exchangeRate;
+	TFloatArrayList exchangeRate;
 
 	/**
 	 * 
 	 */
 	public Currency() {
 		super();
-		this.exchangeRate = new ArrayList<Float>();
+		this.exchangeRate = new TFloatArrayList();
 	}
 
 	public Currency(String isoCode, String currencyName, float fxRate, float average1yr, float standardDeviation1yr,
@@ -39,7 +40,7 @@ public class Currency implements Serializable {
 		this.avg1yr = average1yr;
 		this.stdev1yr = standardDeviation1yr;
 		this.stdev5yr = standardDeviation5yr;
-		this.exchangeRate = new ArrayList<Float>();
+		this.exchangeRate = new TFloatArrayList();
 		this.exchangeRate.add(fxRate);
 	}
 
@@ -74,7 +75,7 @@ public class Currency implements Serializable {
 
 		DecimalFormat decimal = new DecimalFormat("###0.0000000000");
 		DecimalFormat wholeNumber = new DecimalFormat("###0");
-		//DecimalFormat percent = new DecimalFormat("###0.0000");
+		// DecimalFormat percent = new DecimalFormat("###0.0000");
 
 		sb.append(this.iso4217code + separator);
 		sb.append(this.name + separator);
@@ -135,7 +136,7 @@ public class Currency implements Serializable {
 			this.exchangeRate.add(exchangeRate);
 		} else {
 			result = 1;
-			//this.exchangeRate.add(result);
+			// this.exchangeRate.add(result);
 		}
 		return result;
 	}
@@ -157,7 +158,7 @@ public class Currency implements Serializable {
 			this.exchangeRate.add(prevFxRate);
 		} else {
 			fxRate = 1f;
-			//this.exchangeRate.add(fxRate);
+			// this.exchangeRate.add(fxRate);
 		}
 		return fxRate;
 	}
@@ -247,7 +248,7 @@ public class Currency implements Serializable {
 	 */
 	private float setExchangeRateRandom(int iteration, Random random, float stdDev, int forceSign) {
 		if (this.exchangeRate == null) {
-			this.exchangeRate = new ArrayList<Float>();
+			this.exchangeRate = new TFloatArrayList();
 		}
 		float prevFxRate = (iteration == 0 ? this.avg1yr : this.exchangeRate.get(iteration - 1));
 		float fxRate = 1f;
@@ -341,7 +342,7 @@ public class Currency implements Serializable {
 		this.stdev5yr = stdev5yr;
 	}
 
-	public ArrayList<Float> getExchangeRates() {
+	public TFloatArrayList getExchangeRates() {
 		return this.exchangeRate;
 	}
 

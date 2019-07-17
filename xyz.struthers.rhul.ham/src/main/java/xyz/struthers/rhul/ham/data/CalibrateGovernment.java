@@ -3,12 +3,11 @@
  */
 package xyz.struthers.rhul.ham.data;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import gnu.trove.map.hash.TObjectFloatHashMap;
 import xyz.struthers.rhul.ham.agent.AustralianGovernment;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
 
@@ -27,8 +26,8 @@ public class CalibrateGovernment {
 	private AustralianEconomy economy;
 
 	// field variables
-	private Map<String, Float> govtBalSht;
-	private Map<String, Float> govtProfitLoss;
+	private TObjectFloatHashMap<String> govtBalSht;
+	private TObjectFloatHashMap<String> govtProfitLoss;
 	private AustralianGovernment govtAgent;
 
 	/**

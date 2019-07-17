@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import gnu.trove.map.hash.TObjectFloatHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import xyz.struthers.lang.CustomMath;
 import xyz.struthers.rhul.ham.agent.Household;
 import xyz.struthers.rhul.ham.agent.Individual;
@@ -222,7 +224,7 @@ public class CalibrateHouseholds {
 	 * 
 	 * Keys: Series ID, Date
 	 */
-	private Map<String, Map<Date, Float>> rbaE1;
+	private Map<String, TObjectFloatHashMap<Date>> rbaE1;
 	/**
 	 * RBA E2 Household Finances - Selected Ratios<br>
 	 * 
@@ -261,7 +263,7 @@ public class CalibrateHouseholds {
 	 * Keys: Household Income, Rent Range, LGA, Household Composition Dwelling<br>
 	 * Values: Number of dwellings
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Integer>>>> censusHCFMD_LGA_HIND_RNTRD;
+	private Map<String, Map<String, Map<String, TObjectIntHashMap<String>>>> censusHCFMD_LGA_HIND_RNTRD;
 	/**
 	 * ABS Census Table Builder data:<br>
 	 * HCFMD by LGA by HIND and MRERD<br>
@@ -270,7 +272,7 @@ public class CalibrateHouseholds {
 	 * Keys: Household Income, Rent Range, LGA, Household Composition Dwelling<br>
 	 * Values: Number of dwellings
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Integer>>>> censusHCFMD_LGA_HIND_MRERD;
+	private Map<String, Map<String, Map<String, TObjectIntHashMap<String>>>> censusHCFMD_LGA_HIND_MRERD;
 	/**
 	 * ABS Census Table Builder data:<br>
 	 * HCFMF by LGA by FINF and CDCF<br>
@@ -280,7 +282,7 @@ public class CalibrateHouseholds {
 	 * Dwelling<br>
 	 * Values: Number of dwellings
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Integer>>>> censusHCFMF_LGA_FINF_CDCF;
+	private Map<String, Map<String, Map<String, TObjectIntHashMap<String>>>> censusHCFMF_LGA_FINF_CDCF;
 
 	/**
 	 * Default constructor

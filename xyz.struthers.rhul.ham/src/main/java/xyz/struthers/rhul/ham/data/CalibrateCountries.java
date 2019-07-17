@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import gnu.trove.map.hash.TObjectFloatHashMap;
 import xyz.struthers.rhul.ham.agent.ForeignCountry;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
 
@@ -51,8 +52,8 @@ public class CalibrateCountries {
 	private Map<String, ForeignCountry> countryNameMap;
 
 	// values based on ABS data, used to calibrate Agent links
-	private Map<String, Float> initialExportsFromAustraliaByState; // 8 states
-	private Map<String, Float> initialImportsToAustraliaByState;
+	private TObjectFloatHashMap<String> initialExportsFromAustraliaByState; // 8 states
+	private TObjectFloatHashMap<String> initialImportsToAustraliaByState;
 
 	/**
 	 * 
@@ -112,7 +113,7 @@ public class CalibrateCountries {
 	 * 
 	 * @return a map of total exports from Australia by state
 	 */
-	private Map<String, Float> calculateInitialExportsFromAustraliaByState() {
+	private TObjectFloatHashMap<String> calculateInitialExportsFromAustraliaByState() {
 		// set the calibration date
 		DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
 		Date absDate = null;
@@ -123,7 +124,7 @@ public class CalibrateCountries {
 		}
 
 		// load raw CSV country data for each state
-		Map<String, Map<String, Map<Date, Float>>> dataStates = new HashMap<String, Map<String, Map<Date, Float>>>(
+		Map<String, Map<String, TObjectFloatHashMap<Date>>> dataStates = new HashMap<String, Map<String, TObjectFloatHashMap<Date>>>(
 				(int) Math.ceil(8f / 0.75f));
 		dataStates.put("NSW", this.data.getAbs5368_0Table36a());
 		dataStates.put("VIC", this.data.getAbs5368_0Table36b());
@@ -140,7 +141,8 @@ public class CalibrateCountries {
 		}
 
 		// sum data for each state
-		Map<String, Float> exports = new HashMap<String, Float>((int) Math.ceil(ForeignCountry.STATES.length / 0.75f));
+		TObjectFloatHashMap<String> exports = new TObjectFloatHashMap<String>(
+				(int) Math.ceil(ForeignCountry.STATES.length / 0.75f));
 		Set<String> countryNames = this.allCountryData.keySet(); // just those with FX data
 		for (int stateIdx = 0; stateIdx < ForeignCountry.STATES.length; stateIdx++) {
 			String state = ForeignCountry.STATES[stateIdx];
@@ -182,7 +184,7 @@ public class CalibrateCountries {
 	 * 
 	 * @return a map of total imports to Australia by state
 	 */
-	private Map<String, Float> calculateInitialImportsToAustraliaByState() {
+	private TObjectFloatHashMap<String> calculateInitialImportsToAustraliaByState() {
 		// set the calibration date
 		DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
 		Date absDate = null;
@@ -193,7 +195,7 @@ public class CalibrateCountries {
 		}
 
 		// load raw CSV country data for each state
-		Map<String, Map<String, Map<Date, Float>>> dataStates = new HashMap<String, Map<String, Map<Date, Float>>>(
+		Map<String, Map<String, TObjectFloatHashMap<Date>>> dataStates = new HashMap<String, Map<String, TObjectFloatHashMap<Date>>>(
 				(int) Math.ceil(8f / 0.75f));
 		dataStates.put("NSW", this.data.getAbs5368_0Table37a());
 		dataStates.put("VIC", this.data.getAbs5368_0Table37b());
@@ -210,7 +212,8 @@ public class CalibrateCountries {
 		}
 
 		// sum data for each state
-		Map<String, Float> imports = new HashMap<String, Float>((int) Math.ceil(ForeignCountry.STATES.length / 0.75f));
+		TObjectFloatHashMap<String> imports = new TObjectFloatHashMap<String>(
+				(int) Math.ceil(ForeignCountry.STATES.length / 0.75f));
 		Set<String> countryNames = this.allCountryData.keySet(); // just those with FX data
 		for (int stateIdx = 0; stateIdx < ForeignCountry.STATES.length; stateIdx++) {
 			String state = ForeignCountry.STATES[stateIdx];
@@ -260,7 +263,7 @@ public class CalibrateCountries {
 	/**
 	 * @return the initialExportsFromAustraliaByState
 	 */
-	public Map<String, Float> getInitialExportsFromAustraliaByState() {
+	public TObjectFloatHashMap<String> getInitialExportsFromAustraliaByState() {
 		return initialExportsFromAustraliaByState;
 	}
 
@@ -269,14 +272,14 @@ public class CalibrateCountries {
 	 *                                           initialExportsFromAustraliaByState
 	 *                                           to set
 	 */
-	public void setInitialExportsFromAustraliaByState(Map<String, Float> initialExportsFromAustraliaByState) {
+	public void setInitialExportsFromAustraliaByState(TObjectFloatHashMap<String> initialExportsFromAustraliaByState) {
 		this.initialExportsFromAustraliaByState = initialExportsFromAustraliaByState;
 	}
 
 	/**
 	 * @return the initialImportsToAustraliaByState
 	 */
-	public Map<String, Float> getInitialImportsToAustraliaByState() {
+	public TObjectFloatHashMap<String> getInitialImportsToAustraliaByState() {
 		return initialImportsToAustraliaByState;
 	}
 
@@ -284,7 +287,7 @@ public class CalibrateCountries {
 	 * @param initialImportsToAustraliaByState the initialImportsToAustraliaByState
 	 *                                         to set
 	 */
-	public void setInitialImportsToAustraliaByState(Map<String, Float> initialImportsToAustraliaByState) {
+	public void setInitialImportsToAustraliaByState(TObjectFloatHashMap<String> initialImportsToAustraliaByState) {
 		this.initialImportsToAustraliaByState = initialImportsToAustraliaByState;
 	}
 

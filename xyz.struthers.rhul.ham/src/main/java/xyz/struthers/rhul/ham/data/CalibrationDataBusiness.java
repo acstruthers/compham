@@ -29,6 +29,8 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Sets;
 import com.opencsv.CSVReader;
 
+import gnu.trove.map.hash.TObjectFloatHashMap;
+
 /**
  * Loads CSV data downloaded using Table Builder from the ABS, RBA, APRA and
  * ATO. This class contains the data that is only needed when calibrating
@@ -75,57 +77,57 @@ public class CalibrationDataBusiness {
 	private Map<String, List<String>> title;
 	private Map<String, List<String>> unitType;
 
-	private Map<String, Map<Date, Float>> abs5676_0Table7; // Business Indicators: Sales by State
-	private Map<String, Map<Date, Float>> abs5676_0Table19; // Business Indicators: Wages by State
-	private Map<String, Map<Date, Float>> abs5676_0Table21; // Business Indicators: Sales vs Wages Ratio
-	private Map<String, Map<Date, Float>> abs5676_0Table22; // Business Indicators: Profits vs Sales Ratio
-	private Map<String, Map<String, Map<String, Float>>> abs6524_055_002EmployeeTable5; // Income by LGA: Employee
+	private Map<String, TObjectFloatHashMap<Date>> abs5676_0Table7; // Business Indicators: Sales by State
+	private Map<String, TObjectFloatHashMap<Date>> abs5676_0Table19; // Business Indicators: Wages by State
+	private Map<String, TObjectFloatHashMap<Date>> abs5676_0Table21; // Business Indicators: Sales vs Wages Ratio
+	private Map<String, TObjectFloatHashMap<Date>> abs5676_0Table22; // Business Indicators: Profits vs Sales Ratio
+	private Map<String, Map<String, TObjectFloatHashMap<String>>> abs6524_055_002EmployeeTable5; // Income by LGA: Employee
 																						// (Table 5) (keys: year,
 																						// column title without
 																						// units, LGA)
-	private Map<String, Map<String, Map<String, Float>>> abs6524_055_002InvestmentTable5; // Income by LGA: Investments
+	private Map<String, Map<String, TObjectFloatHashMap<String>>> abs6524_055_002InvestmentTable5; // Income by LGA: Investments
 																							// (Table 5) (keys: year,
 																							// column title without
 																							// units, LGA)
-	private Map<String, Map<String, Map<String, Float>>> abs6524_055_002IncomeTable5; // Income by LGA: Income (Table
+	private Map<String, Map<String, TObjectFloatHashMap<String>>> abs6524_055_002IncomeTable5; // Income by LGA: Income (Table
 																						// 5) (keys: year, column title
 																						// without units, LGA)
-	private Map<String, Map<String, Map<String, Float>>> abs8155_0Table2; // labour costs by division (keys: year,
+	private Map<String, Map<String, TObjectFloatHashMap<String>>> abs8155_0Table2; // labour costs by division (keys: year,
 																			// column title, industry)
-	private Map<String, Map<String, Map<String, Float>>> abs8155_0Table4; // industry performance by division (keys:
+	private Map<String, Map<String, TObjectFloatHashMap<String>>> abs8155_0Table4; // industry performance by division (keys:
 																			// year, column title, industry)
-	private Map<String, Map<String, Map<String, Map<String, Float>>>> abs8155_0Table5; // business size by division
+	private Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>> abs8155_0Table5; // business size by division
 																						// (keys: year, column title,
 																						// size, industry)
-	private Map<String, Map<String, Map<String, Map<String, Float>>>> abs8155_0Table6; // states by division (keys:
+	private Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>> abs8155_0Table6; // states by division (keys:
 																						// year, column title, state,
 																						// industry)
 	/*
 	 * Count by state, industry & employment range. Keys are: employment range,
 	 * state, industry class code.
 	 */
-	private Map<String, Map<String, Map<String, Float>>> abs8165_0StateEmployment;
+	private Map<String, Map<String, TObjectFloatHashMap<String>>> abs8165_0StateEmployment;
 	/*
 	 * Count by state, industry & turnover range. Keys are: turnover range, state,
 	 * industry class code.
 	 */
-	private Map<String, Map<String, Map<String, Float>>> abs8165_0StateTurnover;
+	private Map<String, Map<String, TObjectFloatHashMap<String>>> abs8165_0StateTurnover;
 	/*
 	 * Count by LGA, industry & employment range. Keys are: employment range, state,
 	 * LGA code, industry division code.
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Float>>>> abs8165_0LgaEmployment;
+	private Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>> abs8165_0LgaEmployment;
 	/*
 	 * Count by LGA, industry & turnover range. Keys are: turnover range, state, LGA
 	 * code, industry division code.
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Float>>>> abs8165_0LgaTurnover;
-	private Map<String, Map<String, Float>> abs8165_0Table4; // businesses by main state
-	private Map<String, Map<String, Float>> abs8165_0Table13; // businesses by employment size range
-	private Map<String, Map<String, Float>> abs8165_0Table17; // businesses by annual turnover range
+	private Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>> abs8165_0LgaTurnover;
+	private Map<String, TObjectFloatHashMap<String>> abs8165_0Table4; // businesses by main state
+	private Map<String, TObjectFloatHashMap<String>> abs8165_0Table13; // businesses by employment size range
+	private Map<String, TObjectFloatHashMap<String>> abs8165_0Table17; // businesses by annual turnover range
 
-	private Map<String, Map<String, Float>> atoCompanyTable4a; // ATO Fine Industry Detailed P&L and Bal Sht
-	private Map<String, Map<String, Float>> atoCompanyTable4b; // Industry Code Total P&L
+	private Map<String, TObjectFloatHashMap<String>> atoCompanyTable4a; // ATO Fine Industry Detailed P&L and Bal Sht
+	private Map<String, TObjectFloatHashMap<String>> atoCompanyTable4b; // Industry Code Total P&L
 
 	/**
 	 * 
@@ -374,21 +376,21 @@ public class CalibrationDataBusiness {
 		// load ABS 5676.0 data
 		System.out.println(new Date(System.currentTimeMillis())
 				+ ": Loading ABS 5676.0 Business Indicators: Table 7, Sales by State");
-		this.abs5676_0Table7 = new HashMap<String, Map<Date, Float>>();
+		this.abs5676_0Table7 = new HashMap<String, TObjectFloatHashMap<Date>>();
 		int[] abs5676_0Table7Columns = { 9, 10, 11, 12, 13, 14, 15, 16 }; // loads seasonally adjusted sales
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5676.0_BusinessIndicators/Table7_SalesByState.csv", ABS_5676_0_T7,
 				abs5676_0Table7Columns, this.title, this.unitType, this.abs5676_0Table7);
 
 		System.out.println(new Date(System.currentTimeMillis())
 				+ ": Loading ABS 5676.0 Business Indicators: Table 19, Wages by State");
-		this.abs5676_0Table19 = new HashMap<String, Map<Date, Float>>();
+		this.abs5676_0Table19 = new HashMap<String, TObjectFloatHashMap<Date>>();
 		int[] abs5676_0Table19Columns = { 10, 11, 12, 13, 14, 15, 16, 17, 18 }; // loads seasonally adjusted wages
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5676.0_BusinessIndicators/Table19_WagesByState.csv", ABS_5676_0_T19,
 				abs5676_0Table19Columns, this.title, this.unitType, this.abs5676_0Table19);
 
 		System.out.println(new Date(System.currentTimeMillis())
 				+ ": Loading ABS 5676.0 Business Indicators: Table 21, Sales vs Wages Ratio");
-		this.abs5676_0Table21 = new HashMap<String, Map<Date, Float>>();
+		this.abs5676_0Table21 = new HashMap<String, TObjectFloatHashMap<Date>>();
 		int[] abs5676_0Table21Columns = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }; // loads sales to wages
 																								// ratio by industry
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5676.0_BusinessIndicators/Table21_SalesVsWagesRatio.csv",
@@ -396,7 +398,7 @@ public class CalibrationDataBusiness {
 
 		System.out.println(new Date(System.currentTimeMillis())
 				+ ": Loading ABS 5676.0 Business Indicators: Table 22, Profits vs Sales Ratio");
-		this.abs5676_0Table22 = new HashMap<String, Map<Date, Float>>();
+		this.abs5676_0Table22 = new HashMap<String, TObjectFloatHashMap<Date>>();
 		int[] abs5676_0Table22Columns = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }; // loads profit to sales
 																								// ratio by industry
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5676.0_BusinessIndicators/Table22_ProfitsVsSalesRatio.csv",
@@ -404,7 +406,7 @@ public class CalibrationDataBusiness {
 
 		// load ABS 6524 employee
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 6524.055.002 Employee data");
-		this.abs6524_055_002EmployeeTable5 = new HashMap<String, Map<String, Map<String, Float>>>(6); // 6 years
+		this.abs6524_055_002EmployeeTable5 = new HashMap<String, Map<String, TObjectFloatHashMap<String>>>(6); // 6 years
 		int[] abs6524_055_002EmployeeTable5Columns = { 19 };
 		this.loadAbsDataCsv_6524_0("/data/ABS/6524.0.55.002_IncomeByLGA/Employee income_Table5.csv",
 				ABS6524_055_002_EMPLOYEE_T5, abs6524_055_002EmployeeTable5Columns, this.title, this.unitType,
@@ -412,7 +414,7 @@ public class CalibrationDataBusiness {
 
 		// ABS 6524 investment
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 6524.055.002 Investment data");
-		this.abs6524_055_002InvestmentTable5 = new HashMap<String, Map<String, Map<String, Float>>>(6); // 6 years
+		this.abs6524_055_002InvestmentTable5 = new HashMap<String, Map<String, TObjectFloatHashMap<String>>>(6); // 6 years
 		int[] abs6524_055_002InvestmentTable5Columns = { 7, 13, 19, 25, 31, 37 };
 		this.loadAbsDataCsv_6524_0("/data/ABS/6524.0.55.002_IncomeByLGA/Investment income_Table5.csv",
 				ABS6524_055_002_INVEST_T5, abs6524_055_002InvestmentTable5Columns, this.title, this.unitType,
@@ -420,7 +422,7 @@ public class CalibrationDataBusiness {
 
 		// ABS 6524 income
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 6524.055.002 Income data");
-		this.abs6524_055_002IncomeTable5 = new HashMap<String, Map<String, Map<String, Float>>>(6); // 6 years
+		this.abs6524_055_002IncomeTable5 = new HashMap<String, Map<String, TObjectFloatHashMap<String>>>(6); // 6 years
 		int[] abs6524_055_002IncomeTable5Columns = { 7, 13, 19, 25, 31 };
 		this.loadAbsDataCsv_6524_0("/data/ABS/6524.0.55.002_IncomeByLGA/Total income_Table5.csv",
 				ABS6524_055_002_INCOME_T5, abs6524_055_002IncomeTable5Columns, this.title, this.unitType,
@@ -430,7 +432,7 @@ public class CalibrationDataBusiness {
 		System.out
 				.println(new Date(System.currentTimeMillis()) + ": Loading ABS 8155.0 Australian industry by division");
 		System.out.print("   Table 2");
-		this.abs8155_0Table2 = new HashMap<String, Map<String, Map<String, Float>>>();
+		this.abs8155_0Table2 = new HashMap<String, Map<String, TObjectFloatHashMap<String>>>();
 		int[] abs8155_0Table2Columns = { 1, 2, 3, 5, 6 };
 		String[] abs8155_0Table2Years = { "2016–17" };
 		int abs8155_0Table2TitleRow = 4;
@@ -440,7 +442,7 @@ public class CalibrationDataBusiness {
 				this.title, this.unitType, this.abs8155_0Table2);
 
 		System.out.print(", Table 4");
-		this.abs8155_0Table4 = new HashMap<String, Map<String, Map<String, Float>>>();
+		this.abs8155_0Table4 = new HashMap<String, Map<String, TObjectFloatHashMap<String>>>();
 		int[] abs8155_0Table4Columns = { 1, 2, 3, 4, 5, 7, 8, 9, 10, 11 };
 		String[] abs8155_0Table4Years = { "2016–17" };
 		int abs8155_0Table4TitleRow = 6;
@@ -450,7 +452,7 @@ public class CalibrationDataBusiness {
 				abs8155_0Table4UnitsRow, this.title, this.unitType, this.abs8155_0Table4);
 
 		System.out.print(", Table 5");
-		this.abs8155_0Table5 = new HashMap<String, Map<String, Map<String, Map<String, Float>>>>();
+		this.abs8155_0Table5 = new HashMap<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>();
 		int[] abs8155_0Table5Columns = { 3, 6, 9, 12, 15, 18, 21 };
 		int abs8155_0Table5TitleRow = 4;
 		int abs8155_0Table5UnitsRow = 6;
@@ -459,7 +461,7 @@ public class CalibrationDataBusiness {
 				this.abs8155_0Table5);
 
 		System.out.print(", Table 6.");
-		this.abs8155_0Table6 = new HashMap<String, Map<String, Map<String, Map<String, Float>>>>();
+		this.abs8155_0Table6 = new HashMap<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>();
 		int[] abs8155_0Table6Columns = { 3, 6, 9 };
 		int abs8155_0Table6TitleRow = 4;
 		int abs8155_0Table6UnitsRow = 6;
@@ -473,7 +475,7 @@ public class CalibrationDataBusiness {
 		int[] abs8165_0StateEmploymentColumns = { 23, 24, 25, 26 };
 		int abs8165_0StateEmploymentTitleRow = 5;
 		int abs8165_0StateEmploymentUnitsRow = 6;
-		this.abs8165_0StateEmployment = new HashMap<String, Map<String, Map<String, Float>>>(
+		this.abs8165_0StateEmployment = new HashMap<String, Map<String, TObjectFloatHashMap<String>>>(
 				abs8165_0StateEmploymentColumns.length);
 		this.loadAbsDataCsv_8165_0State(
 				"/data/ABS/8165.0_CountOfBusinesses/8165.0_by State, Industry Code & Employment Size.csv",
@@ -484,7 +486,7 @@ public class CalibrationDataBusiness {
 		int[] abs8165_0StateTurnoverColumns = { 31, 32, 33, 34, 35, 36 };
 		int abs8165_0StateTurnoverTitleRow = 5;
 		int abs8165_0StateTurnoverUnitsRow = 6;
-		this.abs8165_0StateTurnover = new HashMap<String, Map<String, Map<String, Float>>>(
+		this.abs8165_0StateTurnover = new HashMap<String, Map<String, TObjectFloatHashMap<String>>>(
 				abs8165_0StateTurnoverColumns.length);
 		this.loadAbsDataCsv_8165_0State(
 				"/data/ABS/8165.0_CountOfBusinesses/8165.0_by State, Industry Code & Turnover.csv",
@@ -493,7 +495,7 @@ public class CalibrationDataBusiness {
 
 		System.out.print(", LGA Employment");
 		int[] abs8165_0LgaEmploymentColumns = { 5, 6, 7, 8 };
-		this.abs8165_0LgaEmployment = new HashMap<String, Map<String, Map<String, Map<String, Float>>>>(
+		this.abs8165_0LgaEmployment = new HashMap<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>(
 				abs8165_0LgaEmploymentColumns.length);
 		this.loadAbsDataCsv_8165_0Lga(
 				"/data/ABS/8165.0_CountOfBusinesses/8165.0_by State, LGA, Industry & Employment Size.csv",
@@ -502,7 +504,7 @@ public class CalibrationDataBusiness {
 
 		System.out.print(", LGA Turnover");
 		int[] abs8165_0LgaTurnoverColumns = { 5, 6, 7, 8, 9, 10 };
-		this.abs8165_0LgaTurnover = new HashMap<String, Map<String, Map<String, Map<String, Float>>>>(
+		this.abs8165_0LgaTurnover = new HashMap<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>(
 				abs8165_0LgaTurnoverColumns.length);
 		this.loadAbsDataCsv_8165_0Lga(
 				"/data/ABS/8165.0_CountOfBusinesses/8165.0_by State, LGA, Industry & Turnover.csv",
@@ -510,7 +512,7 @@ public class CalibrationDataBusiness {
 				this.abs8165_0LgaTurnover);
 
 		System.out.print(", Table 4");
-		this.abs8165_0Table4 = new HashMap<String, Map<String, Float>>(1);
+		this.abs8165_0Table4 = new HashMap<String, TObjectFloatHashMap<String>>(1);
 		int[] abs8165_0Table4Columns = { 4 };
 		int[] abs8165_0Table4Rows = { 40, 41, 42, 43, 44, 45, 46, 47, 48 };
 		int abs8165_0Table4TitleRow = 4;
@@ -518,7 +520,7 @@ public class CalibrationDataBusiness {
 				abs8165_0Table4Columns, abs8165_0Table4Rows, abs8165_0Table4TitleRow, this.title, this.abs8165_0Table4);
 
 		System.out.print(", Table 13");
-		this.abs8165_0Table13 = new HashMap<String, Map<String, Float>>(1);
+		this.abs8165_0Table13 = new HashMap<String, TObjectFloatHashMap<String>>(1);
 		int[] abs8165_0Table13Columns = { 5 };
 		int[] abs8165_0Table13Rows = { 34, 36, 37, 38, 39 };
 		int abs8165_0Table13TitleRow = 4;
@@ -527,7 +529,7 @@ public class CalibrationDataBusiness {
 				this.abs8165_0Table13);
 
 		System.out.println(", Table 17.");
-		this.abs8165_0Table17 = new HashMap<String, Map<String, Float>>(1);
+		this.abs8165_0Table17 = new HashMap<String, TObjectFloatHashMap<String>>(1);
 		int[] abs8165_0Table17Columns = { 5 };
 		int[] abs8165_0Table17Rows = { 31, 32, 33, 34, 35, 36 };
 		int abs8165_0Table17TitleRow = 4;
@@ -537,14 +539,14 @@ public class CalibrationDataBusiness {
 
 		// load ATO Company Table 4
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Company Table 4A data");
-		this.atoCompanyTable4a = new HashMap<String, Map<String, Float>>();
+		this.atoCompanyTable4a = new HashMap<String, TObjectFloatHashMap<String>>();
 		int[] atoCompanyTable4aColumns = { 2, 3, 4, 9, 10, 11, 12, 17, 18, 21, 22, 23, 24, 31, 32, 33, 34, 35, 36, 37,
 				38, 41, 42, 51, 52, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 111, 112, 115, 116 };
 		this.loadAtoCompanyTable4A("/data/ATO/Company/CompanyTable4A.csv", ATO_COMPANY_T4A, atoCompanyTable4aColumns,
 				this.title, this.atoCompanyTable4a);
 
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Company Table 4B data");
-		this.atoCompanyTable4b = new HashMap<String, Map<String, Float>>();
+		this.atoCompanyTable4b = new HashMap<String, TObjectFloatHashMap<String>>();
 		int[] atoCompanyTable4bColumns = { 2, 3, 4, 5, 6 };
 		this.loadAtoCompanyTable4B("/data/ATO/Company/CompanyTable4B.csv", ATO_COMPANY_T4B, atoCompanyTable4bColumns,
 				this.title, this.atoCompanyTable4b);
@@ -578,7 +580,7 @@ public class CalibrationDataBusiness {
 	 * @param data                 - the data map that the values are returned in
 	 */
 	private void loadAbsDataCsv_Catalogue(String fileResourceLocation, String catalogueName, int[] columnsToImport,
-			Map<String, List<String>> titles, Map<String, List<String>> units, Map<String, Map<Date, Float>> data) {
+			Map<String, List<String>> titles, Map<String, List<String>> units, Map<String, TObjectFloatHashMap<Date>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -608,7 +610,7 @@ public class CalibrationDataBusiness {
 						// store series ID as key with blank collections to populate with data below
 						for (int i = 0; i < columnsToImport.length; i++) {
 							seriesId[i] = line[columnsToImport[i]];
-							data.put(line[columnsToImport[i]], new HashMap<Date, Float>());
+							data.put(line[columnsToImport[i]], new TObjectFloatHashMap<Date>());
 						}
 						header = false;
 					}
@@ -659,7 +661,7 @@ public class CalibrationDataBusiness {
 	 */
 	private void loadAbsDataCsv_6524_0(String fileResourceLocation, String catalogueName, int[] columnsToImport,
 			Map<String, List<String>> titles, Map<String, List<String>> units,
-			Map<String, Map<String, Map<String, Float>>> data) {
+			Map<String, Map<String, TObjectFloatHashMap<String>>> data) {
 
 		/*
 		 * use previous column heading from row 6 if this cell is empty.<br> use years
@@ -720,9 +722,9 @@ public class CalibrationDataBusiness {
 									if (!data.containsKey(line[i])) {
 										// this is the first column for this year, so add it to the map
 										// store series ID as key with blank collections to populate with data below
-										data.put(line[i], new HashMap<String, Map<String, Float>>());
+										data.put(line[i], new HashMap<String, TObjectFloatHashMap<String>>());
 										for (int k = 0; k < columnsToImport.length; k++) {
-											data.get(line[i]).put(seriesId[k], new HashMap<String, Float>());
+											data.get(line[i]).put(seriesId[k], new TObjectFloatHashMap<String>());
 										}
 									}
 									// store year
@@ -779,7 +781,7 @@ public class CalibrationDataBusiness {
 	 */
 	private void loadAbsDataCsv_8155_0T2T4(String fileResourceLocation, String catalogueName, int[] columnsToImport,
 			String[] yearsToImport, int titleRow, int unitsRow, Map<String, List<String>> titles,
-			Map<String, List<String>> units, Map<String, Map<String, Map<String, Float>>> data) {
+			Map<String, List<String>> units, Map<String, Map<String, TObjectFloatHashMap<String>>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -805,10 +807,10 @@ public class CalibrationDataBusiness {
 
 						// store series ID as key with blank collections to populate with data below
 						for (int i = 0; i < yearsToImport.length; i++) {
-							Map<String, Map<String, Float>> columnMaps = new HashMap<String, Map<String, Float>>(
+							Map<String, TObjectFloatHashMap<String>> columnMaps = new HashMap<String, TObjectFloatHashMap<String>>(
 									columnsToImport.length);
 							for (int j = 0; j < columnsToImport.length; j++) {
-								columnMaps.put(line[columnsToImport[j]], new HashMap<String, Float>());
+								columnMaps.put(line[columnsToImport[j]], new TObjectFloatHashMap<String>());
 							}
 							data.put(yearsToImport[i], columnMaps);
 						}
@@ -887,7 +889,7 @@ public class CalibrationDataBusiness {
 	 */
 	private void loadAbsDataCsv_8155_0T5T6(String fileResourceLocation, String catalogueName, int[] columnsToImport,
 			int titleRow, int unitsRow, Map<String, List<String>> titles, Map<String, List<String>> units,
-			Map<String, Map<String, Map<String, Map<String, Float>>>> data) {
+			Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -949,9 +951,9 @@ public class CalibrationDataBusiness {
 						// create title maps for each year
 						// year, column title, state/size, industry
 						for (String thisYear : uniqueYears) {
-							Map<String, Map<String, Map<String, Float>>> theseTitles = new HashMap<String, Map<String, Map<String, Float>>>();
+							Map<String, Map<String, TObjectFloatHashMap<String>>> theseTitles = new HashMap<String, Map<String, TObjectFloatHashMap<String>>>();
 							for (String thisTitle : uniqueColumnTitles) {
-								theseTitles.put(thisTitle, new HashMap<String, Map<String, Float>>());
+								theseTitles.put(thisTitle, new HashMap<String, TObjectFloatHashMap<String>>());
 							}
 							data.put(thisYear, theseTitles);
 						}
@@ -1018,7 +1020,7 @@ public class CalibrationDataBusiness {
 						if (isNewCategory) {
 							// initialise category maps
 							for (int i = 0; i < columnsToImport.length; i++) {
-								data.get(years[i]).get(seriesId[i]).put(sizeOrState, new HashMap<String, Float>());
+								data.get(years[i]).get(seriesId[i]).put(sizeOrState, new TObjectFloatHashMap<String>());
 							}
 							isNewCategory = false;
 						}
@@ -1068,7 +1070,7 @@ public class CalibrationDataBusiness {
 	 */
 	private void loadAbsDataCsv_8165_0State(String fileResourceLocation, String catalogueName, int[] columnsToImport,
 			int titleRow, int unitsRow, Map<String, List<String>> titles, Map<String, List<String>> units,
-			Map<String, Map<String, Map<String, Float>>> data) {
+			Map<String, Map<String, TObjectFloatHashMap<String>>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -1093,9 +1095,9 @@ public class CalibrationDataBusiness {
 						// create title maps for each year
 						String[] states = { "NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT", "Other" };
 						for (String columnTitle : seriesId) {
-							Map<String, Map<String, Float>> stateMap = new HashMap<String, Map<String, Float>>(9);
+							Map<String, TObjectFloatHashMap<String>> stateMap = new HashMap<String, TObjectFloatHashMap<String>>(9);
 							for (String thisState : states) {
-								stateMap.put(thisState, new HashMap<String, Float>());
+								stateMap.put(thisState, new TObjectFloatHashMap<String>());
 							}
 							data.put(columnTitle, stateMap);
 						}
@@ -1160,7 +1162,7 @@ public class CalibrationDataBusiness {
 	 */
 	private void loadAbsDataCsv_8165_0Lga(String fileResourceLocation, String catalogueName, int[] columnsToImport,
 			Map<String, List<String>> titles, Map<String, List<String>> units,
-			Map<String, Map<String, Map<String, Map<String, Float>>>> data) {
+			Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -1185,10 +1187,10 @@ public class CalibrationDataBusiness {
 						// create title maps for each year
 						String[] states = { "NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT", "Other", "AU" };
 						for (String columnTitle : seriesId) {
-							Map<String, Map<String, Map<String, Float>>> stateMap = new HashMap<String, Map<String, Map<String, Float>>>(
+							Map<String, Map<String, TObjectFloatHashMap<String>>> stateMap = new HashMap<String, Map<String, TObjectFloatHashMap<String>>>(
 									states.length);
 							for (String thisState : states) {
-								stateMap.put(thisState, new HashMap<String, Map<String, Float>>());
+								stateMap.put(thisState, new HashMap<String, TObjectFloatHashMap<String>>());
 							}
 							data.put(columnTitle, stateMap);
 						}
@@ -1216,7 +1218,7 @@ public class CalibrationDataBusiness {
 								} catch (NumberFormatException e) {
 									// do nothing and leave it as zero.
 								}
-								Map<String, Float> stateTotalMap = new HashMap<String, Float>(1);
+								TObjectFloatHashMap<String> stateTotalMap = new TObjectFloatHashMap<String>(1);
 								stateTotalMap.put("All", value);
 								data.get(seriesId[i]).get(thisState).put("Total", stateTotalMap);
 							}
@@ -1231,7 +1233,7 @@ public class CalibrationDataBusiness {
 						if (!line[1].equals(prevLgaCode)) {
 							// new LGA, so create industry-value map
 							for (int i = 0; i < columnsToImport.length; i++) {
-								data.get(seriesId[i]).get(thisState).put(line[1], new HashMap<String, Float>());
+								data.get(seriesId[i]).get(thisState).put(line[1], new TObjectFloatHashMap<String>());
 							}
 							prevLgaCode = line[1];
 						}
@@ -1276,7 +1278,7 @@ public class CalibrationDataBusiness {
 	 * @param data                 - the data map that the values are returned in
 	 */
 	private void loadAbsDataRowsColumnsCsv(String fileResourceLocation, String dataSourceName, int[] columnsToImport,
-			int[] rowsToImport, int titleRow, Map<String, List<String>> titles, Map<String, Map<String, Float>> data) {
+			int[] rowsToImport, int titleRow, Map<String, List<String>> titles, Map<String, TObjectFloatHashMap<String>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -1296,7 +1298,7 @@ public class CalibrationDataBusiness {
 							seriesId[i] = line[columnsToImport[i]];
 
 							// inistialise data
-							data.put(seriesId[i], new HashMap<String, Float>());
+							data.put(seriesId[i], new TObjectFloatHashMap<String>());
 						}
 					}
 				} else {
@@ -1344,7 +1346,7 @@ public class CalibrationDataBusiness {
 	 * @param data                 - the data map that the values are returned in
 	 */
 	private void loadAtoCompanyTable4A(String fileResourceLocation, String tableName, int[] columnsToImport,
-			Map<String, List<String>> titles, Map<String, Map<String, Float>> data) {
+			Map<String, List<String>> titles, Map<String, TObjectFloatHashMap<String>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -1366,7 +1368,7 @@ public class CalibrationDataBusiness {
 							thesecolumnNames.add(line[columnsToImport[i]]);
 
 							// store series ID as key with blank collections to populate with data below
-							data.put(line[columnsToImport[i]], new HashMap<String, Float>());
+							data.put(line[columnsToImport[i]], new TObjectFloatHashMap<String>());
 						}
 						titles.put(tableName, thesecolumnNames);
 						header = false;
@@ -1418,7 +1420,7 @@ public class CalibrationDataBusiness {
 	 * @param data                 - the data map that the values are returned in
 	 */
 	private void loadAtoCompanyTable4B(String fileResourceLocation, String tableName, int[] columnsToImport,
-			Map<String, List<String>> titles, Map<String, Map<String, Float>> data) {
+			Map<String, List<String>> titles, Map<String, TObjectFloatHashMap<String>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -1440,7 +1442,7 @@ public class CalibrationDataBusiness {
 							thesecolumnNames.add(line[columnsToImport[i]]);
 
 							// store series ID as key with blank collections to populate with data below
-							data.put(line[columnsToImport[i]], new HashMap<String, Float>());
+							data.put(line[columnsToImport[i]], new TObjectFloatHashMap<String>());
 						}
 						titles.put(tableName, thesecolumnNames);
 						header = false;
@@ -1518,7 +1520,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the abs5676_0Table7
 	 */
-	public Map<String, Map<Date, Float>> getAbs5676_0Table7() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5676_0Table7() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1528,7 +1530,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the abs5676_0Table19
 	 */
-	public Map<String, Map<Date, Float>> getAbs5676_0Table19() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5676_0Table19() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1538,7 +1540,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the abs5676_0Table21
 	 */
-	public Map<String, Map<Date, Float>> getAbs5676_0Table21() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5676_0Table21() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1548,7 +1550,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the abs5676_0Table22
 	 */
-	public Map<String, Map<Date, Float>> getAbs5676_0Table22() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5676_0Table22() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1558,7 +1560,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the abs6524_055_002EmployeeTable5
 	 */
-	public Map<String, Map<String, Map<String, Float>>> getAbs6524_055_002EmployeeTable5() {
+	public Map<String, Map<String, TObjectFloatHashMap<String>>> getAbs6524_055_002EmployeeTable5() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1568,7 +1570,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the abs6524_055_002InvestmentTable5
 	 */
-	public Map<String, Map<String, Map<String, Float>>> getAbs6524_055_002InvestmentTable5() {
+	public Map<String, Map<String, TObjectFloatHashMap<String>>> getAbs6524_055_002InvestmentTable5() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1578,7 +1580,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the abs6524_055_002IncomeTable5
 	 */
-	public Map<String, Map<String, Map<String, Float>>> getAbs6524_055_002IncomeTable5() {
+	public Map<String, Map<String, TObjectFloatHashMap<String>>> getAbs6524_055_002IncomeTable5() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1588,7 +1590,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the abs8155_0Table2
 	 */
-	public Map<String, Map<String, Map<String, Float>>> getAbs8155_0Table2() {
+	public Map<String, Map<String, TObjectFloatHashMap<String>>> getAbs8155_0Table2() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1598,7 +1600,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the abs8155_0Table4
 	 */
-	public Map<String, Map<String, Map<String, Float>>> getAbs8155_0Table4() {
+	public Map<String, Map<String, TObjectFloatHashMap<String>>> getAbs8155_0Table4() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1608,7 +1610,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the abs8155_0Table5
 	 */
-	public Map<String, Map<String, Map<String, Map<String, Float>>>> getAbs8155_0Table5() {
+	public Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>> getAbs8155_0Table5() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1618,7 +1620,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the abs8155_0Table6
 	 */
-	public Map<String, Map<String, Map<String, Map<String, Float>>>> getAbs8155_0Table6() {
+	public Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>> getAbs8155_0Table6() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1628,7 +1630,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the abs8165_0StateEmployment
 	 */
-	public Map<String, Map<String, Map<String, Float>>> getAbs8165_0StateEmployment() {
+	public Map<String, Map<String, TObjectFloatHashMap<String>>> getAbs8165_0StateEmployment() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1638,7 +1640,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the abs8165_0StateTurnover
 	 */
-	public Map<String, Map<String, Map<String, Float>>> getAbs8165_0StateTurnover() {
+	public Map<String, Map<String, TObjectFloatHashMap<String>>> getAbs8165_0StateTurnover() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1648,7 +1650,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the abs8165_0LgaEmployment
 	 */
-	public Map<String, Map<String, Map<String, Map<String, Float>>>> getAbs8165_0LgaEmployment() {
+	public Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>> getAbs8165_0LgaEmployment() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1658,7 +1660,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the abs8165_0LgaTurnover
 	 */
-	public Map<String, Map<String, Map<String, Map<String, Float>>>> getAbs8165_0LgaTurnover() {
+	public Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>> getAbs8165_0LgaTurnover() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1668,7 +1670,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the abs8165_0Table4
 	 */
-	public Map<String, Map<String, Float>> getAbs8165_0Table4() {
+	public Map<String, TObjectFloatHashMap<String>> getAbs8165_0Table4() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1678,7 +1680,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the abs8165_0Table13
 	 */
-	public Map<String, Map<String, Float>> getAbs8165_0Table13() {
+	public Map<String, TObjectFloatHashMap<String>> getAbs8165_0Table13() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1688,7 +1690,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the abs8165_0Table17
 	 */
-	public Map<String, Map<String, Float>> getAbs8165_0Table17() {
+	public Map<String, TObjectFloatHashMap<String>> getAbs8165_0Table17() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1698,7 +1700,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the atoCompanyTable4a
 	 */
-	public Map<String, Map<String, Float>> getAtoCompanyTable4a() {
+	public Map<String, TObjectFloatHashMap<String>> getAtoCompanyTable4a() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1708,7 +1710,7 @@ public class CalibrationDataBusiness {
 	/**
 	 * @return the atoCompanyTable4b
 	 */
-	public Map<String, Map<String, Float>> getAtoCompanyTable4b() {
+	public Map<String, TObjectFloatHashMap<String>> getAtoCompanyTable4b() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}

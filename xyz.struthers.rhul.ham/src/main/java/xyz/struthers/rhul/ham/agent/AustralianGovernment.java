@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.map.hash.TObjectFloatHashMap;
 import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.process.Clearable;
 import xyz.struthers.rhul.ham.process.Employer;
@@ -36,7 +38,7 @@ public final class AustralianGovernment extends Agent implements Employer {
 	protected ArrayList<Individual> employees; // calculate wages & super
 	private ArrayList<Household> welfareRecipients;
 	private ArrayList<AuthorisedDepositTakingInstitution> bondInvestors;
-	private ArrayList<Float> bondInvestorAmounts;
+	private TFloatArrayList bondInvestorAmounts;
 	private ArrayList<Business> governmentSuppliers;
 	private int defaultIteration;
 	private int defaultOrder;
@@ -68,7 +70,7 @@ public final class AustralianGovernment extends Agent implements Employer {
 	private float bsOtherLiabilities;
 
 	// Interest rates
-	protected ArrayList<Float> interestRateStudentLoans; // in Australia this is always CPI (by law)
+	protected TFloatArrayList interestRateStudentLoans; // in Australia this is always CPI (by law)
 
 	/**
 	 * Default constructor
@@ -84,7 +86,7 @@ public final class AustralianGovernment extends Agent implements Employer {
 	 * @param balSht
 	 * @param profitLoss
 	 */
-	public AustralianGovernment(Map<String, Float> balSht, Map<String, Float> profitLoss) {
+	public AustralianGovernment(TObjectFloatHashMap<String> balSht, TObjectFloatHashMap<String> profitLoss) {
 		super();
 		this.init();
 
@@ -367,7 +369,7 @@ public final class AustralianGovernment extends Agent implements Employer {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	/**
 	 * @return the welfareRecipients
 	 */
@@ -399,14 +401,14 @@ public final class AustralianGovernment extends Agent implements Employer {
 	/**
 	 * @return the bondInvestorAmounts
 	 */
-	public ArrayList<Float> getBondInvestorAmounts() {
+	public TFloatArrayList getBondInvestorAmounts() {
 		return bondInvestorAmounts;
 	}
 
 	/**
 	 * @param bondInvestorAmounts the bondInvestorAmounts to set
 	 */
-	public void setBondInvestorAmounts(ArrayList<Float> bondInvestorAmounts) {
+	public void setBondInvestorAmounts(TFloatArrayList bondInvestorAmounts) {
 		this.bondInvestorAmounts = bondInvestorAmounts;
 	}
 
@@ -427,7 +429,7 @@ public final class AustralianGovernment extends Agent implements Employer {
 	/**
 	 * @return the interestRateStudentLoans
 	 */
-	public ArrayList<Float> getInterestRateStudentLoans() {
+	public TFloatArrayList getInterestRateStudentLoans() {
 		return interestRateStudentLoans;
 	}
 
@@ -444,7 +446,7 @@ public final class AustralianGovernment extends Agent implements Employer {
 	 */
 	public void addInterestRateStudentLoans(float interestRateStudentLoans) {
 		if (this.interestRateStudentLoans == null) {
-			this.interestRateStudentLoans = new ArrayList<Float>(1);
+			this.interestRateStudentLoans = new TFloatArrayList(1);
 		}
 		this.interestRateStudentLoans.add(interestRateStudentLoans);
 	}

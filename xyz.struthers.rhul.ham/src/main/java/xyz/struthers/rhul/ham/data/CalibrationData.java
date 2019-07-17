@@ -27,6 +27,8 @@ import org.springframework.stereotype.Component;
 
 import com.opencsv.CSVReader;
 
+import gnu.trove.map.hash.TObjectFloatHashMap;
+
 /**
  * Loads CSV data downloaded using Table Builder from the ABS, RBA, APRA and
  * ATO.
@@ -93,41 +95,41 @@ public class CalibrationData {
 
 	private Map<String, List<String>> title;
 	private Map<String, List<String>> unitType;
-	private Map<String, Map<Date, Float>> rbaE1; // AU Bal Sht totals
+	private Map<String, TObjectFloatHashMap<Date>> rbaE1; // AU Bal Sht totals
 	private Map<String, Map<String, String>> abs1292_0_55_002ANZSIC; // ANZSIC industry code mapping
 	// private Map<String, Map<Date, String>> abs3222_0; // AU by gender and age
 	// (population projections)
-	private Map<String, Map<Date, Float>> abs5368_0Table14a; // exports by country
-	private Map<String, Map<Date, Float>> abs5368_0Table14b; // imports by country
-	private Map<String, Map<Date, Float>> abs5368_0Table36a; // exports NSW
-	private Map<String, Map<Date, Float>> abs5368_0Table36b; // exports VIC
-	private Map<String, Map<Date, Float>> abs5368_0Table36c; // exports QLD
-	private Map<String, Map<Date, Float>> abs5368_0Table36d; // exports SA
-	private Map<String, Map<Date, Float>> abs5368_0Table36e; // exports WA
-	private Map<String, Map<Date, Float>> abs5368_0Table36f; // exports TAS
-	private Map<String, Map<Date, Float>> abs5368_0Table36g; // exports NT
-	private Map<String, Map<Date, Float>> abs5368_0Table36h; // exports ACT
-	private Map<String, Map<Date, Float>> abs5368_0Table37a; // imports NSW
-	private Map<String, Map<Date, Float>> abs5368_0Table37b; // imports VIC
-	private Map<String, Map<Date, Float>> abs5368_0Table37c; // imports QLD
-	private Map<String, Map<Date, Float>> abs5368_0Table37d; // imports SA
-	private Map<String, Map<Date, Float>> abs5368_0Table37e; // imports WA
-	private Map<String, Map<Date, Float>> abs5368_0Table37f; // imports TAS
-	private Map<String, Map<Date, Float>> abs5368_0Table37g; // imports NT
-	private Map<String, Map<Date, Float>> abs5368_0Table37h; // imports ACT
-	private Map<String, Map<String, Map<String, Map<String, Float>>>> abs5368_0Exporters; // formatted export data
+	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table14a; // exports by country
+	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table14b; // imports by country
+	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table36a; // exports NSW
+	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table36b; // exports VIC
+	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table36c; // exports QLD
+	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table36d; // exports SA
+	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table36e; // exports WA
+	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table36f; // exports TAS
+	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table36g; // exports NT
+	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table36h; // exports ACT
+	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table37a; // imports NSW
+	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table37b; // imports VIC
+	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table37c; // imports QLD
+	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table37d; // imports SA
+	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table37e; // imports WA
+	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table37f; // imports TAS
+	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table37g; // imports NT
+	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table37h; // imports ACT
+	private Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>> abs5368_0Exporters; // formatted export data
 																							// (keys: industry, state,
 																							// country, value range)
-	private Map<String, Map<String, Float>> abs8167_0Table3; // main source of income
-	private Map<String, Map<String, Float>> abs8167_0Table6; // main supplier
+	private Map<String, TObjectFloatHashMap<String>> abs8167_0Table3; // main source of income
+	private Map<String, TObjectFloatHashMap<String>> abs8167_0Table6; // main supplier
 
 	private Map<String, Map<String, String>> adiData; // banks, building societies & credit unions
 	private Map<String, Map<String, String>> currencyData; // (ISO code, field name, value)
 	private Map<String, Map<String, String>> countryData; // (Country name, field name, value)
-	private Map<String, Float> rbaBalSht;
-	private Map<String, Float> rbaProfitLoss;
-	private Map<String, Float> govtBalSht;
-	private Map<String, Float> govtProfitLoss;
+	private TObjectFloatHashMap<String> rbaBalSht;
+	private TObjectFloatHashMap<String> rbaProfitLoss;
+	private TObjectFloatHashMap<String> govtBalSht;
+	private TObjectFloatHashMap<String> govtProfitLoss;
 
 	/**
 	 * 
@@ -207,7 +209,7 @@ public class CalibrationData {
 			// RBA E1
 			for (String key1 : this.rbaE1.keySet()) {
 				for (Date key2 : this.rbaE1.get(key1).keySet()) {
-					this.rbaE1.get(key1).put(key2, null);
+					this.rbaE1.get(key1).put(key2, 0f); // null
 				}
 				this.rbaE1.get(key1).clear();
 				this.rbaE1.put(key1, null);
@@ -237,7 +239,7 @@ public class CalibrationData {
 			// ABS 5368.0 Table 14A
 			for (String key1 : this.abs5368_0Table14a.keySet()) {
 				for (Date key2 : this.abs5368_0Table14a.get(key1).keySet()) {
-					this.abs5368_0Table14a.get(key1).put(key2, null);
+					this.abs5368_0Table14a.get(key1).put(key2, 0f); // null
 				}
 				this.abs5368_0Table14a.get(key1).clear();
 				this.abs5368_0Table14a.put(key1, null);
@@ -250,7 +252,7 @@ public class CalibrationData {
 			// ABS 5368.0 Table 14B
 			for (String key1 : this.abs5368_0Table14b.keySet()) {
 				for (Date key2 : this.abs5368_0Table14b.get(key1).keySet()) {
-					this.abs5368_0Table14b.get(key1).put(key2, null);
+					this.abs5368_0Table14b.get(key1).put(key2, 0f); // null
 				}
 				this.abs5368_0Table14b.get(key1).clear();
 				this.abs5368_0Table14b.put(key1, null);
@@ -263,7 +265,7 @@ public class CalibrationData {
 			// ABS 5368.0 Table 36A
 			for (String key1 : this.abs5368_0Table36a.keySet()) {
 				for (Date key2 : this.abs5368_0Table36a.get(key1).keySet()) {
-					this.abs5368_0Table36a.get(key1).put(key2, null);
+					this.abs5368_0Table36a.get(key1).put(key2, 0f); // null
 				}
 				this.abs5368_0Table36a.get(key1).clear();
 				this.abs5368_0Table36a.put(key1, null);
@@ -276,7 +278,7 @@ public class CalibrationData {
 			// ABS 5368.0 Table 36B
 			for (String key1 : this.abs5368_0Table36b.keySet()) {
 				for (Date key2 : this.abs5368_0Table36b.get(key1).keySet()) {
-					this.abs5368_0Table36b.get(key1).put(key2, null);
+					this.abs5368_0Table36b.get(key1).put(key2, 0f); // null
 				}
 				this.abs5368_0Table36b.get(key1).clear();
 				this.abs5368_0Table36b.put(key1, null);
@@ -289,7 +291,7 @@ public class CalibrationData {
 			// ABS 5368.0 Table 36C
 			for (String key1 : this.abs5368_0Table36c.keySet()) {
 				for (Date key2 : this.abs5368_0Table36c.get(key1).keySet()) {
-					this.abs5368_0Table36c.get(key1).put(key2, null);
+					this.abs5368_0Table36c.get(key1).put(key2, 0f); // null
 				}
 				this.abs5368_0Table36c.get(key1).clear();
 				this.abs5368_0Table36c.put(key1, null);
@@ -302,7 +304,7 @@ public class CalibrationData {
 			// ABS 5368.0 Table 36D
 			for (String key1 : this.abs5368_0Table36d.keySet()) {
 				for (Date key2 : this.abs5368_0Table36d.get(key1).keySet()) {
-					this.abs5368_0Table36d.get(key1).put(key2, null);
+					this.abs5368_0Table36d.get(key1).put(key2, 0f); // null
 				}
 				this.abs5368_0Table36d.get(key1).clear();
 				this.abs5368_0Table36d.put(key1, null);
@@ -315,7 +317,7 @@ public class CalibrationData {
 			// ABS 5368.0 Table 36E
 			for (String key1 : this.abs5368_0Table36e.keySet()) {
 				for (Date key2 : this.abs5368_0Table36e.get(key1).keySet()) {
-					this.abs5368_0Table36e.get(key1).put(key2, null);
+					this.abs5368_0Table36e.get(key1).put(key2, 0f); // null
 				}
 				this.abs5368_0Table36e.get(key1).clear();
 				this.abs5368_0Table36e.put(key1, null);
@@ -328,7 +330,7 @@ public class CalibrationData {
 			// ABS 5368.0 Table 36F
 			for (String key1 : this.abs5368_0Table36f.keySet()) {
 				for (Date key2 : this.abs5368_0Table36f.get(key1).keySet()) {
-					this.abs5368_0Table36f.get(key1).put(key2, null);
+					this.abs5368_0Table36f.get(key1).put(key2, 0f); // null
 				}
 				this.abs5368_0Table36f.get(key1).clear();
 				this.abs5368_0Table36f.put(key1, null);
@@ -341,7 +343,7 @@ public class CalibrationData {
 			// ABS 5368.0 Table 36G
 			for (String key1 : this.abs5368_0Table36g.keySet()) {
 				for (Date key2 : this.abs5368_0Table36g.get(key1).keySet()) {
-					this.abs5368_0Table36g.get(key1).put(key2, null);
+					this.abs5368_0Table36g.get(key1).put(key2, 0f); // null
 				}
 				this.abs5368_0Table36g.get(key1).clear();
 				this.abs5368_0Table36g.put(key1, null);
@@ -354,7 +356,7 @@ public class CalibrationData {
 			// ABS 5368.0 Table 36H
 			for (String key1 : this.abs5368_0Table36h.keySet()) {
 				for (Date key2 : this.abs5368_0Table36h.get(key1).keySet()) {
-					this.abs5368_0Table36h.get(key1).put(key2, null);
+					this.abs5368_0Table36h.get(key1).put(key2, 0f); // null
 				}
 				this.abs5368_0Table36h.get(key1).clear();
 				this.abs5368_0Table36h.put(key1, null);
@@ -367,7 +369,7 @@ public class CalibrationData {
 			// ABS 5368.0 Table 37A
 			for (String key1 : this.abs5368_0Table37a.keySet()) {
 				for (Date key2 : this.abs5368_0Table37a.get(key1).keySet()) {
-					this.abs5368_0Table37a.get(key1).put(key2, null);
+					this.abs5368_0Table37a.get(key1).put(key2, 0f); // null
 				}
 				this.abs5368_0Table37a.get(key1).clear();
 				this.abs5368_0Table37a.put(key1, null);
@@ -380,7 +382,7 @@ public class CalibrationData {
 			// ABS 5368.0 Table 37B
 			for (String key1 : this.abs5368_0Table37b.keySet()) {
 				for (Date key2 : this.abs5368_0Table37b.get(key1).keySet()) {
-					this.abs5368_0Table37b.get(key1).put(key2, null);
+					this.abs5368_0Table37b.get(key1).put(key2, 0f); // null
 				}
 				this.abs5368_0Table37b.get(key1).clear();
 				this.abs5368_0Table37b.put(key1, null);
@@ -393,7 +395,7 @@ public class CalibrationData {
 			// ABS 5368.0 Table 37C
 			for (String key1 : this.abs5368_0Table37c.keySet()) {
 				for (Date key2 : this.abs5368_0Table37c.get(key1).keySet()) {
-					this.abs5368_0Table37c.get(key1).put(key2, null);
+					this.abs5368_0Table37c.get(key1).put(key2, 0f); // null
 				}
 				this.abs5368_0Table37c.get(key1).clear();
 				this.abs5368_0Table37c.put(key1, null);
@@ -406,7 +408,7 @@ public class CalibrationData {
 			// ABS 5368.0 Table 37D
 			for (String key1 : this.abs5368_0Table37d.keySet()) {
 				for (Date key2 : this.abs5368_0Table37d.get(key1).keySet()) {
-					this.abs5368_0Table37d.get(key1).put(key2, null);
+					this.abs5368_0Table37d.get(key1).put(key2, 0f); // null
 				}
 				this.abs5368_0Table37d.get(key1).clear();
 				this.abs5368_0Table37d.put(key1, null);
@@ -419,7 +421,7 @@ public class CalibrationData {
 			// ABS 5368.0 Table 37E
 			for (String key1 : this.abs5368_0Table37e.keySet()) {
 				for (Date key2 : this.abs5368_0Table37e.get(key1).keySet()) {
-					this.abs5368_0Table37e.get(key1).put(key2, null);
+					this.abs5368_0Table37e.get(key1).put(key2, 0f); // null
 				}
 				this.abs5368_0Table37e.get(key1).clear();
 				this.abs5368_0Table37e.put(key1, null);
@@ -432,7 +434,7 @@ public class CalibrationData {
 			// ABS 5368.0 Table 37F
 			for (String key1 : this.abs5368_0Table37f.keySet()) {
 				for (Date key2 : this.abs5368_0Table37f.get(key1).keySet()) {
-					this.abs5368_0Table37f.get(key1).put(key2, null);
+					this.abs5368_0Table37f.get(key1).put(key2, 0f); // null
 				}
 				this.abs5368_0Table37f.get(key1).clear();
 				this.abs5368_0Table37f.put(key1, null);
@@ -445,7 +447,7 @@ public class CalibrationData {
 			// ABS 5368.0 Table 37G
 			for (String key1 : this.abs5368_0Table37g.keySet()) {
 				for (Date key2 : this.abs5368_0Table37g.get(key1).keySet()) {
-					this.abs5368_0Table37g.get(key1).put(key2, null);
+					this.abs5368_0Table37g.get(key1).put(key2, 0f); // null
 				}
 				this.abs5368_0Table37g.get(key1).clear();
 				this.abs5368_0Table37g.put(key1, null);
@@ -458,7 +460,7 @@ public class CalibrationData {
 			// ABS 5368.0 Table 37H
 			for (String key1 : this.abs5368_0Table37h.keySet()) {
 				for (Date key2 : this.abs5368_0Table37h.get(key1).keySet()) {
-					this.abs5368_0Table37h.get(key1).put(key2, null);
+					this.abs5368_0Table37h.get(key1).put(key2, 0f); // null
 				}
 				this.abs5368_0Table37h.get(key1).clear();
 				this.abs5368_0Table37h.put(key1, null);
@@ -475,7 +477,7 @@ public class CalibrationData {
 				for (String key2 : this.abs5368_0Exporters.get(key1).keySet()) {
 					for (String key3 : this.abs5368_0Exporters.get(key1).get(key2).keySet()) {
 						for (String key4 : this.abs5368_0Exporters.get(key1).get(key2).get(key3).keySet()) {
-							this.abs5368_0Exporters.get(key1).get(key2).get(key3).put(key4, null);
+							this.abs5368_0Exporters.get(key1).get(key2).get(key3).put(key4, 0f); // null
 						}
 						this.abs5368_0Exporters.get(key1).get(key2).get(key3).clear();
 						this.abs5368_0Exporters.get(key1).get(key2).put(key3, null);
@@ -496,7 +498,7 @@ public class CalibrationData {
 			// ABS 8167.0 Table 3
 			for (String key1 : this.abs8167_0Table3.keySet()) {
 				for (String key2 : this.abs8167_0Table3.get(key1).keySet()) {
-					this.abs8167_0Table3.get(key1).put(key2, null);
+					this.abs8167_0Table3.get(key1).put(key2, 0f); // null
 				}
 				this.abs8167_0Table3.get(key1).clear();
 				this.abs8167_0Table3.put(key1, null);
@@ -509,7 +511,7 @@ public class CalibrationData {
 			// ABS 8167.0 Table 6
 			for (String key1 : this.abs8167_0Table6.keySet()) {
 				for (String key2 : this.abs8167_0Table6.get(key1).keySet()) {
-					this.abs8167_0Table6.get(key1).put(key2, null);
+					this.abs8167_0Table6.get(key1).put(key2, 0f); // null
 				}
 				this.abs8167_0Table6.get(key1).clear();
 				this.abs8167_0Table6.put(key1, null);
@@ -538,7 +540,7 @@ public class CalibrationData {
 		// RBA Bal Sht
 		if (this.rbaBalSht != null) {
 			for (String key1 : this.rbaBalSht.keySet()) {
-				this.rbaBalSht.put(key1, null);
+				this.rbaBalSht.put(key1, 0f); // null
 			}
 			this.rbaBalSht.clear();
 			this.rbaBalSht = null;
@@ -547,7 +549,7 @@ public class CalibrationData {
 		if (this.rbaProfitLoss != null) {
 			// RBA P&L
 			for (String key1 : this.rbaProfitLoss.keySet()) {
-				this.rbaProfitLoss.put(key1, null);
+				this.rbaProfitLoss.put(key1, 0f); // null
 			}
 			this.rbaProfitLoss.clear();
 			this.rbaProfitLoss = null;
@@ -588,7 +590,7 @@ public class CalibrationData {
 		if (this.govtBalSht != null) {
 			// Govt Bal Sht
 			for (String key1 : this.govtBalSht.keySet()) {
-				this.govtBalSht.put(key1, null);
+				this.govtBalSht.put(key1, 0f); // null
 			}
 			this.govtBalSht.clear();
 			this.govtBalSht = null;
@@ -597,7 +599,7 @@ public class CalibrationData {
 		if (this.govtProfitLoss != null) {
 			// Govt P&L
 			for (String key1 : this.govtProfitLoss.keySet()) {
-				this.govtProfitLoss.put(key1, null);
+				this.govtProfitLoss.put(key1, 0f); // null
 			}
 			this.govtProfitLoss.clear();
 			this.govtProfitLoss = null;
@@ -626,7 +628,7 @@ public class CalibrationData {
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading RBA E1 data");
 		int[] rbaE1Columns = { 1, 3, 4, 5, 6, 7, 9, 10, 11, 14, 15, 16, 17, 18, 20, 23 };
 		int rbaE1MapCapacity = (int) Math.ceil(rbaE1Columns.length / MAP_LOAD_FACTOR);
-		this.rbaE1 = new HashMap<String, Map<Date, Float>>(rbaE1MapCapacity);
+		this.rbaE1 = new HashMap<String, TObjectFloatHashMap<Date>>(rbaE1MapCapacity);
 		this.loadRbaDataCsv("/data/RBA/E_HouseholdBusiness/e1-data.csv", RBA_E1, rbaE1Columns, this.title,
 				this.unitType, this.rbaE1);
 
@@ -646,92 +648,92 @@ public class CalibrationData {
 				227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247,
 				248, 249, 250, 251, 252 };
 		int abs5368_0MapCapacity = (int) Math.ceil(abs5368_0Columns.length / MAP_LOAD_FACTOR);
-		this.abs5368_0Table14a = new HashMap<String, Map<Date, Float>>(abs5368_0MapCapacity);
+		this.abs5368_0Table14a = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368014a - exports by country.csv", ABS_5368_0_T14A,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table14a);
 
 		System.out.print(", 14b");
-		this.abs5368_0Table14b = new HashMap<String, Map<Date, Float>>(abs5368_0MapCapacity);
+		this.abs5368_0Table14b = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368014b - imports by country.csv", ABS_5368_0_T14B,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table14b);
 
 		System.out.print(", 36a");
-		this.abs5368_0Table36a = new HashMap<String, Map<Date, Float>>(abs5368_0MapCapacity);
+		this.abs5368_0Table36a = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036a - merch exports NSW.csv", ABS_5368_0_T36A,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36a);
 
 		System.out.print(", 36b");
-		this.abs5368_0Table36b = new HashMap<String, Map<Date, Float>>(abs5368_0MapCapacity);
+		this.abs5368_0Table36b = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036b - merch exports VIC.csv", ABS_5368_0_T36B,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36b);
 
 		System.out.print(", 36c");
-		this.abs5368_0Table36c = new HashMap<String, Map<Date, Float>>(abs5368_0MapCapacity);
+		this.abs5368_0Table36c = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036c - merch exports QLD.csv", ABS_5368_0_T36C,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36c);
 
 		System.out.print(", 36d");
-		this.abs5368_0Table36d = new HashMap<String, Map<Date, Float>>(abs5368_0MapCapacity);
+		this.abs5368_0Table36d = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036d - merch exports SA.csv", ABS_5368_0_T36D,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36d);
 
 		System.out.print(", 36e");
-		this.abs5368_0Table36e = new HashMap<String, Map<Date, Float>>(abs5368_0MapCapacity);
+		this.abs5368_0Table36e = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036e - merch exports WA.csv", ABS_5368_0_T36E,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36e);
 
 		System.out.print(", 36f");
-		this.abs5368_0Table36f = new HashMap<String, Map<Date, Float>>(abs5368_0MapCapacity);
+		this.abs5368_0Table36f = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036f - merch exports TAS.csv", ABS_5368_0_T36F,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36f);
 
 		System.out.print(", 36g");
-		this.abs5368_0Table36g = new HashMap<String, Map<Date, Float>>(abs5368_0MapCapacity);
+		this.abs5368_0Table36g = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036g - merch exports NT.csv", ABS_5368_0_T36G,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36g);
 
 		System.out.print(", 36h");
-		this.abs5368_0Table36h = new HashMap<String, Map<Date, Float>>(abs5368_0MapCapacity);
+		this.abs5368_0Table36h = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036h - merch exports ACT.csv", ABS_5368_0_T36H,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36h);
 
 		System.out.print(", 37a");
-		this.abs5368_0Table37a = new HashMap<String, Map<Date, Float>>(abs5368_0MapCapacity);
+		this.abs5368_0Table37a = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037a - merch imports NSW.csv", ABS_5368_0_T37A,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37a);
 
 		System.out.print(", 37b");
-		this.abs5368_0Table37b = new HashMap<String, Map<Date, Float>>(abs5368_0MapCapacity);
+		this.abs5368_0Table37b = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037b - merch imports VIC.csv", ABS_5368_0_T37B,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37b);
 
 		System.out.print(", 37c");
-		this.abs5368_0Table37c = new HashMap<String, Map<Date, Float>>(abs5368_0MapCapacity);
+		this.abs5368_0Table37c = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037c - merch imports QLD.csv", ABS_5368_0_T37C,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37c);
 
 		System.out.print(", 37d");
-		this.abs5368_0Table37d = new HashMap<String, Map<Date, Float>>(abs5368_0MapCapacity);
+		this.abs5368_0Table37d = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037d - merch imports SA.csv", ABS_5368_0_T37D,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37d);
 
 		System.out.print(", 37e");
-		this.abs5368_0Table37e = new HashMap<String, Map<Date, Float>>(abs5368_0MapCapacity);
+		this.abs5368_0Table37e = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037e - merch imports WA.csv", ABS_5368_0_T37E,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37e);
 
 		System.out.print(", 37f");
-		this.abs5368_0Table37f = new HashMap<String, Map<Date, Float>>(abs5368_0MapCapacity);
+		this.abs5368_0Table37f = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037f - merch imports TAS.csv", ABS_5368_0_T37F,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37f);
 
 		System.out.print(", 37g");
-		this.abs5368_0Table37g = new HashMap<String, Map<Date, Float>>(abs5368_0MapCapacity);
+		this.abs5368_0Table37g = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037g - merch imports NT.csv", ABS_5368_0_T37G,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37g);
 
 		System.out.println(", 37h");
-		this.abs5368_0Table37h = new HashMap<String, Map<Date, Float>>(abs5368_0MapCapacity);
+		this.abs5368_0Table37h = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
 		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037h - merch imports ACT.csv", ABS_5368_0_T37H,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37h);
 
@@ -740,7 +742,7 @@ public class CalibrationData {
 				new Date(System.currentTimeMillis()) + ": Loading ABS 5368.0.55.006 Exporters (formatted data)");
 		int[] abs5368_0ExportersColumns = { 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20 };
 		int abs5368_0ExportersMapCapacity = (int) Math.ceil(abs5368_0ExportersColumns.length / MAP_LOAD_FACTOR);
-		this.abs5368_0Exporters = new HashMap<String, Map<String, Map<String, Map<String, Float>>>>(
+		this.abs5368_0Exporters = new HashMap<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>(
 				abs5368_0ExportersMapCapacity);
 		this.loadAbsDataCsv_5368_0Exporters("/data/ABS/5368.0.55.006_Exporters/5368.0_exporter data.csv",
 				ABS_5368_0_EXPORTERS, abs5368_0ExportersColumns, this.title, this.unitType, this.abs5368_0Exporters);
@@ -750,7 +752,7 @@ public class CalibrationData {
 				new Date(System.currentTimeMillis()) + ": Loading ABS 8167.0 business markets and competition");
 		int[] abs8167_0Table3Columns = { 1, 2, 3, 4, 5 };
 		int abs8167_0Table3MapCapacity = (int) Math.ceil(abs8167_0Table3Columns.length / MAP_LOAD_FACTOR);
-		this.abs8167_0Table3 = new HashMap<String, Map<String, Float>>(abs8167_0Table3MapCapacity);
+		this.abs8167_0Table3 = new HashMap<String, TObjectFloatHashMap<String>>(abs8167_0Table3MapCapacity);
 		int[] abs8167_0Table3Rows = { 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 };
 		int abs8167_0titleRow = 6;
 		this.loadAbsDataRowsColumnsCsv("/data/ABS/8167.0_BusMktAndComp/Table3.csv", ABS8167_0_T3,
@@ -758,7 +760,7 @@ public class CalibrationData {
 
 		int[] abs8167_0Table6Columns = { 1, 2, 3, 4, 5 };
 		int abs8167_0Table6MapCapacity = (int) Math.ceil(abs8167_0Table6Columns.length / MAP_LOAD_FACTOR);
-		this.abs8167_0Table6 = new HashMap<String, Map<String, Float>>(abs8167_0Table6MapCapacity);
+		this.abs8167_0Table6 = new HashMap<String, TObjectFloatHashMap<String>>(abs8167_0Table6MapCapacity);
 		int[] abs8167_0Table6Rows = { 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 };
 		this.loadAbsDataRowsColumnsCsv("/data/ABS/8167.0_BusMktAndComp/Table6.csv", ABS8167_0_T6,
 				abs8167_0Table6Columns, abs8167_0Table6Rows, abs8167_0titleRow, this.title, this.abs8167_0Table6);
@@ -794,7 +796,7 @@ public class CalibrationData {
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading RBA financial statements");
 		int[] rbaBalShtRows = { 3, 4, 5, 6, 7, 11, 12, 13, 14, 18, 19, 25, 26, 27, 28, 29, 30, 31 };
 		int rbaBalShtMapCapacity = (int) Math.ceil(rbaBalShtRows.length / MAP_LOAD_FACTOR);
-		this.rbaBalSht = new HashMap<String, Float>(rbaBalShtMapCapacity);
+		this.rbaBalSht = new TObjectFloatHashMap<String>(rbaBalShtMapCapacity);
 		int rbaBalShtColumn = 2;
 		float rbaMultiplier = 1f;
 		this.loadFinancialStatementCsv("/data/RBA/RBA_BalSht.csv", CalibrationData.RBA_BS, rbaBalShtColumn,
@@ -802,7 +804,7 @@ public class CalibrationData {
 
 		int[] rbaProfitLossRows = { 3, 4, 5, 6, 7, 8, 9, 13, 14, 15, 18, 19 };
 		int rbaProfitLossMapCapacity = (int) Math.ceil(rbaProfitLossRows.length / MAP_LOAD_FACTOR);
-		this.rbaProfitLoss = new HashMap<String, Float>(rbaProfitLossMapCapacity);
+		this.rbaProfitLoss = new TObjectFloatHashMap<String>(rbaProfitLossMapCapacity);
 		int rbaProfitLossColumn = 2;
 		this.loadFinancialStatementCsv("/data/RBA/RBA_PnL.csv", CalibrationData.RBA_PL, rbaProfitLossColumn,
 				rbaProfitLossRows, this.title, this.rbaProfitLoss, rbaMultiplier);
@@ -812,7 +814,7 @@ public class CalibrationData {
 				.println(new Date(System.currentTimeMillis()) + ": Loading Australian Government financial statements");
 		int[] govtBalShtRows = { 8, 10, 12, 13, 15, 16, 22, 23, 25, 29 };
 		int govtBalShtMapCapacity = (int) Math.ceil(govtBalShtRows.length / MAP_LOAD_FACTOR);
-		this.govtBalSht = new HashMap<String, Float>(govtBalShtMapCapacity);
+		this.govtBalSht = new TObjectFloatHashMap<String>(govtBalShtMapCapacity);
 		int govtBalShtColumn = 10;
 		float govtMultiplier = 1000000f;
 		this.loadFinancialStatementCsv("/data/ABS/5512.0_GovtFinStats/55120DO057_201617 - Table 3 - Bal Sht.csv",
@@ -820,7 +822,7 @@ public class CalibrationData {
 
 		int[] govtProfitLossRows = { 7, 9, 10, 12, 17, 18, 22, 23, 37, 48 };
 		int govtProfitLossMapCapacity = (int) Math.ceil(govtProfitLossRows.length / MAP_LOAD_FACTOR);
-		this.govtProfitLoss = new HashMap<String, Float>(govtProfitLossMapCapacity);
+		this.govtProfitLoss = new TObjectFloatHashMap<String>(govtProfitLossMapCapacity);
 		int govtProfitLossColumn = 10;
 		this.loadFinancialStatementCsv("/data/ABS/5512.0_GovtFinStats/55120DO057_201617 - Table 1 - P&L.csv",
 				CalibrationData.GOVT_PL, govtProfitLossColumn, govtProfitLossRows, this.title, this.govtProfitLoss,
@@ -864,7 +866,7 @@ public class CalibrationData {
 	 *                             Keys: Series ID, Date
 	 */
 	private void loadRbaDataCsv(String fileResourceLocation, String dataSourceName, int[] columnsToImport,
-			Map<String, List<String>> titles, Map<String, List<String>> units, Map<String, Map<Date, Float>> data) {
+			Map<String, List<String>> titles, Map<String, List<String>> units, Map<String, TObjectFloatHashMap<Date>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -893,7 +895,7 @@ public class CalibrationData {
 						// store series ID as key with blank collections to populate with data below
 						for (int i = 0; i < columnsToImport.length; i++) {
 							seriesId[i] = line[columnsToImport[i]];
-							data.put(line[columnsToImport[i]], new HashMap<Date, Float>());
+							data.put(line[columnsToImport[i]], new TObjectFloatHashMap<Date>());
 						}
 						header = false;
 					}
@@ -1071,7 +1073,7 @@ public class CalibrationData {
 	 *                             Keys: series ID, date
 	 */
 	private void loadAbsDataCsv_Catalogue(String fileResourceLocation, String catalogueName, int[] columnsToImport,
-			Map<String, List<String>> titles, Map<String, List<String>> units, Map<String, Map<Date, Float>> data) {
+			Map<String, List<String>> titles, Map<String, List<String>> units, Map<String, TObjectFloatHashMap<Date>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -1094,7 +1096,7 @@ public class CalibrationData {
 						// store series ID as key with blank collections to populate with data below
 						for (int i = 0; i < columnsToImport.length; i++) {
 							seriesId[i] = line[columnsToImport[i]].replace(";", "").trim();
-							data.put(seriesId[i], new HashMap<Date, Float>());
+							data.put(seriesId[i], new TObjectFloatHashMap<Date>());
 						}
 						// N.B. I want country names not Series ID codes, so moved this code up here
 
@@ -1159,7 +1161,7 @@ public class CalibrationData {
 	 */
 	private void loadAbsDataCsv_5368_0Exporters(String fileResourceLocation, String catalogueName,
 			int[] columnsToImport, Map<String, List<String>> titles, Map<String, List<String>> units,
-			Map<String, Map<String, Map<String, Map<String, Float>>>> data) {
+			Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -1184,7 +1186,7 @@ public class CalibrationData {
 							seriesId[i] = line[columnsToImport[i]];
 
 							// create top-level maps
-							data.put(seriesId[i], new HashMap<String, Map<String, Map<String, Float>>>());
+							data.put(seriesId[i], new HashMap<String, Map<String, TObjectFloatHashMap<String>>>());
 						}
 					} else if (currentRow == unitsRow) {
 						units.put(catalogueName, new ArrayList<String>(columnsToImport.length));
@@ -1200,11 +1202,11 @@ public class CalibrationData {
 					for (int i = 0; i < columnsToImport.length; i++) {
 						// check if we need to create a new Country map
 						if (!line[0].equals(prevCountry)) {
-							data.get(seriesId[i]).put(line[0], new HashMap<String, Map<String, Float>>());
+							data.get(seriesId[i]).put(line[0], new HashMap<String, TObjectFloatHashMap<String>>());
 						}
 						// check if we need to create a new State map
 						if (!line[0].equals(prevState)) {
-							data.get(seriesId[i]).get(line[0]).put(line[2], new HashMap<String, Float>());
+							data.get(seriesId[i]).get(line[0]).put(line[2], new TObjectFloatHashMap<String>());
 						}
 
 						// parse the body of the data
@@ -1249,7 +1251,7 @@ public class CalibrationData {
 	 *                             Keys: column title, row name (first column).
 	 */
 	private void loadAbsDataRowsColumnsCsv(String fileResourceLocation, String dataSourceName, int[] columnsToImport,
-			int[] rowsToImport, int titleRow, Map<String, List<String>> titles, Map<String, Map<String, Float>> data) {
+			int[] rowsToImport, int titleRow, Map<String, List<String>> titles, Map<String, TObjectFloatHashMap<String>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -1269,7 +1271,7 @@ public class CalibrationData {
 							seriesId[i] = line[columnsToImport[i]];
 
 							// inistialise data
-							data.put(seriesId[i], new HashMap<String, Float>());
+							data.put(seriesId[i], new TObjectFloatHashMap<String>());
 						}
 					}
 				} else {
@@ -1512,7 +1514,7 @@ public class CalibrationData {
 	 *                             $.
 	 */
 	private void loadFinancialStatementCsv(String fileResourceLocation, String dataSourceName, int columnToImport,
-			int[] rowsToImport, Map<String, List<String>> titles, Map<String, Float> data, float multiplier) {
+			int[] rowsToImport, Map<String, List<String>> titles, TObjectFloatHashMap<String> data, float multiplier) {
 
 		CSVReader reader = null;
 		try {
@@ -1616,7 +1618,7 @@ public class CalibrationData {
 	/**
 	 * @return the rbaE1
 	 */
-	public Map<String, Map<Date, Float>> getRbaE1() {
+	public Map<String, TObjectFloatHashMap<Date>> getRbaE1() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1636,7 +1638,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs5368_0Exporters
 	 */
-	public Map<String, Map<String, Map<String, Map<String, Float>>>> getAbs5368_0Exporters() {
+	public Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>> getAbs5368_0Exporters() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1646,7 +1648,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs5368_0Table14a
 	 */
-	public Map<String, Map<Date, Float>> getAbs5368_0Table14a() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5368_0Table14a() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1656,7 +1658,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs5368_0Table14b
 	 */
-	public Map<String, Map<Date, Float>> getAbs5368_0Table14b() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5368_0Table14b() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1666,7 +1668,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs5368_0Table36a
 	 */
-	public Map<String, Map<Date, Float>> getAbs5368_0Table36a() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5368_0Table36a() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1676,7 +1678,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs5368_0Table36b
 	 */
-	public Map<String, Map<Date, Float>> getAbs5368_0Table36b() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5368_0Table36b() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1686,7 +1688,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs5368_0Table36c
 	 */
-	public Map<String, Map<Date, Float>> getAbs5368_0Table36c() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5368_0Table36c() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1696,7 +1698,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs5368_0Table36d
 	 */
-	public Map<String, Map<Date, Float>> getAbs5368_0Table36d() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5368_0Table36d() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1706,7 +1708,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs5368_0Table36e
 	 */
-	public Map<String, Map<Date, Float>> getAbs5368_0Table36e() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5368_0Table36e() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1716,7 +1718,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs5368_0Table36f
 	 */
-	public Map<String, Map<Date, Float>> getAbs5368_0Table36f() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5368_0Table36f() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1726,7 +1728,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs5368_0Table36g
 	 */
-	public Map<String, Map<Date, Float>> getAbs5368_0Table36g() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5368_0Table36g() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1736,7 +1738,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs5368_0Table36h
 	 */
-	public Map<String, Map<Date, Float>> getAbs5368_0Table36h() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5368_0Table36h() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1746,7 +1748,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs5368_0Table37a
 	 */
-	public Map<String, Map<Date, Float>> getAbs5368_0Table37a() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5368_0Table37a() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1756,7 +1758,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs5368_0Table37b
 	 */
-	public Map<String, Map<Date, Float>> getAbs5368_0Table37b() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5368_0Table37b() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1766,7 +1768,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs5368_0Table37c
 	 */
-	public Map<String, Map<Date, Float>> getAbs5368_0Table37c() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5368_0Table37c() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1776,7 +1778,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs5368_0Table37d
 	 */
-	public Map<String, Map<Date, Float>> getAbs5368_0Table37d() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5368_0Table37d() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1786,7 +1788,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs5368_0Table37e
 	 */
-	public Map<String, Map<Date, Float>> getAbs5368_0Table37e() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5368_0Table37e() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1796,7 +1798,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs5368_0Table37f
 	 */
-	public Map<String, Map<Date, Float>> getAbs5368_0Table37f() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5368_0Table37f() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1806,7 +1808,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs5368_0Table37g
 	 */
-	public Map<String, Map<Date, Float>> getAbs5368_0Table37g() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5368_0Table37g() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1816,7 +1818,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs5368_0Table37h
 	 */
-	public Map<String, Map<Date, Float>> getAbs5368_0Table37h() {
+	public Map<String, TObjectFloatHashMap<Date>> getAbs5368_0Table37h() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1826,7 +1828,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs8167_0Table3
 	 */
-	public Map<String, Map<String, Float>> getAbs8167_0Table3() {
+	public Map<String, TObjectFloatHashMap<String>> getAbs8167_0Table3() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1836,7 +1838,7 @@ public class CalibrationData {
 	/**
 	 * @return the abs8167_0Table6
 	 */
-	public Map<String, Map<String, Float>> getAbs8167_0Table6() {
+	public Map<String, TObjectFloatHashMap<String>> getAbs8167_0Table6() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1881,7 +1883,7 @@ public class CalibrationData {
 	/**
 	 * @return the rbaBalSht
 	 */
-	public Map<String, Float> getRbaBalSht() {
+	public TObjectFloatHashMap<String> getRbaBalSht() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1891,7 +1893,7 @@ public class CalibrationData {
 	/**
 	 * @return the rbaProfitLoss
 	 */
-	public Map<String, Float> getRbaProfitLoss() {
+	public TObjectFloatHashMap<String> getRbaProfitLoss() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1901,7 +1903,7 @@ public class CalibrationData {
 	/**
 	 * @return the govtBalSht
 	 */
-	public Map<String, Float> getGovtBalSht() {
+	public TObjectFloatHashMap<String> getGovtBalSht() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -1911,7 +1913,7 @@ public class CalibrationData {
 	/**
 	 * @return the govtProfitLoss
 	 */
-	public Map<String, Float> getGovtProfitLoss() {
+	public TObjectFloatHashMap<String> getGovtProfitLoss() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}

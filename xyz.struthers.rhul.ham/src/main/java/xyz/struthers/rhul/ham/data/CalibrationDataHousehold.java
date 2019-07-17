@@ -26,6 +26,9 @@ import org.springframework.stereotype.Component;
 
 import com.opencsv.CSVReader;
 
+import gnu.trove.map.hash.TObjectFloatHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 /**
  * Loads CSV data downloaded using Table Builder from the ABS, RBA, APRA and
  * ATO. This class contains the data that is only needed when calibrating
@@ -81,7 +84,7 @@ public class CalibrationDataHousehold {
 	 * 
 	 * Keys: Year (yyyy), LGA code, Series Title
 	 */
-	private Map<String, Map<String, Map<String, Float>>> abs1410_0Economy;
+	private Map<String, Map<String, TObjectFloatHashMap<String>>> abs1410_0Economy;
 	/**
 	 * Data by LGA: Family
 	 * 
@@ -91,7 +94,7 @@ public class CalibrationDataHousehold {
 	 * 
 	 * Keys: Year (yyyy), LGA code, Series Title
 	 */
-	private Map<String, Map<String, Map<String, Float>>> abs1410_0Family;
+	private Map<String, Map<String, TObjectFloatHashMap<String>>> abs1410_0Family;
 	// Map<String, Map<String, Map<String, Float>>> abs1410_0Income; // Data by
 	// LGA: Income
 	/**
@@ -102,7 +105,7 @@ public class CalibrationDataHousehold {
 	 * Keys: Household Income, Rent Range, LGA, Household Composition Dwelling<br>
 	 * Values: Number of dwellings
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Integer>>>> censusHCFMD_LGA_HIND_RNTRD;
+	private Map<String, Map<String, Map<String, TObjectIntHashMap<String>>>> censusHCFMD_LGA_HIND_RNTRD;
 	/**
 	 * ABS Census Table Builder data:<br>
 	 * HCFMD by LGA by HIND and MRERD<br>
@@ -111,7 +114,7 @@ public class CalibrationDataHousehold {
 	 * Keys: Household Income, Rent Range, LGA, Household Composition Dwelling<br>
 	 * Values: Number of dwellings
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Integer>>>> censusHCFMD_LGA_HIND_MRERD;
+	private Map<String, Map<String, Map<String, TObjectIntHashMap<String>>>> censusHCFMD_LGA_HIND_MRERD;
 	/**
 	 * ABS Census Table Builder data:<br>
 	 * HCFMF by LGA by FINF and CDCF<br>
@@ -121,7 +124,7 @@ public class CalibrationDataHousehold {
 	 * Dwelling<br>
 	 * Values: Number of dwellings
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Integer>>>> censusHCFMF_LGA_FINF_CDCF;
+	private Map<String, Map<String, Map<String, TObjectIntHashMap<String>>>> censusHCFMF_LGA_FINF_CDCF;
 
 	private boolean initialisedCensusHCFMD_LGA_HIND_RNTRD;
 	private boolean initialisedCensusHCFMD_LGA_HIND_MRERD;
@@ -137,7 +140,7 @@ public class CalibrationDataHousehold {
 
 	private void init() {
 		this.dataLoaded = false;
-		
+
 		this.title = null;
 		this.unitType = null;
 
@@ -167,7 +170,7 @@ public class CalibrationDataHousehold {
 		this.area = null;
 
 		this.dataLoaded = false;
-		
+
 		if (this.title != null) {
 			for (String key : this.title.keySet()) {
 				this.title.get(key).clear();
@@ -201,7 +204,7 @@ public class CalibrationDataHousehold {
 			for (String key1 : this.abs1410_0Economy.keySet()) {
 				for (String key2 : this.abs1410_0Economy.get(key1).keySet()) {
 					for (String key3 : this.abs1410_0Economy.get(key1).get(key2).keySet()) {
-						this.abs1410_0Economy.get(key1).get(key2).put(key3, null);
+						this.abs1410_0Economy.get(key1).get(key2).put(key3, 0f); // null
 					}
 					this.abs1410_0Economy.get(key1).get(key2).clear();
 					this.abs1410_0Economy.get(key1).put(key2, null);
@@ -218,7 +221,7 @@ public class CalibrationDataHousehold {
 			for (String key1 : this.abs1410_0Family.keySet()) {
 				for (String key2 : this.abs1410_0Family.get(key1).keySet()) {
 					for (String key3 : this.abs1410_0Family.get(key1).get(key2).keySet()) {
-						this.abs1410_0Family.get(key1).get(key2).put(key3, null);
+						this.abs1410_0Family.get(key1).get(key2).put(key3, 0f); // null
 					}
 					this.abs1410_0Family.get(key1).get(key2).clear();
 					this.abs1410_0Family.get(key1).put(key2, null);
@@ -236,7 +239,7 @@ public class CalibrationDataHousehold {
 				for (String key2 : this.censusHCFMD_LGA_HIND_RNTRD.get(key1).keySet()) {
 					for (String key3 : this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).keySet()) {
 						for (String key4 : this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).get(key3).keySet()) {
-							this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).get(key3).put(key4, null);
+							this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).get(key3).put(key4, 0); // null
 						}
 						this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).get(key3).clear();
 						this.censusHCFMD_LGA_HIND_RNTRD.get(key1).get(key2).put(key3, null);
@@ -258,7 +261,7 @@ public class CalibrationDataHousehold {
 				for (String key2 : this.censusHCFMD_LGA_HIND_MRERD.get(key1).keySet()) {
 					for (String key3 : this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).keySet()) {
 						for (String key4 : this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).get(key3).keySet()) {
-							this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).get(key3).put(key4, null);
+							this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).get(key3).put(key4, 0); // null
 						}
 						this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).get(key3).clear();
 						this.censusHCFMD_LGA_HIND_MRERD.get(key1).get(key2).put(key3, null);
@@ -280,7 +283,7 @@ public class CalibrationDataHousehold {
 				for (String key2 : this.censusHCFMF_LGA_FINF_CDCF.get(key1).keySet()) {
 					for (String key3 : this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).keySet()) {
 						for (String key4 : this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).get(key3).keySet()) {
-							this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).get(key3).put(key4, null);
+							this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).get(key3).put(key4, 0); // null
 						}
 						this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).get(key3).clear();
 						this.censusHCFMF_LGA_FINF_CDCF.get(key1).get(key2).put(key3, null);
@@ -387,7 +390,7 @@ public class CalibrationDataHousehold {
 		// ABS Census HCFMD by LGA by HIND and RNTRD
 		System.out.print(
 				new Date(System.currentTimeMillis()) + ": Loading ABS Census HCFMD by LGA by HIND and RNTRD data");
-		this.censusHCFMD_LGA_HIND_RNTRD = new HashMap<String, Map<String, Map<String, Map<String, Integer>>>>(
+		this.censusHCFMD_LGA_HIND_RNTRD = new HashMap<String, Map<String, Map<String, TObjectIntHashMap<String>>>>(
 				MAP_INIT_SIZE_HIND);
 		int fromColumnHCFMD_LGA_HIND_RNTRD = 1;
 		int toColumnHCFMD_LGA_HIND_RNTRD = 651;
@@ -452,7 +455,7 @@ public class CalibrationDataHousehold {
 		// ABS Census HCFMD by LGA by HIND and MRERD
 		System.out.print(
 				new Date(System.currentTimeMillis()) + ": Loading ABS Census HCFMD by LGA by HIND and MRERD data");
-		this.censusHCFMD_LGA_HIND_MRERD = new HashMap<String, Map<String, Map<String, Map<String, Integer>>>>(
+		this.censusHCFMD_LGA_HIND_MRERD = new HashMap<String, Map<String, Map<String, TObjectIntHashMap<String>>>>(
 				MAP_INIT_SIZE_HIND);
 		int fromColumnHCFMD_LGA_HIND_MRERD = 1;
 		int toColumnHCFMD_LGA_HIND_MRERD = 547;
@@ -517,7 +520,7 @@ public class CalibrationDataHousehold {
 		// ABS Census HCFMF by LGA by FINF and CDCF
 		System.out.print(
 				new Date(System.currentTimeMillis()) + ": Loading ABS Census HCFMD by LGA by FINF and CDCF data");
-		this.censusHCFMF_LGA_FINF_CDCF = new HashMap<String, Map<String, Map<String, Map<String, Integer>>>>(
+		this.censusHCFMF_LGA_FINF_CDCF = new HashMap<String, Map<String, Map<String, TObjectIntHashMap<String>>>>(
 				MAP_INIT_SIZE_FINF);
 		int fromColumnHCFMF_LGA_FINF_CDCF = 1;
 		int toColumnHCFMF_LGA_FINF_CDCF = 416;
@@ -695,84 +698,47 @@ public class CalibrationDataHousehold {
 	 * @param data                 - the data map that the values are returned in.
 	 *                             Keys are: Year, Series ID, LGA.
 	 */
-	/*private void loadAbsDataCsv_1410_0(String fileResourceLocation, String catalogueName, int[] columnsToImport,
-			String[] yearsToImport, Map<String, List<String>> titles, Map<String, List<String>> units,
-			Map<String, Map<String, Map<String, Float>>> data) {
-
-		CSVReader reader = null;
-		try {
-			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
-			reader = new CSVReader(new InputStreamReader(is));
-			boolean header = true;
-			int currentRow = 1;
-			final int titleRow = 7;
-			final int yearCol = 2;
-			String[] seriesId = new String[columnsToImport.length];
-			String[] line = null;
-			while ((line = reader.readNext()) != null) {
-				if (header) {
-					if (currentRow == titleRow) {
-						// store title
-						titles.put(catalogueName, new ArrayList<String>(columnsToImport.length));
-						for (int i = 0; i < columnsToImport.length; i++) {
-							titles.get(catalogueName).add(line[columnsToImport[i]]);
-							seriesId[i] = new String(line[columnsToImport[i]]);
-						}
-
-						// store series ID as key with blank collections to populate with data below
-						for (int i = 0; i < yearsToImport.length; i++) {
-							data.put(yearsToImport[i], new HashMap<String, Map<String, Float>>());
-							for (int j = 0; j < columnsToImport.length; j++) {
-								data.get(yearsToImport[i]).put(line[columnsToImport[j]], new HashMap<String, Float>());
-							}
-						}
-					} else if (line[0].equals("CODE")) {
-						// store unit types
-						units.put(catalogueName, new ArrayList<String>(columnsToImport.length));
-						for (int i = 0; i < columnsToImport.length; i++) {
-							units.get(catalogueName).add(line[columnsToImport[i]]);
-						}
-						header = false;
-					}
-					currentRow++;
-				} else {
-					// check if we should import this year
-					boolean importThisRow = false;
-					for (int i = 0; i < yearsToImport.length; i++) {
-						if (line[yearCol].equals(yearsToImport[i])) {
-							importThisRow = true;
-							break;
-						}
-					}
-					if (importThisRow) {
-						// for (int j = 1; j < columnsToImport.length; j++) {
-						for (int j = 0; j < columnsToImport.length; j++) {
-							// parse the body of the data
-							float value = 0f;
-							try {
-								if (line[columnsToImport[j]].trim().replace(",", "").equals("-")) {
-									value = 0f; // change "-" into 0d
-								} else {
-									value = Float.valueOf(line[columnsToImport[j]].trim().replace(",", ""));
-								}
-							} catch (NumberFormatException e) {
-								value = 0f;
-							}
-							data.get(line[yearCol]).get(seriesId[j]).put(line[0], value);
-						}
-					}
-				}
-			}
-			reader.close();
-			reader = null;
-		} catch (FileNotFoundException e) {
-			// open file
-			e.printStackTrace();
-		} catch (IOException e) {
-			// read next
-			e.printStackTrace();
-		}
-	}*/
+	/*
+	 * private void loadAbsDataCsv_1410_0(String fileResourceLocation, String
+	 * catalogueName, int[] columnsToImport, String[] yearsToImport, Map<String,
+	 * List<String>> titles, Map<String, List<String>> units, Map<String,
+	 * Map<String, Map<String, Float>>> data) {
+	 * 
+	 * CSVReader reader = null; try { InputStream is =
+	 * this.getClass().getResourceAsStream(fileResourceLocation); reader = new
+	 * CSVReader(new InputStreamReader(is)); boolean header = true; int currentRow =
+	 * 1; final int titleRow = 7; final int yearCol = 2; String[] seriesId = new
+	 * String[columnsToImport.length]; String[] line = null; while ((line =
+	 * reader.readNext()) != null) { if (header) { if (currentRow == titleRow) { //
+	 * store title titles.put(catalogueName, new
+	 * ArrayList<String>(columnsToImport.length)); for (int i = 0; i <
+	 * columnsToImport.length; i++) {
+	 * titles.get(catalogueName).add(line[columnsToImport[i]]); seriesId[i] = new
+	 * String(line[columnsToImport[i]]); }
+	 * 
+	 * // store series ID as key with blank collections to populate with data below
+	 * for (int i = 0; i < yearsToImport.length; i++) { data.put(yearsToImport[i],
+	 * new HashMap<String, Map<String, Float>>()); for (int j = 0; j <
+	 * columnsToImport.length; j++) {
+	 * data.get(yearsToImport[i]).put(line[columnsToImport[j]], new HashMap<String,
+	 * Float>()); } } } else if (line[0].equals("CODE")) { // store unit types
+	 * units.put(catalogueName, new ArrayList<String>(columnsToImport.length)); for
+	 * (int i = 0; i < columnsToImport.length; i++) {
+	 * units.get(catalogueName).add(line[columnsToImport[i]]); } header = false; }
+	 * currentRow++; } else { // check if we should import this year boolean
+	 * importThisRow = false; for (int i = 0; i < yearsToImport.length; i++) { if
+	 * (line[yearCol].equals(yearsToImport[i])) { importThisRow = true; break; } }
+	 * if (importThisRow) { // for (int j = 1; j < columnsToImport.length; j++) {
+	 * for (int j = 0; j < columnsToImport.length; j++) { // parse the body of the
+	 * data float value = 0f; try { if (line[columnsToImport[j]].trim().replace(",",
+	 * "").equals("-")) { value = 0f; // change "-" into 0d } else { value =
+	 * Float.valueOf(line[columnsToImport[j]].trim().replace(",", "")); } } catch
+	 * (NumberFormatException e) { value = 0f; }
+	 * data.get(line[yearCol]).get(seriesId[j]).put(line[0], value); } } } }
+	 * reader.close(); reader = null; } catch (FileNotFoundException e) { // open
+	 * file e.printStackTrace(); } catch (IOException e) { // read next
+	 * e.printStackTrace(); } }
+	 */
 
 	/**
 	 * Loads ABS Census Table Builder tables with one row series, two column series,
@@ -796,7 +762,8 @@ public class CalibrationDataHousehold {
 	 *                             RNTRD/MRERD, LGA, HCFMD)
 	 */
 	private void loadAbsCensusTableCsv2Columns1Wafer(String fileResourceLocation, boolean isInitialised,
-			int fromColumnIndex, int toColumnIndex, Map<String, Map<String, Map<String, Map<String, Integer>>>> data) {
+			int fromColumnIndex, int toColumnIndex,
+			Map<String, Map<String, Map<String, TObjectIntHashMap<String>>>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -846,14 +813,14 @@ public class CalibrationDataHousehold {
 										if (!columnTitles[0][i].isBlank() && !data.containsKey(columnTitles[0][i])) {
 											// add column series 1 key
 											data.put(columnTitles[0][i],
-													new HashMap<String, Map<String, Map<String, Integer>>>(
+													new HashMap<String, Map<String, TObjectIntHashMap<String>>>(
 															MAP_INIT_SIZE_RNTRD));
 										}
 										if (!columnTitles[1][i].isBlank()
 												&& !data.get(columnTitles[0][i]).containsKey(columnTitles[1][i])) {
 											// add column series 2 key
 											data.get(columnTitles[0][i]).put(columnTitles[1][i],
-													new HashMap<String, Map<String, Integer>>(MAP_INIT_SIZE_LGA));
+													new HashMap<String, TObjectIntHashMap<String>>(MAP_INIT_SIZE_LGA));
 										}
 									}
 								}
@@ -867,7 +834,7 @@ public class CalibrationDataHousehold {
 									for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
 										if (waferNumber == 1) {
 											data.get(columnTitles[0][i]).get(columnTitles[1][i]).put(lgaCode,
-													new HashMap<String, Integer>(MAP_INIT_SIZE_HCFMD));
+													new TObjectIntHashMap<String>(MAP_INIT_SIZE_HCFMD));
 										}
 										int value = 0;
 										try {
@@ -910,7 +877,7 @@ public class CalibrationDataHousehold {
 	/**
 	 * @return the abs1410_0Economy
 	 */
-	public Map<String, Map<String, Map<String, Float>>> getAbs1410_0Economy() {
+	public Map<String, Map<String, TObjectFloatHashMap<String>>> getAbs1410_0Economy() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -920,7 +887,7 @@ public class CalibrationDataHousehold {
 	/**
 	 * @return the abs1410_0Family
 	 */
-	public Map<String, Map<String, Map<String, Float>>> getAbs1410_0Family() {
+	public Map<String, Map<String, TObjectFloatHashMap<String>>> getAbs1410_0Family() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -930,7 +897,7 @@ public class CalibrationDataHousehold {
 	/**
 	 * @return the censusHCFMD_LGA_HIND_MRERD
 	 */
-	public Map<String, Map<String, Map<String, Map<String, Integer>>>> getCensusHCFMD_LGA_HIND_MRERD() {
+	public Map<String, Map<String, Map<String, TObjectIntHashMap<String>>>> getCensusHCFMD_LGA_HIND_MRERD() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -940,7 +907,7 @@ public class CalibrationDataHousehold {
 	/**
 	 * @return the censusHCFMD_LGA_HIND_RNTRD
 	 */
-	public Map<String, Map<String, Map<String, Map<String, Integer>>>> getCensusHCFMD_LGA_HIND_RNTRD() {
+	public Map<String, Map<String, Map<String, TObjectIntHashMap<String>>>> getCensusHCFMD_LGA_HIND_RNTRD() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}
@@ -950,7 +917,7 @@ public class CalibrationDataHousehold {
 	/**
 	 * @return the censusCDCF_LGA_FINF
 	 */
-	public Map<String, Map<String, Map<String, Map<String, Integer>>>> getCensusHCFMF_LGA_FINF_CDCF() {
+	public Map<String, Map<String, Map<String, TObjectIntHashMap<String>>>> getCensusHCFMF_LGA_FINF_CDCF() {
 		if (!this.dataLoaded) {
 			this.loadData();
 		}

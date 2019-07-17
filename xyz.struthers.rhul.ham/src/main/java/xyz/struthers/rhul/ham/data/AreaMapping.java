@@ -26,6 +26,8 @@ import org.springframework.stereotype.Component;
 
 import com.opencsv.CSVReader;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import xyz.struthers.rhul.ham.MemoryUsageBenchmark;
 import xyz.struthers.rhul.ham.config.Properties;
 
@@ -52,7 +54,7 @@ public class AreaMapping {
 	// column headings in CSV files
 	private static final String ABS_GCCSA_CODE = "GCCSA_CODE_2016";
 	private static final String LGA_LGA_CODE = "LGA_CODE_2018";
-	//private static final String LGA_STATE_NAME = "STATE_NAME_2016";
+	// private static final String LGA_STATE_NAME = "STATE_NAME_2016";
 	private static final String POA_POA_CODE = "POA_CODE_2016";
 	private static final int INDEX_COUNT_PERSON = 0;
 	private static final int INDEX_COUNT_DWELLING = 1;
@@ -66,12 +68,12 @@ public class AreaMapping {
 	private Map<String, Map<String, String>> lgaData;
 	private Map<String, Map<String, String>> poaData;
 
-	private Map<Date, Integer> totalPopulation;
+	private TObjectIntHashMap<Date> totalPopulation;
 	private Map<Date, Float> totalPopulationMultiplier; // multiply old data by this to get to 2018
-	private Map<Date, Map<String, Integer>> adjustedPeopleByLga;
-	private Map<Date, Map<String, Integer>> adjustedDwellingsByLga;
-	private Map<String, Integer> abs2074_0indexMap;
-	private ArrayList<ArrayList<Integer>> abs2074_0dataMatrix;
+	private Map<Date, TObjectIntHashMap<String>> adjustedPeopleByLga;
+	private Map<Date, TObjectIntHashMap<String>> adjustedDwellingsByLga;
+	private TObjectIntHashMap<String> abs2074_0indexMap;
+	private ArrayList<TIntArrayList> abs2074_0dataMatrix;
 	private ArrayList<ArrayList<String>> abs2074_0seriesTitles;
 	private Map<String, Map<Date, String>> abs3222_0; // AU by gender and age (population projections)
 
@@ -109,10 +111,10 @@ public class AreaMapping {
 			this.mapMeshblocks();
 		}
 		if (this.totalPopulation == null) {
-			this.totalPopulation = new HashMap<Date, Integer>(5);
+			this.totalPopulation = new TObjectIntHashMap<Date>(5);
 		}
-		Integer totalPop = this.totalPopulation.get(date);
-		if (totalPop == null) {
+		int totalPop = this.totalPopulation.get(date);
+		if (totalPop == 0f) {
 			totalPop = 0;
 			Set<String> seriesIds = this.abs3222_0.keySet();
 			for (String series : seriesIds) {
@@ -121,7 +123,7 @@ public class AreaMapping {
 			this.totalPopulation.put(date, totalPop);
 		}
 		Properties.setTotalPopulationAU(totalPop);
-		return totalPop.intValue();
+		return totalPop;
 	}
 
 	public float getPopulationMultiplier(Date date) {
@@ -131,16 +133,16 @@ public class AreaMapping {
 		return this.totalPopulationMultiplier.get(date);
 	}
 
-	public Map<String, Integer> getAdjustedPeopleByLga(Date date) {
+	public TObjectIntHashMap<String> getAdjustedPeopleByLga(Date date) {
 		if (!this.dataLoaded) {
 			this.mapMeshblocks();
 		}
 		if (this.adjustedPeopleByLga == null) {
 			// these are always initialised and populated together (by this method)
-			this.adjustedPeopleByLga = new HashMap<Date, Map<String, Integer>>(5);
+			this.adjustedPeopleByLga = new HashMap<Date, TObjectIntHashMap<String>>(5);
 			this.totalPopulationMultiplier = new HashMap<Date, Float>(5);
 		}
-		Map<String, Integer> result = this.adjustedPeopleByLga.get(date);
+		TObjectIntHashMap<String> result = this.adjustedPeopleByLga.get(date);
 		if (result == null) {
 			Map<String, Integer> censusPeopleByLga = this.getCensusPeopleByLga();
 			Set<String> lgaSet = censusPeopleByLga.keySet();
@@ -148,7 +150,7 @@ public class AreaMapping {
 			for (String lga : lgaSet) {
 				totalCensusPopulation += censusPeopleByLga.get(lga);
 			}
-			result = new HashMap<String, Integer>(lgaSet.size());
+			result = new TObjectIntHashMap<String>(lgaSet.size());
 			float factor = Float.valueOf(this.getTotalPopulation(date)) / Float.valueOf(totalCensusPopulation);
 			for (String lga : lgaSet) {
 				result.put(lga, (int) Math.round(Float.valueOf(censusPeopleByLga.get(lga)) * factor));
@@ -163,14 +165,14 @@ public class AreaMapping {
 		return this.getAdjustedPeopleByLga(date).get(lgaCode);
 	}
 
-	public Map<String, Integer> getAdjustedDwellingsByLga(Date date) {
+	public TObjectIntHashMap<String> getAdjustedDwellingsByLga(Date date) {
 		if (!this.dataLoaded) {
 			this.mapMeshblocks();
 		}
 		if (this.adjustedDwellingsByLga == null) {
-			this.adjustedDwellingsByLga = new HashMap<Date, Map<String, Integer>>(2);
+			this.adjustedDwellingsByLga = new HashMap<Date, TObjectIntHashMap<String>>(2);
 		}
-		Map<String, Integer> result = this.adjustedDwellingsByLga.get(date);
+		TObjectIntHashMap<String> result = this.adjustedDwellingsByLga.get(date);
 		if (result == null) {
 			Map<String, Integer> censusDwellingsByLga = this.getCensusDwellingsByLga();
 			Map<String, Integer> censusPeopleByLga = this.getCensusPeopleByLga();
@@ -180,7 +182,7 @@ public class AreaMapping {
 				totalCensusPopulation += censusPeopleByLga.get(lga);
 			}
 			int resultMapCapacity = (int) Math.ceil(lgaSet.size() / 0.75d);
-			result = new HashMap<String, Integer>(resultMapCapacity);
+			result = new TObjectIntHashMap<String>(resultMapCapacity);
 			float factor = Float.valueOf(this.getTotalPopulation(date)) / Float.valueOf(totalCensusPopulation);
 			for (String lga : lgaSet) {
 				result.put(lga, (int) Math.round(Float.valueOf(censusDwellingsByLga.get(lga)) * factor));
@@ -433,7 +435,8 @@ public class AreaMapping {
 				this.mapLgaToGccsa);
 
 		// map POA to LGA
-		// MAYBE: extend this to map LGA to POA too (any POA code within the LGA is fine)
+		// MAYBE: extend this to map LGA to POA too (any POA code within the LGA is
+		// fine)
 		Set<String> poaSet = new HashSet<String>(this.poaData.get(AreaMapping.POA_POA_CODE).values());
 		this.mapPoaToLga = new HashMap<String, String>(poaSet.size());
 		this.mapSmallToBigArea(this.poaData, AreaMapping.POA_POA_CODE, this.lgaData, AreaMapping.LGA_LGA_CODE,
@@ -554,8 +557,8 @@ public class AreaMapping {
 
 		// load mesh block counts
 		final int[] abs2074_0_Columns = { 3, 4 };
-		this.abs2074_0indexMap = new HashMap<String, Integer>();
-		this.abs2074_0dataMatrix = new ArrayList<ArrayList<Integer>>(abs2074_0_Columns.length);
+		this.abs2074_0indexMap = new TObjectIntHashMap<String>();
+		this.abs2074_0dataMatrix = new ArrayList<TIntArrayList>(abs2074_0_Columns.length);
 		this.abs2074_0seriesTitles = new ArrayList<ArrayList<String>>(abs2074_0_Columns.length);
 		this.loadAbsDataCsv_2074_0("/data/ABS/2074.0_MeshblockCounts/2016 Census Mesh Block Counts.csv",
 				abs2074_0_Columns, this.abs2074_0indexMap, this.abs2074_0dataMatrix, this.abs2074_0seriesTitles);
@@ -716,7 +719,7 @@ public class AreaMapping {
 	 */
 
 	private void loadAbsDataCsv_2074_0(String fileResourceLocation, int[] columnsToImport,
-			Map<String, Integer> indexMap, ArrayList<ArrayList<Integer>> dataMatrix,
+			TObjectIntHashMap<String> indexMap, ArrayList<TIntArrayList> dataMatrix,
 			ArrayList<ArrayList<String>> seriesTitles) {
 
 		CSVReader reader = null;
@@ -758,7 +761,7 @@ public class AreaMapping {
 					// do nothing because the header was processed on the first reading
 					seriesTitles.add(new ArrayList<String>(columnsToImport.length));
 					for (int i = 0; i < columnsToImport.length; i++) {
-						dataMatrix.add(new ArrayList<Integer>(dataRowCount));
+						dataMatrix.add(new TIntArrayList(dataRowCount));
 						seriesTitles.get(0).add(line[columnsToImport[i]]);
 					}
 					dataMatrix.trimToSize();

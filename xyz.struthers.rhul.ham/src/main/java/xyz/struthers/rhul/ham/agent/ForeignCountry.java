@@ -5,10 +5,10 @@ package xyz.struthers.rhul.ham.agent;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.map.hash.TObjectFloatHashMap;
 import xyz.struthers.rhul.ham.data.Currency;
 import xyz.struthers.rhul.ham.process.Clearable;
 import xyz.struthers.rhul.ham.process.NodePayment;
@@ -54,15 +54,15 @@ public final class ForeignCountry extends Agent {
 	 * Exchange rates are expressed as 1 AUD = xxx foreign currency<br>
 	 * e.g. 1 AUD = 0.7391 USD
 	 */
-	private ArrayList<Float> exchangeRates;
+	private TFloatArrayList exchangeRates;
 	private float totalExportsFromAustralia;
 	private float totalImportsToAustralia;
 	// values based on ABS data, used to calibrate Agent links
-	private Map<String, Float> absExportsFromAustraliaByState; // 8 states
-	private Map<String, Float> absImportsToAustraliaByState;
+	private TObjectFloatHashMap<String> absExportsFromAustraliaByState; // 8 states
+	private TObjectFloatHashMap<String> absImportsToAustraliaByState;
 	// values based on actual linked Business Agents
-	private Map<String, Float> actualExportsFromAustraliaByState;
-	private Map<String, Float> actualImportsToAustraliaByState;
+	private TObjectFloatHashMap<String> actualExportsFromAustraliaByState;
+	private TObjectFloatHashMap<String> actualImportsToAustraliaByState;
 
 	/**
 	 * 
@@ -87,14 +87,14 @@ public final class ForeignCountry extends Agent {
 	}
 
 	public ForeignCountry(String countryName, Currency countryCurrency, float initialExchangeRate,
-			float exportsFromAustralia, float importsToAustralia, Map<String, Float> exportsFromAusByState,
-			Map<String, Float> importsToAusByState) {
+			float exportsFromAustralia, float importsToAustralia, TObjectFloatHashMap<String> exportsFromAusByState,
+			TObjectFloatHashMap<String> importsToAusByState) {
 		super();
 		this.init();
 
 		this.name = countryName;
 		this.currency = countryCurrency;
-		this.exchangeRates = new ArrayList<Float>();
+		this.exchangeRates = new TFloatArrayList();
 		this.exchangeRates.add(initialExchangeRate);
 		this.totalExportsFromAustralia = exportsFromAustralia;
 		this.totalImportsToAustralia = importsToAustralia;
@@ -171,7 +171,8 @@ public final class ForeignCountry extends Agent {
 				this.actualExportsFromAustraliaByState = null;
 			}
 		}
-		this.actualExportsFromAustraliaByState = new HashMap<String, Float>((int) Math.ceil(STATES.length / 0.75f));
+		this.actualExportsFromAustraliaByState = new TObjectFloatHashMap<String>(
+				(int) Math.ceil(STATES.length / 0.75f));
 		for (String state : STATES) {
 			float stateTotal = (float) this.exporters.stream().filter(o -> o.getState().equals(state))
 					.mapToDouble(o -> o.getSalesForeign()).sum();
@@ -374,7 +375,7 @@ public final class ForeignCountry extends Agent {
 		 * decrease foreign demand and result in a drop in sales.
 		 */
 		float currentExchangeRate = this.exchangeRates.get(0);
-		if (this.exchangeRates.size() > iteration && this.exchangeRates.get(iteration) != null) {
+		if (this.exchangeRates.size() > iteration && this.exchangeRates.get(iteration) != 0f) { // null
 			currentExchangeRate = this.exchangeRates.get(iteration);
 		}
 		float exchRateAdjustment = this.exchangeRates.get(0) / currentExchangeRate;
@@ -484,14 +485,14 @@ public final class ForeignCountry extends Agent {
 	/**
 	 * @return the exchangeRates
 	 */
-	public ArrayList<Float> getExchangeRates() {
+	public TFloatArrayList getExchangeRates() {
 		return exchangeRates;
 	}
 
 	/**
 	 * @param exchangeRates the exchangeRates to set
 	 */
-	public void setExchangeRates(ArrayList<Float> exchangeRates) {
+	public void setExchangeRates(TFloatArrayList exchangeRates) {
 		this.exchangeRates = exchangeRates;
 	}
 
@@ -526,7 +527,7 @@ public final class ForeignCountry extends Agent {
 	/**
 	 * @return the exportsFromAustraliaByState
 	 */
-	public Map<String, Float> getAbsExportsFromAustraliaByState() {
+	public TObjectFloatHashMap<String> getAbsExportsFromAustraliaByState() {
 		return absExportsFromAustraliaByState;
 	}
 
@@ -544,7 +545,7 @@ public final class ForeignCountry extends Agent {
 	/**
 	 * @param exportsFromAustraliaByState the exportsFromAustraliaByState to set
 	 */
-	public void setAbsExportsFromAustraliaByState(Map<String, Float> exportsFromAustraliaByState) {
+	public void setAbsExportsFromAustraliaByState(TObjectFloatHashMap<String> exportsFromAustraliaByState) {
 		this.absExportsFromAustraliaByState = exportsFromAustraliaByState;
 	}
 
@@ -554,9 +555,10 @@ public final class ForeignCountry extends Agent {
 	 * @param state
 	 * @param exportsFromAustralia
 	 */
-	public void putAbsExportsFromAustraliaByState(String state, Float exportsFromAustralia) {
+	public void putAbsExportsFromAustraliaByState(String state, float exportsFromAustralia) {
 		if (this.absExportsFromAustraliaByState == null) {
-			this.absExportsFromAustraliaByState = new HashMap<String, Float>((int) Math.ceil(STATES.length / 0.75f));
+			this.absExportsFromAustraliaByState = new TObjectFloatHashMap<String>(
+					(int) Math.ceil(STATES.length / 0.75f));
 		}
 		this.absExportsFromAustraliaByState.put(state, exportsFromAustralia);
 	}
@@ -564,7 +566,7 @@ public final class ForeignCountry extends Agent {
 	/**
 	 * @return the importsToAustraliaByState
 	 */
-	public Map<String, Float> getAbsImportsToAustraliaByState() {
+	public TObjectFloatHashMap<String> getAbsImportsToAustraliaByState() {
 		return absImportsToAustraliaByState;
 	}
 
@@ -582,7 +584,7 @@ public final class ForeignCountry extends Agent {
 	/**
 	 * @param absImportsToAustraliaByState the absImportsToAustraliaByState to set
 	 */
-	public void setAbsImportsToAustraliaByState(Map<String, Float> absImportsToAustraliaByState) {
+	public void setAbsImportsToAustraliaByState(TObjectFloatHashMap<String> absImportsToAustraliaByState) {
 		this.absImportsToAustraliaByState = absImportsToAustraliaByState;
 	}
 
@@ -592,9 +594,9 @@ public final class ForeignCountry extends Agent {
 	 * @param state
 	 * @param absImportsToAustralia
 	 */
-	public void putAbsImportsToAustraliaByState(String state, Float absImportsToAustralia) {
+	public void putAbsImportsToAustraliaByState(String state, float absImportsToAustralia) {
 		if (this.absImportsToAustraliaByState == null) {
-			this.absImportsToAustraliaByState = new HashMap<String, Float>((int) Math.ceil(STATES.length / 0.75f));
+			this.absImportsToAustraliaByState = new TObjectFloatHashMap<String>((int) Math.ceil(STATES.length / 0.75f));
 		}
 		this.absImportsToAustraliaByState.put(state, absImportsToAustralia);
 	}
@@ -602,14 +604,14 @@ public final class ForeignCountry extends Agent {
 	/**
 	 * @return the actualExportsFromAustraliaByState
 	 */
-	public Map<String, Float> getActualExportsFromAustraliaByState() {
+	public TObjectFloatHashMap<String> getActualExportsFromAustraliaByState() {
 		return actualExportsFromAustraliaByState;
 	}
 
 	/**
 	 * @return the actualImportsToAustraliaByState
 	 */
-	public Map<String, Float> getActualImportsToAustraliaByState() {
+	public TObjectFloatHashMap<String> getActualImportsToAustraliaByState() {
 		return actualImportsToAustraliaByState;
 	}
 

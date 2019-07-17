@@ -4,7 +4,6 @@
 package xyz.struthers.rhul.ham.data;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import gnu.trove.map.hash.TObjectFloatHashMap;
 import xyz.struthers.rhul.ham.agent.AuthorisedDepositTakingInstitution;
 import xyz.struthers.rhul.ham.agent.ForeignBank;
 import xyz.struthers.rhul.ham.agent.MajorBank;
@@ -79,7 +79,7 @@ public class CalibrateAdis {
 			String adiCategory = this.allAdiData.get(key).get("Diss Model Category");
 
 			// create map to hold financial statements
-			Map<String, Float> financialStatement = new HashMap<String, Float>();
+			TObjectFloatHashMap<String> financialStatement = new TObjectFloatHashMap<String>();
 
 			// P&L
 			financialStatement.put("pnlInterestIncome", Float.valueOf(this.allAdiData.get(key).get("Interest income")));

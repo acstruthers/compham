@@ -7,6 +7,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import gnu.trove.list.array.TFloatArrayList;
 import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.data.CalibrateEconomy;
 import xyz.struthers.rhul.ham.process.Clearable;
@@ -50,7 +51,7 @@ public class Business extends Agent implements Employer {
 	// exporter fields
 	protected boolean isExporter;
 	private ArrayList<ForeignCountry> destinationCountries; // average 2.4 countries per exporter
-	private ArrayList<Float> destinationCountryInitialRatios;
+	private TFloatArrayList destinationCountryInitialRatios;
 
 	// agent relationships
 	protected int paymentClearingIndex;
@@ -58,9 +59,9 @@ public class Business extends Agent implements Employer {
 	protected ArrayList<Individual> employees; // calculate wages & super
 	protected AuthorisedDepositTakingInstitution adi; // loans & deposits
 	protected ArrayList<Business> domesticSuppliers;
-	protected ArrayList<Float> supplierRatios;
+	protected TFloatArrayList supplierRatios;
 	protected ArrayList<ForeignCountry> foreignSuppliers;
-	protected ArrayList<Float> foreignSupplierRatios;
+	protected TFloatArrayList foreignSupplierRatios;
 	protected Business landlord;
 	protected AustralianGovernment govt;
 	private int defaultIteration;
@@ -135,7 +136,7 @@ public class Business extends Agent implements Employer {
 		this.isExporter = business.isExporter;
 		if (business.isExporter) {
 			this.destinationCountries = new ArrayList<ForeignCountry>(business.destinationCountries);
-			this.destinationCountryInitialRatios = new ArrayList<Float>(business.destinationCountryInitialRatios);
+			this.destinationCountryInitialRatios = new TFloatArrayList(business.destinationCountryInitialRatios);
 		} else {
 			this.destinationCountries = null;
 			this.destinationCountryInitialRatios = null;
@@ -470,9 +471,9 @@ public class Business extends Agent implements Employer {
 				int index = supplier.getPaymentClearingIndex();
 				float expense = this.foreignExpenses * this.foreignSupplierRatios.get(supplierIdx);
 				// add in the effect of FX rate movements
-				ArrayList<Float> exchangeRates = supplier.getExchangeRates();
+				TFloatArrayList exchangeRates = supplier.getExchangeRates();
 				float currentExchangeRate = exchangeRates.get(0);
-				if (exchangeRates.size() > iteration && exchangeRates.get(iteration) != null) {
+				if (exchangeRates.size() > iteration && exchangeRates.get(iteration) != 0f) { // null
 					currentExchangeRate = exchangeRates.get(iteration);
 				}
 				// adjust in the opposite direction to exports
@@ -905,7 +906,7 @@ public class Business extends Agent implements Employer {
 	/**
 	 * @return the destinationCountryInitialRatios
 	 */
-	public ArrayList<Float> getDestinationCountryInitialRatios() {
+	public TFloatArrayList getDestinationCountryInitialRatios() {
 		return destinationCountryInitialRatios;
 	}
 
@@ -913,7 +914,7 @@ public class Business extends Agent implements Employer {
 	 * @param destinationCountryInitialRatios the destinationCountryInitialRatios to
 	 *                                        set
 	 */
-	public void setDestinationCountryInitialRatios(ArrayList<Float> destinationCountryInitialRatios) {
+	public void setDestinationCountryInitialRatios(TFloatArrayList destinationCountryInitialRatios) {
 		this.destinationCountryInitialRatios = destinationCountryInitialRatios;
 	}
 
@@ -981,14 +982,14 @@ public class Business extends Agent implements Employer {
 	/**
 	 * @return the supplierRatios
 	 */
-	public ArrayList<Float> getSupplierRatios() {
+	public TFloatArrayList getSupplierRatios() {
 		return supplierRatios;
 	}
 
 	/**
 	 * @param supplierRatios the supplierRatios to set
 	 */
-	public void setSupplierRatios(ArrayList<Float> supplierRatios) {
+	public void setSupplierRatios(TFloatArrayList supplierRatios) {
 		this.supplierRatios = supplierRatios;
 	}
 
@@ -1009,14 +1010,14 @@ public class Business extends Agent implements Employer {
 	/**
 	 * @return the foreignSupplierRatios
 	 */
-	public ArrayList<Float> getForeignSupplierRatios() {
+	public TFloatArrayList getForeignSupplierRatios() {
 		return foreignSupplierRatios;
 	}
 
 	/**
 	 * @param foreignSupplierRatios the foreignSupplierRatios to set
 	 */
-	public void setForeignSupplierRatios(ArrayList<Float> foreignSupplierRatios) {
+	public void setForeignSupplierRatios(TFloatArrayList foreignSupplierRatios) {
 		this.foreignSupplierRatios = foreignSupplierRatios;
 	}
 

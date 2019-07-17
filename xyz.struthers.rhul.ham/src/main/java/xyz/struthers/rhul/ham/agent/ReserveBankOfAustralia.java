@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import gnu.trove.map.hash.TObjectFloatHashMap;
 import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.process.Clearable;
 import xyz.struthers.rhul.ham.process.Employer;
@@ -94,7 +95,7 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 	 * @param balSht     - a map of Balance Sheet fields and values
 	 * @param profitLoss - a map of Profit & Loss Statement fields and values
 	 */
-	public ReserveBankOfAustralia(Map<String, Float> balSht, Map<String, Float> profitLoss) {
+	public ReserveBankOfAustralia(TObjectFloatHashMap<String> balSht, TObjectFloatHashMap<String> profitLoss) {
 		super();
 		this.init();
 

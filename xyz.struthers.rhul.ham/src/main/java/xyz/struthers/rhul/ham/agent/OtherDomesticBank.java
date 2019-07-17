@@ -3,7 +3,7 @@
  */
 package xyz.struthers.rhul.ham.agent;
 
-import java.util.Map;
+import gnu.trove.map.hash.TObjectFloatHashMap;
 
 /**
  * @author Adam Struthers
@@ -30,7 +30,7 @@ public final class OtherDomesticBank extends AuthorisedDepositTakingInstitution 
 	 * @param financialStatementAmounts
 	 */
 	public OtherDomesticBank(String adiAustralianBusinessNumber, String adiShortName, String adiLongName,
-			String adiType, Map<String, Float> financialStatementAmounts) {
+			String adiType, TObjectFloatHashMap<String> financialStatementAmounts) {
 		super(adiAustralianBusinessNumber, adiShortName, adiLongName, adiType, financialStatementAmounts);
 	}
 

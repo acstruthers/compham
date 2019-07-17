@@ -6,8 +6,9 @@ package xyz.struthers.rhul.ham.agent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.map.hash.TObjectFloatHashMap;
 import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.data.CalibrateEconomy;
 import xyz.struthers.rhul.ham.process.Clearable;
@@ -45,11 +46,11 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	protected int paymentClearingIndex;
 	protected ArrayList<Individual> employees; // calculate wages & super
 	protected ArrayList<Business> domesticSuppliers;
-	protected ArrayList<Float> domesticSupplierRatios;
+	protected TFloatArrayList domesticSupplierRatios;
 	protected ArrayList<Household> retailDepositors;
 	protected ArrayList<Business> commercialDepositors;
 	protected ArrayList<AuthorisedDepositTakingInstitution> adiInvestors;
-	protected ArrayList<Float> adiInvestorAmounts;
+	protected TFloatArrayList adiInvestorAmounts;
 	protected AustralianGovernment govt;
 	protected ReserveBankOfAustralia rba;
 	protected int defaultIteration;
@@ -108,10 +109,10 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	protected float capitalCreditRWA;
 
 	// effective interest rates
-	protected ArrayList<Float> depositRate;
-	protected ArrayList<Float> loanRate;
-	protected ArrayList<Float> borrowingsRate;
-	protected ArrayList<Float> govtBondRate;
+	protected TFloatArrayList depositRate;
+	protected TFloatArrayList loanRate;
+	protected TFloatArrayList borrowingsRate;
+	protected TFloatArrayList govtBondRate;
 
 	/**
 	 * Default constructor
@@ -130,7 +131,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	 * @param financialStatementAmounts
 	 */
 	public AuthorisedDepositTakingInstitution(String adiAustralianBusinessNumber, String adiShortName,
-			String adiLongName, String adiType, Map<String, Float> financialStatementAmounts) {
+			String adiLongName, String adiType, TObjectFloatHashMap<String> financialStatementAmounts) {
 		super();
 
 		// Company details
@@ -140,55 +141,55 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		this.adiCategory = adiType;
 
 		// P&L
-		this.pnlInterestIncome = financialStatementAmounts.get("pnlInterestIncome").floatValue();
-		this.pnlInterestExpense = financialStatementAmounts.get("pnlInterestExpense").floatValue();
-		this.pnlTradingIncome = financialStatementAmounts.get("pnlTradingIncome").floatValue();
-		this.pnlInvestmentIncome = financialStatementAmounts.get("pnlInvestmentIncome").floatValue();
-		this.pnlOtherIncome = financialStatementAmounts.get("pnlOtherIncome").floatValue();
+		this.pnlInterestIncome = financialStatementAmounts.get("pnlInterestIncome");
+		this.pnlInterestExpense = financialStatementAmounts.get("pnlInterestExpense");
+		this.pnlTradingIncome = financialStatementAmounts.get("pnlTradingIncome");
+		this.pnlInvestmentIncome = financialStatementAmounts.get("pnlInvestmentIncome");
+		this.pnlOtherIncome = financialStatementAmounts.get("pnlOtherIncome");
 
-		this.pnlPersonnelExpenses = financialStatementAmounts.get("pnlPersonnelExpenses").floatValue();
-		this.pnlLoanImpairmentExpense = financialStatementAmounts.get("pnlLoanImpairmentExpense").floatValue();
-		this.pnlDepreciationAmortisation = financialStatementAmounts.get("pnlDepreciationAmortisation").floatValue();
-		this.pnlOtherExpenses = financialStatementAmounts.get("pnlOtherExpenses").floatValue();
+		this.pnlPersonnelExpenses = financialStatementAmounts.get("pnlPersonnelExpenses");
+		this.pnlLoanImpairmentExpense = financialStatementAmounts.get("pnlLoanImpairmentExpense");
+		this.pnlDepreciationAmortisation = financialStatementAmounts.get("pnlDepreciationAmortisation");
+		this.pnlOtherExpenses = financialStatementAmounts.get("pnlOtherExpenses");
 
-		this.pnlIncomeTaxExpense = financialStatementAmounts.get("pnlIncomeTaxExpense").floatValue();
+		this.pnlIncomeTaxExpense = financialStatementAmounts.get("pnlIncomeTaxExpense");
 
 		// Bal Sht
-		this.bsCash = financialStatementAmounts.get("bsCash").floatValue();
-		this.bsTradingSecurities = financialStatementAmounts.get("bsTradingSecurities").floatValue();
-		this.bsDerivativeAssets = financialStatementAmounts.get("bsDerivativeAssets").floatValue();
-		this.bsInvestments = financialStatementAmounts.get("bsInvestments").floatValue();
-		this.bsLoansPersonal = financialStatementAmounts.get("bsLoansPersonal").floatValue();
-		this.bsLoansHome = financialStatementAmounts.get("bsLoansHome").floatValue();
-		this.bsLoansBusiness = financialStatementAmounts.get("bsLoansBusiness").floatValue();
-		this.bsLoansADI = financialStatementAmounts.get("bsLoansADI").floatValue();
-		this.bsLoansGovernment = financialStatementAmounts.get("bsLoansGovernment").floatValue();
-		this.bsOtherNonFinancialAssets = financialStatementAmounts.get("bsOtherNonFinancialAssets").floatValue();
+		this.bsCash = financialStatementAmounts.get("bsCash");
+		this.bsTradingSecurities = financialStatementAmounts.get("bsTradingSecurities");
+		this.bsDerivativeAssets = financialStatementAmounts.get("bsDerivativeAssets");
+		this.bsInvestments = financialStatementAmounts.get("bsInvestments");
+		this.bsLoansPersonal = financialStatementAmounts.get("bsLoansPersonal");
+		this.bsLoansHome = financialStatementAmounts.get("bsLoansHome");
+		this.bsLoansBusiness = financialStatementAmounts.get("bsLoansBusiness");
+		this.bsLoansADI = financialStatementAmounts.get("bsLoansADI");
+		this.bsLoansGovernment = financialStatementAmounts.get("bsLoansGovernment");
+		this.bsOtherNonFinancialAssets = financialStatementAmounts.get("bsOtherNonFinancialAssets");
 
-		this.bsDepositsAtCall = financialStatementAmounts.get("bsDepositsAtCall").floatValue();
-		this.bsDepositsTerm = financialStatementAmounts.get("bsDepositsTerm").floatValue();
-		this.bsDepositsAdiRepoEligible = financialStatementAmounts.get("bsDepositsAdiRepoEligible").floatValue();
-		this.bsDerivativeLiabilities = financialStatementAmounts.get("bsDerivativeLiabilities").floatValue();
-		this.bsBondsNotesBorrowings = financialStatementAmounts.get("bsBondsNotesBorrowings").floatValue();
-		this.bsOtherLiabilities = financialStatementAmounts.get("bsOtherLiabilities").floatValue();
+		this.bsDepositsAtCall = financialStatementAmounts.get("bsDepositsAtCall");
+		this.bsDepositsTerm = financialStatementAmounts.get("bsDepositsTerm");
+		this.bsDepositsAdiRepoEligible = financialStatementAmounts.get("bsDepositsAdiRepoEligible");
+		this.bsDerivativeLiabilities = financialStatementAmounts.get("bsDerivativeLiabilities");
+		this.bsBondsNotesBorrowings = financialStatementAmounts.get("bsBondsNotesBorrowings");
+		this.bsOtherLiabilities = financialStatementAmounts.get("bsOtherLiabilities");
 
-		this.bsRetainedEarnings = financialStatementAmounts.get("bsRetainedEarnings").floatValue();
-		this.bsReserves = financialStatementAmounts.get("bsReserves").floatValue();
-		this.bsOtherEquity = financialStatementAmounts.get("bsOtherEquity").floatValue();
+		this.bsRetainedEarnings = financialStatementAmounts.get("bsRetainedEarnings");
+		this.bsReserves = financialStatementAmounts.get("bsReserves");
+		this.bsOtherEquity = financialStatementAmounts.get("bsOtherEquity");
 
 		// Metrics
-		this.rateCash = financialStatementAmounts.get("rateCash").floatValue();
-		this.rateTrading = financialStatementAmounts.get("rateTrading").floatValue();
-		this.rateInvestment = financialStatementAmounts.get("rateInvestment").floatValue();
-		this.rateAdiLoan = financialStatementAmounts.get("rateAdiLoan").floatValue();
-		this.rateGovernmentLoan = financialStatementAmounts.get("rateGovernmentLoan").floatValue();
-		this.rateTotalLoans = financialStatementAmounts.get("rateTotalLoans").floatValue();
-		this.rateTotalDeposits = financialStatementAmounts.get("rateTotalDeposits").floatValue();
-		this.rateBondsNotesBorrowings = financialStatementAmounts.get("rateBondsNotesBorrowings").floatValue();
-		this.capitalTotalRatio = financialStatementAmounts.get("capitalTotalRatio").floatValue();
-		this.capitalTotalAmount = financialStatementAmounts.get("capitalTotalAmount").floatValue();
-		this.capitalTotalRWA = financialStatementAmounts.get("capitalTotalRWA").floatValue();
-		this.capitalCreditRWA = financialStatementAmounts.get("capitalCreditRWA").floatValue();
+		this.rateCash = financialStatementAmounts.get("rateCash");
+		this.rateTrading = financialStatementAmounts.get("rateTrading");
+		this.rateInvestment = financialStatementAmounts.get("rateInvestment");
+		this.rateAdiLoan = financialStatementAmounts.get("rateAdiLoan");
+		this.rateGovernmentLoan = financialStatementAmounts.get("rateGovernmentLoan");
+		this.rateTotalLoans = financialStatementAmounts.get("rateTotalLoans");
+		this.rateTotalDeposits = financialStatementAmounts.get("rateTotalDeposits");
+		this.rateBondsNotesBorrowings = financialStatementAmounts.get("rateBondsNotesBorrowings");
+		this.capitalTotalRatio = financialStatementAmounts.get("capitalTotalRatio");
+		this.capitalTotalAmount = financialStatementAmounts.get("capitalTotalAmount");
+		this.capitalTotalRWA = financialStatementAmounts.get("capitalTotalRWA");
+		this.capitalCreditRWA = financialStatementAmounts.get("capitalCreditRWA");
 	}
 
 	public float getTotalIncome() {
@@ -211,7 +212,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 
 	public float setDepositRate(int iteration) {
 		if (this.depositRate == null) {
-			this.depositRate = new ArrayList<Float>(iteration + 1);
+			this.depositRate = new TFloatArrayList(iteration + 1);
 			for (int i = 0; i < iteration; i++) {
 				this.depositRate.add(this.rateTotalDeposits);
 			}
@@ -246,7 +247,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 
 	public float setLoanRate(int iteration) {
 		if (this.loanRate == null) {
-			this.loanRate = new ArrayList<Float>(iteration + 1);
+			this.loanRate = new TFloatArrayList(iteration + 1);
 			for (int i = 0; i < iteration; i++) {
 				this.loanRate.add(this.rateTotalLoans);
 			}
@@ -281,7 +282,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 
 	public float setBorrowingsRate(int iteration) {
 		if (this.borrowingsRate == null) {
-			this.borrowingsRate = new ArrayList<Float>();
+			this.borrowingsRate = new TFloatArrayList();
 			for (int i = 0; i < iteration; i++) {
 				this.borrowingsRate.add(this.rateBondsNotesBorrowings);
 			}
@@ -316,7 +317,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 
 	public float setGovtBondRate(int iteration) {
 		if (this.govtBondRate == null) {
-			this.govtBondRate = new ArrayList<Float>();
+			this.govtBondRate = new TFloatArrayList();
 			for (int i = 0; i < iteration; i++) {
 				this.govtBondRate.add(this.rateGovernmentLoan);
 			}
@@ -443,7 +444,11 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 				+ separator);
 		sb.append(wholeNumber.format(this.adiInvestors != null ? this.adiInvestors.size() : 0) + separator);
 		if (this.adiInvestorAmounts != null) {
-			float sum = this.adiInvestorAmounts.stream().reduce(0f, Float::sum);
+			// float sum = this.adiInvestorAmounts.stream().reduce(0f, Float::sum);
+			float sum = 0f;
+			for (int investorIdx = 0; investorIdx < this.adiInvestorAmounts.size(); investorIdx++) {
+				sum += this.adiInvestorAmounts.get(investorIdx);
+			}
 			sb.append(decimal.format(sum) + separator);
 		} else {
 			sb.append(decimal.format(0) + separator);
@@ -917,14 +922,14 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	/**
 	 * @return the domesticSupplierRatios
 	 */
-	public ArrayList<Float> getDomesticSupplierRatios() {
+	public TFloatArrayList getDomesticSupplierRatios() {
 		return domesticSupplierRatios;
 	}
 
 	/**
 	 * @param domesticSupplierRatios the domesticSupplierRatios to set
 	 */
-	public void setDomesticSupplierRatios(ArrayList<Float> domesticSupplierRatios) {
+	public void setDomesticSupplierRatios(TFloatArrayList domesticSupplierRatios) {
 		this.domesticSupplierRatios = domesticSupplierRatios;
 	}
 
@@ -1002,14 +1007,14 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	/**
 	 * @return the adiInvestorAmounts
 	 */
-	public ArrayList<Float> getAdiInvestorAmounts() {
+	public TFloatArrayList getAdiInvestorAmounts() {
 		return adiInvestorAmounts;
 	}
 
 	/**
 	 * @param adiInvestorAmounts the adiInvestorAmounts to set
 	 */
-	public void setAdiInvestorAmounts(ArrayList<Float> adiInvestorAmounts) {
+	public void setAdiInvestorAmounts(TFloatArrayList adiInvestorAmounts) {
 		this.adiInvestorAmounts = adiInvestorAmounts;
 	}
 

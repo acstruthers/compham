@@ -31,7 +31,7 @@ public final class Individual extends Agent {
 	// "Personal" Details (8 bytes + approx. 7 bytes of Strings = 15 bytes)
 	private int age;
 	private String sex; // "M" / "F"
-	private String employmentIndustry; // "A" to "S", can be null if not employed
+	private char employmentIndustry; // "A" to "S", can be null if not employed
 	private String localGovernmentAreaCode; // 5 chars
 	private int mainIncomeSource;
 
@@ -282,7 +282,7 @@ public final class Individual extends Agent {
 		// Demographic
 		this.age = 0;
 		this.sex = null;
-		this.employmentIndustry = null;
+		this.employmentIndustry = '\0'; // null
 		this.localGovernmentAreaCode = null;
 		this.mainIncomeSource = 0;
 
@@ -365,14 +365,14 @@ public final class Individual extends Agent {
 	/**
 	 * @return the employmentIndustry
 	 */
-	public String getEmploymentIndustry() {
+	public char getEmploymentIndustry() {
 		return employmentIndustry;
 	}
 
 	/**
 	 * @param employmentIndustry the employmentIndustry to set
 	 */
-	public void setEmploymentIndustry(String employmentIndustry) {
+	public void setEmploymentIndustry(char employmentIndustry) {
 		this.employmentIndustry = employmentIndustry;
 	}
 

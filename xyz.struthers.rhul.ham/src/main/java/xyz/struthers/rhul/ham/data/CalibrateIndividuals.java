@@ -75,6 +75,8 @@ public class CalibrateIndividuals {
 			82, 87, 92, 97, 102 };
 	public static final String[] DIVISION_CODE_ARRAY = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
 			"M", "N", "O", "P", "Q", "R", "S" }; // S = Other Services
+	public static final char[] DIVISION_CODE_CHAR_ARRAY = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+			'M', 'N', 'O', 'P', 'Q', 'R', 'S' }; // S = Other Services
 	public static final int NUM_DIVISIONS = DIVISION_CODE_ARRAY.length; // 19
 	public static final String[] INDIVIDUAL_INCOME_RANGES_ABS = { "Negative income", "Nil income",
 			"$1-$149 ($1-$7,799)", "$150-$299 ($7,800-$15,599)", "$300-$399 ($15,600-$20,799)",
@@ -219,19 +221,19 @@ public class CalibrateIndividuals {
 	 * Contains P&L and people count by sex and 5-year age range.<br>
 	 * Keys: Series Title, State, Age, Gender, Taxable Status, Lodgment Method
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>>> atoIndividualTable2a;
+	private Map<String, Map<String, Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>>> atoIndividualTable2a;
 	/**
 	 * ATO Individuals Table 3A<br>
 	 * Contains P&L and people count by sex, 5-year age range, and income range.<br>
 	 * Keys: Series Title, Income Range, Age, Gender, Taxable Status
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>> atoIndividualTable3a;
+	private Map<String, Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>> atoIndividualTable3a;
 	/**
 	 * ATO Individuals Table 6B<br>
 	 * Contains P&L and people count by post code.<br>
 	 * Keys: Series Title, Post Code
 	 */
-	private Map<String, Map<String, Float>> atoIndividualTable6b;
+	private Map<String, TObjectFloatHashMap<String>> atoIndividualTable6b;
 	/**
 	 * ATO Individuals Table 9 (Industry Division summary)<br>
 	 * Contains count and taxable income, summarised by industry division.<br>
@@ -1474,7 +1476,7 @@ public class CalibrateIndividuals {
 													Individual individual = new Individual();
 													individual.setAge(AGE_ARRAY_ABS_MIDPOINT[ageIdxAbs]);
 													individual.setSex(SEX_ARRAY[sexIdx]);
-													individual.setEmploymentIndustry(DIVISION_CODE_ARRAY[divIdx]);
+													individual.setEmploymentIndustry(DIVISION_CODE_CHAR_ARRAY[divIdx]);
 													individual.setLocalGovernmentAreaCode(
 															this.area.getLgaCodeFromPoa(poa));
 

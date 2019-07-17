@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import gnu.trove.map.hash.TObjectFloatHashMap;
 import xyz.struthers.rhul.ham.agent.Business;
 import xyz.struthers.rhul.ham.config.Properties;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
@@ -79,7 +80,7 @@ public class CalibrateBusinesses {
 	 * AU Bal Sht totals<br>
 	 * Keys: Series, Date
 	 */
-	private Map<String, Map<Date, Float>> rbaE1;
+	private Map<String, TObjectFloatHashMap<Date>> rbaE1;
 	/**
 	 * ANZSIC industry code mapping<br>
 	 * Key 1 is mapping per the titles (e.g. "Class Code to Division")<br>
@@ -115,32 +116,32 @@ public class CalibrateBusinesses {
 	 * Business size by division<br>
 	 * Keys: year, column title, size, industry
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Float>>>> abs8155_0Table5;
+	private Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>> abs8155_0Table5;
 	/**
 	 * States by division<br>
 	 * Keys: year, column title, state, industry
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Float>>>> abs8155_0Table6;
+	private Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>> abs8155_0Table6;
 	/**
 	 * Count by state, industry & employment range<br>
 	 * Keys: employment range, state, industry class code
 	 */
-	private Map<String, Map<String, Map<String, Float>>> abs8165_0StateEmployment;
+	private Map<String, Map<String, TObjectFloatHashMap<String>>> abs8165_0StateEmployment;
 	/**
 	 * Count by LGA, industry & employment range<br>
 	 * Keys: employment range, state acronym, LGA code, industry division code
 	 */
-	private Map<String, Map<String, Map<String, Map<String, Float>>>> abs8165_0LgaEmployment;
+	private Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>> abs8165_0LgaEmployment;
 	/**
 	 * ATO Fine Industry Detailed P&L and Bal Sht<br>
 	 * Keys: column title, fine industry code
 	 */
-	private Map<String, Map<String, Float>> atoCompanyTable4a;
+	private Map<String, TObjectFloatHashMap<String>> atoCompanyTable4a;
 	/**
 	 * Industry Code Total P&L<br>
 	 * Keys: column title, business industry code
 	 */
-	private Map<String, Map<String, Float>> atoCompanyTable4b;
+	private Map<String, TObjectFloatHashMap<String>> atoCompanyTable4b;
 
 	/**
 	 * 

@@ -811,14 +811,8 @@ public class Household extends Agent {
 	/**
 	 * @param supplierRatios the supplierRatios to set
 	 */
-	public void setSupplierRatios(ArrayList<Float> supplierRatios) {
-		// this.supplierRatios = supplierRatios;
-		float[] primitiveArray = new float[supplierRatios.size()];
-		int i = 0;
-		for (Float node : supplierRatios) {
-			primitiveArray[i++] = (node != null ? node : 0f);
-		}
-		this.supplierRatios = TFloatArrayList.wrap(primitiveArray);
+	public void setSupplierRatios(TFloatArrayList supplierRatios) {
+		this.supplierRatios = supplierRatios;
 	}
 
 	/**
