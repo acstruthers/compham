@@ -49,6 +49,8 @@ import xyz.struthers.rhul.ham.process.Employer;
 @Scope(value = "singleton")
 public class CalibrateEconomy {
 
+	public static final boolean DEBUG_LINK_EMPLOYEES = false;
+
 	private static final int MAX_IMPORT_COUNTRIES = 3;
 	private static final int MAX_EXPORT_COUNTRIES = 3;
 
@@ -308,8 +310,10 @@ public class CalibrateEconomy {
 		}
 		// release memory
 		for (char div : ABS_6530_0_SPEND_DIV_CODE_CHAR) {
-			businessIndices.get(div).clear();
-			businessIndices.put(div, null);
+			if (businessIndices.get(div) != null) {
+				businessIndices.get(div).clear();
+				businessIndices.put(div, null);
+			}
 		}
 		businessIndices.clear();
 		businessIndices = null;
@@ -563,7 +567,7 @@ public class CalibrateEconomy {
 		// get total wages expense by industry division
 		System.out.println(new Date(System.currentTimeMillis()) + ": get total wages expense by industry division");
 		TCharFloatHashMap totalWagesExpenseByDiv = new TCharFloatHashMap(
-				(int) Math.ceil(CalibrateIndividuals.DIVISION_CODE_CHAR_ARRAY.length / 0.75f));
+				(int) Math.ceil(CalibrateIndividuals.DIVISION_CODE_CHAR_ARRAY.length / 0.75f) + 1);
 		for (char div : CalibrateIndividuals.DIVISION_CODE_CHAR_ARRAY) {
 			float totalWagesExpense = 0f;
 			for (int i = 0; i < this.businesses.length; i++) {
@@ -635,26 +639,83 @@ public class CalibrateEconomy {
 		for (char div : employeesByDiv.keySet()) {
 			employeesByDiv.get(div).trimToSize();
 		}
+
+		/*
+		 * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		 * IT GETS STUCK IN AN INFINITE LOOP SOMEWHERE BETWEEN HERE
+		 * 
+		 * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		 */
+
 		// for each division, calculate employer ratio and multiply by employee count
 		System.out.println(new Date(System.currentTimeMillis())
 				+ ": for each division, calculate employer ratio and multiply by employee count");
 		Map<Character, TIntArrayList> shuffledEmployerIndicesByDiv = new HashMap<Character, TIntArrayList>(
 				(int) Math.ceil(totalWagesExpenseByDiv.size() / 0.75f));
-		for (int i = 0; i < employers.size(); i++) {
+		if (DEBUG_LINK_EMPLOYEES) {
+			System.out.println(new Date(System.currentTimeMillis()) + ": DEBUG: map created" + ", employers.size() = "
+					+ employers.size());
+		}
+		for (int employerIdx = 0; employerIdx < employers.size(); employerIdx++) {
+			if (DEBUG_LINK_EMPLOYEES) {
+				System.out.println(new Date(System.currentTimeMillis()) + ": DEBUG: employerIdx = " + employerIdx
+						+ ", employers.size() = " + employers.size());
+			}
 			// Employer employer : employers
-			char div = employers.get(i).getIndustryDivisionCode();
+			char div = employers.get(employerIdx).getIndustryDivisionCode();
+			if (DEBUG_LINK_EMPLOYEES) {
+				System.out.println(new Date(System.currentTimeMillis()) + ": DEBUG: div = " + div);
+			}
 			float divTotalWages = totalWagesExpenseByDiv.get(div);
-			float employerWages = employers.get(i).getInitialWagesExpense();
+			if (DEBUG_LINK_EMPLOYEES) {
+				System.out.println(new Date(System.currentTimeMillis()) + ": DEBUG: divTotalWages = " + divTotalWages);
+			}
+			float employerWages = employers.get(employerIdx).getInitialWagesExpense();
+			if (DEBUG_LINK_EMPLOYEES) {
+				System.out.println(new Date(System.currentTimeMillis()) + ": DEBUG: employerWages = " + employerWages);
+			}
 			float employeesPerDiv = employeesByDiv.get(div).size();
+			if (DEBUG_LINK_EMPLOYEES) {
+				System.out.println(
+						new Date(System.currentTimeMillis()) + ": DEBUG: employeesPerDiv = " + employeesPerDiv);
+			}
 			int employeeCount = (int) Math.ceil(employerWages / divTotalWages * employeesPerDiv);
+			if (DEBUG_LINK_EMPLOYEES) {
+				System.out.println(new Date(System.currentTimeMillis()) + ": DEBUG: employeeCount = " + employeeCount);
+				System.out.println(new Date(System.currentTimeMillis())
+						+ ": DEBUG: !shuffledEmployerIndicesByDiv.containsKey(div) = "
+						+ !shuffledEmployerIndicesByDiv.containsKey(div));
+			}
 			if (!shuffledEmployerIndicesByDiv.containsKey(div)) {
+				if (DEBUG_LINK_EMPLOYEES) {
+					System.out.println(
+							new Date(System.currentTimeMillis()) + ": DEBUG: inside the IF statement for div " + div);
+				}
 				shuffledEmployerIndicesByDiv.put(div, new TIntArrayList(
 						(int) Math.ceil(employees.size() / DIVISION_CODE_INDICES.length * 2f / 0.75f)));
-				System.out.println(new Date(System.currentTimeMillis()) + ": add TIntArrayList for " + div
-						+ " to shuffledEmployerIndicesByDiv");
+				if (DEBUG_LINK_EMPLOYEES) {
+					System.out.println(new Date(System.currentTimeMillis()) + ": added TIntArrayList for " + div
+							+ " to shuffledEmployerIndicesByDiv");
+				}
 			}
-			shuffledEmployerIndicesByDiv.get(div).addAll(Collections.nCopies(employeeCount, i));
+			if (DEBUG_LINK_EMPLOYEES) {
+				System.out.println(
+						new Date(System.currentTimeMillis()) + ": DEBUG: adding employee count to shuffled index");
+			}
+			shuffledEmployerIndicesByDiv.get(div).addAll(Collections.nCopies(employeeCount, employerIdx));
+			if (DEBUG_LINK_EMPLOYEES) {
+				System.out.println(new Date(System.currentTimeMillis())
+						+ ": DEBUG: at the bottom of the employer loop for employerIdx = " + employerIdx);
+			}
 		}
+
+		/*
+		 * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		 * AND HERE
+		 * 
+		 * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		 */
+
 		// shuffle indices and initialise next index map
 		System.out.println(new Date(System.currentTimeMillis()) + ": shuffle indices and initialise next index map");
 		TCharIntHashMap nextDivIdx = new TCharIntHashMap((int) Math.ceil(shuffledEmployerIndicesByDiv.size() / 0.75f));
@@ -791,9 +852,6 @@ public class CalibrateEconomy {
 			customer.setSupplierRatios(supplierRatios);
 		}
 		// release memory
-		for (String div : totalDomesticRevenueByDiv.keySet()) {
-			totalDomesticRevenueByDiv.put(div, 0f); // null
-		}
 		totalDomesticRevenueByDiv.clear();
 		totalDomesticRevenueByDiv = null;
 		domesticSupplierDivs.clear();
@@ -803,9 +861,6 @@ public class CalibrateEconomy {
 		}
 		shuffledSupplierIndicesByDiv.clear();
 		shuffledSupplierIndicesByDiv = null;
-		for (String div : nextDivIdx.keySet()) {
-			nextDivIdx.put(div, 0);
-		}
 		nextDivIdx.clear();
 		nextDivIdx = null;
 
