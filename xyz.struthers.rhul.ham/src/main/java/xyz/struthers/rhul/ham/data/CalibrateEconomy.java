@@ -193,11 +193,11 @@ public class CalibrateEconomy {
 			System.out.println(new Date(System.currentTimeMillis()) + ": Linking Households");
 			this.linkHouseholds();
 			System.gc();
-			System.out.println(new Date(System.currentTimeMillis()) + ": Linking Employees");
-			this.linkEmployees();
-			System.gc();
 			System.out.println(new Date(System.currentTimeMillis()) + ": Linking Employees Faster");
 			this.linkEmployeesFaster();
+			System.gc();
+			System.out.println(new Date(System.currentTimeMillis()) + ": Linking Employees");
+			this.linkEmployees();
 			System.gc();
 			System.out.println(new Date(System.currentTimeMillis()) + ": Linking Businesses");
 			this.linkBusinesses();
@@ -650,6 +650,8 @@ public class CalibrateEconomy {
 			if (!shuffledEmployerIndicesByDiv.containsKey(div)) {
 				shuffledEmployerIndicesByDiv.put(div, new TIntArrayList(
 						(int) Math.ceil(employees.size() / DIVISION_CODE_INDICES.length * 2f / 0.75f)));
+				System.out.println(new Date(System.currentTimeMillis()) + ": add TIntArrayList for " + div
+						+ " to shuffledEmployerIndicesByDiv");
 			}
 			shuffledEmployerIndicesByDiv.get(div).addAll(Collections.nCopies(employeeCount, i));
 		}
