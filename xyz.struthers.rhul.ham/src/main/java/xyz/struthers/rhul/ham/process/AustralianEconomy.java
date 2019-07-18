@@ -183,7 +183,7 @@ public class AustralianEconomy implements Serializable {
 		this.businessTypeCount = null;
 	}
 
-	public ClearingPaymentInputs prepareOneMonth(int iteration) {
+	public ClearingPaymentInputs prepareOneMonth(int iteration, String scenarioName) {
 		if (this.random == null) {
 			this.random = this.properties.getRandom();
 		}
@@ -237,7 +237,7 @@ public class AustralianEconomy implements Serializable {
 		}
 
 		// prepare the inputs to the Clearing Payments Vector algorithm
-		this.preparePaymentsClearingVectorInputs(iteration);
+		this.preparePaymentsClearingVectorInputs(iteration, scenarioName);
 
 		ClearingPaymentInputs cpvInputs = new ClearingPaymentInputs(this.liabilitiesAmounts, this.liabilitiesIndices,
 				this.operatingCashFlow, this.liquidAssets, iteration);
@@ -369,7 +369,7 @@ public class AustralianEconomy implements Serializable {
 	 * liabilities matrix. It also makes it far more efficient to process the output
 	 * of the CPV.
 	 */
-	void preparePaymentsClearingVectorInputs(int iteration) {
+	void preparePaymentsClearingVectorInputs(int iteration, String scenarioName) {
 		// initialise local variables
 		int totalAgentCount = 1 + 1 + this.households.length + this.businesses.length + this.adis.length
 				+ this.countries.length;
@@ -587,39 +587,128 @@ public class AustralianEconomy implements Serializable {
 		 * the CPV needs to be able to apply pro-rata payments to the exogeneous cash
 		 * flow expenses too if the agent defaults.
 		 */
+		// create CSV file header
+		DecimalFormat wholeNumber = new DecimalFormat("000");
+		DecimalFormat decimalFormat = new DecimalFormat("#,##0.00");
+		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_EXOGENEOUS_" + wholeNumber.format(iteration)
+				+ ".csv";
+		String[] entries = { "IterationNo", "AgentType", "ExogenousIncome", "TotalIncome" };
+		Writer writer;
 		// households
-		for (Household household : this.households) {
-			int paymentClearingIndex = household.getPaymentClearingIndex();
+		if (iteration == 0) {
+			try {
+				writer = new FileWriter(filename);
+				ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
+				csvWriter.writeNext(entries); // write header row
+				for (Household household : this.households) {
+					int paymentClearingIndex = household.getPaymentClearingIndex();
 
-			// calculate exogeneous cash flow (i.e. not from another Agent)
-			float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
-			float calibratedIncome = household.getGrossIncome();
-			float exogeneousIncome = calibratedIncome - receivable;
-			this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
+					// calculate exogeneous cash flow (i.e. not from another Agent)
+					float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
+					float calibratedIncome = household.getGrossIncome();
+					float exogeneousIncome = calibratedIncome - receivable;
+					this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
 
-			// FIXME save ratio of exogeneous to total income to CSV so it can be graphed
+					// save ratio of exogeneous to total income to CSV so it can be graphed
+					entries = new String[] { String.valueOf(iteration), "H", decimalFormat.format(exogeneousIncome),
+							decimalFormat.format(calibratedIncome) };
+					csvWriter.writeNext(entries);
+				}
+				writer.close();
+			} catch (IOException e) {
+				// new FileWriter
+				e.printStackTrace();
+			} finally {
+				writer = null;
+			}
+		} else {
+			for (Household household : this.households) {
+				int paymentClearingIndex = household.getPaymentClearingIndex();
+
+				// calculate exogeneous cash flow (i.e. not from another Agent)
+				float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
+				float calibratedIncome = household.getGrossIncome();
+				float exogeneousIncome = calibratedIncome - receivable;
+				this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
+			}
 		}
 
 		// businesses
-		for (Business business : this.businesses) {
-			int paymentClearingIndex = business.getPaymentClearingIndex();
+		if (iteration == 0) {
+			try {
+				// FIXME: this should append, not overwrite
+				writer = new FileWriter(filename);
+				ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
+				for (Business business : this.businesses) {
+					int paymentClearingIndex = business.getPaymentClearingIndex();
 
-			// calculate exogeneous cash flow (i.e. not from another Agent)
-			float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
-			float calibratedIncome = business.getTotalIncome();
-			float exogeneousIncome = calibratedIncome - receivable;
-			this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
+					// calculate exogeneous cash flow (i.e. not from another Agent)
+					float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
+					float calibratedIncome = business.getTotalIncome();
+					float exogeneousIncome = calibratedIncome - receivable;
+					this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
+
+					// save ratio of exogeneous to total income to CSV so it can be graphed
+					entries = new String[] { String.valueOf(iteration), "B", decimalFormat.format(exogeneousIncome),
+							decimalFormat.format(calibratedIncome) };
+					csvWriter.writeNext(entries);
+				}
+				writer.close();
+			} catch (IOException e) {
+				// new FileWriter
+				e.printStackTrace();
+			} finally {
+				writer = null;
+			}
+		} else {
+			for (Business business : this.businesses) {
+				int paymentClearingIndex = business.getPaymentClearingIndex();
+
+				// calculate exogeneous cash flow (i.e. not from another Agent)
+				float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
+				float calibratedIncome = business.getTotalIncome();
+				float exogeneousIncome = calibratedIncome - receivable;
+				this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
+			}
 		}
 
 		// ADIs
-		for (AuthorisedDepositTakingInstitution adi : this.adis) {
-			int paymentClearingIndex = adi.getPaymentClearingIndex();
+		if (iteration == 0) {
+			try {
+				// FIXME: this should append, not overwrite
+				writer = new FileWriter(filename);
+				ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
+				for (AuthorisedDepositTakingInstitution adi : this.adis) {
+					int paymentClearingIndex = adi.getPaymentClearingIndex();
 
-			// calculate exogeneous cash flow (i.e. not from another Agent)
-			float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
-			float calibratedIncome = adi.getTotalIncome();
-			float exogeneousIncome = calibratedIncome - receivable;
-			this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
+					// calculate exogeneous cash flow (i.e. not from another Agent)
+					float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
+					float calibratedIncome = adi.getTotalIncome();
+					float exogeneousIncome = calibratedIncome - receivable;
+					this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
+
+					// save ratio of exogeneous to total income to CSV so it can be graphed
+					entries = new String[] { String.valueOf(iteration), "A", decimalFormat.format(exogeneousIncome),
+							decimalFormat.format(calibratedIncome) };
+					csvWriter.writeNext(entries);
+				}
+				writer.close();
+			} catch (IOException e) {
+				// new FileWriter
+				e.printStackTrace();
+			} finally {
+				writer = null;
+			}
+		} else {
+			for (AuthorisedDepositTakingInstitution adi : this.adis) {
+				int paymentClearingIndex = adi.getPaymentClearingIndex();
+
+				// calculate exogeneous cash flow (i.e. not from another Agent)
+				float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
+				float calibratedIncome = adi.getTotalIncome();
+				float exogeneousIncome = calibratedIncome - receivable;
+				this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
+			}
 		}
 
 		// government

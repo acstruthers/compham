@@ -202,7 +202,7 @@ public class CpvSocketClient {
 		int iteration = 0;
 		for (iteration = 0; iteration < NUM_ITERATIONS; iteration++) {
 			// prepare CPV inputs inside loop
-			ClearingPaymentInputs cpvInputs = economy.prepareOneMonth(iteration);
+			ClearingPaymentInputs cpvInputs = economy.prepareOneMonth(iteration, SCENARIO_NAME);
 
 			// send to CpvSocketServer to calculate CPV
 			// new CpvSocketClient();

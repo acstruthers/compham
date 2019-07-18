@@ -75,8 +75,8 @@ public class CalibrateEconomy {
 			18 };
 
 	// beans
-	private CalibrationData commonData;
-	private AreaMapping area;
+	//private CalibrationData commonData;
+	//private AreaMapping area;
 	private AustralianEconomy economy;
 	private Properties properties;
 
@@ -86,7 +86,7 @@ public class CalibrateEconomy {
 	private Business[] businesses;
 	private AuthorisedDepositTakingInstitution[] adis;
 	private ForeignCountry[] countries;
-	private Currencies currencies;
+	//private Currencies currencies;
 	private AustralianGovernment govt;
 	private ReserveBankOfAustralia rba;
 
@@ -112,7 +112,7 @@ public class CalibrateEconomy {
 		this.businesses = null;
 		this.adis = null;
 		this.countries = null;
-		this.currencies = null;
+		//this.currencies = null;
 		this.govt = null;
 		this.rba = null;
 
@@ -130,8 +130,8 @@ public class CalibrateEconomy {
 	 */
 	public void close() {
 		// beans
-		this.commonData = null;
-		this.area = null;
+		//this.commonData = null;
+		//this.area = null;
 		this.economy = null;
 		this.properties = null;
 
@@ -141,7 +141,7 @@ public class CalibrateEconomy {
 		this.businesses = null;
 		this.adis = null;
 		this.countries = null;
-		this.currencies = null;
+		//this.currencies = null;
 		this.govt = null;
 		this.rba = null;
 
@@ -173,7 +173,7 @@ public class CalibrateEconomy {
 			this.businesses = this.economy.getBusinesses();
 			this.adis = this.economy.getAdis();
 			this.countries = this.economy.getCountries();
-			this.currencies = this.economy.getCurrencies();
+			//this.currencies = this.economy.getCurrencies();
 
 			/*
 			 * To ensure that every agent has other agents linked to it, use the shuffled
@@ -194,13 +194,8 @@ public class CalibrateEconomy {
 			this.random = this.properties.getRandom();
 			System.out.println(new Date(System.currentTimeMillis()) + ": Linking Households");
 			this.linkHouseholds();
-			System.gc();
 			System.out.println(new Date(System.currentTimeMillis()) + ": Linking Employees Faster");
 			this.linkEmployeesFaster();
-			System.gc();
-			System.out.println(new Date(System.currentTimeMillis()) + ": Linking Employees");
-			this.linkEmployees();
-			System.gc();
 			System.out.println(new Date(System.currentTimeMillis()) + ": Linking Businesses");
 			this.linkBusinesses();
 			// N.B. Must link Businesses before ADIs for the business links to be populated.
@@ -401,7 +396,8 @@ public class CalibrateEconomy {
 	 * MAYBE: refactor later to assign employees to employers who are based closer
 	 * to the employee's LGA.
 	 */
-	private void linkEmployees() {
+	// try using streams, and using for loops. Compare performance.
+	/*private void linkEmployees() {
 		if (!this.indicesAssigned) {
 			this.assignPaymentClearingIndices();
 		}
@@ -412,7 +408,7 @@ public class CalibrateEconomy {
 		TObjectFloatHashMap<String> totalWagesExpenseByDiv = new TObjectFloatHashMap<String>(
 				(int) Math.ceil(CalibrateIndividuals.DIVISION_CODE_ARRAY.length / 0.75f));
 		for (String div : CalibrateIndividuals.DIVISION_CODE_ARRAY) {
-			// FIXME: try using streams, and using for loops. Compare performance.
+			
 			float totalWagesExpense = (float) Arrays.asList(this.businesses).stream()
 					.filter(o -> String.valueOf(o.getIndustryDivisionCode()).equals(div))
 					.mapToDouble(o -> o.getInitialWagesExpense()).sum();
@@ -550,18 +546,12 @@ public class CalibrateEconomy {
 		shuffledEmployerIndicesByDiv = null;
 		nextDivIdx.clear();
 		nextDivIdx = null;
-	}
+	}*/
 
 	private void linkEmployeesFaster() {
 		if (!this.indicesAssigned) {
 			this.assignPaymentClearingIndices();
 		}
-
-		// FIXME: try using streams, and using for loops. Compare performance.
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		System.out.println(new Date(System.currentTimeMillis())
-				+ ": linkEmployeesFaster() avoids Streams to see if it can improve performance");
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
 		// link to employees
 		// get total wages expense by industry division
@@ -1201,7 +1191,7 @@ public class CalibrateEconomy {
 		// other ADIs per these calculated ratios (store the amounts - not the ratios).
 		// Store pointers to the ADIs at the same time.
 		for (int adiIdx = 0; adiIdx < this.adis.length; adiIdx++) {
-			ArrayList<Float> otherAdiRatios = new ArrayList<Float>(Collections.nCopies(this.adis.length, 0f));
+			//ArrayList<Float> otherAdiRatios = new ArrayList<Float>(Collections.nCopies(this.adis.length, 0f));
 			// calculate total
 			float otherAdiTotal = 0f;
 			for (int otherAdiIdx = 0; otherAdiIdx < this.adis.length; otherAdiIdx++) {
@@ -1471,7 +1461,7 @@ public class CalibrateEconomy {
 	 * 
 	 * @return
 	 */
-	private float[] calcAdiIndividualLoanRatios() {
+	/*private float[] calcAdiIndividualLoanRatios() {
 		float[] ratios = new float[this.adis.length];
 		float total = 0f;
 		for (int i = 0; i < this.adis.length; i++) {
@@ -1481,7 +1471,7 @@ public class CalibrateEconomy {
 			ratios[i] = (this.adis[i].getBsLoansHome() + this.adis[i].getBsLoansPersonal()) / total;
 		}
 		return ratios;
-	}
+	}*/
 
 	/**
 	 * Calculates the ratio of the deposit balances by ADI. This will be used as a
@@ -1489,7 +1479,7 @@ public class CalibrateEconomy {
 	 * 
 	 * @return
 	 */
-	private float[] calcAdiDepositRatios() {
+	/*private float[] calcAdiDepositRatios() {
 		float[] ratios = new float[this.adis.length];
 		float total = 0f;
 		for (int i = 0; i < this.adis.length; i++) {
@@ -1499,7 +1489,7 @@ public class CalibrateEconomy {
 			ratios[i] = (this.adis[i].getBsDepositsAtCall() + this.adis[i].getBsDepositsTerm()) / total;
 		}
 		return ratios;
-	}
+	}*/
 
 	/**
 	 * Calculates the ratio of the business loan balances by ADI. This will be used
@@ -1509,7 +1499,7 @@ public class CalibrateEconomy {
 	 * 
 	 * @return
 	 */
-	private float[] calcAdiBusinessLoanRatios() {
+	/*private float[] calcAdiBusinessLoanRatios() {
 		float[] ratios = new float[this.adis.length];
 		float total = 0f;
 		for (int i = 0; i < this.adis.length; i++) {
@@ -1519,7 +1509,7 @@ public class CalibrateEconomy {
 			ratios[i] = this.adis[i].getBsLoansBusiness() / total;
 		}
 		return ratios;
-	}
+	}*/
 
 	/**
 	 * Calculates the ratio of business's wage expenses by Division. This will be
@@ -1529,7 +1519,7 @@ public class CalibrateEconomy {
 	 * 
 	 * @return
 	 */
-	private List<List<Float>> calcBusinessDivisionWageRatios() {
+	/*private List<List<Float>> calcBusinessDivisionWageRatios() {
 		// initialise division totals
 		Float[] divTotal = Collections.nCopies(CalibrateIndividuals.DIVISION_CODE_ARRAY.length, 0f)
 				.toArray(Float[]::new);
@@ -1557,9 +1547,9 @@ public class CalibrateEconomy {
 			ratios.get(divIdx).add(this.businesses[busIdx].getWageExpenses() / divTotal[divIdx]);
 		}
 		return ratios;
-	}
+	}*/
 
-	private int getIndustryDivisionIndex(char divisionCode) {
+	/*private int getIndustryDivisionIndex(char divisionCode) {
 		int index = 0;
 		switch (divisionCode) {
 		case 'A':
@@ -1621,23 +1611,23 @@ public class CalibrateEconomy {
 			break;
 		}
 		return index;
-	}
+	}*/
 
 	/**
 	 * @param data the data to set
 	 */
-	@Autowired
+	/*@Autowired
 	public void setCommonData(CalibrationData data) {
 		this.commonData = data;
-	}
+	}*/
 
 	/**
 	 * @param area the area to set
 	 */
-	@Autowired
+	/*@Autowired
 	public void setArea(AreaMapping area) {
 		this.area = area;
-	}
+	}*/
 
 	/**
 	 * @param economy the economy to set

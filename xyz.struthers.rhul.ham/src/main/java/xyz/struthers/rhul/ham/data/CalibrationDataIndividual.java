@@ -702,7 +702,7 @@ public class CalibrationDataIndividual {
 		}
 	}
 
-	private void loadAbsCensusTableCsv3Columns1WaferJDK(String fileResourceLocation, boolean isInitialised,
+	/*private void loadAbsCensusTableCsv3Columns1WaferJDK(String fileResourceLocation, boolean isInitialised,
 			int fromColumnIndex, int toColumnIndex,
 			Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>> data, String lgaOrPoa) {
 
@@ -823,7 +823,7 @@ public class CalibrationDataIndividual {
 			// read next
 			e.printStackTrace();
 		}
-	}
+	}*/
 
 	/**
 	 * Loads ABS Census Table Builder tables with one row series, two column series,
