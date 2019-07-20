@@ -1,6 +1,3 @@
-/**
- * 
- */
 package xyz.struthers.rhul.ham.config;
 
 import java.io.Serializable;
@@ -16,6 +13,12 @@ import xyz.struthers.rhul.ham.agent.ReserveBankOfAustralia;
 import xyz.struthers.rhul.ham.data.Currencies;
 
 /**
+ * FIXME: convert Properties to be class variables so that it can be written to
+ * XML and read from XML. This will allow me to have all the parameters for my
+ * scenarios saved to file and included in the Git repository, which makes the
+ * results reproducible. It also means I can run several scenarios sequentially
+ * without any manual intervention.
+ * 
  * @author Adam Struthers
  * @since 19-Nov-2018
  */
@@ -66,10 +69,10 @@ public class Properties implements Serializable {
 	public static final float FCS_LIMIT_PER_DEPOSITOR = 250000f; // AUD 250k limit per depositor
 	public static int FX_RATE_STRATEGY = Currencies.SAME;
 	public static int INTEREST_RATE_STRATEGY = ReserveBankOfAustralia.RATES_SAME;
-	public static final float[] INTEREST_RATE_CUSTOM_PATH = new float[] { 1.50f, 1.50f, 1.50f, 1.25f, 1.25f, 1.00f, 1.00f,
-			0.75f, 0.75f, 0.50f, 0.50f, 0.25f, 0.25f };
+	public static final float[] INTEREST_RATE_CUSTOM_PATH = new float[] { 1.50f, 1.50f, 1.50f, 1.25f, 1.25f, 1.00f,
+			1.00f, 0.75f, 0.75f, 0.50f, 0.50f, 0.25f, 0.25f };
 	public static final float HOUSEHOLD_SAVING_RATIO = 3298f / 299456f; // about 1.1% per ABS 5206.0 Table 20
-	
+
 	// static config constants
 	/*
 	 * Use a classpath resource loader instead. One of these two options:

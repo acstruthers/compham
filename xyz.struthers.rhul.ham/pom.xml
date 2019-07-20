@@ -74,6 +74,9 @@
 		<version.shiro>1.4.0</version.shiro>
 		<version.google.guava>27.0-jre</version.google.guava><!-- 27.0.1-jre -->
 		<version.opencsv>4.5</version.opencsv>
+		<version.javax.xml.bind.jaxb-api>2.3.1</version.javax.xml.bind.jaxb-api>
+		<version.javax.activation>1.1.1</version.javax.activation>
+		<version.org.glassfish.jaxb.jaxb-runtime>2.3.2</version.org.glassfish.jaxb.jaxb-runtime>
 		<version.slf4j>1.8.0-beta2</version.slf4j>
 		<version.logback>1.3.0-alpha4</version.logback>
 		<version.jcl>1.2</version.jcl><!-- commons-logging -->
@@ -226,6 +229,24 @@
 				<artifactId>opencsv</artifactId>
 				<version>${version.opencsv}</version>
 			</dependency>
+			<!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
+			<dependency>
+				<groupId>javax.xml.bind</groupId>
+				<artifactId>jaxb-api</artifactId>
+				<version>${version.javax.xml.bind.jaxb-api}</version>
+			</dependency>
+			<!-- https://mvnrepository.com/artifact/javax.activation/activation -->
+			<dependency>
+				<groupId>javax.activation</groupId>
+				<artifactId>activation</artifactId>
+				<version>${version.javax.activation}</version>
+			</dependency>
+			<!-- https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime -->
+			<dependency>
+				<groupId>org.glassfish.jaxb</groupId>
+				<artifactId>jaxb-runtime</artifactId>
+				<version>${version.org.glassfish.jaxb.jaxb-runtime}</version>
+			</dependency>
 
 			<!-- logging dependencies -->
 			<dependency>
@@ -370,7 +391,18 @@
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.activation</groupId>
+			<artifactId>activation</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+		</dependency>
 
 		<!-- logging dependencies -->
 		<!-- <dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-api</artifactId> 
