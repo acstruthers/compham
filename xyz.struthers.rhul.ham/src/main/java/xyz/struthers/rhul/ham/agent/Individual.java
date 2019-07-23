@@ -6,7 +6,8 @@ package xyz.struthers.rhul.ham.agent;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.config.PropertiesXml;
+import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 import xyz.struthers.rhul.ham.process.Clearable;
 import xyz.struthers.rhul.ham.process.Employer;
 import xyz.struthers.rhul.ham.process.NodePayment;
@@ -22,6 +23,8 @@ import xyz.struthers.rhul.ham.process.NodePayment;
 public final class Individual extends Agent {
 
 	private static final long serialVersionUID = 1L;
+
+	private static PropertiesXml properties = PropertiesXmlFactory.getProperties();
 
 	// Agent relationships (3 pointers = 24 bytes)
 	protected int paymentClearingIndex;
@@ -56,9 +59,10 @@ public final class Individual extends Agent {
 	private float bsStudentLoans; // HELP debt
 
 	// Interest rates (24 bytes)
-	//protected float interestRateDeposits;
-	//protected float interestRateLoans;
-	//protected float interestRateStudentLoans; // in Australia this is always CPI (by law)
+	// protected float interestRateDeposits;
+	// protected float interestRateLoans;
+	// protected float interestRateStudentLoans; // in Australia this is always CPI
+	// (by law)
 
 	/**
 	 * Default constructor
@@ -96,9 +100,9 @@ public final class Individual extends Agent {
 		this.pnlDonations = individual.pnlDonations;
 		this.bsBankDeposits = individual.bsBankDeposits;
 		this.bsStudentLoans = individual.bsStudentLoans;
-		//this.interestRateDeposits = individual.interestRateDeposits;
-		//this.interestRateLoans = individual.interestRateLoans;
-		//this.interestRateStudentLoans = individual.interestRateStudentLoans;
+		// this.interestRateDeposits = individual.interestRateDeposits;
+		// this.interestRateLoans = individual.interestRateLoans;
+		// this.interestRateStudentLoans = individual.interestRateStudentLoans;
 	}
 
 	public float getGrossIncome() {
@@ -255,7 +259,7 @@ public final class Individual extends Agent {
 			this.household.setPnlWorkRelatedExpenses(newValue);
 
 			// add back income from unemployment benefits
-			newValue = household.getPnlUnemploymentBenefits() + Properties.UNEMPLOYMENT_BENEFIT_PER_PERSON;
+			newValue = household.getPnlUnemploymentBenefits() + properties.getUnemploymentBenefitPerPerson();
 			this.household.setPnlUnemploymentBenefits(newValue);
 
 			// cut back on discretionary spending
@@ -268,7 +272,7 @@ public final class Individual extends Agent {
 		this.pnlWorkRelatedExpenses = 0f;
 
 		// add back income from unemployment benefits
-		this.pnlUnemploymentBenefits = Properties.UNEMPLOYMENT_BENEFIT_PER_PERSON;
+		this.pnlUnemploymentBenefits = properties.getUnemploymentBenefitPerPerson();
 
 		// cut back on discretionary spending
 		this.pnlDonations = 0f;
@@ -603,42 +607,42 @@ public final class Individual extends Agent {
 	/**
 	 * @return the interestRateDeposits
 	 */
-	//public float getInterestRateDeposits() {
-	//	return interestRateDeposits;
-	//}
+	// public float getInterestRateDeposits() {
+	// return interestRateDeposits;
+	// }
 
 	/**
 	 * @param interestRateDeposits the interestRateDeposits to set
 	 */
-	//public void setInterestRateDeposits(float interestRateDeposits) {
-	//	this.interestRateDeposits = interestRateDeposits;
-	//}
+	// public void setInterestRateDeposits(float interestRateDeposits) {
+	// this.interestRateDeposits = interestRateDeposits;
+	// }
 
 	/**
 	 * @return the interestRateLoans
 	 */
-	//public float getInterestRateLoans() {
-	//	return interestRateLoans;
-	//}
+	// public float getInterestRateLoans() {
+	// return interestRateLoans;
+	// }
 
 	/**
 	 * @param interestRateLoans the interestRateLoans to set
 	 */
-	//public void setInterestRateLoans(float interestRateLoans) {
-	//	this.interestRateLoans = interestRateLoans;
-	//}
+	// public void setInterestRateLoans(float interestRateLoans) {
+	// this.interestRateLoans = interestRateLoans;
+	// }
 
 	/**
 	 * @return the interestRateStudentLoans
 	 */
-	//public float getInterestRateStudentLoans() {
-	//	return interestRateStudentLoans;
-	//}
+	// public float getInterestRateStudentLoans() {
+	// return interestRateStudentLoans;
+	// }
 
 	/**
 	 * @param interestRateStudentLoans the interestRateStudentLoans to set
 	 */
-	//public void setInterestRateStudentLoans(float interestRateStudentLoans) {
-	//	this.interestRateStudentLoans = interestRateStudentLoans;
-	//}
+	// public void setInterestRateStudentLoans(float interestRateStudentLoans) {
+	// this.interestRateStudentLoans = interestRateStudentLoans;
+	// }
 }

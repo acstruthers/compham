@@ -9,7 +9,8 @@ import java.util.List;
 
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.map.hash.TObjectFloatHashMap;
-import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.config.PropertiesXml;
+import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 import xyz.struthers.rhul.ham.data.CalibrateEconomy;
 import xyz.struthers.rhul.ham.process.Clearable;
 import xyz.struthers.rhul.ham.process.Employer;
@@ -32,6 +33,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 	private static final long serialVersionUID = 1L;
 
 	public static final float NUMBER_MONTHS = 12f; // for interest calcs
+	private static PropertiesXml properties = PropertiesXmlFactory.getProperties();
 
 	// Company details (approx. 60 chars)
 	protected String name;
@@ -225,7 +227,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 			} else {
 				rate = this.rateTotalDeposits + this.rba.getCashRateChange(iteration);
 			}
-			if (!Properties.ALLOW_NEGATIVE_RATES) {
+			if (!properties.isAllowNegativerates()) {
 				rate = Math.max(0f, rate);
 			}
 			if (this.depositRate.size() > iteration) {
@@ -260,7 +262,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 			} else {
 				rate = this.rateTotalLoans + this.rba.getCashRateChange(iteration);
 			}
-			if (!Properties.ALLOW_NEGATIVE_RATES) {
+			if (!properties.isAllowNegativerates()) {
 				rate = Math.max(0f, rate);
 			}
 			if (this.loanRate.size() > iteration) {
@@ -295,7 +297,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 			} else {
 				rate = this.rateBondsNotesBorrowings + this.rba.getCashRateChange(iteration);
 			}
-			if (!Properties.ALLOW_NEGATIVE_RATES) {
+			if (!properties.isAllowNegativerates()) {
 				rate = Math.max(0f, rate);
 			}
 			if (this.borrowingsRate.size() > iteration) {
@@ -330,7 +332,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 			} else {
 				rate = this.rateGovernmentLoan + this.rba.getCashRateChange(iteration);
 			}
-			if (!Properties.ALLOW_NEGATIVE_RATES) {
+			if (!properties.isAllowNegativerates()) {
 				rate = Math.max(0f, rate);
 			}
 			if (this.govtBondRate.size() > iteration) {
@@ -541,7 +543,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 
 	@Override
 	public float getInitialWagesExpense() {
-		return this.pnlPersonnelExpenses / Properties.SUPERANNUATION_RATE;
+		return this.pnlPersonnelExpenses / properties.getSuperannuationGuaranteeRate();
 	}
 
 	@Override
@@ -587,7 +589,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 			for (Individual employee : this.employees) {
 				int index = employee.getPaymentClearingIndex();
 				float monthlyWagesIncludingSuper = employee.getPnlWagesSalaries()
-						* (1f + Properties.SUPERANNUATION_RATE);
+						* (1f + properties.getSuperannuationGuaranteeRate());
 				liabilities.add(new NodePayment(index, monthlyWagesIncludingSuper));
 			}
 		}
@@ -697,7 +699,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 				// cash is enough, so just update cash balance
 				this.bsCash += nodeEquity;
 			} else {
-				if ((this.bsCash + this.bsInvestments * Properties.ADI_HQLA_PROPORTION + nodeEquity) > 0f) {
+				if ((this.bsCash + this.bsInvestments * properties.getAdiHqlaProportion() + nodeEquity) > 0f) {
 					// the ADI holds sufficient liquid assets, so liquidate the amount needed
 					nodeEquity += this.bsCash;
 					this.bsCash = 0f;
@@ -726,26 +728,26 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 			// under the FCS legislation it could be inferred that secured creditors take
 			// precedence over depositors, so we process them first.
 			AuthorisedDepositTakingInstitution adi = this.adiInvestors.get(adiIdx);
-			float liquidationValue = this.adiInvestorAmounts.get(adiIdx) * Properties.INVESTMENT_HAIRCUT;
+			float liquidationValue = this.adiInvestorAmounts.get(adiIdx) * properties.getInvestmentHaircut();
 			float newCashBalance = adi.getBsCash() + liquidationValue;
 			adi.setBsCash(newCashBalance);
 		}
 		// calculate FCS limit
-		float fcsAdiLimit = Properties.FCS_LIMIT_PER_ADI;
+		float fcsAdiLimit = properties.getFcsLimitPerAdi();
 		float totalDeposits = this.bsDepositsAtCall + this.bsDepositsTerm + this.bsDepositsAdiRepoEligible;
 		float fcsGuaranteedRatio = totalDeposits > fcsAdiLimit ? fcsAdiLimit / totalDeposits : 1f;
 		// distribute deposits to
 		if (this.retailDepositors != null) {
 			for (Household household : this.retailDepositors) {
 				float newDepositBal = Math.min(household.getBsBankDeposits() * fcsGuaranteedRatio,
-						Properties.FCS_LIMIT_PER_DEPOSITOR);
+						properties.getFcsLimitPerDepositor());
 				household.setBsBankDeposits(newDepositBal);
 			}
 		}
 		if (this.commercialDepositors != null) {
 			for (Business business : this.commercialDepositors) {
 				float newDepositBal = Math.min(business.getBankDeposits() * fcsGuaranteedRatio,
-						Properties.FCS_LIMIT_PER_DEPOSITOR);
+						properties.getFcsLimitPerDepositor());
 				business.setBankDeposits(newDepositBal);
 			}
 		}

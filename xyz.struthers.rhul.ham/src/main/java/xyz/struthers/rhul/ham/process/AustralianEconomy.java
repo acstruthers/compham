@@ -21,7 +21,6 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -41,7 +40,8 @@ import xyz.struthers.rhul.ham.agent.ForeignCountry;
 import xyz.struthers.rhul.ham.agent.Household;
 import xyz.struthers.rhul.ham.agent.Individual;
 import xyz.struthers.rhul.ham.agent.ReserveBankOfAustralia;
-import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.config.PropertiesXml;
+import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 import xyz.struthers.rhul.ham.data.Currencies;
 import xyz.struthers.rhul.ham.data.Currency;
 
@@ -77,7 +77,7 @@ public class AustralianEconomy implements Serializable {
 	Currencies currencies;
 	ReserveBankOfAustralia rba;
 	AustralianGovernment government;
-	Properties properties;
+	PropertiesXml properties;
 	Random random;
 
 	// Process
@@ -113,6 +113,8 @@ public class AustralianEconomy implements Serializable {
 
 	@PostConstruct
 	private void init() {
+		this.properties = PropertiesXmlFactory.getProperties();
+
 		// Agents
 		this.households = null;
 		this.individuals = null;
@@ -201,17 +203,17 @@ public class AustralianEconomy implements Serializable {
 		}
 
 		// generate the FX rates for this iteration using the desired strategy
-		if (Properties.FX_RATE_STRATEGY == Currencies.RANDOM_1YR) {
+		if (properties.getFxRateStrategy() == Currencies.RANDOM_1YR) {
 			this.currencies.prepareFxRatesRandom1yr(iteration, this.random);
-		} else if (Properties.FX_RATE_STRATEGY == Currencies.RANDOM_1YR_UP) {
+		} else if (properties.getFxRateStrategy() == Currencies.RANDOM_1YR_UP) {
 			this.currencies.prepareFxRatesRandom1yrUp(iteration, this.random);
-		} else if (Properties.FX_RATE_STRATEGY == Currencies.RANDOM_1YR_DOWN) {
+		} else if (properties.getFxRateStrategy() == Currencies.RANDOM_1YR_DOWN) {
 			this.currencies.prepareFxRatesRandom1yrDown(iteration, this.random);
-		} else if (Properties.FX_RATE_STRATEGY == Currencies.RANDOM_5YR) {
+		} else if (properties.getFxRateStrategy() == Currencies.RANDOM_5YR) {
 			this.currencies.prepareFxRatesRandom5yr(iteration, this.random);
-		} else if (Properties.FX_RATE_STRATEGY == Currencies.RANDOM_5YR_UP) {
+		} else if (properties.getFxRateStrategy() == Currencies.RANDOM_5YR_UP) {
 			this.currencies.prepareFxRatesRandom5yrUp(iteration, this.random);
-		} else if (Properties.FX_RATE_STRATEGY == Currencies.RANDOM_5YR_DOWN) {
+		} else if (properties.getFxRateStrategy() == Currencies.RANDOM_5YR_DOWN) {
 			this.currencies.prepareFxRatesRandom5yrDown(iteration, this.random);
 		} else {
 			// same FX rates for all iterations
@@ -222,8 +224,8 @@ public class AustralianEconomy implements Serializable {
 		}
 
 		// generate interest rates for this iteration using the desired strategy
-		if (Properties.INTEREST_RATE_STRATEGY == ReserveBankOfAustralia.RATES_CUSTOM) {
-			this.rba.setCashRateCustomPath(iteration, Properties.INTEREST_RATE_CUSTOM_PATH);
+		if (properties.getInterestRateStrategy() == ReserveBankOfAustralia.RATES_CUSTOM) {
+			this.rba.setCashRateCustomPath(iteration, properties.getInterestRateCustomPathArray());
 		} else {
 			// same interest rates for all iterations
 			this.rba.setCashRateSame(iteration);
@@ -413,7 +415,7 @@ public class AustralianEconomy implements Serializable {
 
 			// calculate liquid assets
 			float liquid = household.getBsBankDeposits()
-					+ household.getBsSuperannuation() * (1f - Properties.SUPERANNUATION_HAIRCUT);
+					+ household.getBsSuperannuation() * (1f - properties.getSuperannuationHaircut());
 			this.liquidAssets.set(paymentClearingIndex, liquid);
 		}
 
@@ -443,8 +445,8 @@ public class AustralianEconomy implements Serializable {
 
 			// calculate liquid assets
 			float liquid = business.getBankDeposits()
-					+ business.getOtherFinancialAssets() * (1f - Properties.INVESTMENT_HAIRCUT)
-					+ business.getForeignEquities() * (1f - Properties.FOREIGN_INVESTMENT_HAIRCUT);
+					+ business.getOtherFinancialAssets() * (1f - properties.getInvestmentHaircut())
+					+ business.getForeignEquities() * (1f - properties.getForeignInvestmentHaircut());
 			this.liquidAssets.set(paymentClearingIndex, liquid);
 		}
 
@@ -473,7 +475,7 @@ public class AustralianEconomy implements Serializable {
 			this.liabilitiesIndices.set(paymentClearingIndex, liabilityIndices);
 
 			// calculate liquid assets
-			float liquid = adi.getBsCash() + adi.getBsInvestments() * Properties.ADI_HQLA_PROPORTION;
+			float liquid = adi.getBsCash() + adi.getBsInvestments() * properties.getAdiHqlaProportion();
 			this.liquidAssets.set(paymentClearingIndex, liquid);
 		}
 
@@ -590,8 +592,8 @@ public class AustralianEconomy implements Serializable {
 		// create CSV file header
 		DecimalFormat wholeNumber = new DecimalFormat("000");
 		DecimalFormat decimalFormat = new DecimalFormat("#,##0.00");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_EXOGENEOUS_" + wholeNumber.format(iteration)
-				+ ".csv";
+		String filename = properties.getOutputDirectory() + scenarioName + "_EXOGENEOUS_"
+				+ wholeNumber.format(iteration) + ".csv";
 		String[] entries = { "IterationNo", "AgentType", "ExogenousIncome", "TotalIncome" };
 		Writer writer;
 		// households
@@ -963,12 +965,13 @@ public class AustralianEconomy implements Serializable {
 	 */
 	public String saveHouseholdDetailsToFile(int iteration, String scenarioName) {
 		// get data
-		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
-				+ this.households[0].toCsvStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
+		String[] entries = ("IterationNo" + properties.getCsvSeparator()
+				+ this.households[0].toCsvStringHeaders(properties.getCsvSeparator()))
+						.split(properties.getCsvSeparator());
 
 		// save CSV file
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_Agents_Household_"
+		String filename = properties.getOutputDirectory() + scenarioName + "_Agents_Household_"
 				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
@@ -976,9 +979,9 @@ public class AustralianEconomy implements Serializable {
 			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
 			csvWriter.writeNext(entries);
 			for (int row = 0; row < this.households.length; row++) {
-				entries = (iteration + Properties.CSV_SEPARATOR
-						+ this.households[row].toCsvString(Properties.CSV_SEPARATOR, iteration))
-								.split(Properties.CSV_SEPARATOR);
+				entries = (iteration + properties.getCsvSeparator()
+						+ this.households[row].toCsvString(properties.getCsvSeparator(), iteration))
+								.split(properties.getCsvSeparator());
 				csvWriter.writeNext(entries);
 			}
 			writer.close();
@@ -998,13 +1001,13 @@ public class AustralianEconomy implements Serializable {
 	 */
 	public String saveHouseholdSummaryToFile(int iteration, String scenarioName) {
 		// get data
-		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
-				+ this.households[0].toCsvSummaryStringHeaders(Properties.CSV_SEPARATOR))
-						.split(Properties.CSV_SEPARATOR);
+		String[] entries = ("IterationNo" + properties.getCsvSeparator()
+				+ this.households[0].toCsvSummaryStringHeaders(properties.getCsvSeparator()))
+						.split(properties.getCsvSeparator());
 
 		// save CSV file
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_SUMMARY_Household_"
+		String filename = properties.getOutputDirectory() + scenarioName + "_SUMMARY_Household_"
 				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
@@ -1012,9 +1015,9 @@ public class AustralianEconomy implements Serializable {
 			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
 			csvWriter.writeNext(entries);
 			for (int row = 0; row < this.households.length; row++) {
-				entries = (iteration + Properties.CSV_SEPARATOR
-						+ this.households[row].toCsvSummaryString(Properties.CSV_SEPARATOR, iteration))
-								.split(Properties.CSV_SEPARATOR);
+				entries = (iteration + properties.getCsvSeparator()
+						+ this.households[row].toCsvSummaryString(properties.getCsvSeparator(), iteration))
+								.split(properties.getCsvSeparator());
 				csvWriter.writeNext(entries);
 			}
 			writer.close();
@@ -1034,13 +1037,13 @@ public class AustralianEconomy implements Serializable {
 	 */
 	public String saveHouseholdIncomeBySourceSummaryToFile(int iteration, String scenarioName) {
 		// get data
-		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
-				+ this.households[0].toCsvIncomeBySourceStringHeaders(Properties.CSV_SEPARATOR))
-						.split(Properties.CSV_SEPARATOR);
+		String[] entries = ("IterationNo" + properties.getCsvSeparator()
+				+ this.households[0].toCsvIncomeBySourceStringHeaders(properties.getCsvSeparator()))
+						.split(properties.getCsvSeparator());
 
 		// save CSV file
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_SUMMARY_Household_IncomeBySource_"
+		String filename = properties.getOutputDirectory() + scenarioName + "_SUMMARY_Household_IncomeBySource_"
 				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
@@ -1048,9 +1051,9 @@ public class AustralianEconomy implements Serializable {
 			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
 			csvWriter.writeNext(entries);
 			for (int row = 0; row < this.households.length; row++) {
-				entries = (iteration + Properties.CSV_SEPARATOR
-						+ this.households[row].toCsvIncomeBySourceString(Properties.CSV_SEPARATOR, iteration))
-								.split(Properties.CSV_SEPARATOR);
+				entries = (iteration + properties.getCsvSeparator()
+						+ this.households[row].toCsvIncomeBySourceString(properties.getCsvSeparator(), iteration))
+								.split(properties.getCsvSeparator());
 				csvWriter.writeNext(entries);
 			}
 			writer.close();
@@ -1070,13 +1073,13 @@ public class AustralianEconomy implements Serializable {
 	 */
 	public String saveHouseholdSalaryByIndustrySummaryToFile(int iteration, String scenarioName) {
 		// get data
-		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
-				+ this.households[0].toCsvSalaryByIndustryStringHeaders(Properties.CSV_SEPARATOR))
-						.split(Properties.CSV_SEPARATOR);
+		String[] entries = ("IterationNo" + properties.getCsvSeparator()
+				+ this.households[0].toCsvSalaryByIndustryStringHeaders(properties.getCsvSeparator()))
+						.split(properties.getCsvSeparator());
 
 		// save CSV file
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_SUMMARY_Household_SalaryByIndustry_"
+		String filename = properties.getOutputDirectory() + scenarioName + "_SUMMARY_Household_SalaryByIndustry_"
 				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
@@ -1084,9 +1087,9 @@ public class AustralianEconomy implements Serializable {
 			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
 			csvWriter.writeNext(entries);
 			for (int row = 0; row < this.households.length; row++) {
-				entries = (iteration + Properties.CSV_SEPARATOR
-						+ this.households[row].toCsvSalaryByIndustryString(Properties.CSV_SEPARATOR, iteration))
-								.split(Properties.CSV_SEPARATOR);
+				entries = (iteration + properties.getCsvSeparator()
+						+ this.households[row].toCsvSalaryByIndustryString(properties.getCsvSeparator(), iteration))
+								.split(properties.getCsvSeparator());
 				csvWriter.writeNext(entries);
 			}
 			writer.close();
@@ -1106,12 +1109,13 @@ public class AustralianEconomy implements Serializable {
 	 */
 	public String saveIndividualDetailsToFile(int iteration, String scenarioName) {
 		// get data
-		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
-				+ this.individuals[0].toCsvStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
+		String[] entries = ("IterationNo" + properties.getCsvSeparator()
+				+ this.individuals[0].toCsvStringHeaders(properties.getCsvSeparator()))
+						.split(properties.getCsvSeparator());
 
 		// save CSV file
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_Agents_Individual_"
+		String filename = properties.getOutputDirectory() + scenarioName + "_Agents_Individual_"
 				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
@@ -1119,9 +1123,9 @@ public class AustralianEconomy implements Serializable {
 			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
 			csvWriter.writeNext(entries);
 			for (int row = 0; row < this.individuals.length; row++) {
-				entries = (iteration + Properties.CSV_SEPARATOR
-						+ this.individuals[row].toCsvString(Properties.CSV_SEPARATOR, iteration))
-								.split(Properties.CSV_SEPARATOR);
+				entries = (iteration + properties.getCsvSeparator()
+						+ this.individuals[row].toCsvString(properties.getCsvSeparator(), iteration))
+								.split(properties.getCsvSeparator());
 				csvWriter.writeNext(entries);
 			}
 			writer.close();
@@ -1153,12 +1157,13 @@ public class AustralianEconomy implements Serializable {
 	 */
 	public String saveBusinessDetailsToFile(int iteration, String scenarioName) {
 		// get data
-		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
-				+ this.businesses[0].toCsvStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
+		String[] entries = ("IterationNo" + properties.getCsvSeparator()
+				+ this.businesses[0].toCsvStringHeaders(properties.getCsvSeparator()))
+						.split(properties.getCsvSeparator());
 
 		// save CSV file
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_Agents_Business_"
+		String filename = properties.getOutputDirectory() + scenarioName + "_Agents_Business_"
 				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
@@ -1166,9 +1171,9 @@ public class AustralianEconomy implements Serializable {
 			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
 			csvWriter.writeNext(entries);
 			for (int row = 0; row < this.businesses.length; row++) {
-				entries = (iteration + Properties.CSV_SEPARATOR
-						+ this.businesses[row].toCsvString(Properties.CSV_SEPARATOR, iteration))
-								.split(Properties.CSV_SEPARATOR);
+				entries = (iteration + properties.getCsvSeparator()
+						+ this.businesses[row].toCsvString(properties.getCsvSeparator(), iteration))
+								.split(properties.getCsvSeparator());
 				csvWriter.writeNext(entries);
 			}
 			writer.close();
@@ -1188,13 +1193,13 @@ public class AustralianEconomy implements Serializable {
 	 */
 	public String saveBusinessSummaryToFile(int iteration, String scenarioName) {
 		// get data
-		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
-				+ this.businesses[0].toCsvSummaryStringHeaders(Properties.CSV_SEPARATOR))
-						.split(Properties.CSV_SEPARATOR);
+		String[] entries = ("IterationNo" + properties.getCsvSeparator()
+				+ this.businesses[0].toCsvSummaryStringHeaders(properties.getCsvSeparator()))
+						.split(properties.getCsvSeparator());
 
 		// save CSV file
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_SUMMARY_Business_"
+		String filename = properties.getOutputDirectory() + scenarioName + "_SUMMARY_Business_"
 				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
@@ -1202,9 +1207,9 @@ public class AustralianEconomy implements Serializable {
 			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
 			csvWriter.writeNext(entries);
 			for (int row = 0; row < this.businesses.length; row++) {
-				entries = (iteration + Properties.CSV_SEPARATOR
-						+ this.businesses[row].toCsvSummaryString(Properties.CSV_SEPARATOR, iteration))
-								.split(Properties.CSV_SEPARATOR);
+				entries = (iteration + properties.getCsvSeparator()
+						+ this.businesses[row].toCsvSummaryString(properties.getCsvSeparator(), iteration))
+								.split(properties.getCsvSeparator());
 				csvWriter.writeNext(entries);
 			}
 			writer.close();
@@ -1224,22 +1229,22 @@ public class AustralianEconomy implements Serializable {
 	 */
 	public String saveAdiDetailsToFile(int iteration, String scenarioName) {
 		// get data
-		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
-				+ this.adis[0].toCsvStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
+		String[] entries = ("IterationNo" + properties.getCsvSeparator()
+				+ this.adis[0].toCsvStringHeaders(properties.getCsvSeparator())).split(properties.getCsvSeparator());
 
 		// save CSV file
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_Agents_ADI_" + wholeNumber.format(iteration)
-				+ ".csv";
+		String filename = properties.getOutputDirectory() + scenarioName + "_Agents_ADI_"
+				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
 			writer = new FileWriter(filename);
 			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
 			csvWriter.writeNext(entries);
 			for (int row = 0; row < this.adis.length; row++) {
-				entries = (iteration + Properties.CSV_SEPARATOR
-						+ this.adis[row].toCsvString(Properties.CSV_SEPARATOR, iteration))
-								.split(Properties.CSV_SEPARATOR);
+				entries = (iteration + properties.getCsvSeparator()
+						+ this.adis[row].toCsvString(properties.getCsvSeparator(), iteration))
+								.split(properties.getCsvSeparator());
 				csvWriter.writeNext(entries);
 			}
 			writer.close();
@@ -1259,22 +1264,23 @@ public class AustralianEconomy implements Serializable {
 	 */
 	public String saveAdiSummaryToFile(int iteration, String scenarioName) {
 		// get data
-		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
-				+ this.adis[0].toCsvSummaryStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
+		String[] entries = ("IterationNo" + properties.getCsvSeparator()
+				+ this.adis[0].toCsvSummaryStringHeaders(properties.getCsvSeparator()))
+						.split(properties.getCsvSeparator());
 
 		// save CSV file
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_SUMMARY_ADI_" + wholeNumber.format(iteration)
-				+ ".csv";
+		String filename = properties.getOutputDirectory() + scenarioName + "_SUMMARY_ADI_"
+				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
 			writer = new FileWriter(filename);
 			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
 			csvWriter.writeNext(entries);
 			for (int row = 0; row < this.adis.length; row++) {
-				entries = (iteration + Properties.CSV_SEPARATOR
-						+ this.adis[row].toCsvSummaryString(Properties.CSV_SEPARATOR, iteration))
-								.split(Properties.CSV_SEPARATOR);
+				entries = (iteration + properties.getCsvSeparator()
+						+ this.adis[row].toCsvSummaryString(properties.getCsvSeparator(), iteration))
+								.split(properties.getCsvSeparator());
 				csvWriter.writeNext(entries);
 			}
 			writer.close();
@@ -1294,12 +1300,13 @@ public class AustralianEconomy implements Serializable {
 	 */
 	public String saveForeignCountryDetailsToFile(int iteration, String scenarioName) {
 		// get data
-		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
-				+ this.countries[0].toCsvStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
+		String[] entries = ("IterationNo" + properties.getCsvSeparator()
+				+ this.countries[0].toCsvStringHeaders(properties.getCsvSeparator()))
+						.split(properties.getCsvSeparator());
 
 		// save CSV file
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_Agents_ForeignCountry_"
+		String filename = properties.getOutputDirectory() + scenarioName + "_Agents_ForeignCountry_"
 				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
@@ -1307,9 +1314,9 @@ public class AustralianEconomy implements Serializable {
 			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
 			csvWriter.writeNext(entries);
 			for (int row = 0; row < this.countries.length; row++) {
-				entries = (iteration + Properties.CSV_SEPARATOR
-						+ this.countries[row].toCsvString(Properties.CSV_SEPARATOR, iteration))
-								.split(Properties.CSV_SEPARATOR);
+				entries = (iteration + properties.getCsvSeparator()
+						+ this.countries[row].toCsvString(properties.getCsvSeparator(), iteration))
+								.split(properties.getCsvSeparator());
 				csvWriter.writeNext(entries);
 			}
 			writer.close();
@@ -1329,13 +1336,13 @@ public class AustralianEconomy implements Serializable {
 	 */
 	public String saveForeignCountrySummaryToFile(int iteration, String scenarioName) {
 		// get data
-		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
-				+ this.countries[0].toCsvSummaryStringHeaders(Properties.CSV_SEPARATOR))
-						.split(Properties.CSV_SEPARATOR);
+		String[] entries = ("IterationNo" + properties.getCsvSeparator()
+				+ this.countries[0].toCsvSummaryStringHeaders(properties.getCsvSeparator()))
+						.split(properties.getCsvSeparator());
 
 		// save CSV file
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_SUMMARY_ForeignCountry_"
+		String filename = properties.getOutputDirectory() + scenarioName + "_SUMMARY_ForeignCountry_"
 				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
@@ -1343,9 +1350,9 @@ public class AustralianEconomy implements Serializable {
 			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
 			csvWriter.writeNext(entries);
 			for (int row = 0; row < this.countries.length; row++) {
-				entries = (iteration + Properties.CSV_SEPARATOR
-						+ this.countries[row].toCsvSummaryString(Properties.CSV_SEPARATOR, iteration))
-								.split(Properties.CSV_SEPARATOR);
+				entries = (iteration + properties.getCsvSeparator()
+						+ this.countries[row].toCsvSummaryString(properties.getCsvSeparator(), iteration))
+								.split(properties.getCsvSeparator());
 				csvWriter.writeNext(entries);
 			}
 			writer.close();
@@ -1366,7 +1373,7 @@ public class AustralianEconomy implements Serializable {
 	public String saveCurrencyDetailsToFile(int iteration, String scenarioName) {
 		List<Currencies> beans = Arrays.asList(this.currencies);
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_Agents_Currencies_"
+		String filename = properties.getOutputDirectory() + scenarioName + "_Agents_Currencies_"
 				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
@@ -1401,7 +1408,7 @@ public class AustralianEconomy implements Serializable {
 		// save CSV file
 		boolean headerWritten = false;
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_SUMMARY_Currencies_"
+		String filename = properties.getOutputDirectory() + scenarioName + "_SUMMARY_Currencies_"
 				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		String[] entries = null;
@@ -1411,14 +1418,14 @@ public class AustralianEconomy implements Serializable {
 			csvWriter.writeNext(entries); // writes column titles
 			for (String currencyCode : currenciesMap.keySet()) {
 				if (!headerWritten) {
-					entries = ("IterationNo" + Properties.CSV_SEPARATOR
-							+ currenciesMap.get(currencyCode).toCsvSummaryStringHeaders(Properties.CSV_SEPARATOR))
-									.split(Properties.CSV_SEPARATOR);
+					entries = ("IterationNo" + properties.getCsvSeparator()
+							+ currenciesMap.get(currencyCode).toCsvSummaryStringHeaders(properties.getCsvSeparator()))
+									.split(properties.getCsvSeparator());
 					headerWritten = true;
 				}
-				entries = (iteration + Properties.CSV_SEPARATOR
-						+ currenciesMap.get(currencyCode).toCsvSummaryString(Properties.CSV_SEPARATOR, iteration))
-								.split(Properties.CSV_SEPARATOR);
+				entries = (iteration + properties.getCsvSeparator()
+						+ currenciesMap.get(currencyCode).toCsvSummaryString(properties.getCsvSeparator(), iteration))
+								.split(properties.getCsvSeparator());
 				csvWriter.writeNext(entries);
 			}
 			writer.close();
@@ -1438,20 +1445,21 @@ public class AustralianEconomy implements Serializable {
 	 */
 	public String saveRbaDetailsToFile(int iteration, String scenarioName) {
 		// get data
-		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
-				+ this.rba.toCsvStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
+		String[] entries = ("IterationNo" + properties.getCsvSeparator()
+				+ this.rba.toCsvStringHeaders(properties.getCsvSeparator())).split(properties.getCsvSeparator());
 
 		// save CSV file
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_Agents_RBA_" + wholeNumber.format(iteration)
-				+ ".csv";
+		String filename = properties.getOutputDirectory() + scenarioName + "_Agents_RBA_"
+				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
 			writer = new FileWriter(filename);
 			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
 			csvWriter.writeNext(entries);
-			entries = (iteration + Properties.CSV_SEPARATOR + this.rba.toCsvString(Properties.CSV_SEPARATOR, iteration))
-					.split(Properties.CSV_SEPARATOR);
+			entries = (iteration + properties.getCsvSeparator()
+					+ this.rba.toCsvString(properties.getCsvSeparator(), iteration))
+							.split(properties.getCsvSeparator());
 			csvWriter.writeNext(entries);
 			writer.close();
 		} catch (IOException e) {
@@ -1470,20 +1478,21 @@ public class AustralianEconomy implements Serializable {
 	 */
 	public String saveRbaSummaryToFile(int iteration, String scenarioName) {
 		// get data
-		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
-				+ this.rba.toCsvSummaryStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
+		String[] entries = ("IterationNo" + properties.getCsvSeparator()
+				+ this.rba.toCsvSummaryStringHeaders(properties.getCsvSeparator())).split(properties.getCsvSeparator());
 
 		// save CSV file
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_SUMMARY_RBA_" + wholeNumber.format(iteration)
-				+ ".csv";
+		String filename = properties.getOutputDirectory() + scenarioName + "_SUMMARY_RBA_"
+				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
 			writer = new FileWriter(filename);
 			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
 			csvWriter.writeNext(entries);
-			entries = (iteration + Properties.CSV_SEPARATOR
-					+ this.rba.toCsvSummaryString(Properties.CSV_SEPARATOR, iteration)).split(Properties.CSV_SEPARATOR);
+			entries = (iteration + properties.getCsvSeparator()
+					+ this.rba.toCsvSummaryString(properties.getCsvSeparator(), iteration))
+							.split(properties.getCsvSeparator());
 			csvWriter.writeNext(entries);
 			writer.close();
 		} catch (IOException e) {
@@ -1502,20 +1511,21 @@ public class AustralianEconomy implements Serializable {
 	 */
 	public String saveGovernmentDetailsToFile(int iteration, String scenarioName) {
 		// get data
-		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
-				+ this.government.toCsvStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
+		String[] entries = ("IterationNo" + properties.getCsvSeparator()
+				+ this.government.toCsvStringHeaders(properties.getCsvSeparator())).split(properties.getCsvSeparator());
 
 		// save CSV file
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_Agents_Govt_" + wholeNumber.format(iteration)
-				+ ".csv";
+		String filename = properties.getOutputDirectory() + scenarioName + "_Agents_Govt_"
+				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
 			writer = new FileWriter(filename);
 			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
 			csvWriter.writeNext(entries);
-			entries = (iteration + Properties.CSV_SEPARATOR
-					+ this.government.toCsvString(Properties.CSV_SEPARATOR, iteration)).split(Properties.CSV_SEPARATOR);
+			entries = (iteration + properties.getCsvSeparator()
+					+ this.government.toCsvString(properties.getCsvSeparator(), iteration))
+							.split(properties.getCsvSeparator());
 			csvWriter.writeNext(entries);
 			writer.close();
 		} catch (IOException e) {
@@ -1534,21 +1544,22 @@ public class AustralianEconomy implements Serializable {
 	 */
 	public String saveGovernmentSummaryToFile(int iteration, String scenarioName) {
 		// get data
-		String[] entries = ("IterationNo" + Properties.CSV_SEPARATOR
-				+ this.government.toCsvSummaryStringHeaders(Properties.CSV_SEPARATOR)).split(Properties.CSV_SEPARATOR);
+		String[] entries = ("IterationNo" + properties.getCsvSeparator()
+				+ this.government.toCsvSummaryStringHeaders(properties.getCsvSeparator()))
+						.split(properties.getCsvSeparator());
 
 		// save CSV file
 		DecimalFormat wholeNumber = new DecimalFormat("000");
-		String filename = Properties.OUTPUT_DIRECTORY + scenarioName + "_SUMMARY_Govt_" + wholeNumber.format(iteration)
-				+ ".csv";
+		String filename = properties.getOutputDirectory() + scenarioName + "_SUMMARY_Govt_"
+				+ wholeNumber.format(iteration) + ".csv";
 		Writer writer;
 		try {
 			writer = new FileWriter(filename);
 			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
 			csvWriter.writeNext(entries);
-			entries = (iteration + Properties.CSV_SEPARATOR
-					+ this.government.toCsvSummaryString(Properties.CSV_SEPARATOR, iteration))
-							.split(Properties.CSV_SEPARATOR);
+			entries = (iteration + properties.getCsvSeparator()
+					+ this.government.toCsvSummaryString(properties.getCsvSeparator(), iteration))
+							.split(properties.getCsvSeparator());
 			csvWriter.writeNext(entries);
 			writer.close();
 		} catch (IOException e) {
@@ -1670,14 +1681,6 @@ public class AustralianEconomy implements Serializable {
 	 */
 	public void setGovernment(AustralianGovernment government) {
 		this.government = government;
-	}
-
-	/**
-	 * @param properties the properties to set
-	 */
-	@Autowired
-	public void setProperties(Properties properties) {
-		this.properties = properties;
 	}
 
 	/**

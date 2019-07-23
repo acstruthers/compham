@@ -9,7 +9,8 @@ import java.util.List;
 
 import gnu.trove.list.array.TFloatArrayList;
 import xyz.struthers.lang.CustomMath;
-import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.config.PropertiesXml;
+import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 import xyz.struthers.rhul.ham.process.Clearable;
 import xyz.struthers.rhul.ham.process.NodePayment;
 import xyz.struthers.rhul.ham.process.Tax;
@@ -27,6 +28,8 @@ import xyz.struthers.rhul.ham.process.Tax;
 public class Household extends Agent {
 
 	private static final long serialVersionUID = 1L;
+
+	private static PropertiesXml properties = PropertiesXmlFactory.getProperties();
 
 	// Agent relationships (approx. 28 bytes)
 	protected int paymentClearingIndex;
@@ -548,11 +551,11 @@ public class Household extends Agent {
 				this.bsBankDeposits += nodeEquity;
 			} else {
 				// negative cashflow is greater than bank balance
-				if ((this.bsBankDeposits + this.bsSuperannuation * (1f - Properties.SUPERANNUATION_HAIRCUT)
+				if ((this.bsBankDeposits + this.bsSuperannuation * (1f - properties.getSuperannuationHaircut())
 						+ nodeEquity) > 0f) {
 					// drawing down on superannuation will be enough to avoid bankruptcy
 					this.bsSuperannuation += (nodeEquity + this.bsBankDeposits)
-							* (1f + Properties.SUPERANNUATION_HAIRCUT);
+							* (1f + properties.getSuperannuationHaircut());
 					this.bsBankDeposits = 0f;
 				} else {
 					status = this.makeHouseholdBankrupt(iteration);
@@ -571,7 +574,7 @@ public class Household extends Agent {
 		if (this.pnlMortgageRepayments > 0f) {
 			// home owner, so sell home and switch to renting
 			this.bsResidentialLandAndDwellings = 0f;
-			this.pnlRentExpense = this.pnlMortgageRepayments * Properties.MTG_RENT_CONVERSION_RATIO;
+			this.pnlRentExpense = this.pnlMortgageRepayments * properties.getMortgageRentConversionRatio();
 			this.pnlMortgageRepayments = 0f;
 		}
 		// cut down on discretionary spending too

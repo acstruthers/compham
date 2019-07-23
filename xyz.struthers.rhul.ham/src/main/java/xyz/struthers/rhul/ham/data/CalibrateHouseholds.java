@@ -29,7 +29,8 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import xyz.struthers.lang.CustomMath;
 import xyz.struthers.rhul.ham.agent.Household;
 import xyz.struthers.rhul.ham.agent.Individual;
-import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.config.PropertiesXml;
+import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
 import xyz.struthers.rhul.ham.process.Tax;
 
@@ -54,10 +55,11 @@ public class CalibrateHouseholds {
 	// private static final float NUM_MONTHS = 12f;
 	// private static final float NUM_WEEKS = 365f / 7f;
 
-	public static final String ABS_1410_YEAR = "2016";
-	public static final String CALIBRATION_DATE_ABS = "01/06/2018";
-	public static final String CALIBRATION_DATE_RBA = "01/06/2018";
-	public static final float HOUSEHOLD_MULTIPLIER = 4f; // HACK: forces it up to the right number of households
+	// public static final String ABS_1410_YEAR = "2016";
+	// public static final String CALIBRATION_DATE_ABS = "01/06/2018";
+	// public static final String CALIBRATION_DATE_RBA = "01/06/2018";
+	// public static final float HOUSEHOLD_MULTIPLIER = 4f; // HACK: forces it up to
+	// the right number of households
 
 	private static final int AGENT_LIST_INIT_SIZE = 10000000; // 10 million households
 	private static final int AGENT_LIST_CDCF_INIT_SIZE = 5; // initial size of the lists in each cell
@@ -180,7 +182,7 @@ public class CalibrateHouseholds {
 	private CalibrateIndividuals calibrateIndividuals;
 	private AreaMapping area;
 	private AustralianEconomy economy;
-	private Properties properties;
+	private PropertiesXml properties;
 
 	// field variables
 	private Random random;
@@ -310,7 +312,7 @@ public class CalibrateHouseholds {
 		DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
 		try {
 			// this.calibrationDateAbs = sdf.parse(CALIBRATION_DATE_ABS);
-			this.calibrationDateRba = sdf.parse(CALIBRATION_DATE_RBA);
+			this.calibrationDateRba = sdf.parse(properties.getCalibrationDateRba());
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -767,7 +769,7 @@ public class CalibrateHouseholds {
 								&& this.censusHCFMF_LGA_FINF_CDCF.get(hind).get(cdcf).get(lgaCode).containsKey(hcfmd)) {
 							int numFamiliesInCell = (int) Math
 									.round(this.censusHCFMF_LGA_FINF_CDCF.get(hind).get(cdcf).get(lgaCode).get(hcfmd)
-											* HOUSEHOLD_MULTIPLIER);
+											* properties.getHouseholdMultiplier());
 
 							// count number of families in source data
 							rawFamilyCount += numFamiliesInCell;
@@ -1515,10 +1517,10 @@ public class CalibrateHouseholds {
 									// adjust Other Income and Other Expenses so that net saving is 1.1%
 									float tmpIncome = household.getIncomeAfterTax();
 									float tmpExpense = household.getTotalExpenses();
-									if (tmpExpense > (tmpIncome * (1 - Properties.HOUSEHOLD_SAVING_RATIO))) {
+									if (tmpExpense > (tmpIncome * (1 - properties.getHouseholdSavingRatio()))) {
 										// expenses already too high, so increase other income
 										float assumedMarginalTaxRate = 0.30f;
-										float tmpSavings = tmpIncome * Properties.HOUSEHOLD_SAVING_RATIO
+										float tmpSavings = tmpIncome * properties.getHouseholdSavingRatio()
 												/ (1f - assumedMarginalTaxRate);
 										// float newIncome = tmpExpense + tmpSavings;
 										float tmpIncomeExclOther = tmpIncome - household.getPnlOtherIncome();
@@ -1554,7 +1556,7 @@ public class CalibrateHouseholds {
 										household.setPnlIncomeTaxExpense(tmpHouseholdIncomeTax);
 									} else {
 										// income is sufficient, so increase discretionary spending
-										float tmpSavings = tmpIncome * Properties.HOUSEHOLD_SAVING_RATIO;
+										float tmpSavings = tmpIncome * properties.getHouseholdSavingRatio();
 										float newTotalExpenses = tmpIncome - tmpSavings;
 										float tmpExpenseExclOther = tmpExpense
 												- household.getPnlOtherDiscretionaryExpenses();
@@ -1689,6 +1691,9 @@ public class CalibrateHouseholds {
 	}
 
 	private void init() {
+		this.properties = PropertiesXmlFactory.getProperties();
+		this.random = this.properties.getRandom();
+
 		// calibration data
 		this.rbaE1 = null;
 		this.rbaE2 = null;
@@ -1793,14 +1798,6 @@ public class CalibrateHouseholds {
 	@Autowired
 	public void setEconomy(AustralianEconomy economy) {
 		this.economy = economy;
-	}
-
-	/**
-	 * @param properties the properties to set
-	 */
-	@Autowired
-	public void setProperties(Properties properties) {
-		this.properties = properties;
 	}
 
 }

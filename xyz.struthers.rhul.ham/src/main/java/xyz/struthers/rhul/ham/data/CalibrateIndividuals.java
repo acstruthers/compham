@@ -26,7 +26,8 @@ import org.springframework.stereotype.Component;
 import gnu.trove.map.hash.TObjectFloatHashMap;
 import xyz.struthers.lang.CustomMath;
 import xyz.struthers.rhul.ham.agent.Individual;
-import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.config.PropertiesXml;
+import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 import xyz.struthers.rhul.ham.process.Tax;
 
 /**
@@ -48,9 +49,10 @@ public class CalibrateIndividuals {
 	// CONSTANTS
 	private static final float EPSILON = 0.1f; // to round business counts so the integer sums match
 	public static final float NUM_MONTHS = 12f;
-	public static final String CALIBRATION_DATE_ATO = "01/06/2018";
-	public static final String CALIBRATION_DATE_RBA = "30/06/2018";
-	public static final float POPULATION_MULTIPLIER = 1.2f; // HACK: forces it up to the right number of people
+	// public static final String CALIBRATION_DATE_ATO = "01/06/2018";
+	// public static final String CALIBRATION_DATE_RBA = "30/06/2018";
+	// public static final float POPULATION_MULTIPLIER = 1.2f; // HACK: forces it up
+	// to the right number of people
 
 	// map optimisation
 	public static final float MAP_LOAD_FACTOR = 0.75f;
@@ -160,7 +162,7 @@ public class CalibrateIndividuals {
 	// beans
 	private AreaMapping area;
 	private CalibrationDataIndividual individualData;
-	private Properties properties;
+	private PropertiesXml properties;
 
 	// field variables
 	private Random random;
@@ -248,7 +250,8 @@ public class CalibrateIndividuals {
 	 * Keys: Age5, Industry Division, Personal Income, POA, Sex<br>
 	 * Values: Number of persons
 	 */
-	//private Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>> censusSEXP_POA_AGE5P_INDP_INCP;
+	// private Map<String, Map<String, Map<String, Map<String, Map<String,
+	// Float>>>>> censusSEXP_POA_AGE5P_INDP_INCP;
 	private Map<String, Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>> censusSEXP_POA_AGE5P_INDP_INCP;
 
 	/**
@@ -260,6 +263,9 @@ public class CalibrateIndividuals {
 	}
 
 	private void init() {
+		this.properties = PropertiesXmlFactory.getProperties();
+		this.random = this.properties.getRandom();
+
 		this.individualMatrix = null;
 		this.individualMap = null;
 		this.calibrationDateAto = null;
@@ -456,7 +462,7 @@ public class CalibrateIndividuals {
 		// set the calibration date
 		DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
 		try {
-			this.calibrationDateAto = sdf.parse(CALIBRATION_DATE_ATO);
+			this.calibrationDateAto = sdf.parse(properties.getCalibrationDateAto());
 			// this.calibrationDateRba = sdf.parse(CALIBRATION_DATE_RBA);
 		} catch (ParseException e) {
 			e.printStackTrace();
@@ -819,7 +825,7 @@ public class CalibrateIndividuals {
 								adjustedPopulation = (int) Math.round(Float
 										.valueOf(this.censusSEXP_POA_AGE5P_INDP_INCP.get(age).get(divisionCode)
 												.get(incomeRange).get(poa).get(sex))
-										* this.populationMultiplier * POPULATION_MULTIPLIER);
+										* this.populationMultiplier * properties.getPopulationMultiplier());
 							} catch (NumberFormatException e) {
 								adjustedPopulation = 0;
 							}
@@ -1921,15 +1927,6 @@ public class CalibrateIndividuals {
 	@Autowired
 	public void setArea(AreaMapping area) {
 		this.area = area;
-	}
-
-	/**
-	 * @param properties the properties to set
-	 */
-	@Autowired
-	public void setProperties(Properties properties) {
-		this.properties = properties;
-		this.random = this.properties.getRandom();
 	}
 
 }

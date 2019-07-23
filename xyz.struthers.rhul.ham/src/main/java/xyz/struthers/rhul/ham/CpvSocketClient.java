@@ -16,7 +16,8 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import xyz.struthers.io.Serialization;
 import xyz.struthers.io.Serialization.CompressionType;
-import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.config.PropertiesXml;
+import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 import xyz.struthers.rhul.ham.config.SpringConfiguration;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
 import xyz.struthers.rhul.ham.process.ClearingPaymentInputs;
@@ -31,10 +32,12 @@ import xyz.struthers.rhul.ham.process.ClearingPaymentOutputs;
 public class CpvSocketClient {
 
 	// TODO: update name & iterations for each scenario (in properties file)
-	public final static String SCENARIO_NAME = "Baseline";
-	public final static boolean[] SAVE_ITERATION_SUMMARY = new boolean[] { true, true, true, true, true, true,
-			true, true, true, true, true, true, true };
-	public final static int NUM_ITERATIONS = SAVE_ITERATION_SUMMARY.length; // first iteration is zero
+	// public final static String SCENARIO_NAME = "Baseline";
+	// public final static boolean[] SAVE_ITERATION_SUMMARY = new boolean[] { true,
+	// true, true, true, true, true, true,
+	// true, true, true, true, true, true };
+	// public final static int NUM_ITERATIONS = SAVE_ITERATION_SUMMARY.length; //
+	// first iteration is zero
 
 	static Thread t;
 	// static Client client = null;
@@ -89,13 +92,13 @@ public class CpvSocketClient {
 	 * @param cpvInputs
 	 * @return cpvOutputs
 	 */
-	private static ClearingPaymentOutputs runCpvOnServer(ClearingPaymentInputs cpvInputs) {
+	private static ClearingPaymentOutputs runCpvOnServer(ClearingPaymentInputs cpvInputs, PropertiesXml properties) {
 		// getting CPV server's IP address
 		InetAddress ip = null;
 		try {
-			ip = InetAddress.getByName(Properties.CPV_SERVER_HOST);
+			ip = InetAddress.getByName(properties.getCpvServerHost());
 		} catch (UnknownHostException e) {
-			System.err.println("Unknown host: " + Properties.CPV_SERVER_HOST);
+			System.err.println("Unknown host: " + properties.getCpvServerHost());
 			e.printStackTrace();
 		}
 
@@ -105,7 +108,7 @@ public class CpvSocketClient {
 		DataOutputStream dos = null;
 		ClearingPaymentOutputs cpvOutputs = null;
 		try {
-			s = new Socket(ip, Properties.CPV_SERVER_PORT);
+			s = new Socket(ip, properties.getCpvServerPort());
 
 			// obtaining input and out streams
 			dis = new DataInputStream(s.getInputStream());
@@ -114,8 +117,8 @@ public class CpvSocketClient {
 			// OUTBOUND
 			// send CPV inputs to server for processing
 			System.out.println(new Date(System.currentTimeMillis()) + ": serializing CPV inputs.");
-			Serialization.writeToDataStream(dos, cpvInputs, Properties.SOCKET_BUFFER_BYTES, Properties.SOCKET_MSG_BYTES,
-					CompressionType.NO_COMPRESSION);
+			Serialization.writeToDataStream(dos, cpvInputs, properties.getSocketBufferBytes(),
+					properties.getSocketMessageBytes(), CompressionType.NO_COMPRESSION);
 			/*
 			 * byte[] bytes = null; byte compression = 1; switch (compression) { case 1: //
 			 * GZIP compression bytes = Serialization.toBytesGZIP(cpvInputs,
@@ -148,8 +151,8 @@ public class CpvSocketClient {
 			 * cpvOutputs = (ClearingPaymentOutputs) Serialization.toObject(bytes); break; }
 			 */
 		} catch (IOException e) {
-			System.err.println(
-					"Error connecting to : " + Properties.CPV_SERVER_HOST + " on port: " + Properties.CPV_SERVER_PORT);
+			System.err.println("Error connecting to : " + properties.getCpvServerHost() + " on port: "
+					+ properties.getCpvServerPort());
 			e.printStackTrace();
 		}
 
@@ -170,7 +173,8 @@ public class CpvSocketClient {
 	 * sending CPV calculations to another computer (the Kryonet server) so it will
 	 * run on two computers with 32GB of RAM.
 	 * 
-	 * @param args
+	 * @param args - the fully qualified filename of the XML file that contains the
+	 *             properties to use for this simulation.
 	 */
 	public static void main(String[] args) {
 
@@ -182,6 +186,11 @@ public class CpvSocketClient {
 				+ formatter.format(megabytesBefore) + "MB");
 		System.out.println("################################################");
 
+		// set properties filename
+		PropertiesXmlFactory.propertiesXmlFilename = args[0];
+		PropertiesXml props = PropertiesXmlFactory.getProperties();
+
+		// load Spring context
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfiguration.class);
 		InitialiseEconomy init = new InitialiseEconomy();
 		init.initialiseEconomy(ctx); // iteration 0
@@ -200,13 +209,13 @@ public class CpvSocketClient {
 		memoryBefore = memoryAfter;
 
 		int iteration = 0;
-		for (iteration = 0; iteration < NUM_ITERATIONS; iteration++) {
+		for (iteration = 0; iteration < props.getNumberOfIterations(); iteration++) {
 			// prepare CPV inputs inside loop
-			ClearingPaymentInputs cpvInputs = economy.prepareOneMonth(iteration, SCENARIO_NAME);
+			ClearingPaymentInputs cpvInputs = economy.prepareOneMonth(iteration, props.getScenarioName());
 
 			// send to CpvSocketServer to calculate CPV
 			// new CpvSocketClient();
-			ClearingPaymentOutputs cpvOutputs = runCpvOnServer(cpvInputs);
+			ClearingPaymentOutputs cpvOutputs = runCpvOnServer(cpvInputs, props);
 			/*
 			 * try { // wait for CPV listener to terminate before continuing with execution
 			 * t.join(); } catch (InterruptedException e) { // do nothing }
@@ -239,8 +248,8 @@ public class CpvSocketClient {
 			memoryBefore = memoryAfter;
 
 			// save summary to file
-			if (SAVE_ITERATION_SUMMARY[iteration]) {
-				economy.saveSummaryToFile(iteration, SCENARIO_NAME);
+			if (props.getSaveIterationSummary(iteration)) {
+				economy.saveSummaryToFile(iteration, props.getScenarioName());
 			}
 			// details after being updated with CPV output
 			// 6.32GB of CSV files (takes 4 minutes to write to disk)

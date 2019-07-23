@@ -1,6 +1,8 @@
 package xyz.struthers.rhul.ham.config;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import xyz.struthers.rhul.ham.agent.ReserveBankOfAustralia;
 import xyz.struthers.rhul.ham.data.Currencies;
@@ -23,13 +25,16 @@ public class PropertiesXmlTestHarness {
 	public static void main(String[] args) {
 		System.out.println(new Date(System.currentTimeMillis()) + ": starting Properties XML test harness.");
 
-		// writeBaselineToFile();
-		readXmlFromFile("C:/diss-props/00_baseline.xml");
+		// set properties filename
+		String filename = args[0];
+
+		writeBaselineToFile(filename); // "D:/compham-config/00_baseline-test-harness.xml"
+		// readXmlFromFile("D:/compham-config/00_baseline.xml");
 
 		System.out.println(new Date(System.currentTimeMillis()) + ": finished.");
 	}
 
-	private static void readXmlFromFile(String filename) {
+	public static void readXmlFromFile(String filename) {
 		System.out.println(new Date(System.currentTimeMillis()) + ": reading XML from file.");
 		PropertiesXml props = PropertiesXmlHandler.readPropertiesFromXmlFile(filename);
 		System.out.println(new Date(System.currentTimeMillis()) + ": file read successfully.");
@@ -53,7 +58,7 @@ public class PropertiesXmlTestHarness {
 		System.out.println("Interest Rate Custom Path 12: " + props.getInterestRateCustomPath(12));
 	}
 
-	private static void writeBaselineToFile() {
+	private static void writeBaselineToFile(String filename) {
 		System.out.println(new Date(System.currentTimeMillis()) + ": writing baseline to file.");
 		PropertiesXml props = new PropertiesXml();
 
@@ -102,6 +107,13 @@ public class PropertiesXmlTestHarness {
 		props.setFcsLimitPerAdi(15000000000f); // AUD 15Bn limit per ADI
 		props.setFcsLimitPerDepositor(250000f); // AUD 250k limit per depositor
 		props.setFxRateStrategy(Currencies.SAME);
+		Map<String, ExchangeRateList> fxRateCustomPath = new HashMap<String, ExchangeRateList>();
+		ExchangeRateList usdRates = new ExchangeRateList(3);
+		usdRates.addFxRate(0.1f);
+		usdRates.addFxRate(0.5f);
+		usdRates.addFxRate(0.9f);
+		fxRateCustomPath.put("USD", usdRates);
+		props.setFxRateCustomPath(fxRateCustomPath);
 		props.setInterestRateStrategy(ReserveBankOfAustralia.RATES_SAME);
 		props.setInterestRateCustomPath(0, 1.50f);
 		props.setInterestRateCustomPath(1, 1.50f);
@@ -117,10 +129,22 @@ public class PropertiesXmlTestHarness {
 		props.setInterestRateCustomPath(11, 0.25f);
 		props.setInterestRateCustomPath(12, 0.25f);
 		props.setHouseholdSavingRatio(3298f / 299456f); // about 1.1% per ABS 5206.0 Table 20
+		props.setUseActualWages(true);
+
+		// data sources
+		props.setDataSubFolder("2016"); // the census year the data corresponds to (for calibration)
+		props.setRbaE1DateString("Jun-2018");
+		props.setAbs1410Year("2016");
+		props.setAbs8155Year("2016-17");
+		props.setCalibrationDateAbs("01/06/2018");
+		props.setCalibrationDateAto("01/06/2018");
+		props.setCalibrationDateRba("01/06/2018");
+		props.setHouseholdMultiplier(4f);
+		props.setPopulationMultiplier(1.2f);
 
 		System.out.println(new Date(System.currentTimeMillis()) + ": writing properties to XML file");
 
-		PropertiesXmlHandler.writePropertiesToXmlFile(props, "C:/diss-props/00_baseline.xml");
+		PropertiesXmlHandler.writePropertiesToXmlFile(props, filename);
 
 		System.out.println(new Date(System.currentTimeMillis()) + ": baseline written to XML file");
 	}

@@ -11,7 +11,8 @@ import java.util.Map;
 
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.map.hash.TObjectFloatHashMap;
-import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.config.PropertiesXml;
+import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 import xyz.struthers.rhul.ham.process.Clearable;
 import xyz.struthers.rhul.ham.process.Employer;
 import xyz.struthers.rhul.ham.process.NodePayment;
@@ -249,7 +250,8 @@ public final class AustralianGovernment extends Agent implements Employer {
 
 	@Override
 	public float getInitialWagesExpense() {
-		return this.pnlPersonnelExpenses / Properties.SUPERANNUATION_RATE;
+		PropertiesXml properties = PropertiesXmlFactory.getProperties();
+		return this.pnlPersonnelExpenses / properties.getSuperannuationGuaranteeRate();
 	}
 
 	@Override

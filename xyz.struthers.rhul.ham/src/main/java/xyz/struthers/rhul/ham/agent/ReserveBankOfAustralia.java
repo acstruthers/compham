@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 import gnu.trove.map.hash.TObjectFloatHashMap;
-import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.config.PropertiesXml;
+import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 import xyz.struthers.rhul.ham.process.Clearable;
 import xyz.struthers.rhul.ham.process.Employer;
 import xyz.struthers.rhul.ham.process.NodePayment;
@@ -29,9 +30,10 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 	private static final long serialVersionUID = 1L;
 
 	private final float NUMBER_MONTHS = 12f;
+	private static PropertiesXml properties = PropertiesXmlFactory.getProperties();
 
 	// interest rate scenarios
-	public static final float OCR_INITIAL = 0.015f;
+	//public static final float OCR_INITIAL = 0.015f;
 	public static final int RATES_SAME = 0;
 	public static final int RATES_CUSTOM = 1;
 
@@ -269,7 +271,7 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 
 	@Override
 	public float getInitialWagesExpense() {
-		return this.pnlPersonnelExpenses / Properties.SUPERANNUATION_RATE;
+		return this.pnlPersonnelExpenses / properties.getSuperannuationGuaranteeRate();
 	}
 
 	@Override
@@ -457,17 +459,17 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 	public float setCashRateSame(int iteration) {
 		if (this.cashRate == null) {
 			this.cashRate = new ArrayList<Float>(12); // assume we model at least a year
-			this.cashRate.add(OCR_INITIAL);
+			this.cashRate.add(properties.getInitialCashRate());
 		}
 		float interestRate = 0f;
 		if (this.cashRate.size() > iteration) {
-			interestRate = (iteration == 0 ? OCR_INITIAL : this.cashRate.get(iteration - 1));
+			interestRate = (iteration == 0 ? properties.getInitialCashRate() : this.cashRate.get(iteration - 1));
 			this.cashRate.set(iteration, interestRate);
 		} else if (this.cashRate.size() == iteration) {
-			interestRate = (iteration == 0 ? OCR_INITIAL : this.cashRate.get(iteration - 1));
+			interestRate = (iteration == 0 ? properties.getInitialCashRate() : this.cashRate.get(iteration - 1));
 			this.cashRate.add(interestRate);
 		} else {
-			interestRate = OCR_INITIAL;
+			interestRate = properties.getInitialCashRate();
 			this.cashRate.add(interestRate);
 		}
 		return interestRate;
@@ -476,27 +478,27 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 	public float setCashRateCustomPath(int iteration, float[] customRates) {
 		if (this.cashRate == null) {
 			this.cashRate = new ArrayList<Float>(customRates.length); // assume we model at least a year
-			this.cashRate.add(OCR_INITIAL);
+			this.cashRate.add(properties.getInitialCashRate());
 		}
 		float interestRate = 0f;
 		if (this.cashRate.size() > iteration) {
 			if (customRates.length > iteration) {
-				interestRate = (iteration == 0 ? OCR_INITIAL : customRates[iteration]);
+				interestRate = (iteration == 0 ? properties.getInitialCashRate() : customRates[iteration]);
 			} else {
 				// iteration would read past end of the array, so use the previous rate
-				interestRate = (iteration == 0 ? OCR_INITIAL : this.cashRate.get(iteration - 1));
+				interestRate = (iteration == 0 ? properties.getInitialCashRate() : this.cashRate.get(iteration - 1));
 			}
 			this.cashRate.set(iteration, interestRate);
 		} else if (this.cashRate.size() == iteration) {
 			if (customRates.length > iteration) {
-				interestRate = (iteration == 0 ? OCR_INITIAL : customRates[iteration]);
+				interestRate = (iteration == 0 ? properties.getInitialCashRate() : customRates[iteration]);
 			} else {
 				// iteration would read past end of the array, so use the previous rate
-				interestRate = (iteration == 0 ? OCR_INITIAL : this.cashRate.get(iteration - 1));
+				interestRate = (iteration == 0 ? properties.getInitialCashRate() : this.cashRate.get(iteration - 1));
 			}
 			this.cashRate.add(interestRate);
 		} else {
-			interestRate = OCR_INITIAL;
+			interestRate = properties.getInitialCashRate();
 			this.cashRate.add(interestRate);
 		}
 		return interestRate;

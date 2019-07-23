@@ -4,25 +4,28 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 import java.util.Random;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import it.unimi.dsi.util.XoRoShiRo128PlusRandom;
 
 /**
- * FIXME: convert Properties to be class variables so that it can be written to
- * XML and read from XML. This will allow me to have all the parameters for my
- * scenarios saved to file and included in the Git repository, which makes the
- * results reproducible. It also means I can run several scenarios sequentially
- * without any manual intervention.
+ * Properties are persisted as XML files on disk. This will allows all the
+ * parameters for the scenarios to be saved to file and included in the Git
+ * repository, which makes the results reproducible. It also means several
+ * scenarios can be run sequentially without any manual intervention.
  * 
  * @author Adam Struthers
  * @since 19-Nov-2018
  */
+//@Component
+//@Scope(value = "singleton")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PropertiesXml implements Serializable {
@@ -31,7 +34,8 @@ public class PropertiesXml implements Serializable {
 
 	// scenario descriptors
 	private String scenarioName;
-	private ArrayList<SaveIterationSummary> saveIterationSummary;
+	@XmlElementWrapper(name = "saveIteration")
+	private ArrayList<Boolean> saveSummary;
 	private int numberOfIterations; // first iteration is zero
 
 	// static config constants
@@ -95,14 +99,31 @@ public class PropertiesXml implements Serializable {
 	 * It is currently about $600 per fortnight.
 	 */
 	private float unemploymentBenefitPerPerson;// = 600f / 14f * 365f / 12f;
-	private float adiHqlaProportion;// = 0.75f; // proportion of investments that are liquid
-	private boolean allowNegativerates;// = false; // allow negative interest rates?
-	private float fcsLimitPerAdi;// = 15000000000f; // AUD 15Bn limit per ADI
-	private float fcsLimitPerDepositor;// = 250000f; // AUD 250k limit per depositor
-	private int fxRateStrategy;// = Currencies.SAME;
-	private int interestRateStrategy;// = ReserveBankOfAustralia.RATES_SAME;
-	private ArrayList<InterestRate> interestRateCustomPath;
-	private float householdSavingRatio;// = 3298f / 299456f; // about 1.1% per ABS 5206.0 Table 20
+	private float adiHqlaProportion; // = 0.75f; // proportion of investments that are liquid
+	private boolean allowNegativerates; // = false; // allow negative interest rates?
+	private float fcsLimitPerAdi; // = 15000000000f; // AUD 15Bn limit per ADI
+	private float fcsLimitPerDepositor; // = 250000f; // AUD 250k limit per depositor
+	private int fxRateStrategy; // = Currencies.SAME;
+	@XmlElementWrapper(name = "exchangeRateCustomPath")
+	private Map<String, ExchangeRateList> fxRate;
+	private int interestRateStrategy; // = ReserveBankOfAustralia.RATES_SAME;
+	private float initialCashRate; // = 0.015f;
+	// private ArrayList<InterestRate> interestRateCustomPath;
+	@XmlElementWrapper(name = "interestRateCustomPath")
+	private ArrayList<Float> cashRate;
+	private float householdSavingRatio; // = 3298f / 299456f; // about 1.1% per ABS 5206.0 Table 20
+	private boolean useActualWages; // = true;
+
+	// data sources
+	private String dataSubFolder; // the census year the data corresponds to (for calibration)
+	private String rbaE1DateString; // = "Jun-2018";
+	private String abs1410Year; // = "2016";
+	private String abs8155Year; // = "2016-17";
+	private String calibrationDateAbs; // = "01/06/2018";
+	private String calibrationDateAto; // = "01/06/2018";
+	private String calibrationDateRba; // = "01/06/2018";
+	private float householdMultiplier; // 4f; // HACK: forces it up to the right number of households
+	private float populationMultiplier; // = 1.2f; // HACK: forces it up to the right number of people
 
 	// transient fields
 	@XmlTransient
@@ -133,20 +154,20 @@ public class PropertiesXml implements Serializable {
 	/**
 	 * @return the saveIterationSummary
 	 */
-	public ArrayList<SaveIterationSummary> getSaveIterationSummary() {
-		return saveIterationSummary;
+	public ArrayList<Boolean> getSaveIterationSummary() {
+		return saveSummary;
 	}
 
 	/**
 	 * @param saveIterationSummary the saveIterationSummary to set
 	 */
-	public void setSaveIterationSummary(ArrayList<SaveIterationSummary> saveIterationSummary) {
-		this.saveIterationSummary = saveIterationSummary;
-		this.numberOfIterations = this.saveIterationSummary.size();
+	public void setSaveIterationSummary(ArrayList<Boolean> saveIterationSummary) {
+		this.saveSummary = saveIterationSummary;
+		this.numberOfIterations = this.saveSummary.size();
 	}
 
 	public boolean getSaveIterationSummary(int iteration) {
-		return this.saveIterationSummary.get(iteration).isSaveFlag();
+		return this.saveSummary.get(iteration);
 	}
 
 	/**
@@ -158,15 +179,15 @@ public class PropertiesXml implements Serializable {
 	 * @param flag
 	 */
 	public void setSaveIterationSummary(int iteration, boolean flag) {
-		if (this.saveIterationSummary == null) {
-			this.saveIterationSummary = new ArrayList<SaveIterationSummary>(iteration);
+		if (this.saveSummary == null) {
+			this.saveSummary = new ArrayList<Boolean>(iteration);
 		}
-		if (this.saveIterationSummary.size() > iteration) {
-			this.saveIterationSummary.set(iteration, new SaveIterationSummary(flag));
+		if (this.saveSummary.size() > iteration) {
+			this.saveSummary.set(iteration, flag);
 		} else {
-			this.saveIterationSummary.add(new SaveIterationSummary(flag));
+			this.saveSummary.add(flag);
 		}
-		this.numberOfIterations = this.saveIterationSummary.size();
+		this.numberOfIterations = this.saveSummary.size();
 	}
 
 	/**
@@ -508,6 +529,20 @@ public class PropertiesXml implements Serializable {
 	}
 
 	/**
+	 * @return the fxRateCustomPath
+	 */
+	public Map<String, ExchangeRateList> getFxRateCustomPath() {
+		return fxRate;
+	}
+
+	/**
+	 * @param fxRateCustomPath the fxRateCustomPath to set
+	 */
+	public void setFxRateCustomPath(Map<String, ExchangeRateList> fxRateCustomPath) {
+		this.fxRate = fxRateCustomPath;
+	}
+
+	/**
 	 * @return the interestRateStrategy
 	 */
 	public int getInterestRateStrategy() {
@@ -522,33 +557,73 @@ public class PropertiesXml implements Serializable {
 	}
 
 	/**
-	 * @return the interestRateCustomPath
+	 * @return the initialCashRate
 	 */
-	public ArrayList<InterestRate> getInterestRateCustomPath() {
-		return interestRateCustomPath;
+	public float getInitialCashRate() {
+		return initialCashRate;
 	}
 
 	/**
-	 * @param interestRateCustomPath the interestRateCustomPath to set
+	 * @param initialCashRate the initialCashRate to set
 	 */
-	public void setInterestRateCustomPath(ArrayList<InterestRate> interestRateCustomPath) {
-		this.interestRateCustomPath = interestRateCustomPath;
+	public void setInitialCashRate(float initialCashRate) {
+		this.initialCashRate = initialCashRate;
+	}
+
+	public ArrayList<Float> getInterestRateCustomPath() {
+		return cashRate;
+	}
+
+	public float[] getInterestRateCustomPathArray() {
+		float[] rates = new float[cashRate.size()];
+		for (int i = 0; i < cashRate.size(); i++) {
+			rates[i] = cashRate.get(i);
+		}
+		return rates;
+	}
+
+	public void setInterestRateCustomPath(ArrayList<Float> interestRateCustomPath) {
+		this.cashRate = interestRateCustomPath;
 	}
 
 	public float getInterestRateCustomPath(int iteration) {
-		return this.interestRateCustomPath.get(iteration).getInterestRate();
+		return this.cashRate.get(iteration);
 	}
 
 	public void setInterestRateCustomPath(int iteration, float rate) {
-		if (this.interestRateCustomPath == null) {
-			this.interestRateCustomPath = new ArrayList<InterestRate>(iteration);
+		if (this.cashRate == null) {
+			this.cashRate = new ArrayList<Float>(iteration);
 		}
-		if (this.interestRateCustomPath.size() > iteration) {
-			this.interestRateCustomPath.set(iteration, new InterestRate(rate));
+		if (this.cashRate.size() > iteration) {
+			this.cashRate.set(iteration, rate);
 		} else {
-			this.interestRateCustomPath.add(new InterestRate(rate));
+			this.cashRate.add(rate);
 		}
 	}
+
+	/*
+	 * public ArrayList<InterestRate> getInterestRateCustomPath() { return
+	 * interestRateCustomPath; }
+	 * 
+	 * public float[] getInterestRateCustomPathArray() { float[] rates = new
+	 * float[interestRateCustomPath.size()]; for (int i = 0; i <
+	 * interestRateCustomPath.size(); i++) { rates[i] =
+	 * interestRateCustomPath.get(i).getInterestRate(); } return rates; }
+	 * 
+	 * public void setInterestRateCustomPath(ArrayList<InterestRate>
+	 * interestRateCustomPath) { this.interestRateCustomPath =
+	 * interestRateCustomPath; }
+	 * 
+	 * public float getInterestRateCustomPath(int iteration) { return
+	 * this.interestRateCustomPath.get(iteration).getInterestRate(); }
+	 * 
+	 * public void setInterestRateCustomPath(int iteration, float rate) { if
+	 * (this.interestRateCustomPath == null) { this.interestRateCustomPath = new
+	 * ArrayList<InterestRate>(iteration); } if (this.interestRateCustomPath.size()
+	 * > iteration) { this.interestRateCustomPath.set(iteration, new
+	 * InterestRate(rate)); } else { this.interestRateCustomPath.add(new
+	 * InterestRate(rate)); } }
+	 */
 
 	/**
 	 * @return the householdSavingRatio
@@ -562,6 +637,146 @@ public class PropertiesXml implements Serializable {
 	 */
 	public void setHouseholdSavingRatio(float householdSavingRatio) {
 		this.householdSavingRatio = householdSavingRatio;
+	}
+
+	/**
+	 * @return the useActualWages
+	 */
+	public boolean isUseActualWages() {
+		return useActualWages;
+	}
+
+	/**
+	 * @param useActualWages the useActualWages to set
+	 */
+	public void setUseActualWages(boolean useActualWages) {
+		this.useActualWages = useActualWages;
+	}
+
+	/**
+	 * @return the dataSubFolder
+	 */
+	public String getDataSubFolder() {
+		return dataSubFolder;
+	}
+
+	/**
+	 * @param dataSubFolder the dataSubFolder to set
+	 */
+	public void setDataSubFolder(String dataSubFolder) {
+		this.dataSubFolder = dataSubFolder;
+	}
+
+	/**
+	 * @return the rbaE1DateString
+	 */
+	public String getRbaE1DateString() {
+		return rbaE1DateString;
+	}
+
+	/**
+	 * @param rbaE1DateString the rbaE1DateString to set
+	 */
+	public void setRbaE1DateString(String rbaE1DateString) {
+		this.rbaE1DateString = rbaE1DateString;
+	}
+
+	/**
+	 * @return the abs1410Year
+	 */
+	public String getAbs1410Year() {
+		return abs1410Year;
+	}
+
+	/**
+	 * @param abs1410Year the abs1410Year to set
+	 */
+	public void setAbs1410Year(String abs1410Year) {
+		this.abs1410Year = abs1410Year;
+	}
+
+	/**
+	 * @return the abs8155Year
+	 */
+	public String getAbs8155Year() {
+		return abs8155Year;
+	}
+
+	/**
+	 * @param abs8155Year the abs8155Year to set
+	 */
+	public void setAbs8155Year(String abs8155Year) {
+		this.abs8155Year = abs8155Year;
+	}
+
+	/**
+	 * @return the calibrationDateAbs
+	 */
+	public String getCalibrationDateAbs() {
+		return calibrationDateAbs;
+	}
+
+	/**
+	 * @param calibrationDateAbs the calibrationDateAbs to set
+	 */
+	public void setCalibrationDateAbs(String calibrationDateAbs) {
+		this.calibrationDateAbs = calibrationDateAbs;
+	}
+
+	/**
+	 * @return the calibrationDateAto
+	 */
+	public String getCalibrationDateAto() {
+		return calibrationDateAto;
+	}
+
+	/**
+	 * @param calibrationDateAto the calibrationDateAto to set
+	 */
+	public void setCalibrationDateAto(String calibrationDateAto) {
+		this.calibrationDateAto = calibrationDateAto;
+	}
+
+	/**
+	 * @return the calibrationDateRba
+	 */
+	public String getCalibrationDateRba() {
+		return calibrationDateRba;
+	}
+
+	/**
+	 * @param calibrationDateRba the calibrationDateRba to set
+	 */
+	public void setCalibrationDateRba(String calibrationDateRba) {
+		this.calibrationDateRba = calibrationDateRba;
+	}
+
+	/**
+	 * @return the householdMultiplier
+	 */
+	public float getHouseholdMultiplier() {
+		return householdMultiplier;
+	}
+
+	/**
+	 * @param householdMultiplier the householdMultiplier to set
+	 */
+	public void setHouseholdMultiplier(float householdMultiplier) {
+		this.householdMultiplier = householdMultiplier;
+	}
+
+	/**
+	 * @return the populationMultiplier
+	 */
+	public float getPopulationMultiplier() {
+		return populationMultiplier;
+	}
+
+	/**
+	 * @param populationMultiplier the populationMultiplier to set
+	 */
+	public void setPopulationMultiplier(float populationMultiplier) {
+		this.populationMultiplier = populationMultiplier;
 	}
 
 	/**

@@ -11,7 +11,8 @@ import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
 import xyz.struthers.io.Serialization;
 import xyz.struthers.io.Serialization.CompressionType;
-import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.config.PropertiesXml;
+import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 import xyz.struthers.rhul.ham.process.ClearingPaymentInputs;
 import xyz.struthers.rhul.ham.process.ClearingPaymentOutputs;
 
@@ -36,6 +37,8 @@ public class CpvSocketClientHandler extends Thread {
 
 	@Override
 	public void run() {
+		PropertiesXml props = PropertiesXmlFactory.getProperties();
+
 		ClearingPaymentInputs cpvInputs = null;
 		ClearingPaymentOutputs cpvOutputs = null;
 		// byte compression = Byte.valueOf(null); // use the same compression for input
@@ -70,6 +73,10 @@ public class CpvSocketClientHandler extends Thread {
 		TFloatArrayList operatingCashFlow = cpvInputs.getOperatingCashFlow();
 		TFloatArrayList liquidAssets = cpvInputs.getLiquidAssets();
 		int iteration = cpvInputs.getIteration();
+		cpvInputs.clear(); // FIXME: make sure this doesn't delete the underlying data (i.e. the above
+							// assignment makes copies rather than just referencing the underlying arrays).
+		cpvInputs = null;
+		System.gc();
 		System.out.println(new Date(System.currentTimeMillis()) + ": CPV inputs split into separate lists.");
 
 		// calculate CPV
@@ -92,8 +99,11 @@ public class CpvSocketClientHandler extends Thread {
 			 * dos.writeByte(compression); dos.write(bytes); dos.flush(); // don't know if I
 			 * really need this, but it probably can't hurt
 			 */
-			Serialization.writeToDataStream(dos, cpvOutputs, Properties.SOCKET_BUFFER_BYTES,
-					Properties.SOCKET_MSG_BYTES, CompressionType.GZIP);
+			Serialization.writeToDataStream(dos, cpvOutputs, props.getSocketBufferBytes(),
+					props.getSocketMessageBytes(), CompressionType.GZIP);
+			cpvOutputs.close();
+			cpvOutputs = null;
+			System.gc();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -11,6 +11,8 @@ import java.util.Random;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import gnu.trove.list.array.TFloatArrayList;
+
 /**
  * @author Adam Struthers
  * @since 27-Jan-2019
@@ -20,7 +22,7 @@ import org.springframework.stereotype.Component;
 public class Currencies implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	// FX rate change strategies
 	public static final int SAME = 0;
 	public static final int RANDOM_1YR = 1;
@@ -29,6 +31,7 @@ public class Currencies implements Serializable {
 	public static final int RANDOM_5YR = 4;
 	public static final int RANDOM_5YR_UP = 5;
 	public static final int RANDOM_5YR_DOWN = 6;
+	public static final int CUSTOM_PATH = 7;
 
 	Map<String, Currency> currencies; // key is ISO-4217 Code (e.g. USD)
 
@@ -78,6 +81,18 @@ public class Currencies implements Serializable {
 	public void prepareFxRatesRandom5yrDown(int iteration, Random random) {
 		for (String ccyCode : this.currencies.keySet()) {
 			this.currencies.get(ccyCode).setExchangeRateRandom5yrDown(iteration, random);
+		}
+	}
+
+	public void prepareFxRatesCustomPath(int iteration, Map<String, TFloatArrayList> rates) {
+		for (String ccyCode : this.currencies.keySet()) {
+			if (rates.containsKey(ccyCode) && rates.get(ccyCode).size() > iteration) {
+				// set the custom rate
+				this.currencies.get(ccyCode).setExchangeRate(iteration, rates.get(ccyCode).get(iteration));
+			} else {
+				// no custom rate data, so just use the previous rate
+				this.currencies.get(ccyCode).setExchangeRateSame(iteration);
+			}
 		}
 	}
 

@@ -29,7 +29,6 @@ import com.opencsv.CSVReader;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import xyz.struthers.rhul.ham.MemoryUsageBenchmark;
-import xyz.struthers.rhul.ham.config.Properties;
 
 /**
  * Loads ASGS boundary data from the ABS, downloaded in CSV format. Uses
@@ -122,7 +121,7 @@ public class AreaMapping {
 			}
 			this.totalPopulation.put(date, totalPop);
 		}
-		Properties.setTotalPopulationAU(totalPop);
+		//Properties.setTotalPopulationAU(totalPop);
 		return totalPop;
 	}
 

@@ -8,7 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import gnu.trove.list.array.TFloatArrayList;
-import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.config.PropertiesXml;
+import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 import xyz.struthers.rhul.ham.data.CalibrateEconomy;
 import xyz.struthers.rhul.ham.process.Clearable;
 import xyz.struthers.rhul.ham.process.Employer;
@@ -27,7 +28,8 @@ public class Business extends Agent implements Employer {
 
 	private static final long serialVersionUID = 1L;
 	private static final float YEAR_MONTHS = 12;
-	private static final boolean USE_ACTUAL_WAGES = true;
+	// private static final boolean USE_ACTUAL_WAGES = true;
+	private static PropertiesXml properties = PropertiesXmlFactory.getProperties();
 
 	/**
 	 * Identifies agents that were calibrated using the same industry / size / state
@@ -391,13 +393,13 @@ public class Business extends Agent implements Employer {
 		this.employees.add(employee);
 		this.employees.trimToSize();
 
-		if (USE_ACTUAL_WAGES) {
+		if (properties.isUseActualWages()) {
 			// re-calc wage exp, super exp, payroll tax (and total exp)
 			float wages = 0f;
 			float superannuation = 0f;
 			for (Individual staff : this.employees) {
 				wages += staff.getPnlWagesSalaries();
-				superannuation += staff.getPnlWagesSalaries() * Properties.SUPERANNUATION_RATE;
+				superannuation += staff.getPnlWagesSalaries() * properties.getSuperannuationGuaranteeRate();
 			}
 			this.wageExpenses = wages;
 			this.superannuationExpense = superannuation;
@@ -450,7 +452,7 @@ public class Business extends Agent implements Employer {
 			for (Individual employee : this.employees) {
 				int index = employee.getPaymentClearingIndex();
 				float monthlyWagesIncludingSuper = employee.getPnlWagesSalaries()
-						* (1f + Properties.SUPERANNUATION_RATE);
+						* (1f + properties.getSuperannuationGuaranteeRate());
 				liabilities.add(new NodePayment(index, monthlyWagesIncludingSuper));
 			}
 		}
@@ -536,36 +538,36 @@ public class Business extends Agent implements Employer {
 				this.bankDeposits += nodeEquity;
 			} else {
 				// negative cashflow is greater than bank balance
-				if ((this.bankDeposits + this.otherFinancialAssets * (1f - Properties.INVESTMENT_HAIRCUT)
-						+ this.foreignEquities * (1f - Properties.FOREIGN_INVESTMENT_HAIRCUT) + nodeEquity) > 0f) {
+				if ((this.bankDeposits + this.otherFinancialAssets * (1f - properties.getInvestmentHaircut())
+						+ this.foreignEquities * (1f - properties.getForeignInvestmentHaircut()) + nodeEquity) > 0f) {
 					// drawing down on other financial assets will be enough to avoid bankruptcy
 					// 1. liquidate domestic investments first
-					if (this.otherFinancialAssets * (1f - Properties.INVESTMENT_HAIRCUT) + nodeEquity < 0) {
+					if (this.otherFinancialAssets * (1f - properties.getInvestmentHaircut()) + nodeEquity < 0) {
 						// domestic financial assets weren't enough, so liquidate all of them
-						nodeEquity += this.otherFinancialAssets * (1f - Properties.INVESTMENT_HAIRCUT);
+						nodeEquity += this.otherFinancialAssets * (1f - properties.getInvestmentHaircut());
 						this.otherFinancialAssets = 0f;
 						this.interestIncome = 0f;
 					} else {
 						// domestic financial assets were enough, so only partially liquidate them
-						this.interestIncome = this.interestIncome
-								* (1f - (this.otherFinancialAssets + nodeEquity / (1f - Properties.INVESTMENT_HAIRCUT))
+						this.interestIncome = this.interestIncome * (1f
+								- (this.otherFinancialAssets + nodeEquity / (1f - properties.getInvestmentHaircut()))
 										/ this.otherFinancialAssets);
-						this.otherFinancialAssets += nodeEquity / (1f - Properties.INVESTMENT_HAIRCUT);
+						this.otherFinancialAssets += nodeEquity / (1f - properties.getInvestmentHaircut());
 						nodeEquity = 0f;
 					}
 
 					// 2. then liquidate foreign investments
-					if (this.foreignEquities * (1f - Properties.FOREIGN_INVESTMENT_HAIRCUT) + nodeEquity < 0) {
+					if (this.foreignEquities * (1f - properties.getForeignInvestmentHaircut()) + nodeEquity < 0) {
 						// foreign assets weren't enough, so liquidate all of them
-						nodeEquity += this.foreignEquities * (1f - Properties.FOREIGN_INVESTMENT_HAIRCUT);
+						nodeEquity += this.foreignEquities * (1f - properties.getForeignInvestmentHaircut());
 						this.foreignEquities = 0f;
 						this.otherIncome = 0f;
 					} else {
 						// foreign assets were enough, so only partially liquidate them
 						this.otherIncome = this.otherIncome * (1f
-								- (this.foreignEquities + nodeEquity / (1f - Properties.FOREIGN_INVESTMENT_HAIRCUT))
+								- (this.foreignEquities + nodeEquity / (1f - properties.getForeignInvestmentHaircut()))
 										/ this.foreignEquities);
-						this.foreignEquities += nodeEquity / (1f - Properties.FOREIGN_INVESTMENT_HAIRCUT);
+						this.foreignEquities += nodeEquity / (1f - properties.getForeignInvestmentHaircut());
 						nodeEquity = 0f;
 					}
 

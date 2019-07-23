@@ -23,6 +23,8 @@ import org.springframework.stereotype.Component;
 
 import gnu.trove.map.hash.TObjectFloatHashMap;
 import xyz.struthers.rhul.ham.agent.ForeignCountry;
+import xyz.struthers.rhul.ham.config.PropertiesXml;
+import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
 
 /**
@@ -36,7 +38,7 @@ import xyz.struthers.rhul.ham.process.AustralianEconomy;
 @Scope(value = "singleton")
 public class CalibrateCountries {
 
-	public static final String CALIBRATION_DATE_ABS = "01/06/2018";
+	// public static final String CALIBRATION_DATE_ABS = "01/06/2018";
 	private static final boolean DEBUG = false;
 
 	private static final float MILLION = 1000000f;
@@ -45,6 +47,8 @@ public class CalibrateCountries {
 	private CalibrationData data;
 	private Currencies currencies;
 	private AustralianEconomy economy;
+
+	private PropertiesXml properties;
 
 	// field variables
 	private Map<String, Map<String, String>> allCountryData;
@@ -118,7 +122,7 @@ public class CalibrateCountries {
 		DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
 		Date absDate = null;
 		try {
-			absDate = sdf.parse(CALIBRATION_DATE_ABS);
+			absDate = sdf.parse(properties.getCalibrationDateAbs());
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -189,7 +193,7 @@ public class CalibrateCountries {
 		DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
 		Date absDate = null;
 		try {
-			absDate = sdf.parse(CALIBRATION_DATE_ABS);
+			absDate = sdf.parse(properties.getCalibrationDateAbs());
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -239,6 +243,8 @@ public class CalibrateCountries {
 
 	@PostConstruct
 	private void init() {
+		properties = PropertiesXmlFactory.getProperties();
+
 		this.allCountryData = null;
 		this.countryAgents = null;
 	}

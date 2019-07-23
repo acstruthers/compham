@@ -8,7 +8,8 @@ import java.io.FileFilter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.config.PropertiesXml;
+import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 
 /**
  * Loads a list of files in a network folder.
@@ -20,6 +21,8 @@ import xyz.struthers.rhul.ham.config.Properties;
  * @since 19-Nov-2018
  */
 public abstract class LoadFileSystem {
+
+	private static PropertiesXml properties = PropertiesXmlFactory.getProperties();
 
 	/**
 	 * 
@@ -45,7 +48,7 @@ public abstract class LoadFileSystem {
 		 * https://docs.oracle.com/javase/8/docs/api/index.html?java/io/FileFilter.html
 		 */
 
-		File folder = new File(Properties.RESOURCE_DIRECTORY);
+		File folder = new File(properties.getResourceDirectory());
 
 		FileFilter fileFilter = new FileFilter() {
 			Pattern pattern = Pattern.compile(regex);

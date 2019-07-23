@@ -34,7 +34,8 @@ import xyz.struthers.rhul.ham.agent.ForeignCountry;
 import xyz.struthers.rhul.ham.agent.Household;
 import xyz.struthers.rhul.ham.agent.Individual;
 import xyz.struthers.rhul.ham.agent.ReserveBankOfAustralia;
-import xyz.struthers.rhul.ham.config.Properties;
+import xyz.struthers.rhul.ham.config.PropertiesXml;
+import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 import xyz.struthers.rhul.ham.process.AustralianEconomy;
 import xyz.struthers.rhul.ham.process.Employer;
 
@@ -75,10 +76,10 @@ public class CalibrateEconomy {
 			18 };
 
 	// beans
-	//private CalibrationData commonData;
-	//private AreaMapping area;
+	// private CalibrationData commonData;
+	// private AreaMapping area;
 	private AustralianEconomy economy;
-	private Properties properties;
+	private PropertiesXml properties;
 
 	// agents
 	private Household[] households;
@@ -86,7 +87,7 @@ public class CalibrateEconomy {
 	private Business[] businesses;
 	private AuthorisedDepositTakingInstitution[] adis;
 	private ForeignCountry[] countries;
-	//private Currencies currencies;
+	// private Currencies currencies;
 	private AustralianGovernment govt;
 	private ReserveBankOfAustralia rba;
 
@@ -106,13 +107,15 @@ public class CalibrateEconomy {
 	private void init() {
 		System.out.println("################## initialising economy ##################");
 
+		this.properties = PropertiesXmlFactory.getProperties();
+
 		// agents
 		this.households = null;
 		this.individuals = null;
 		this.businesses = null;
 		this.adis = null;
 		this.countries = null;
-		//this.currencies = null;
+		// this.currencies = null;
 		this.govt = null;
 		this.rba = null;
 
@@ -130,8 +133,8 @@ public class CalibrateEconomy {
 	 */
 	public void close() {
 		// beans
-		//this.commonData = null;
-		//this.area = null;
+		// this.commonData = null;
+		// this.area = null;
 		this.economy = null;
 		this.properties = null;
 
@@ -141,7 +144,7 @@ public class CalibrateEconomy {
 		this.businesses = null;
 		this.adis = null;
 		this.countries = null;
-		//this.currencies = null;
+		// this.currencies = null;
 		this.govt = null;
 		this.rba = null;
 
@@ -173,7 +176,7 @@ public class CalibrateEconomy {
 			this.businesses = this.economy.getBusinesses();
 			this.adis = this.economy.getAdis();
 			this.countries = this.economy.getCountries();
-			//this.currencies = this.economy.getCurrencies();
+			// this.currencies = this.economy.getCurrencies();
 
 			/*
 			 * To ensure that every agent has other agents linked to it, use the shuffled
@@ -397,156 +400,121 @@ public class CalibrateEconomy {
 	 * to the employee's LGA.
 	 */
 	// try using streams, and using for loops. Compare performance.
-	/*private void linkEmployees() {
-		if (!this.indicesAssigned) {
-			this.assignPaymentClearingIndices();
-		}
-
-		// link to employees
-		// get total wages expense by industry division
-		System.out.println(new Date(System.currentTimeMillis()) + ": get total wages expense by industry division");
-		TObjectFloatHashMap<String> totalWagesExpenseByDiv = new TObjectFloatHashMap<String>(
-				(int) Math.ceil(CalibrateIndividuals.DIVISION_CODE_ARRAY.length / 0.75f));
-		for (String div : CalibrateIndividuals.DIVISION_CODE_ARRAY) {
-			
-			float totalWagesExpense = (float) Arrays.asList(this.businesses).stream()
-					.filter(o -> String.valueOf(o.getIndustryDivisionCode()).equals(div))
-					.mapToDouble(o -> o.getInitialWagesExpense()).sum();
-			totalWagesExpense += (float) Arrays.asList(this.adis).stream()
-					.filter(o -> String.valueOf(o.getIndustryDivisionCode()).equals(div))
-					.mapToDouble(o -> o.getInitialWagesExpense()).sum();
-			totalWagesExpense += (float) Arrays.asList(this.rba).stream()
-					.filter(o -> String.valueOf(o.getIndustryDivisionCode()).equals(div))
-					.mapToDouble(o -> o.getInitialWagesExpense()).sum();
-			totalWagesExpense += (float) Arrays.asList(this.govt).stream()
-					.filter(o -> String.valueOf(o.getIndustryDivisionCode()).equals(div))
-					.mapToDouble(o -> o.getInitialWagesExpense()).sum();
-			totalWagesExpenseByDiv.put(div, totalWagesExpense);
-		}
-		// get list of all Employers
-		System.out.println(new Date(System.currentTimeMillis()) + ": get list of all Employers");
-		List<Business> businessEmployers = Arrays.asList(this.businesses).stream()
-				.filter(o -> o.getInitialWagesExpense() > 0f).collect(Collectors.toList());
-		ArrayList<Employer> employers = new ArrayList<Employer>(businessEmployers);
-		employers.addAll(Arrays.asList(this.adis)); // all ADIs have employees
-		employers.add(this.rba); // RBA has employees
-		employers.add(this.govt); // government has employees
-		employers.trimToSize();
-		// get list of all Households with employees, by industry division
-		System.out.println(new Date(System.currentTimeMillis())
-				+ ": get list of all Households with employees, by industry division");
-		List<Household> employeeHouseholds = Arrays.asList(this.households).stream()
-				.filter(o -> o.getPnlWagesSalaries() > 0f).collect(Collectors.toList());
-		Map<Character, ArrayList<Household>> employeeHouseholdsByDiv = new HashMap<Character, ArrayList<Household>>(
-				(int) Math.ceil(DIVISION_CODE_INDICES.length / 0.75f));
-		for (Household house : employeeHouseholds) {
-			Individual[] members = house.getIndividuals();
-			for (int individualIdx = 0; individualIdx < members.length; individualIdx++) {
-				if (members[individualIdx].getPnlWagesSalaries() > 0f) {
-					// Individual is an employee
-					char div = members[individualIdx].getEmploymentIndustry();
-					if (!employeeHouseholdsByDiv.containsKey(div)) {
-						employeeHouseholdsByDiv.put(div, new ArrayList<Household>(
-								(int) Math.ceil(this.households.length / DIVISION_CODE_INDICES.length * 2f / 0.75f)));
-					}
-					employeeHouseholdsByDiv.get(div).add(house);
-				}
-			}
-		}
-		for (char div : employeeHouseholdsByDiv.keySet()) {
-			employeeHouseholdsByDiv.get(div).trimToSize();
-		}
-		// get list of all Individual employees, by industry division
-		System.out.println(
-				new Date(System.currentTimeMillis()) + ": get list of all Individual employees, by industry division");
-		List<Individual> employees = Arrays.asList(this.individuals).stream().filter(o -> o.getPnlWagesSalaries() > 0f)
-				.collect(Collectors.toList());
-		Map<Character, ArrayList<Individual>> employeesByDiv = new HashMap<Character, ArrayList<Individual>>(
-				(int) Math.ceil(DIVISION_CODE_INDICES.length / 0.75f));
-		for (Individual employee : employees) {
-			char div = employee.getEmploymentIndustry();
-			if (!employeesByDiv.containsKey(div)) {
-				employeesByDiv.put(div, new ArrayList<Individual>(
-						(int) Math.ceil(employees.size() / DIVISION_CODE_INDICES.length * 2f / 0.75f)));
-			}
-			employeesByDiv.get(div).add(employee);
-		}
-		for (char div : employeesByDiv.keySet()) {
-			employeesByDiv.get(div).trimToSize();
-		}
-		// for each division, calculate employer ratio and multiply by employee count
-		System.out.println(new Date(System.currentTimeMillis())
-				+ ": for each division, calculate employer ratio and multiply by employee count");
-		Map<Character, TIntArrayList> shuffledEmployerIndicesByDiv = new HashMap<Character, TIntArrayList>(
-				(int) Math.ceil(totalWagesExpenseByDiv.size() / 0.75f));
-		for (int i = 0; i < employers.size(); i++) {
-			// Employer employer : employers
-			char div = employers.get(i).getIndustryDivisionCode();
-			float divTotalWages = totalWagesExpenseByDiv.get(div);
-			float employerWages = employers.get(i).getInitialWagesExpense();
-			float employeesPerDiv = employeesByDiv.get(div).size();
-			int employeeCount = (int) Math.ceil(employerWages / divTotalWages * employeesPerDiv);
-			if (!shuffledEmployerIndicesByDiv.containsKey(div)) {
-				shuffledEmployerIndicesByDiv.put(div, new TIntArrayList(
-						(int) Math.ceil(employees.size() / DIVISION_CODE_INDICES.length * 2f / 0.75f)));
-			}
-			shuffledEmployerIndicesByDiv.get(div).addAll(Collections.nCopies(employeeCount, i));
-		}
-		// shuffle indices and initialise next index map
-		System.out.println(new Date(System.currentTimeMillis()) + ": shuffle indices and initialise next index map");
-		TCharIntHashMap nextDivIdx = new TCharIntHashMap((int) Math.ceil(shuffledEmployerIndicesByDiv.size() / 0.75f));
-		for (char div : shuffledEmployerIndicesByDiv.keySet()) {
-			shuffledEmployerIndicesByDiv.get(div).trimToSize();
-			shuffledEmployerIndicesByDiv.get(div).shuffle(this.random);
-			nextDivIdx.put(div, 0);
-		}
-		// assign employees to employers (takes about 31 minutes)
-		System.out.println(new Date(System.currentTimeMillis()) + ": assign employees to employers");
-		for (int employeeIdx = 0; employeeIdx < employees.size(); employeeIdx++) {
-			if ((employeeIdx % 100000) == 0) {
-				System.out.println(new Date(System.currentTimeMillis()) + ": employeeIdx = " + employeeIdx);
-			}
-			Individual employee = employees.get(employeeIdx);
-			char div = employee.getEmploymentIndustry();
-			int nextIdx = nextDivIdx.get(div);
-			Employer employer = employers.get(shuffledEmployerIndicesByDiv.get(div).get(nextIdx));
-			employer.addEmployee(employee);
-			nextIdx = (nextIdx + 1) % shuffledEmployerIndicesByDiv.get(div).size();
-			nextDivIdx.put(div, nextIdx);
-		}
-		// release memory
-		System.out.println(new Date(System.currentTimeMillis()) + ": Releasing memory");
-		totalWagesExpenseByDiv.clear();
-		totalWagesExpenseByDiv = null;
-		businessEmployers.clear();
-		businessEmployers = null;
-		employers.clear();
-		employers = null;
-		employeeHouseholds.clear();
-		employeeHouseholds = null;
-		for (char div : employeeHouseholdsByDiv.keySet()) {
-			employeeHouseholdsByDiv.get(div).clear();
-			employeeHouseholdsByDiv.put(div, null);
-		}
-		employeeHouseholdsByDiv.clear();
-		employeeHouseholdsByDiv = null;
-		employees.clear();
-		employees = null;
-		for (char div : employeesByDiv.keySet()) {
-			employeesByDiv.get(div).clear();
-			employeesByDiv.put(div, null);
-		}
-		employeesByDiv.clear();
-		employeesByDiv = null;
-		for (char div : shuffledEmployerIndicesByDiv.keySet()) {
-			shuffledEmployerIndicesByDiv.get(div).clear();
-			shuffledEmployerIndicesByDiv.put(div, null);
-		}
-		shuffledEmployerIndicesByDiv.clear();
-		shuffledEmployerIndicesByDiv = null;
-		nextDivIdx.clear();
-		nextDivIdx = null;
-	}*/
+	/*
+	 * private void linkEmployees() { if (!this.indicesAssigned) {
+	 * this.assignPaymentClearingIndices(); }
+	 * 
+	 * // link to employees // get total wages expense by industry division
+	 * System.out.println(new Date(System.currentTimeMillis()) +
+	 * ": get total wages expense by industry division");
+	 * TObjectFloatHashMap<String> totalWagesExpenseByDiv = new
+	 * TObjectFloatHashMap<String>( (int)
+	 * Math.ceil(CalibrateIndividuals.DIVISION_CODE_ARRAY.length / 0.75f)); for
+	 * (String div : CalibrateIndividuals.DIVISION_CODE_ARRAY) {
+	 * 
+	 * float totalWagesExpense = (float) Arrays.asList(this.businesses).stream()
+	 * .filter(o -> String.valueOf(o.getIndustryDivisionCode()).equals(div))
+	 * .mapToDouble(o -> o.getInitialWagesExpense()).sum(); totalWagesExpense +=
+	 * (float) Arrays.asList(this.adis).stream() .filter(o ->
+	 * String.valueOf(o.getIndustryDivisionCode()).equals(div)) .mapToDouble(o ->
+	 * o.getInitialWagesExpense()).sum(); totalWagesExpense += (float)
+	 * Arrays.asList(this.rba).stream() .filter(o ->
+	 * String.valueOf(o.getIndustryDivisionCode()).equals(div)) .mapToDouble(o ->
+	 * o.getInitialWagesExpense()).sum(); totalWagesExpense += (float)
+	 * Arrays.asList(this.govt).stream() .filter(o ->
+	 * String.valueOf(o.getIndustryDivisionCode()).equals(div)) .mapToDouble(o ->
+	 * o.getInitialWagesExpense()).sum(); totalWagesExpenseByDiv.put(div,
+	 * totalWagesExpense); } // get list of all Employers System.out.println(new
+	 * Date(System.currentTimeMillis()) + ": get list of all Employers");
+	 * List<Business> businessEmployers = Arrays.asList(this.businesses).stream()
+	 * .filter(o -> o.getInitialWagesExpense() > 0f).collect(Collectors.toList());
+	 * ArrayList<Employer> employers = new ArrayList<Employer>(businessEmployers);
+	 * employers.addAll(Arrays.asList(this.adis)); // all ADIs have employees
+	 * employers.add(this.rba); // RBA has employees employers.add(this.govt); //
+	 * government has employees employers.trimToSize(); // get list of all
+	 * Households with employees, by industry division System.out.println(new
+	 * Date(System.currentTimeMillis()) +
+	 * ": get list of all Households with employees, by industry division");
+	 * List<Household> employeeHouseholds = Arrays.asList(this.households).stream()
+	 * .filter(o -> o.getPnlWagesSalaries() > 0f).collect(Collectors.toList());
+	 * Map<Character, ArrayList<Household>> employeeHouseholdsByDiv = new
+	 * HashMap<Character, ArrayList<Household>>( (int)
+	 * Math.ceil(DIVISION_CODE_INDICES.length / 0.75f)); for (Household house :
+	 * employeeHouseholds) { Individual[] members = house.getIndividuals(); for (int
+	 * individualIdx = 0; individualIdx < members.length; individualIdx++) { if
+	 * (members[individualIdx].getPnlWagesSalaries() > 0f) { // Individual is an
+	 * employee char div = members[individualIdx].getEmploymentIndustry(); if
+	 * (!employeeHouseholdsByDiv.containsKey(div)) {
+	 * employeeHouseholdsByDiv.put(div, new ArrayList<Household>( (int)
+	 * Math.ceil(this.households.length / DIVISION_CODE_INDICES.length * 2f /
+	 * 0.75f))); } employeeHouseholdsByDiv.get(div).add(house); } } } for (char div
+	 * : employeeHouseholdsByDiv.keySet()) {
+	 * employeeHouseholdsByDiv.get(div).trimToSize(); } // get list of all
+	 * Individual employees, by industry division System.out.println( new
+	 * Date(System.currentTimeMillis()) +
+	 * ": get list of all Individual employees, by industry division");
+	 * List<Individual> employees =
+	 * Arrays.asList(this.individuals).stream().filter(o -> o.getPnlWagesSalaries()
+	 * > 0f) .collect(Collectors.toList()); Map<Character, ArrayList<Individual>>
+	 * employeesByDiv = new HashMap<Character, ArrayList<Individual>>( (int)
+	 * Math.ceil(DIVISION_CODE_INDICES.length / 0.75f)); for (Individual employee :
+	 * employees) { char div = employee.getEmploymentIndustry(); if
+	 * (!employeesByDiv.containsKey(div)) { employeesByDiv.put(div, new
+	 * ArrayList<Individual>( (int) Math.ceil(employees.size() /
+	 * DIVISION_CODE_INDICES.length * 2f / 0.75f))); }
+	 * employeesByDiv.get(div).add(employee); } for (char div :
+	 * employeesByDiv.keySet()) { employeesByDiv.get(div).trimToSize(); } // for
+	 * each division, calculate employer ratio and multiply by employee count
+	 * System.out.println(new Date(System.currentTimeMillis()) +
+	 * ": for each division, calculate employer ratio and multiply by employee count"
+	 * ); Map<Character, TIntArrayList> shuffledEmployerIndicesByDiv = new
+	 * HashMap<Character, TIntArrayList>( (int)
+	 * Math.ceil(totalWagesExpenseByDiv.size() / 0.75f)); for (int i = 0; i <
+	 * employers.size(); i++) { // Employer employer : employers char div =
+	 * employers.get(i).getIndustryDivisionCode(); float divTotalWages =
+	 * totalWagesExpenseByDiv.get(div); float employerWages =
+	 * employers.get(i).getInitialWagesExpense(); float employeesPerDiv =
+	 * employeesByDiv.get(div).size(); int employeeCount = (int)
+	 * Math.ceil(employerWages / divTotalWages * employeesPerDiv); if
+	 * (!shuffledEmployerIndicesByDiv.containsKey(div)) {
+	 * shuffledEmployerIndicesByDiv.put(div, new TIntArrayList( (int)
+	 * Math.ceil(employees.size() / DIVISION_CODE_INDICES.length * 2f / 0.75f))); }
+	 * shuffledEmployerIndicesByDiv.get(div).addAll(Collections.nCopies(
+	 * employeeCount, i)); } // shuffle indices and initialise next index map
+	 * System.out.println(new Date(System.currentTimeMillis()) +
+	 * ": shuffle indices and initialise next index map"); TCharIntHashMap
+	 * nextDivIdx = new TCharIntHashMap((int)
+	 * Math.ceil(shuffledEmployerIndicesByDiv.size() / 0.75f)); for (char div :
+	 * shuffledEmployerIndicesByDiv.keySet()) {
+	 * shuffledEmployerIndicesByDiv.get(div).trimToSize();
+	 * shuffledEmployerIndicesByDiv.get(div).shuffle(this.random);
+	 * nextDivIdx.put(div, 0); } // assign employees to employers (takes about 31
+	 * minutes) System.out.println(new Date(System.currentTimeMillis()) +
+	 * ": assign employees to employers"); for (int employeeIdx = 0; employeeIdx <
+	 * employees.size(); employeeIdx++) { if ((employeeIdx % 100000) == 0) {
+	 * System.out.println(new Date(System.currentTimeMillis()) + ": employeeIdx = "
+	 * + employeeIdx); } Individual employee = employees.get(employeeIdx); char div
+	 * = employee.getEmploymentIndustry(); int nextIdx = nextDivIdx.get(div);
+	 * Employer employer =
+	 * employers.get(shuffledEmployerIndicesByDiv.get(div).get(nextIdx));
+	 * employer.addEmployee(employee); nextIdx = (nextIdx + 1) %
+	 * shuffledEmployerIndicesByDiv.get(div).size(); nextDivIdx.put(div, nextIdx); }
+	 * // release memory System.out.println(new Date(System.currentTimeMillis()) +
+	 * ": Releasing memory"); totalWagesExpenseByDiv.clear(); totalWagesExpenseByDiv
+	 * = null; businessEmployers.clear(); businessEmployers = null;
+	 * employers.clear(); employers = null; employeeHouseholds.clear();
+	 * employeeHouseholds = null; for (char div : employeeHouseholdsByDiv.keySet())
+	 * { employeeHouseholdsByDiv.get(div).clear(); employeeHouseholdsByDiv.put(div,
+	 * null); } employeeHouseholdsByDiv.clear(); employeeHouseholdsByDiv = null;
+	 * employees.clear(); employees = null; for (char div : employeesByDiv.keySet())
+	 * { employeesByDiv.get(div).clear(); employeesByDiv.put(div, null); }
+	 * employeesByDiv.clear(); employeesByDiv = null; for (char div :
+	 * shuffledEmployerIndicesByDiv.keySet()) {
+	 * shuffledEmployerIndicesByDiv.get(div).clear();
+	 * shuffledEmployerIndicesByDiv.put(div, null); }
+	 * shuffledEmployerIndicesByDiv.clear(); shuffledEmployerIndicesByDiv = null;
+	 * nextDivIdx.clear(); nextDivIdx = null; }
+	 */
 
 	private void linkEmployeesFaster() {
 		if (!this.indicesAssigned) {
@@ -1191,7 +1159,8 @@ public class CalibrateEconomy {
 		// other ADIs per these calculated ratios (store the amounts - not the ratios).
 		// Store pointers to the ADIs at the same time.
 		for (int adiIdx = 0; adiIdx < this.adis.length; adiIdx++) {
-			//ArrayList<Float> otherAdiRatios = new ArrayList<Float>(Collections.nCopies(this.adis.length, 0f));
+			// ArrayList<Float> otherAdiRatios = new
+			// ArrayList<Float>(Collections.nCopies(this.adis.length, 0f));
 			// calculate total
 			float otherAdiTotal = 0f;
 			for (int otherAdiIdx = 0; otherAdiIdx < this.adis.length; otherAdiIdx++) {
@@ -1461,17 +1430,14 @@ public class CalibrateEconomy {
 	 * 
 	 * @return
 	 */
-	/*private float[] calcAdiIndividualLoanRatios() {
-		float[] ratios = new float[this.adis.length];
-		float total = 0f;
-		for (int i = 0; i < this.adis.length; i++) {
-			total += this.adis[i].getBsLoansHome() + this.adis[i].getBsLoansPersonal();
-		}
-		for (int i = 0; i < this.adis.length; i++) {
-			ratios[i] = (this.adis[i].getBsLoansHome() + this.adis[i].getBsLoansPersonal()) / total;
-		}
-		return ratios;
-	}*/
+	/*
+	 * private float[] calcAdiIndividualLoanRatios() { float[] ratios = new
+	 * float[this.adis.length]; float total = 0f; for (int i = 0; i <
+	 * this.adis.length; i++) { total += this.adis[i].getBsLoansHome() +
+	 * this.adis[i].getBsLoansPersonal(); } for (int i = 0; i < this.adis.length;
+	 * i++) { ratios[i] = (this.adis[i].getBsLoansHome() +
+	 * this.adis[i].getBsLoansPersonal()) / total; } return ratios; }
+	 */
 
 	/**
 	 * Calculates the ratio of the deposit balances by ADI. This will be used as a
@@ -1479,17 +1445,14 @@ public class CalibrateEconomy {
 	 * 
 	 * @return
 	 */
-	/*private float[] calcAdiDepositRatios() {
-		float[] ratios = new float[this.adis.length];
-		float total = 0f;
-		for (int i = 0; i < this.adis.length; i++) {
-			total += this.adis[i].getBsDepositsAtCall() + this.adis[i].getBsDepositsTerm();
-		}
-		for (int i = 0; i < this.adis.length; i++) {
-			ratios[i] = (this.adis[i].getBsDepositsAtCall() + this.adis[i].getBsDepositsTerm()) / total;
-		}
-		return ratios;
-	}*/
+	/*
+	 * private float[] calcAdiDepositRatios() { float[] ratios = new
+	 * float[this.adis.length]; float total = 0f; for (int i = 0; i <
+	 * this.adis.length; i++) { total += this.adis[i].getBsDepositsAtCall() +
+	 * this.adis[i].getBsDepositsTerm(); } for (int i = 0; i < this.adis.length;
+	 * i++) { ratios[i] = (this.adis[i].getBsDepositsAtCall() +
+	 * this.adis[i].getBsDepositsTerm()) / total; } return ratios; }
+	 */
 
 	/**
 	 * Calculates the ratio of the business loan balances by ADI. This will be used
@@ -1499,17 +1462,13 @@ public class CalibrateEconomy {
 	 * 
 	 * @return
 	 */
-	/*private float[] calcAdiBusinessLoanRatios() {
-		float[] ratios = new float[this.adis.length];
-		float total = 0f;
-		for (int i = 0; i < this.adis.length; i++) {
-			total += this.adis[i].getBsLoansBusiness();
-		}
-		for (int i = 0; i < this.adis.length; i++) {
-			ratios[i] = this.adis[i].getBsLoansBusiness() / total;
-		}
-		return ratios;
-	}*/
+	/*
+	 * private float[] calcAdiBusinessLoanRatios() { float[] ratios = new
+	 * float[this.adis.length]; float total = 0f; for (int i = 0; i <
+	 * this.adis.length; i++) { total += this.adis[i].getBsLoansBusiness(); } for
+	 * (int i = 0; i < this.adis.length; i++) { ratios[i] =
+	 * this.adis[i].getBsLoansBusiness() / total; } return ratios; }
+	 */
 
 	/**
 	 * Calculates the ratio of business's wage expenses by Division. This will be
@@ -1519,115 +1478,59 @@ public class CalibrateEconomy {
 	 * 
 	 * @return
 	 */
-	/*private List<List<Float>> calcBusinessDivisionWageRatios() {
-		// initialise division totals
-		Float[] divTotal = Collections.nCopies(CalibrateIndividuals.DIVISION_CODE_ARRAY.length, 0f)
-				.toArray(Float[]::new);
-		Integer[] divisionBusinessCount = Collections.nCopies(CalibrateIndividuals.DIVISION_CODE_ARRAY.length, 0)
-				.toArray(Integer[]::new);
+	/*
+	 * private List<List<Float>> calcBusinessDivisionWageRatios() { // initialise
+	 * division totals Float[] divTotal =
+	 * Collections.nCopies(CalibrateIndividuals.DIVISION_CODE_ARRAY.length, 0f)
+	 * .toArray(Float[]::new); Integer[] divisionBusinessCount =
+	 * Collections.nCopies(CalibrateIndividuals.DIVISION_CODE_ARRAY.length, 0)
+	 * .toArray(Integer[]::new);
+	 * 
+	 * // calculate division totals for (int busIdx = 0; busIdx <
+	 * this.businesses.length; busIdx++) { char divCode =
+	 * this.businesses[busIdx].getIndustryDivisionCode(); int divIdx =
+	 * this.getIndustryDivisionIndex(divCode); divTotal[divIdx] +=
+	 * this.businesses[busIdx].getWageExpenses(); divisionBusinessCount[divIdx]++; }
+	 * 
+	 * // initialise ratios List<List<Float>> ratios = new
+	 * ArrayList<List<Float>>(CalibrateIndividuals.DIVISION_CODE_ARRAY.length); for
+	 * (int ratioIdx = 0; ratioIdx <
+	 * CalibrateIndividuals.DIVISION_CODE_ARRAY.length; ratioIdx++) { ratios.add(new
+	 * ArrayList<Float>(divisionBusinessCount[ratioIdx])); }
+	 * 
+	 * // calculate ratios for (int busIdx = 0; busIdx < this.businesses.length;
+	 * busIdx++) { char divCode = this.businesses[busIdx].getIndustryDivisionCode();
+	 * int divIdx = this.getIndustryDivisionIndex(divCode);
+	 * ratios.get(divIdx).add(this.businesses[busIdx].getWageExpenses() /
+	 * divTotal[divIdx]); } return ratios; }
+	 */
 
-		// calculate division totals
-		for (int busIdx = 0; busIdx < this.businesses.length; busIdx++) {
-			char divCode = this.businesses[busIdx].getIndustryDivisionCode();
-			int divIdx = this.getIndustryDivisionIndex(divCode);
-			divTotal[divIdx] += this.businesses[busIdx].getWageExpenses();
-			divisionBusinessCount[divIdx]++;
-		}
-
-		// initialise ratios
-		List<List<Float>> ratios = new ArrayList<List<Float>>(CalibrateIndividuals.DIVISION_CODE_ARRAY.length);
-		for (int ratioIdx = 0; ratioIdx < CalibrateIndividuals.DIVISION_CODE_ARRAY.length; ratioIdx++) {
-			ratios.add(new ArrayList<Float>(divisionBusinessCount[ratioIdx]));
-		}
-
-		// calculate ratios
-		for (int busIdx = 0; busIdx < this.businesses.length; busIdx++) {
-			char divCode = this.businesses[busIdx].getIndustryDivisionCode();
-			int divIdx = this.getIndustryDivisionIndex(divCode);
-			ratios.get(divIdx).add(this.businesses[busIdx].getWageExpenses() / divTotal[divIdx]);
-		}
-		return ratios;
-	}*/
-
-	/*private int getIndustryDivisionIndex(char divisionCode) {
-		int index = 0;
-		switch (divisionCode) {
-		case 'A':
-			index = 0;
-			break;
-		case 'B':
-			index = 1;
-			break;
-		case 'C':
-			index = 2;
-			break;
-		case 'D':
-			index = 3;
-			break;
-		case 'E':
-			index = 4;
-			break;
-		case 'F':
-			index = 5;
-			break;
-		case 'G':
-			index = 6;
-			break;
-		case 'H':
-			index = 7;
-			break;
-		case 'I':
-			index = 8;
-			break;
-		case 'J':
-			index = 9;
-			break;
-		case 'K':
-			index = 10;
-			break;
-		case 'L':
-			index = 11;
-			break;
-		case 'M':
-			index = 12;
-			break;
-		case 'N':
-			index = 13;
-			break;
-		case 'O':
-			index = 14;
-			break;
-		case 'P':
-			index = 15;
-			break;
-		case 'Q':
-			index = 16;
-			break;
-		case 'R':
-			index = 17;
-			break;
-		default: // case 'S':
-			index = 18;
-			break;
-		}
-		return index;
-	}*/
+	/*
+	 * private int getIndustryDivisionIndex(char divisionCode) { int index = 0;
+	 * switch (divisionCode) { case 'A': index = 0; break; case 'B': index = 1;
+	 * break; case 'C': index = 2; break; case 'D': index = 3; break; case 'E':
+	 * index = 4; break; case 'F': index = 5; break; case 'G': index = 6; break;
+	 * case 'H': index = 7; break; case 'I': index = 8; break; case 'J': index = 9;
+	 * break; case 'K': index = 10; break; case 'L': index = 11; break; case 'M':
+	 * index = 12; break; case 'N': index = 13; break; case 'O': index = 14; break;
+	 * case 'P': index = 15; break; case 'Q': index = 16; break; case 'R': index =
+	 * 17; break; default: // case 'S': index = 18; break; } return index; }
+	 */
 
 	/**
 	 * @param data the data to set
 	 */
-	/*@Autowired
-	public void setCommonData(CalibrationData data) {
-		this.commonData = data;
-	}*/
+	/*
+	 * @Autowired public void setCommonData(CalibrationData data) { this.commonData
+	 * = data; }
+	 */
 
 	/**
 	 * @param area the area to set
 	 */
-	/*@Autowired
-	public void setArea(AreaMapping area) {
-		this.area = area;
-	}*/
+	/*
+	 * @Autowired public void setArea(AreaMapping area) { this.area = area; }
+	 */
 
 	/**
 	 * @param economy the economy to set
@@ -1637,11 +1540,4 @@ public class CalibrateEconomy {
 		this.economy = economy;
 	}
 
-	/**
-	 * @param properties the properties to set
-	 */
-	@Autowired
-	public void setProperties(Properties properties) {
-		this.properties = properties;
-	}
 }
