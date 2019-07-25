@@ -28,6 +28,8 @@ import org.springframework.stereotype.Component;
 import com.opencsv.CSVReader;
 
 import gnu.trove.map.hash.TObjectFloatHashMap;
+import xyz.struthers.rhul.ham.config.PropertiesXml;
+import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 
 /**
  * Loads CSV data downloaded using Table Builder from the ABS, RBA, APRA and
@@ -45,6 +47,9 @@ public class CalibrationData {
 	public static final float MILLION = 1000000f;
 	public static final float THOUSAND = 1000f;
 	public static final float PERCENT = 0.01f;
+
+	// properties
+	PropertiesXml properties;
 
 	// map implementation optimisation
 	public static final float MAP_LOAD_FACTOR = 0.75f;
@@ -117,9 +122,10 @@ public class CalibrationData {
 	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table37f; // imports TAS
 	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table37g; // imports NT
 	private Map<String, TObjectFloatHashMap<Date>> abs5368_0Table37h; // imports ACT
-	private Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>> abs5368_0Exporters; // formatted export data
-																							// (keys: industry, state,
-																							// country, value range)
+	private Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>> abs5368_0Exporters; // formatted export
+																									// data
+	// (keys: industry, state,
+	// country, value range)
 	private Map<String, TObjectFloatHashMap<String>> abs8167_0Table3; // main source of income
 	private Map<String, TObjectFloatHashMap<String>> abs8167_0Table6; // main supplier
 
@@ -621,7 +627,8 @@ public class CalibrationData {
 		 * + "/data/ABS/1292.0.55.002_ANZSIC/1292.0.55.002_ANZSIC codes formatted.csv",
 		 * ABS1292_0_55_002_ANZSIC, this.title, this.abs1292_0_55_002ANZSIC);
 		 */
-		this.loadAbsDataCsv_1292_0_55_002("/data/ABS/1292.0.55.002_ANZSIC/1292.0.55.002_ANZSIC codes formatted.csv",
+		this.loadAbsDataCsv_1292_0_55_002(
+				properties.getFilename("ABS/1292.0.55.002_ANZSIC") + "1292.0.55.002_ANZSIC codes formatted.csv",
 				ABS1292_0_55_002_ANZSIC, this.title, this.abs1292_0_55_002ANZSIC);
 
 		// load RBA data
@@ -629,8 +636,8 @@ public class CalibrationData {
 		int[] rbaE1Columns = { 1, 3, 4, 5, 6, 7, 9, 10, 11, 14, 15, 16, 17, 18, 20, 23 };
 		int rbaE1MapCapacity = (int) Math.ceil(rbaE1Columns.length / MAP_LOAD_FACTOR);
 		this.rbaE1 = new HashMap<String, TObjectFloatHashMap<Date>>(rbaE1MapCapacity);
-		this.loadRbaDataCsv("/data/RBA/E_HouseholdBusiness/e1-data.csv", RBA_E1, rbaE1Columns, this.title,
-				this.unitType, this.rbaE1);
+		this.loadRbaDataCsv(properties.getFilename("RBA/E_HouseholdBusiness") + "e1-data.csv", RBA_E1, rbaE1Columns,
+				this.title, this.unitType, this.rbaE1);
 
 		// load ABS 5368.0 International Trade data
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 5368.0 International Trade data");
@@ -649,92 +656,110 @@ public class CalibrationData {
 				248, 249, 250, 251, 252 };
 		int abs5368_0MapCapacity = (int) Math.ceil(abs5368_0Columns.length / MAP_LOAD_FACTOR);
 		this.abs5368_0Table14a = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
-		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368014a - exports by country.csv", ABS_5368_0_T14A,
+		this.loadAbsDataCsv_Catalogue(
+				properties.getFilename("ABS/5368.0_IntlTrade") + "5368014a - exports by country.csv", ABS_5368_0_T14A,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table14a);
 
 		System.out.print(", 14b");
 		this.abs5368_0Table14b = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
-		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368014b - imports by country.csv", ABS_5368_0_T14B,
+		this.loadAbsDataCsv_Catalogue(
+				properties.getFilename("ABS/5368.0_IntlTrade") + "5368014b - imports by country.csv", ABS_5368_0_T14B,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table14b);
 
 		System.out.print(", 36a");
 		this.abs5368_0Table36a = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
-		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036a - merch exports NSW.csv", ABS_5368_0_T36A,
+		this.loadAbsDataCsv_Catalogue(
+				properties.getFilename("ABS/5368.0_IntlTrade") + "5368036a - merch exports NSW.csv", ABS_5368_0_T36A,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36a);
 
 		System.out.print(", 36b");
 		this.abs5368_0Table36b = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
-		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036b - merch exports VIC.csv", ABS_5368_0_T36B,
+		this.loadAbsDataCsv_Catalogue(
+				properties.getFilename("ABS/5368.0_IntlTrade") + "5368036b - merch exports VIC.csv", ABS_5368_0_T36B,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36b);
 
 		System.out.print(", 36c");
 		this.abs5368_0Table36c = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
-		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036c - merch exports QLD.csv", ABS_5368_0_T36C,
+		this.loadAbsDataCsv_Catalogue(
+				properties.getFilename("ABS/5368.0_IntlTrade") + "5368036c - merch exports QLD.csv", ABS_5368_0_T36C,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36c);
 
 		System.out.print(", 36d");
 		this.abs5368_0Table36d = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
-		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036d - merch exports SA.csv", ABS_5368_0_T36D,
+		this.loadAbsDataCsv_Catalogue(
+				properties.getFilename("ABS/5368.0_IntlTrade") + "5368036d - merch exports SA.csv", ABS_5368_0_T36D,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36d);
 
 		System.out.print(", 36e");
 		this.abs5368_0Table36e = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
-		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036e - merch exports WA.csv", ABS_5368_0_T36E,
+		this.loadAbsDataCsv_Catalogue(
+				properties.getFilename("ABS/5368.0_IntlTrade") + "5368036e - merch exports WA.csv", ABS_5368_0_T36E,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36e);
 
 		System.out.print(", 36f");
 		this.abs5368_0Table36f = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
-		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036f - merch exports TAS.csv", ABS_5368_0_T36F,
+		this.loadAbsDataCsv_Catalogue(
+				properties.getFilename("ABS/5368.0_IntlTrade") + "5368036f - merch exports TAS.csv", ABS_5368_0_T36F,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36f);
 
 		System.out.print(", 36g");
 		this.abs5368_0Table36g = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
-		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036g - merch exports NT.csv", ABS_5368_0_T36G,
+		this.loadAbsDataCsv_Catalogue(
+				properties.getFilename("ABS/5368.0_IntlTrade") + "5368036g - merch exports NT.csv", ABS_5368_0_T36G,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36g);
 
 		System.out.print(", 36h");
 		this.abs5368_0Table36h = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
-		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368036h - merch exports ACT.csv", ABS_5368_0_T36H,
+		this.loadAbsDataCsv_Catalogue(
+				properties.getFilename("ABS/5368.0_IntlTrade") + "5368036h - merch exports ACT.csv", ABS_5368_0_T36H,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table36h);
 
 		System.out.print(", 37a");
 		this.abs5368_0Table37a = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
-		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037a - merch imports NSW.csv", ABS_5368_0_T37A,
+		this.loadAbsDataCsv_Catalogue(
+				properties.getFilename("ABS/5368.0_IntlTrade") + "5368037a - merch imports NSW.csv", ABS_5368_0_T37A,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37a);
 
 		System.out.print(", 37b");
 		this.abs5368_0Table37b = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
-		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037b - merch imports VIC.csv", ABS_5368_0_T37B,
+		this.loadAbsDataCsv_Catalogue(
+				properties.getFilename("ABS/5368.0_IntlTrade") + "5368037b - merch imports VIC.csv", ABS_5368_0_T37B,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37b);
 
 		System.out.print(", 37c");
 		this.abs5368_0Table37c = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
-		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037c - merch imports QLD.csv", ABS_5368_0_T37C,
+		this.loadAbsDataCsv_Catalogue(
+				properties.getFilename("ABS/5368.0_IntlTrade") + "5368037c - merch imports QLD.csv", ABS_5368_0_T37C,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37c);
 
 		System.out.print(", 37d");
 		this.abs5368_0Table37d = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
-		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037d - merch imports SA.csv", ABS_5368_0_T37D,
+		this.loadAbsDataCsv_Catalogue(
+				properties.getFilename("ABS/5368.0_IntlTrade") + "5368037d - merch imports SA.csv", ABS_5368_0_T37D,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37d);
 
 		System.out.print(", 37e");
 		this.abs5368_0Table37e = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
-		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037e - merch imports WA.csv", ABS_5368_0_T37E,
+		this.loadAbsDataCsv_Catalogue(
+				properties.getFilename("ABS/5368.0_IntlTrade") + "5368037e - merch imports WA.csv", ABS_5368_0_T37E,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37e);
 
 		System.out.print(", 37f");
 		this.abs5368_0Table37f = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
-		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037f - merch imports TAS.csv", ABS_5368_0_T37F,
+		this.loadAbsDataCsv_Catalogue(
+				properties.getFilename("ABS/5368.0_IntlTrade") + "5368037f - merch imports TAS.csv", ABS_5368_0_T37F,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37f);
 
 		System.out.print(", 37g");
 		this.abs5368_0Table37g = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
-		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037g - merch imports NT.csv", ABS_5368_0_T37G,
+		this.loadAbsDataCsv_Catalogue(
+				properties.getFilename("ABS/5368.0_IntlTrade") + "5368037g - merch imports NT.csv", ABS_5368_0_T37G,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37g);
 
 		System.out.println(", 37h");
 		this.abs5368_0Table37h = new HashMap<String, TObjectFloatHashMap<Date>>(abs5368_0MapCapacity);
-		this.loadAbsDataCsv_Catalogue("/data/ABS/5368.0_IntlTrade/5368037h - merch imports ACT.csv", ABS_5368_0_T37H,
+		this.loadAbsDataCsv_Catalogue(
+				properties.getFilename("ABS/5368.0_IntlTrade") + "5368037h - merch imports ACT.csv", ABS_5368_0_T37H,
 				abs5368_0Columns, this.title, this.unitType, this.abs5368_0Table37h);
 
 		// load ABS 53686.0 exporters data
@@ -744,7 +769,8 @@ public class CalibrationData {
 		int abs5368_0ExportersMapCapacity = (int) Math.ceil(abs5368_0ExportersColumns.length / MAP_LOAD_FACTOR);
 		this.abs5368_0Exporters = new HashMap<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>(
 				abs5368_0ExportersMapCapacity);
-		this.loadAbsDataCsv_5368_0Exporters("/data/ABS/5368.0.55.006_Exporters/5368.0_exporter data.csv",
+		this.loadAbsDataCsv_5368_0Exporters(
+				properties.getFilename("ABS/5368.0.55.006_Exporters") + "5368.0_exporter data.csv",
 				ABS_5368_0_EXPORTERS, abs5368_0ExportersColumns, this.title, this.unitType, this.abs5368_0Exporters);
 
 		// ABS 8167.0 Business Markets and Competition
@@ -755,14 +781,14 @@ public class CalibrationData {
 		this.abs8167_0Table3 = new HashMap<String, TObjectFloatHashMap<String>>(abs8167_0Table3MapCapacity);
 		int[] abs8167_0Table3Rows = { 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 };
 		int abs8167_0titleRow = 6;
-		this.loadAbsDataRowsColumnsCsv("/data/ABS/8167.0_BusMktAndComp/Table3.csv", ABS8167_0_T3,
+		this.loadAbsDataRowsColumnsCsv(properties.getFilename("ABS/8167.0_BusMktAndComp") + "Table3.csv", ABS8167_0_T3,
 				abs8167_0Table3Columns, abs8167_0Table3Rows, abs8167_0titleRow, this.title, this.abs8167_0Table3);
 
 		int[] abs8167_0Table6Columns = { 1, 2, 3, 4, 5 };
 		int abs8167_0Table6MapCapacity = (int) Math.ceil(abs8167_0Table6Columns.length / MAP_LOAD_FACTOR);
 		this.abs8167_0Table6 = new HashMap<String, TObjectFloatHashMap<String>>(abs8167_0Table6MapCapacity);
 		int[] abs8167_0Table6Rows = { 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 };
-		this.loadAbsDataRowsColumnsCsv("/data/ABS/8167.0_BusMktAndComp/Table6.csv", ABS8167_0_T6,
+		this.loadAbsDataRowsColumnsCsv(properties.getFilename("ABS/8167.0_BusMktAndComp") + "Table6.csv", ABS8167_0_T6,
 				abs8167_0Table6Columns, abs8167_0Table6Rows, abs8167_0titleRow, this.title, this.abs8167_0Table6);
 
 		// load pre-formatted ADI data
@@ -773,24 +799,24 @@ public class CalibrationData {
 				28, 29, 30, 31, 32, 34, 35, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 50, 51, 52, 56, 57, 58, 59,
 				60, 63, 66, 67, 68, 79 };
 		String[] adiCategories = { "Major Bank", "Other Domestic Bank", "Foreign Bank", "Mutual ADI" };
-		this.loadAdiDataCsv("/data/ADI/ADI_data.csv", CalibrationData.ADI_DATA, adiColumns, adiCategories, this.title,
-				this.unitType, this.adiData);
+		this.loadAdiDataCsv(properties.getFilename("ADI") + "ADI_data.csv", CalibrationData.ADI_DATA, adiColumns,
+				adiCategories, this.title, this.unitType, this.adiData);
 
 		// load pre-formatted currency data (approx 5.51 kB)
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading currency data");
 		int currencyDataMapCapacity = (int) Math.ceil(NUM_CURRENCIES / MAP_LOAD_FACTOR);
 		this.currencyData = new HashMap<String, Map<String, String>>(currencyDataMapCapacity);
 		int[] currencyColumns = { 1, 61, 62, 63, 64 };
-		this.loadCurrencyDataCsv("/data/FxRates/FX Rates_Monthly.csv", CalibrationData.CCY_DATA, currencyColumns,
-				this.title, this.currencyData);
+		this.loadCurrencyDataCsv(properties.getFilename("FxRates") + "FX Rates_Monthly.csv", CalibrationData.CCY_DATA,
+				currencyColumns, this.title, this.currencyData);
 
 		// load pre-formatted country data (approx 4.83 kB)
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading country data");
 		int countryDataMapCapacity = (int) Math.ceil(NUM_COUNTRIES / MAP_LOAD_FACTOR);
 		this.countryData = new HashMap<String, Map<String, String>>(countryDataMapCapacity);
 		int[] countryColumns = { 1, 3 };
-		this.loadCountryDataCsv("/data/FxRates/CountriesCurrencies_ABS.csv", CalibrationData.COUNTRY_DATA,
-				countryColumns, this.title, this.countryData);
+		this.loadCountryDataCsv(properties.getFilename("FxRates") + "CountriesCurrencies_ABS.csv",
+				CalibrationData.COUNTRY_DATA, countryColumns, this.title, this.countryData);
 
 		// load RBA Balance Sheet (337 bytes) and Profit & Loss Statement (335 bytes)
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading RBA financial statements");
@@ -799,15 +825,15 @@ public class CalibrationData {
 		this.rbaBalSht = new TObjectFloatHashMap<String>(rbaBalShtMapCapacity);
 		int rbaBalShtColumn = 2;
 		float rbaMultiplier = 1f;
-		this.loadFinancialStatementCsv("/data/RBA/RBA_BalSht.csv", CalibrationData.RBA_BS, rbaBalShtColumn,
-				rbaBalShtRows, this.title, this.rbaBalSht, rbaMultiplier);
+		this.loadFinancialStatementCsv(properties.getFilename("RBA") + "RBA_BalSht.csv", CalibrationData.RBA_BS,
+				rbaBalShtColumn, rbaBalShtRows, this.title, this.rbaBalSht, rbaMultiplier);
 
 		int[] rbaProfitLossRows = { 3, 4, 5, 6, 7, 8, 9, 13, 14, 15, 18, 19 };
 		int rbaProfitLossMapCapacity = (int) Math.ceil(rbaProfitLossRows.length / MAP_LOAD_FACTOR);
 		this.rbaProfitLoss = new TObjectFloatHashMap<String>(rbaProfitLossMapCapacity);
 		int rbaProfitLossColumn = 2;
-		this.loadFinancialStatementCsv("/data/RBA/RBA_PnL.csv", CalibrationData.RBA_PL, rbaProfitLossColumn,
-				rbaProfitLossRows, this.title, this.rbaProfitLoss, rbaMultiplier);
+		this.loadFinancialStatementCsv(properties.getFilename("RBA") + "RBA_PnL.csv", CalibrationData.RBA_PL,
+				rbaProfitLossColumn, rbaProfitLossRows, this.title, this.rbaProfitLoss, rbaMultiplier);
 
 		// load Australian Government Financial Statistics
 		System.out
@@ -817,14 +843,16 @@ public class CalibrationData {
 		this.govtBalSht = new TObjectFloatHashMap<String>(govtBalShtMapCapacity);
 		int govtBalShtColumn = 10;
 		float govtMultiplier = 1000000f;
-		this.loadFinancialStatementCsv("/data/ABS/5512.0_GovtFinStats/55120DO057_201617 - Table 3 - Bal Sht.csv",
+		this.loadFinancialStatementCsv(
+				properties.getFilename("ABS/5512.0_GovtFinStats") + "55120DO057_201617 - Table 3 - Bal Sht.csv",
 				CalibrationData.GOVT_PL, govtBalShtColumn, govtBalShtRows, this.title, this.govtBalSht, govtMultiplier);
 
 		int[] govtProfitLossRows = { 7, 9, 10, 12, 17, 18, 22, 23, 37, 48 };
 		int govtProfitLossMapCapacity = (int) Math.ceil(govtProfitLossRows.length / MAP_LOAD_FACTOR);
 		this.govtProfitLoss = new TObjectFloatHashMap<String>(govtProfitLossMapCapacity);
 		int govtProfitLossColumn = 10;
-		this.loadFinancialStatementCsv("/data/ABS/5512.0_GovtFinStats/55120DO057_201617 - Table 1 - P&L.csv",
+		this.loadFinancialStatementCsv(
+				properties.getFilename("ABS/5512.0_GovtFinStats") + "55120DO057_201617 - Table 1 - P&L.csv",
 				CalibrationData.GOVT_PL, govtProfitLossColumn, govtProfitLossRows, this.title, this.govtProfitLoss,
 				govtMultiplier);
 
@@ -866,7 +894,8 @@ public class CalibrationData {
 	 *                             Keys: Series ID, Date
 	 */
 	private void loadRbaDataCsv(String fileResourceLocation, String dataSourceName, int[] columnsToImport,
-			Map<String, List<String>> titles, Map<String, List<String>> units, Map<String, TObjectFloatHashMap<Date>> data) {
+			Map<String, List<String>> titles, Map<String, List<String>> units,
+			Map<String, TObjectFloatHashMap<Date>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -958,7 +987,7 @@ public class CalibrationData {
 	 * "Group Code to Division Code"<br>
 	 * "Subdivision Code to Division Code"<br>
 	 * 
-	 * @param               - the URI of the file to import
+	 * @param -             the URI of the file to import
 	 * @param catalogueName - the name used to store this series' data in the maps
 	 * @param titles        - this is a list of the mapping pairs (e.g. "Group Code
 	 *                      to Subdivision Code")
@@ -1073,7 +1102,8 @@ public class CalibrationData {
 	 *                             Keys: series ID, date
 	 */
 	private void loadAbsDataCsv_Catalogue(String fileResourceLocation, String catalogueName, int[] columnsToImport,
-			Map<String, List<String>> titles, Map<String, List<String>> units, Map<String, TObjectFloatHashMap<Date>> data) {
+			Map<String, List<String>> titles, Map<String, List<String>> units,
+			Map<String, TObjectFloatHashMap<Date>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -1251,7 +1281,8 @@ public class CalibrationData {
 	 *                             Keys: column title, row name (first column).
 	 */
 	private void loadAbsDataRowsColumnsCsv(String fileResourceLocation, String dataSourceName, int[] columnsToImport,
-			int[] rowsToImport, int titleRow, Map<String, List<String>> titles, Map<String, TObjectFloatHashMap<String>> data) {
+			int[] rowsToImport, int titleRow, Map<String, List<String>> titles,
+			Map<String, TObjectFloatHashMap<String>> data) {
 
 		CSVReader reader = null;
 		try {
@@ -1556,6 +1587,8 @@ public class CalibrationData {
 
 	@PostConstruct
 	private void init() {
+		this.properties = PropertiesXmlFactory.getProperties();
+
 		this.dataLoaded = false;
 
 		this.title = null;

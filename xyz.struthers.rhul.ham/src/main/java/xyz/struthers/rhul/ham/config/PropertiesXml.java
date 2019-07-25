@@ -115,7 +115,8 @@ public class PropertiesXml implements Serializable {
 	private boolean useActualWages; // = true;
 
 	// data sources
-	private String dataSubFolder; // the census year the data corresponds to (for calibration)
+	@XmlElementWrapper(name = "filenames")
+	private Map<String, String> file; // varies by census year
 	private String rbaE1DateString; // = "Jun-2018";
 	private String abs1410Year; // = "2016";
 	private String abs8155Year; // = "2016-17";
@@ -653,18 +654,20 @@ public class PropertiesXml implements Serializable {
 		this.useActualWages = useActualWages;
 	}
 
-	/**
-	 * @return the dataSubFolder
-	 */
-	public String getDataSubFolder() {
-		return dataSubFolder;
+	public Map<String, String> getFilenames() {
+		return file;
 	}
 
-	/**
-	 * @param dataSubFolder the dataSubFolder to set
-	 */
-	public void setDataSubFolder(String dataSubFolder) {
-		this.dataSubFolder = dataSubFolder;
+	public String getFilename(String key) {
+		return file.get(key);
+	}
+
+	public void setFilenames(Map<String, String> file) {
+		this.file = file;
+	}
+
+	public void putFilename(String key, String filename) {
+		this.file.put(key, filename);
 	}
 
 	/**

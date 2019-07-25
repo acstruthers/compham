@@ -25,6 +25,8 @@ import org.springframework.stereotype.Component;
 import com.opencsv.CSVReader;
 
 import gnu.trove.map.hash.TObjectFloatHashMap;
+import xyz.struthers.rhul.ham.config.PropertiesXml;
+import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 
 /**
  * Loads CSV data downloaded using Table Builder from the ABS, RBA, APRA and
@@ -60,6 +62,9 @@ public class CalibrationDataIndividual {
 	public static final String ATO_INDIVIDUAL_T9 = "ATO_IndividualTable9";
 
 	public static final String CENSUS_SEXP_POA_AGE5P_INDP_INCP = "Census SEXP by POA (UR) by AGE5P, INDP and INCP";
+
+	// properties
+	PropertiesXml properties;
 
 	// beans
 	private AreaMapping area;
@@ -285,48 +290,57 @@ public class CalibrationDataIndividual {
 		int toColumnSEXP_POA_AGE5P_INDP_INCP = 8229;
 		System.out.print(": NSW");
 		this.loadAbsCensusTableCsv3Columns1Wafer(
-				"/data/ABS/CensusTableBuilder2016/SEXP by POA (UR) by AGE5P, INDP and INCP/SEXP by POA (UR) by AGE5P, INDP and INCP - NSW.csv",
+				properties.getFilename("ABS/CensusTableBuilder")
+						+ "SEXP by POA (UR) by AGE5P, INDP and INCP/SEXP by POA (UR) by AGE5P, INDP and INCP - NSW.csv",
 				this.initialisedCensusSEXP_POA_AGE5P_INDP_INCP, fromColumnSEXP_POA_AGE5P_INDP_INCP,
 				toColumnSEXP_POA_AGE5P_INDP_INCP, this.censusSEXP_POA_AGE5P_INDP_INCP, "POA");
 		this.initialisedCensusSEXP_POA_AGE5P_INDP_INCP = true;
 		System.out.print(", VIC");
 		this.loadAbsCensusTableCsv3Columns1Wafer(
-				"/data/ABS/CensusTableBuilder2016/SEXP by POA (UR) by AGE5P, INDP and INCP/SEXP by POA (UR) by AGE5P, INDP and INCP - VIC.csv",
+				properties.getFilename("ABS/CensusTableBuilder")
+						+ "SEXP by POA (UR) by AGE5P, INDP and INCP/SEXP by POA (UR) by AGE5P, INDP and INCP - VIC.csv",
 				this.initialisedCensusSEXP_POA_AGE5P_INDP_INCP, fromColumnSEXP_POA_AGE5P_INDP_INCP,
 				toColumnSEXP_POA_AGE5P_INDP_INCP, this.censusSEXP_POA_AGE5P_INDP_INCP, "POA");
 		System.out.print(", QLD");
 		this.loadAbsCensusTableCsv3Columns1Wafer(
-				"/data/ABS/CensusTableBuilder2016/SEXP by POA (UR) by AGE5P, INDP and INCP/SEXP by POA (UR) by AGE5P, INDP and INCP - QLD.csv",
+				properties.getFilename("ABS/CensusTableBuilder")
+						+ "SEXP by POA (UR) by AGE5P, INDP and INCP/SEXP by POA (UR) by AGE5P, INDP and INCP - QLD.csv",
 				this.initialisedCensusSEXP_POA_AGE5P_INDP_INCP, fromColumnSEXP_POA_AGE5P_INDP_INCP,
 				toColumnSEXP_POA_AGE5P_INDP_INCP, this.censusSEXP_POA_AGE5P_INDP_INCP, "POA");
 		System.out.print(", SA");
 		this.loadAbsCensusTableCsv3Columns1Wafer(
-				"/data/ABS/CensusTableBuilder2016/SEXP by POA (UR) by AGE5P, INDP and INCP/SEXP by POA (UR) by AGE5P, INDP and INCP - SA.csv",
+				properties.getFilename("ABS/CensusTableBuilder")
+						+ "SEXP by POA (UR) by AGE5P, INDP and INCP/SEXP by POA (UR) by AGE5P, INDP and INCP - SA.csv",
 				this.initialisedCensusSEXP_POA_AGE5P_INDP_INCP, fromColumnSEXP_POA_AGE5P_INDP_INCP,
 				toColumnSEXP_POA_AGE5P_INDP_INCP, this.censusSEXP_POA_AGE5P_INDP_INCP, "POA");
 		System.out.print(", WA");
 		this.loadAbsCensusTableCsv3Columns1Wafer(
-				"/data/ABS/CensusTableBuilder2016/SEXP by POA (UR) by AGE5P, INDP and INCP/SEXP by POA (UR) by AGE5P, INDP and INCP - WA.csv",
+				properties.getFilename("ABS/CensusTableBuilder")
+						+ "SEXP by POA (UR) by AGE5P, INDP and INCP/SEXP by POA (UR) by AGE5P, INDP and INCP - WA.csv",
 				this.initialisedCensusSEXP_POA_AGE5P_INDP_INCP, fromColumnSEXP_POA_AGE5P_INDP_INCP,
 				toColumnSEXP_POA_AGE5P_INDP_INCP, this.censusSEXP_POA_AGE5P_INDP_INCP, "POA");
 		System.out.print(", TAS");
 		this.loadAbsCensusTableCsv3Columns1Wafer(
-				"/data/ABS/CensusTableBuilder2016/SEXP by POA (UR) by AGE5P, INDP and INCP/SEXP by POA (UR) by AGE5P, INDP and INCP - TAS.csv",
+				properties.getFilename("ABS/CensusTableBuilder")
+						+ "SEXP by POA (UR) by AGE5P, INDP and INCP/SEXP by POA (UR) by AGE5P, INDP and INCP - TAS.csv",
 				this.initialisedCensusSEXP_POA_AGE5P_INDP_INCP, fromColumnSEXP_POA_AGE5P_INDP_INCP,
 				toColumnSEXP_POA_AGE5P_INDP_INCP, this.censusSEXP_POA_AGE5P_INDP_INCP, "POA");
 		System.out.print(", NT");
 		this.loadAbsCensusTableCsv3Columns1Wafer(
-				"/data/ABS/CensusTableBuilder2016/SEXP by POA (UR) by AGE5P, INDP and INCP/SEXP by POA (UR) by AGE5P, INDP and INCP - NT.csv",
+				properties.getFilename("ABS/CensusTableBuilder")
+						+ "SEXP by POA (UR) by AGE5P, INDP and INCP/SEXP by POA (UR) by AGE5P, INDP and INCP - NT.csv",
 				this.initialisedCensusSEXP_POA_AGE5P_INDP_INCP, fromColumnSEXP_POA_AGE5P_INDP_INCP,
 				toColumnSEXP_POA_AGE5P_INDP_INCP, this.censusSEXP_POA_AGE5P_INDP_INCP, "POA");
 		System.out.print(", ACT");
 		this.loadAbsCensusTableCsv3Columns1Wafer(
-				"/data/ABS/CensusTableBuilder2016/SEXP by POA (UR) by AGE5P, INDP and INCP/SEXP by POA (UR) by AGE5P, INDP and INCP - ACT.csv",
+				properties.getFilename("ABS/CensusTableBuilder")
+						+ "SEXP by POA (UR) by AGE5P, INDP and INCP/SEXP by POA (UR) by AGE5P, INDP and INCP - ACT.csv",
 				this.initialisedCensusSEXP_POA_AGE5P_INDP_INCP, fromColumnSEXP_POA_AGE5P_INDP_INCP,
 				toColumnSEXP_POA_AGE5P_INDP_INCP, this.censusSEXP_POA_AGE5P_INDP_INCP, "POA");
 		System.out.println(", OT.");
 		this.loadAbsCensusTableCsv3Columns1Wafer(
-				"/data/ABS/CensusTableBuilder2016/SEXP by POA (UR) by AGE5P, INDP and INCP/SEXP by POA (UR) by AGE5P, INDP and INCP - OT.csv",
+				properties.getFilename("ABS/CensusTableBuilder")
+						+ "SEXP by POA (UR) by AGE5P, INDP and INCP/SEXP by POA (UR) by AGE5P, INDP and INCP - OT.csv",
 				this.initialisedCensusSEXP_POA_AGE5P_INDP_INCP, fromColumnSEXP_POA_AGE5P_INDP_INCP,
 				toColumnSEXP_POA_AGE5P_INDP_INCP, this.censusSEXP_POA_AGE5P_INDP_INCP, "POA");
 
@@ -351,8 +365,8 @@ public class CalibrationDataIndividual {
 		int ato2aMapCapacity = (int) Math.ceil(atoIndividualTable2aColumns.length / MAP_LOAD_FACTOR);
 		this.atoIndividualTable2a = new HashMap<String, Map<String, Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>>>(
 				ato2aMapCapacity);
-		this.loadAtoIndividualsTable2a("/data/ATO/Individual/IndividualsTable2A.csv", ATO_INDIVIDUAL_T2A,
-				atoIndividualTable2aColumns, this.title, this.atoIndividualTable2a);
+		this.loadAtoIndividualsTable2a(properties.getFilename("ATO/Individual") + "IndividualsTable2A.csv",
+				ATO_INDIVIDUAL_T2A, atoIndividualTable2aColumns, this.title, this.atoIndividualTable2a);
 
 		if (DEBUG) {
 			System.gc();
@@ -372,8 +386,8 @@ public class CalibrationDataIndividual {
 		int ato3aMapCapacity = (int) Math.ceil(atoIndividualTable3aColumns.length / MAP_LOAD_FACTOR);
 		this.atoIndividualTable3a = new HashMap<String, Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>>(
 				ato3aMapCapacity);
-		this.loadAtoIndividualsTable3a("/data/ATO/Individual/IndividualsTable3A.csv", ATO_INDIVIDUAL_T3A,
-				atoIndividualTable3aColumns, this.title, this.atoIndividualTable3a);
+		this.loadAtoIndividualsTable3a(properties.getFilename("ATO/Individual") + "IndividualsTable3A.csv",
+				ATO_INDIVIDUAL_T3A, atoIndividualTable3aColumns, this.title, this.atoIndividualTable3a);
 
 		if (DEBUG) {
 			System.gc();
@@ -392,8 +406,8 @@ public class CalibrationDataIndividual {
 		int[] atoIndividualTable6bColumns = { 2, 3, 4 };
 		int ato6bMapCapacity = (int) Math.ceil(atoIndividualTable6bColumns.length / MAP_LOAD_FACTOR);
 		this.atoIndividualTable6b = new HashMap<String, TObjectFloatHashMap<String>>(ato6bMapCapacity);
-		this.loadAtoIndividualsTable6("/data/ATO/Individual/IndividualsTable6B.csv", ATO_INDIVIDUAL_T6B,
-				atoIndividualTable6bColumns, this.title, this.atoIndividualTable6b);
+		this.loadAtoIndividualsTable6(properties.getFilename("ATO/Individual") + "IndividualsTable6B.csv",
+				ATO_INDIVIDUAL_T6B, atoIndividualTable6bColumns, this.title, this.atoIndividualTable6b);
 
 		if (DEBUG) {
 			System.gc();
@@ -422,8 +436,8 @@ public class CalibrationDataIndividual {
 		int[] atoIndividualTable9Columns = { 2, 3, 4 };
 		int ato9MapCapacity = (int) Math.ceil(atoIndividualTable9Columns.length / MAP_LOAD_FACTOR);
 		this.atoIndividualTable9DivisionSummary = new HashMap<String, Map<String, Float>>(ato9MapCapacity);
-		this.loadAtoIndividualsTable9DivisionSummary("/data/ATO/Individual/IndividualsTable9.csv", ATO_INDIVIDUAL_T9,
-				atoIndividualTable9Columns, this.title, this.atoIndividualTable9DivisionSummary);
+		this.loadAtoIndividualsTable9DivisionSummary(properties.getFilename("ATO/Individual") + "IndividualsTable9.csv",
+				ATO_INDIVIDUAL_T9, atoIndividualTable9Columns, this.title, this.atoIndividualTable9DivisionSummary);
 		// this.atoIndividualTable9 = new HashMap<String, Map<String,
 		// String>>(ato9MapCapacity);
 		// this.loadAtoIndividualsTable9("/data/ATO/Individual/IndividualsTable9.csv",
@@ -702,128 +716,71 @@ public class CalibrationDataIndividual {
 		}
 	}
 
-	/*private void loadAbsCensusTableCsv3Columns1WaferJDK(String fileResourceLocation, boolean isInitialised,
-			int fromColumnIndex, int toColumnIndex,
-			Map<String, Map<String, Map<String, Map<String, Map<String, Float>>>>> data, String lgaOrPoa) {
-
-		CSVReader reader = null;
-		try {
-			InputStream is = this.getClass().getResourceAsStream(fileResourceLocation);
-			reader = new CSVReader(new InputStreamReader(is));
-			boolean header = true;
-			boolean footer = false;
-			int currentRow = 1;
-			int lastHeaderRow = 9; // the row before the first wafer's title row
-			boolean prevRowIsBlank = true; // there's a blank row before wafer names
-			String waferName = null;
-			int waferNumber = 0;
-			int columnSeriesNumber = Integer.MAX_VALUE;
-			final int columnSeriesMax = 3; // because the dataset contains 3 column series
-			String[][] columnTitles = new String[columnSeriesMax][toColumnIndex - fromColumnIndex];
-
-			String[] line = null;
-			while ((line = reader.readNext()) != null) {
-				if (header) {
-					if (currentRow++ == lastHeaderRow) {
-						header = false;
-					}
-				} else if (!footer) {
-					if (line[0].length() > 11 && line[0].substring(0, 11).equals("Data Source")) {
-						footer = true;
-					} else {
-						if (prevRowIsBlank && !line[0].isBlank()) {
-							// set wafer name
-							waferName = line[0].trim();
-							waferName = waferName.substring(0, 1); // wafer is sex, so just take the first letter (M, F)
-							columnSeriesNumber = 0;
-							waferNumber++;
-							prevRowIsBlank = false;
-						} else {
-							if (columnSeriesNumber < columnSeriesMax) {
-								// set series ID
-								String thisTitle = null;
-								for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
-									thisTitle = line[i + fromColumnIndex].isEmpty() ? thisTitle
-											: line[i + fromColumnIndex];
-									columnTitles[columnSeriesNumber][i] = thisTitle;
-								}
-								columnSeriesNumber++;
-							} else if (columnSeriesNumber == columnSeriesMax && !isInitialised) {
-								// add blank maps to data, so they can be populated below
-								if (waferNumber == 1) {
-									for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
-										if (!columnTitles[0][i].isBlank() && !data.containsKey(columnTitles[0][i])) {
-											// add column series 1 key
-											data.put(columnTitles[0][i],
-													new HashMap<String, Map<String, Map<String, Map<String, Float>>>>(
-															MAP_INIT_SIZE_INDP));
-										}
-										String divCode = this.abs1292_0_55_002ANZSIC.get("Division to Division Code")
-												.get(columnTitles[1][i].toUpperCase());
-										if (!columnTitles[1][i].isBlank()
-												&& !data.get(columnTitles[0][i]).containsKey(divCode)) {
-											// add column series 2 key
-											// convert Industry Division Description to Code
-											data.get(columnTitles[0][i]).put(divCode,
-													new HashMap<String, Map<String, Map<String, Float>>>(
-															MAP_INIT_SIZE_INCP));
-										}
-										if (!columnTitles[2][i].isBlank() && !data.get(columnTitles[0][i]).get(divCode)
-												.containsKey(columnTitles[2][i])) {
-											// add column series 3 key
-											data.get(columnTitles[0][i]).get(divCode).put(columnTitles[2][i],
-													new HashMap<String, Map<String, Float>>(MAP_INIT_SIZE_LGA));
-										}
-									}
-								}
-								columnSeriesNumber++; // make sure this is only executed once
-							} else if (line.length > 1 && !line[1].isBlank()) {
-								// parse the body of the data
-								String areaCode = null;
-								if (lgaOrPoa.equalsIgnoreCase("LGA")) {
-									areaCode = this.area.getLgaCodeFromName(line[0]);
-								} else {
-									// assume it's POA in the format NNNN, SSS
-									if (!line[0].equalsIgnoreCase("Total")) {
-										areaCode = line[0].substring(0, line[0].indexOf(","));
-									}
-								}
-								if (areaCode != null) {
-									// null check excludes invalid LGAs
-									for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
-										String divCode = this.abs1292_0_55_002ANZSIC.get("Division to Division Code")
-												.get(columnTitles[1][i].toUpperCase());
-										if (waferNumber == 1) {
-											data.get(columnTitles[0][i]).get(divCode).get(columnTitles[2][i])
-													.put(areaCode, new HashMap<String, Float>(MAP_INIT_SIZE_SEXP));
-										}
-										float value = 0f;
-										try {
-											value = Float.valueOf(line[i + fromColumnIndex].trim().replace(",", ""));
-										} catch (NumberFormatException e) {
-											// do nothing and leave it as zero.
-										}
-										data.get(columnTitles[0][i]).get(divCode).get(columnTitles[2][i]).get(areaCode)
-												.put(waferName, value);
-									}
-								}
-							} else if (line[0].isBlank()) {
-								prevRowIsBlank = true;
-							}
-						}
-					}
-				}
-			}
-			reader.close();
-			reader = null;
-		} catch (FileNotFoundException e) {
-			// open file
-			e.printStackTrace();
-		} catch (IOException e) {
-			// read next
-			e.printStackTrace();
-		}
-	}*/
+	/*
+	 * private void loadAbsCensusTableCsv3Columns1WaferJDK(String
+	 * fileResourceLocation, boolean isInitialised, int fromColumnIndex, int
+	 * toColumnIndex, Map<String, Map<String, Map<String, Map<String, Map<String,
+	 * Float>>>>> data, String lgaOrPoa) {
+	 * 
+	 * CSVReader reader = null; try { InputStream is =
+	 * this.getClass().getResourceAsStream(fileResourceLocation); reader = new
+	 * CSVReader(new InputStreamReader(is)); boolean header = true; boolean footer =
+	 * false; int currentRow = 1; int lastHeaderRow = 9; // the row before the first
+	 * wafer's title row boolean prevRowIsBlank = true; // there's a blank row
+	 * before wafer names String waferName = null; int waferNumber = 0; int
+	 * columnSeriesNumber = Integer.MAX_VALUE; final int columnSeriesMax = 3; //
+	 * because the dataset contains 3 column series String[][] columnTitles = new
+	 * String[columnSeriesMax][toColumnIndex - fromColumnIndex];
+	 * 
+	 * String[] line = null; while ((line = reader.readNext()) != null) { if
+	 * (header) { if (currentRow++ == lastHeaderRow) { header = false; } } else if
+	 * (!footer) { if (line[0].length() > 11 && line[0].substring(0,
+	 * 11).equals("Data Source")) { footer = true; } else { if (prevRowIsBlank &&
+	 * !line[0].isBlank()) { // set wafer name waferName = line[0].trim(); waferName
+	 * = waferName.substring(0, 1); // wafer is sex, so just take the first letter
+	 * (M, F) columnSeriesNumber = 0; waferNumber++; prevRowIsBlank = false; } else
+	 * { if (columnSeriesNumber < columnSeriesMax) { // set series ID String
+	 * thisTitle = null; for (int i = 0; i < toColumnIndex - fromColumnIndex; i++) {
+	 * thisTitle = line[i + fromColumnIndex].isEmpty() ? thisTitle : line[i +
+	 * fromColumnIndex]; columnTitles[columnSeriesNumber][i] = thisTitle; }
+	 * columnSeriesNumber++; } else if (columnSeriesNumber == columnSeriesMax &&
+	 * !isInitialised) { // add blank maps to data, so they can be populated below
+	 * if (waferNumber == 1) { for (int i = 0; i < toColumnIndex - fromColumnIndex;
+	 * i++) { if (!columnTitles[0][i].isBlank() &&
+	 * !data.containsKey(columnTitles[0][i])) { // add column series 1 key
+	 * data.put(columnTitles[0][i], new HashMap<String, Map<String, Map<String,
+	 * Map<String, Float>>>>( MAP_INIT_SIZE_INDP)); } String divCode =
+	 * this.abs1292_0_55_002ANZSIC.get("Division to Division Code")
+	 * .get(columnTitles[1][i].toUpperCase()); if (!columnTitles[1][i].isBlank() &&
+	 * !data.get(columnTitles[0][i]).containsKey(divCode)) { // add column series 2
+	 * key // convert Industry Division Description to Code
+	 * data.get(columnTitles[0][i]).put(divCode, new HashMap<String, Map<String,
+	 * Map<String, Float>>>( MAP_INIT_SIZE_INCP)); } if
+	 * (!columnTitles[2][i].isBlank() && !data.get(columnTitles[0][i]).get(divCode)
+	 * .containsKey(columnTitles[2][i])) { // add column series 3 key
+	 * data.get(columnTitles[0][i]).get(divCode).put(columnTitles[2][i], new
+	 * HashMap<String, Map<String, Float>>(MAP_INIT_SIZE_LGA)); } } }
+	 * columnSeriesNumber++; // make sure this is only executed once } else if
+	 * (line.length > 1 && !line[1].isBlank()) { // parse the body of the data
+	 * String areaCode = null; if (lgaOrPoa.equalsIgnoreCase("LGA")) { areaCode =
+	 * this.area.getLgaCodeFromName(line[0]); } else { // assume it's POA in the
+	 * format NNNN, SSS if (!line[0].equalsIgnoreCase("Total")) { areaCode =
+	 * line[0].substring(0, line[0].indexOf(",")); } } if (areaCode != null) { //
+	 * null check excludes invalid LGAs for (int i = 0; i < toColumnIndex -
+	 * fromColumnIndex; i++) { String divCode =
+	 * this.abs1292_0_55_002ANZSIC.get("Division to Division Code")
+	 * .get(columnTitles[1][i].toUpperCase()); if (waferNumber == 1) {
+	 * data.get(columnTitles[0][i]).get(divCode).get(columnTitles[2][i])
+	 * .put(areaCode, new HashMap<String, Float>(MAP_INIT_SIZE_SEXP)); } float value
+	 * = 0f; try { value = Float.valueOf(line[i +
+	 * fromColumnIndex].trim().replace(",", "")); } catch (NumberFormatException e)
+	 * { // do nothing and leave it as zero. }
+	 * data.get(columnTitles[0][i]).get(divCode).get(columnTitles[2][i]).get(
+	 * areaCode) .put(waferName, value); } } } else if (line[0].isBlank()) {
+	 * prevRowIsBlank = true; } } } } } reader.close(); reader = null; } catch
+	 * (FileNotFoundException e) { // open file e.printStackTrace(); } catch
+	 * (IOException e) { // read next e.printStackTrace(); } }
+	 */
 
 	/**
 	 * Loads ABS Census Table Builder tables with one row series, two column series,
@@ -1299,6 +1256,8 @@ public class CalibrationDataIndividual {
 
 	@PostConstruct
 	private void init() {
+		this.properties = PropertiesXmlFactory.getProperties();
+
 		this.dataLoaded = false;
 
 		this.title = null;

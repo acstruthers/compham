@@ -29,6 +29,8 @@ import com.opencsv.CSVReader;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import xyz.struthers.rhul.ham.MemoryUsageBenchmark;
+import xyz.struthers.rhul.ham.config.PropertiesXml;
+import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 
 /**
  * Loads ASGS boundary data from the ABS, downloaded in CSV format. Uses
@@ -42,6 +44,9 @@ import xyz.struthers.rhul.ham.MemoryUsageBenchmark;
 @Component
 @Scope(value = "singleton")
 public class AreaMapping {
+
+	// properties
+	PropertiesXml properties;
 
 	// series names
 	public static final String ABS_3222_0 = "ABS_3222.0"; // population projections
@@ -121,7 +126,7 @@ public class AreaMapping {
 			}
 			this.totalPopulation.put(date, totalPop);
 		}
-		//Properties.setTotalPopulationAU(totalPop);
+		// Properties.setTotalPopulationAU(totalPop);
 		return totalPop;
 	}
 
@@ -512,15 +517,24 @@ public class AreaMapping {
 		final boolean[] absLoadColumn = { false, false, false, false, false, false, false, false, false, false, false,
 				true, true, true, true, false };
 		this.absData = new HashMap<String, Map<String, String>>();
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_ACT.csv", this.absData, absLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_NSW.csv", this.absData, absLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_NT.csv", this.absData, absLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_OT.csv", this.absData, absLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_QLD.csv", this.absData, absLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_SA.csv", this.absData, absLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_TAS.csv", this.absData, absLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_VIC.csv", this.absData, absLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.001_AbsMeshblock/MB_2016_WA.csv", this.absData, absLoadColumn);
+		this.readMeshblockCsvData(properties.getFilename("ABS/1270.0.55.001_AbsMeshblock") + "_ACT.csv", this.absData,
+				absLoadColumn);
+		this.readMeshblockCsvData(properties.getFilename("ABS/1270.0.55.001_AbsMeshblock") + "_NSW.csv", this.absData,
+				absLoadColumn);
+		this.readMeshblockCsvData(properties.getFilename("ABS/1270.0.55.001_AbsMeshblock") + "_NT.csv", this.absData,
+				absLoadColumn);
+		this.readMeshblockCsvData(properties.getFilename("ABS/1270.0.55.001_AbsMeshblock") + "_OT.csv", this.absData,
+				absLoadColumn);
+		this.readMeshblockCsvData(properties.getFilename("ABS/1270.0.55.001_AbsMeshblock") + "_QLD.csv", this.absData,
+				absLoadColumn);
+		this.readMeshblockCsvData(properties.getFilename("ABS/1270.0.55.001_AbsMeshblock") + "_SA.csv", this.absData,
+				absLoadColumn);
+		this.readMeshblockCsvData(properties.getFilename("ABS/1270.0.55.001_AbsMeshblock") + "_TAS.csv", this.absData,
+				absLoadColumn);
+		this.readMeshblockCsvData(properties.getFilename("ABS/1270.0.55.001_AbsMeshblock") + "_VIC.csv", this.absData,
+				absLoadColumn);
+		this.readMeshblockCsvData(properties.getFilename("ABS/1270.0.55.001_AbsMeshblock") + "_WA.csv", this.absData,
+				absLoadColumn);
 
 		// load LGA data
 		this.mapLgaNameToCode = new HashMap<String, String>();
@@ -529,41 +543,42 @@ public class AreaMapping {
 
 		final boolean[] lgaLoadColumn = { false, true, true, false, true, false };
 		this.lgaData = new HashMap<String, Map<String, String>>();
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_NSW.csv", this.lgaData,
-				lgaLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_VIC.csv", this.lgaData,
-				lgaLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_QLD.csv", this.lgaData,
-				lgaLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_SA.csv", this.lgaData,
-				lgaLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_WA.csv", this.lgaData,
-				lgaLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_TAS.csv", this.lgaData,
-				lgaLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_NT.csv", this.lgaData,
-				lgaLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_ACT.csv", this.lgaData,
-				lgaLoadColumn);
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018_OT.csv", this.lgaData,
-				lgaLoadColumn);
+		this.readMeshblockCsvData(properties.getFilename("ABS/1270.0.55.003_NonAbsMeshblock/LGA") + "_NSW.csv",
+				this.lgaData, lgaLoadColumn);
+		this.readMeshblockCsvData(properties.getFilename("ABS/1270.0.55.003_NonAbsMeshblock/LGA") + "_VIC.csv",
+				this.lgaData, lgaLoadColumn);
+		this.readMeshblockCsvData(properties.getFilename("ABS/1270.0.55.003_NonAbsMeshblock/LGA") + "_QLD.csv",
+				this.lgaData, lgaLoadColumn);
+		this.readMeshblockCsvData(properties.getFilename("ABS/1270.0.55.003_NonAbsMeshblock/LGA") + "_SA.csv",
+				this.lgaData, lgaLoadColumn);
+		this.readMeshblockCsvData(properties.getFilename("ABS/1270.0.55.003_NonAbsMeshblock/LGA") + "_WA.csv",
+				this.lgaData, lgaLoadColumn);
+		this.readMeshblockCsvData(properties.getFilename("ABS/1270.0.55.003_NonAbsMeshblock/LGA") + "_TAS.csv",
+				this.lgaData, lgaLoadColumn);
+		this.readMeshblockCsvData(properties.getFilename("ABS/1270.0.55.003_NonAbsMeshblock/LGA") + "_NT.csv",
+				this.lgaData, lgaLoadColumn);
+		this.readMeshblockCsvData(properties.getFilename("ABS/1270.0.55.003_NonAbsMeshblock/LGA") + "_ACT.csv",
+				this.lgaData, lgaLoadColumn);
+		this.readMeshblockCsvData(properties.getFilename("ABS/1270.0.55.003_NonAbsMeshblock/LGA") + "_OT.csv",
+				this.lgaData, lgaLoadColumn);
 
 		// load POA data
 		final boolean[] poaLoadColumn = { false, true, false, false };
 		this.poaData = new HashMap<String, Map<String, String>>();
-		this.readMeshblockCsvData("/data/ABS/1270.0.55.003_NonAbsMeshblock/POA_2016_AUST.csv", this.poaData,
-				poaLoadColumn);
+		this.readMeshblockCsvData(properties.getFilename("ABS/1270.0.55.003_NonAbsMeshblock/POA") + "_AUST.csv",
+				this.poaData, poaLoadColumn);
 
 		// load mesh block counts
 		final int[] abs2074_0_Columns = { 3, 4 };
 		this.abs2074_0indexMap = new TObjectIntHashMap<String>();
 		this.abs2074_0dataMatrix = new ArrayList<TIntArrayList>(abs2074_0_Columns.length);
 		this.abs2074_0seriesTitles = new ArrayList<ArrayList<String>>(abs2074_0_Columns.length);
-		this.loadAbsDataCsv_2074_0("/data/ABS/2074.0_MeshblockCounts/2016 Census Mesh Block Counts.csv",
+		this.loadAbsDataCsv_2074_0(
+				properties.getFilename("ABS/2074.0_MeshblockCounts") + " Census Mesh Block Counts.csv",
 				abs2074_0_Columns, this.abs2074_0indexMap, this.abs2074_0dataMatrix, this.abs2074_0seriesTitles);
 
 		// load ABS 3222.0 data
-		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 3222.0 Income data");
+		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 3222.0 Population projections");
 		this.abs3222_0 = new HashMap<String, Map<Date, String>>();
 		int[] abs3220_0Columns = { 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219,
 				220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240,
@@ -572,7 +587,7 @@ public class AreaMapping {
 				283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302,
 				303 }; // loads count of Persons 0 - 100
 		this.loadAbsDataCsv_Catalogue(
-				"/data/ABS/3222.0_PopnProjections/Table B9. Population projections - Series B.csv", ABS_3222_0,
+				properties.getFilename("ABS/3222.0_PopnProjections") + "Table B9. Population projections - Series B.csv", ABS_3222_0,
 				abs3220_0Columns, this.title, this.unitType, this.abs3222_0);
 
 		// load postcode latitude and longitude
@@ -883,6 +898,8 @@ public class AreaMapping {
 	 */
 	@PostConstruct
 	private void init() {
+		this.properties = PropertiesXmlFactory.getProperties();
+
 		this.dataLoaded = false;
 		this.totalPopulation = null;
 		this.totalPopulationMultiplier = null;
