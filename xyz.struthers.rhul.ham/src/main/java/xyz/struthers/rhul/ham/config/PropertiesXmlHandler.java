@@ -23,7 +23,7 @@ public class PropertiesXmlHandler {
 		try {
 			jc = JAXBContext.newInstance(PropertiesXml.class);
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
-			File xml = new File(inFilename); // "src/forum13159089/input.xml"
+			File xml = new File(inFilename);
 			propertiesXml = (PropertiesXml) unmarshaller.unmarshal(xml);
 		} catch (JAXBException e) {
 			e.printStackTrace();
@@ -37,7 +37,7 @@ public class PropertiesXmlHandler {
 			jc = JAXBContext.newInstance(PropertiesXml.class);
 			Marshaller marshaller = jc.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			marshaller.marshal(propertiesXml, new File(outFilename)); // "c:/temp/employees.xml"
+			marshaller.marshal(propertiesXml, new File(outFilename));
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}

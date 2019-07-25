@@ -187,7 +187,10 @@ public class CpvSocketClient {
 		System.out.println("################################################");
 
 		// set properties filename
-		PropertiesXmlFactory.propertiesXmlFilename = args[0];
+		for (int i = 0; i < args.length; i++) {
+			System.out.println("args[" + i + "] = " + args[i]);
+		}
+		PropertiesXmlFactory.propertiesXmlFilename = args[1];
 		PropertiesXml props = PropertiesXmlFactory.getProperties();
 
 		// load Spring context
