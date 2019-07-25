@@ -365,7 +365,7 @@ public class CalibrationDataIndividual {
 		int ato2aMapCapacity = (int) Math.ceil(atoIndividualTable2aColumns.length / MAP_LOAD_FACTOR);
 		this.atoIndividualTable2a = new HashMap<String, Map<String, Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>>>(
 				ato2aMapCapacity);
-		this.loadAtoIndividualsTable2a(properties.getFilename("ATO/Individual") + "IndividualsTable2A.csv",
+		this.loadAtoIndividualsTable2a(properties.getFilename("ATO") + "Individual/IndividualsTable2A.csv",
 				ATO_INDIVIDUAL_T2A, atoIndividualTable2aColumns, this.title, this.atoIndividualTable2a);
 
 		if (DEBUG) {
@@ -386,7 +386,7 @@ public class CalibrationDataIndividual {
 		int ato3aMapCapacity = (int) Math.ceil(atoIndividualTable3aColumns.length / MAP_LOAD_FACTOR);
 		this.atoIndividualTable3a = new HashMap<String, Map<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>>(
 				ato3aMapCapacity);
-		this.loadAtoIndividualsTable3a(properties.getFilename("ATO/Individual") + "IndividualsTable3A.csv",
+		this.loadAtoIndividualsTable3a(properties.getFilename("ATO") + "Individual/IndividualsTable3A.csv",
 				ATO_INDIVIDUAL_T3A, atoIndividualTable3aColumns, this.title, this.atoIndividualTable3a);
 
 		if (DEBUG) {
@@ -406,7 +406,7 @@ public class CalibrationDataIndividual {
 		int[] atoIndividualTable6bColumns = { 2, 3, 4 };
 		int ato6bMapCapacity = (int) Math.ceil(atoIndividualTable6bColumns.length / MAP_LOAD_FACTOR);
 		this.atoIndividualTable6b = new HashMap<String, TObjectFloatHashMap<String>>(ato6bMapCapacity);
-		this.loadAtoIndividualsTable6(properties.getFilename("ATO/Individual") + "IndividualsTable6B.csv",
+		this.loadAtoIndividualsTable6(properties.getFilename("ATO") + "Individual/IndividualsTable6B.csv",
 				ATO_INDIVIDUAL_T6B, atoIndividualTable6bColumns, this.title, this.atoIndividualTable6b);
 
 		if (DEBUG) {
@@ -436,7 +436,7 @@ public class CalibrationDataIndividual {
 		int[] atoIndividualTable9Columns = { 2, 3, 4 };
 		int ato9MapCapacity = (int) Math.ceil(atoIndividualTable9Columns.length / MAP_LOAD_FACTOR);
 		this.atoIndividualTable9DivisionSummary = new HashMap<String, Map<String, Float>>(ato9MapCapacity);
-		this.loadAtoIndividualsTable9DivisionSummary(properties.getFilename("ATO/Individual") + "IndividualsTable9.csv",
+		this.loadAtoIndividualsTable9DivisionSummary(properties.getFilename("ATO") + "Individual/IndividualsTable9.csv",
 				ATO_INDIVIDUAL_T9, atoIndividualTable9Columns, this.title, this.atoIndividualTable9DivisionSummary);
 		// this.atoIndividualTable9 = new HashMap<String, Map<String,
 		// String>>(ato9MapCapacity);

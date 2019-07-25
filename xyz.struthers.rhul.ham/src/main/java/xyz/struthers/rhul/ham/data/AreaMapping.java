@@ -587,8 +587,9 @@ public class AreaMapping {
 				283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302,
 				303 }; // loads count of Persons 0 - 100
 		this.loadAbsDataCsv_Catalogue(
-				properties.getFilename("ABS/3222.0_PopnProjections") + "Table B9. Population projections - Series B.csv", ABS_3222_0,
-				abs3220_0Columns, this.title, this.unitType, this.abs3222_0);
+				properties.getFilename("ABS")
+						+ "3222.0_PopnProjections/Table B9. Population projections - Series B.csv",
+				ABS_3222_0, abs3220_0Columns, this.title, this.unitType, this.abs3222_0);
 
 		// load postcode latitude and longitude
 		/*

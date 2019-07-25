@@ -324,7 +324,7 @@ public class CalibrationDataHousehold {
 		// int[] rbaE2Columns = { 3, 6, 8, 9, 10 };
 		int rbaE2MapCapacity = (int) Math.ceil(rbaE2Columns.length / MAP_LOAD_FACTOR);
 		this.rbaE2 = new HashMap<String, Map<Date, String>>(rbaE2MapCapacity);
-		this.loadRbaDataCsv(properties.getFilename("RBA/E_HouseholdBusiness") + "e2-data.csv", RBA_E2, rbaE2Columns,
+		this.loadRbaDataCsv(properties.getFilename("RBA") + "E_HouseholdBusiness/e2-data.csv", RBA_E2, rbaE2Columns,
 				this.title, this.unitType, this.rbaE2);
 
 		if (DEBUG) {

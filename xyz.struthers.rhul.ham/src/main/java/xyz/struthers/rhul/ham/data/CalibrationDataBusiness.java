@@ -393,7 +393,7 @@ public class CalibrationDataBusiness {
 		this.abs5676_0Table7 = new HashMap<String, TObjectFloatHashMap<Date>>();
 		int[] abs5676_0Table7Columns = { 9, 10, 11, 12, 13, 14, 15, 16 }; // loads seasonally adjusted sales
 		this.loadAbsDataCsv_Catalogue(
-				properties.getFilename("ABS/5676.0_BusinessIndicators") + "Table7_SalesByState.csv", ABS_5676_0_T7,
+				properties.getFilename("ABS") + "5676.0_BusinessIndicators/Table7_SalesByState.csv", ABS_5676_0_T7,
 				abs5676_0Table7Columns, this.title, this.unitType, this.abs5676_0Table7);
 
 		System.out.println(new Date(System.currentTimeMillis())
@@ -401,7 +401,7 @@ public class CalibrationDataBusiness {
 		this.abs5676_0Table19 = new HashMap<String, TObjectFloatHashMap<Date>>();
 		int[] abs5676_0Table19Columns = { 10, 11, 12, 13, 14, 15, 16, 17, 18 }; // loads seasonally adjusted wages
 		this.loadAbsDataCsv_Catalogue(
-				properties.getFilename("ABS/5676.0_BusinessIndicators") + "Table19_WagesByState.csv", ABS_5676_0_T19,
+				properties.getFilename("ABS") + "5676.0_BusinessIndicators/Table19_WagesByState.csv", ABS_5676_0_T19,
 				abs5676_0Table19Columns, this.title, this.unitType, this.abs5676_0Table19);
 
 		System.out.println(new Date(System.currentTimeMillis())
@@ -410,7 +410,7 @@ public class CalibrationDataBusiness {
 		int[] abs5676_0Table21Columns = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }; // loads sales to wages
 																								// ratio by industry
 		this.loadAbsDataCsv_Catalogue(
-				properties.getFilename("ABS/5676.0_BusinessIndicators") + "Table21_SalesVsWagesRatio.csv",
+				properties.getFilename("ABS") + "5676.0_BusinessIndicators/Table21_SalesVsWagesRatio.csv",
 				ABS_5676_0_T21, abs5676_0Table21Columns, this.title, this.unitType, this.abs5676_0Table21);
 
 		System.out.println(new Date(System.currentTimeMillis())
@@ -419,7 +419,7 @@ public class CalibrationDataBusiness {
 		int[] abs5676_0Table22Columns = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }; // loads profit to sales
 																								// ratio by industry
 		this.loadAbsDataCsv_Catalogue(
-				properties.getFilename("ABS/5676.0_BusinessIndicators") + "Table22_ProfitsVsSalesRatio.csv",
+				properties.getFilename("ABS") + "5676.0_BusinessIndicators/Table22_ProfitsVsSalesRatio.csv",
 				ABS_5676_0_T22, abs5676_0Table22Columns, this.title, this.unitType, this.abs5676_0Table22);
 
 		// load ABS 6524 employee
@@ -428,7 +428,7 @@ public class CalibrationDataBusiness {
 																												// years
 		int[] abs6524_055_002EmployeeTable5Columns = { 19 };
 		this.loadAbsDataCsv_6524_0(
-				properties.getFilename("ABS/6524.0.55.002_IncomeByLGA") + "Employee income_Table5.csv",
+				properties.getFilename("ABS") + "6524.0.55.002_IncomeByLGA/Employee income_Table5.csv",
 				ABS6524_055_002_EMPLOYEE_T5, abs6524_055_002EmployeeTable5Columns, this.title, this.unitType,
 				this.abs6524_055_002EmployeeTable5);
 
@@ -438,7 +438,7 @@ public class CalibrationDataBusiness {
 																													// years
 		int[] abs6524_055_002InvestmentTable5Columns = { 7, 13, 19, 25, 31, 37 };
 		this.loadAbsDataCsv_6524_0(
-				properties.getFilename("ABS/6524.0.55.002_IncomeByLGA") + "Investment income_Table5.csv",
+				properties.getFilename("ABS") + "6524.0.55.002_IncomeByLGA/Investment income_Table5.csv",
 				ABS6524_055_002_INVEST_T5, abs6524_055_002InvestmentTable5Columns, this.title, this.unitType,
 				this.abs6524_055_002InvestmentTable5);
 
@@ -446,7 +446,7 @@ public class CalibrationDataBusiness {
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ABS 6524.055.002 Income data");
 		this.abs6524_055_002IncomeTable5 = new HashMap<String, Map<String, TObjectFloatHashMap<String>>>(6); // 6 years
 		int[] abs6524_055_002IncomeTable5Columns = { 7, 13, 19, 25, 31 };
-		this.loadAbsDataCsv_6524_0(properties.getFilename("ABS/6524.0.55.002_IncomeByLGA") + "Total income_Table5.csv",
+		this.loadAbsDataCsv_6524_0(properties.getFilename("ABS") + "6524.0.55.002_IncomeByLGA/Total income_Table5.csv",
 				ABS6524_055_002_INCOME_T5, abs6524_055_002IncomeTable5Columns, this.title, this.unitType,
 				this.abs6524_055_002IncomeTable5);
 
@@ -460,7 +460,7 @@ public class CalibrationDataBusiness {
 		int abs8155_0Table2TitleRow = 4;
 		int abs8155_0Table2UnitsRow = 5;
 		this.loadAbsDataCsv_8155_0T2T4(
-				properties.getFilename("ABS/8155.0_IndustryByDivision") + "Table2_LabourCosts.csv", ABS8155_0_T2,
+				properties.getFilename("ABS") + "8155.0_IndustryByDivision/Table2_LabourCosts.csv", ABS8155_0_T2,
 				abs8155_0Table2Columns, abs8155_0Table2Years, abs8155_0Table2TitleRow, abs8155_0Table2UnitsRow,
 				this.title, this.unitType, this.abs8155_0Table2);
 
@@ -471,7 +471,7 @@ public class CalibrationDataBusiness {
 		int abs8155_0Table4TitleRow = 6;
 		int abs8155_0Table4UnitsRow = 7;
 		this.loadAbsDataCsv_8155_0T2T4(
-				properties.getFilename("ABS/8155.0_IndustryByDivision") + "Table4_IndustryPerformance.csv",
+				properties.getFilename("ABS") + "8155.0_IndustryByDivision/Table4_IndustryPerformance.csv",
 				ABS8155_0_T4, abs8155_0Table4Columns, abs8155_0Table4Years, abs8155_0Table4TitleRow,
 				abs8155_0Table4UnitsRow, this.title, this.unitType, this.abs8155_0Table4);
 
@@ -481,7 +481,7 @@ public class CalibrationDataBusiness {
 		int abs8155_0Table5TitleRow = 4;
 		int abs8155_0Table5UnitsRow = 6;
 		this.loadAbsDataCsv_8155_0T5T6(
-				properties.getFilename("ABS/8155.0_IndustryByDivision") + "Table5_BusinessSize.csv", ABS8155_0_T5,
+				properties.getFilename("ABS") + "8155.0_IndustryByDivision/Table5_BusinessSize.csv", ABS8155_0_T5,
 				abs8155_0Table5Columns, abs8155_0Table5TitleRow, abs8155_0Table5UnitsRow, this.title, this.unitType,
 				this.abs8155_0Table5);
 
@@ -490,7 +490,7 @@ public class CalibrationDataBusiness {
 		int[] abs8155_0Table6Columns = { 3, 6, 9 };
 		int abs8155_0Table6TitleRow = 4;
 		int abs8155_0Table6UnitsRow = 6;
-		this.loadAbsDataCsv_8155_0T5T6(properties.getFilename("ABS/8155.0_IndustryByDivision") + "Table6_States.csv",
+		this.loadAbsDataCsv_8155_0T5T6(properties.getFilename("ABS") + "8155.0_IndustryByDivision/Table6_States.csv",
 				ABS8155_0_T6, abs8155_0Table6Columns, abs8155_0Table6TitleRow, abs8155_0Table6UnitsRow, this.title,
 				this.unitType, this.abs8155_0Table6);
 
@@ -503,8 +503,8 @@ public class CalibrationDataBusiness {
 		this.abs8165_0StateEmployment = new HashMap<String, Map<String, TObjectFloatHashMap<String>>>(
 				abs8165_0StateEmploymentColumns.length);
 		this.loadAbsDataCsv_8165_0State(
-				properties.getFilename("ABS/8165.0_CountOfBusinesses")
-						+ "8165.0_by State, Industry Code & Employment Size.csv",
+				properties.getFilename("ABS")
+						+ "8165.0_CountOfBusinesses/8165.0_by State, Industry Code & Employment Size.csv",
 				ABS8165_0_STATE_EMPLOYMENT, abs8165_0StateEmploymentColumns, abs8165_0StateEmploymentTitleRow,
 				abs8165_0StateEmploymentUnitsRow, this.title, this.unitType, this.abs8165_0StateEmployment);
 
@@ -515,8 +515,8 @@ public class CalibrationDataBusiness {
 		this.abs8165_0StateTurnover = new HashMap<String, Map<String, TObjectFloatHashMap<String>>>(
 				abs8165_0StateTurnoverColumns.length);
 		this.loadAbsDataCsv_8165_0State(
-				properties.getFilename("ABS/8165.0_CountOfBusinesses")
-						+ "8165.0_by State, Industry Code & Turnover.csv",
+				properties.getFilename("ABS")
+						+ "8165.0_CountOfBusinesses/8165.0_by State, Industry Code & Turnover.csv",
 				ABS8165_0_STATE_TURNOVER, abs8165_0StateTurnoverColumns, abs8165_0StateTurnoverTitleRow,
 				abs8165_0StateTurnoverUnitsRow, this.title, this.unitType, this.abs8165_0StateTurnover);
 
@@ -525,8 +525,8 @@ public class CalibrationDataBusiness {
 		this.abs8165_0LgaEmployment = new HashMap<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>(
 				abs8165_0LgaEmploymentColumns.length);
 		this.loadAbsDataCsv_8165_0Lga(
-				properties.getFilename("ABS/8165.0_CountOfBusinesses")
-						+ "8165.0_by State, LGA, Industry & Employment Size.csv",
+				properties.getFilename("ABS")
+						+ "8165.0_CountOfBusinesses/8165.0_by State, LGA, Industry & Employment Size.csv",
 				ABS8165_0_LGA_EMPLOYMENT, abs8165_0LgaEmploymentColumns, this.title, this.unitType,
 				this.abs8165_0LgaEmployment);
 
@@ -535,8 +535,8 @@ public class CalibrationDataBusiness {
 		this.abs8165_0LgaTurnover = new HashMap<String, Map<String, Map<String, TObjectFloatHashMap<String>>>>(
 				abs8165_0LgaTurnoverColumns.length);
 		this.loadAbsDataCsv_8165_0Lga(
-				properties.getFilename("ABS/8165.0_CountOfBusinesses")
-						+ "8165.0_by State, LGA, Industry & Turnover.csv",
+				properties.getFilename("ABS")
+						+ "8165.0_CountOfBusinesses/8165.0_by State, LGA, Industry & Turnover.csv",
 				ABS8165_0_LGA_TURNOVER, abs8165_0LgaTurnoverColumns, this.title, this.unitType,
 				this.abs8165_0LgaTurnover);
 
@@ -546,7 +546,7 @@ public class CalibrationDataBusiness {
 		int[] abs8165_0Table4Rows = { 40, 41, 42, 43, 44, 45, 46, 47, 48 };
 		int abs8165_0Table4TitleRow = 4;
 		this.loadAbsDataRowsColumnsCsv(
-				properties.getFilename("ABS/8165.0_CountOfBusinesses") + "8165.0_Table4_State.csv", ABS8165_0_T4,
+				properties.getFilename("ABS") + "8165.0_CountOfBusinesses/8165.0_Table4_State.csv", ABS8165_0_T4,
 				abs8165_0Table4Columns, abs8165_0Table4Rows, abs8165_0Table4TitleRow, this.title, this.abs8165_0Table4);
 
 		System.out.print(", Table 13");
@@ -555,7 +555,7 @@ public class CalibrationDataBusiness {
 		int[] abs8165_0Table13Rows = { 34, 36, 37, 38, 39 };
 		int abs8165_0Table13TitleRow = 4;
 		this.loadAbsDataRowsColumnsCsv(
-				properties.getFilename("ABS/8165.0_CountOfBusinesses") + "8165.0_Table13_EmploymentSize.csv",
+				properties.getFilename("ABS") + "8165.0_CountOfBusinesses/8165.0_Table13_EmploymentSize.csv",
 				ABS8165_0_T13, abs8165_0Table13Columns, abs8165_0Table13Rows, abs8165_0Table13TitleRow, this.title,
 				this.abs8165_0Table13);
 
@@ -565,7 +565,7 @@ public class CalibrationDataBusiness {
 		int[] abs8165_0Table17Rows = { 31, 32, 33, 34, 35, 36 };
 		int abs8165_0Table17TitleRow = 4;
 		this.loadAbsDataRowsColumnsCsv(
-				properties.getFilename("ABS/8165.0_CountOfBusinesses") + "8165.0_Table17_Turnover.csv", ABS8165_0_T17,
+				properties.getFilename("ABS") + "8165.0_CountOfBusinesses/8165.0_Table17_Turnover.csv", ABS8165_0_T17,
 				abs8165_0Table17Columns, abs8165_0Table17Rows, abs8165_0Table17TitleRow, this.title,
 				this.abs8165_0Table17);
 
@@ -574,13 +574,13 @@ public class CalibrationDataBusiness {
 		this.atoCompanyTable4a = new HashMap<String, TObjectFloatHashMap<String>>();
 		int[] atoCompanyTable4aColumns = { 2, 3, 4, 9, 10, 11, 12, 17, 18, 21, 22, 23, 24, 31, 32, 33, 34, 35, 36, 37,
 				38, 41, 42, 51, 52, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 111, 112, 115, 116 };
-		this.loadAtoCompanyTable4A(properties.getFilename("ATO/Company") + "CompanyTable4A.csv", ATO_COMPANY_T4A,
+		this.loadAtoCompanyTable4A(properties.getFilename("ATO") + "Company/CompanyTable4A.csv", ATO_COMPANY_T4A,
 				atoCompanyTable4aColumns, this.title, this.atoCompanyTable4a);
 
 		System.out.println(new Date(System.currentTimeMillis()) + ": Loading ATO Company Table 4B data");
 		this.atoCompanyTable4b = new HashMap<String, TObjectFloatHashMap<String>>();
 		int[] atoCompanyTable4bColumns = { 2, 3, 4, 5, 6 };
-		this.loadAtoCompanyTable4B(properties.getFilename("ATO/Company") + "CompanyTable4B.csv", ATO_COMPANY_T4B,
+		this.loadAtoCompanyTable4B(properties.getFilename("ATO") + "Company/CompanyTable4B.csv", ATO_COMPANY_T4B,
 				atoCompanyTable4bColumns, this.title, this.atoCompanyTable4b);
 
 		// set flag so we only load the data once
