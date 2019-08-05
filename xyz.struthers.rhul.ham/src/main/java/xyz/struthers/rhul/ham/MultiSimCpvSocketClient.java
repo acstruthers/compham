@@ -37,28 +37,6 @@ public class MultiSimCpvSocketClient {
 		System.gc();
 
 		// using different random seeds (model error box plots)
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 01_census2006_seed-01.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/01_census2006_seed-01.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 01_census2006_seed-02.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/01_census2006_seed-02.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 01_census2006_seed-03.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/01_census2006_seed-03.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 01_census2006_seed-04.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/01_census2006_seed-04.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 01_census2006_seed-05.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/01_census2006_seed-05.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 01_census2006_seed-06.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/01_census2006_seed-06.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 01_census2006_seed-07.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/01_census2006_seed-07.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 01_census2006_seed-08.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/01_census2006_seed-08.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 01_census2006_seed-09.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/01_census2006_seed-09.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 01_census2006_seed-10.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/01_census2006_seed-10.xml" });
-		System.gc();
-
 		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 02_census2011_seed-01.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/02_census2011_seed-01.xml" });
 		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 02_census2011_seed-02.xml");
