@@ -19,10 +19,10 @@ public class PropertiesXmlFactory {
 	}
 
 	public static PropertiesXml getProperties() {
-		if (props == null) {
+		//if (props == null) {
 			System.out.println("Loading properties file: " + propertiesXmlFilename);
 			props = PropertiesXmlHandler.readPropertiesFromXmlFile(propertiesXmlFilename);
-		}
+		//}
 		return props;
 	}
 }
