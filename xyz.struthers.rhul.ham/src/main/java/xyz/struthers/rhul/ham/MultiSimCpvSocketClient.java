@@ -37,28 +37,6 @@ public class MultiSimCpvSocketClient {
 		System.gc();
 
 		// using different random seeds (model error box plots)
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 02_census2011_seed-01.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/02_census2011_seed-01.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 02_census2011_seed-02.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/02_census2011_seed-02.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 02_census2011_seed-03.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/02_census2011_seed-03.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 02_census2011_seed-04.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/02_census2011_seed-04.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 02_census2011_seed-05.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/02_census2011_seed-05.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 02_census2011_seed-06.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/02_census2011_seed-06.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 02_census2011_seed-07.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/02_census2011_seed-07.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 02_census2011_seed-08.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/02_census2011_seed-08.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 02_census2011_seed-09.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/02_census2011_seed-09.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 02_census2011_seed-10.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/02_census2011_seed-10.xml" });
-		System.gc();
-
 		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 03_census2016_seed-01.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/03_census2016_seed-01.xml" });
 		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 03_census2016_seed-02.xml");
@@ -77,12 +55,10 @@ public class MultiSimCpvSocketClient {
 		CpvSocketClient.main(new String[] { "D:/compham-config/03_census2016_seed-08.xml" });
 		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 03_census2016_seed-09.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/03_census2016_seed-09.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 03_census2016_seed-10.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/03_census2016_seed-10.xml" });
 		System.gc();
 
 		// effect of ADI failure on Govt bal sht
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 04_ADI_Failure_Major-Bank-with-FCS-limit.xml");
+		/*appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 04_ADI_Failure_Major-Bank-with-FCS-limit.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/04_ADI_Failure_Major-Bank-with-FCS-limit.xml" });
 		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 04_ADI_Failure_Major-Bank-without-FCS-limit.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/04_ADI_Failure_Major-Bank-without-FCS-limit.xml" });
@@ -179,6 +155,7 @@ public class MultiSimCpvSocketClient {
 		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 06_FX_Rates_10pc-currency-ZAR.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/06_FX_Rates_10pc-currency-ZAR.xml" });
 		System.gc();
+		*/
 
 		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": FINISHED");
 		appendToFile(progressFilename, "...I think I deserve a drink now!");
