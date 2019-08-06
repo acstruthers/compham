@@ -599,7 +599,7 @@ public class AustralianEconomy implements Serializable {
 		// households
 		if (iteration == 0) {
 			try {
-				writer = new FileWriter(filename);
+				writer = new FileWriter(filename, false); // overwrites if there's an existing file
 				ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
 				csvWriter.writeNext(entries); // write header row
 				for (Household household : this.households) {
@@ -638,8 +638,8 @@ public class AustralianEconomy implements Serializable {
 		// businesses
 		if (iteration == 0) {
 			try {
-				// FIXME: this should append, not overwrite
-				writer = new FileWriter(filename);
+				// this should append, not overwrite
+				writer = new FileWriter(filename, true); // append mode
 				ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
 				for (Business business : this.businesses) {
 					int paymentClearingIndex = business.getPaymentClearingIndex();
@@ -677,8 +677,8 @@ public class AustralianEconomy implements Serializable {
 		// ADIs
 		if (iteration == 0) {
 			try {
-				// FIXME: this should append, not overwrite
-				writer = new FileWriter(filename);
+				// this should append, not overwrite
+				writer = new FileWriter(filename, true); // append mode
 				ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
 				for (AuthorisedDepositTakingInstitution adi : this.adis) {
 					int paymentClearingIndex = adi.getPaymentClearingIndex();
