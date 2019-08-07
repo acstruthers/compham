@@ -107,13 +107,14 @@ public class PropertiesXmlTestHarness {
 		props.setFcsLimitPerAdi(15000000000f); // AUD 15Bn limit per ADI
 		props.setFcsLimitPerDepositor(250000f); // AUD 250k limit per depositor
 		props.setFxRateStrategy(Currencies.SAME);
-		Map<String, ExchangeRateList> fxRateCustomPath = new HashMap<String, ExchangeRateList>();
-		ExchangeRateList usdRates = new ExchangeRateList(3);
-		usdRates.addFxRate(0.1f);
-		usdRates.addFxRate(0.5f);
-		usdRates.addFxRate(0.9f);
-		fxRateCustomPath.put("USD", usdRates);
-		props.setFxRateCustomPath(fxRateCustomPath);
+
+		props.addFxRateCustomPath("USD", 0.95f);
+		props.addFxRateCustomPath("USD", 0.95f);
+		props.addFxRateCustomPath("USD", 0.95f);
+		props.addFxRateCustomPath("CAD", 1.05f);
+		props.addFxRateCustomPath("CAD", 1.05f);
+		props.addFxRateCustomPath("CAD", 1.05f);
+
 		props.setInterestRateStrategy(ReserveBankOfAustralia.RATES_SAME);
 		props.setInterestRateCustomPath(0, 1.50f);
 		props.setInterestRateCustomPath(1, 1.50f);
@@ -138,26 +139,39 @@ public class PropertiesXmlTestHarness {
 		props.putFilename("ABS", "/data/2016/ABS/");
 		props.putFilename("ABS/CensusTableBuilder", "/data/2016/ABS/CensusTableBuilder2016/");
 		props.putFilename("ABS/1270.0.55.001_AbsMeshblock", "/data/2016/ABS/1270.0.55.001_AbsMeshblock/MB_2016");
-		//props.putFilename("ABS/1292.0.55.002_ANZSIC", "/data/2016/ABS/1292.0.55.002_ANZSIC/");
-		props.putFilename("ABS/1270.0.55.003_NonAbsMeshblock/LGA", "/data/2016/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018");
-		props.putFilename("ABS/1270.0.55.003_NonAbsMeshblock/POA", "/data/2016/ABS/1270.0.55.003_NonAbsMeshblock/POA_2016");
+		// props.putFilename("ABS/1292.0.55.002_ANZSIC",
+		// "/data/2016/ABS/1292.0.55.002_ANZSIC/");
+		props.putFilename("ABS/1270.0.55.003_NonAbsMeshblock/LGA",
+				"/data/2016/ABS/1270.0.55.003_NonAbsMeshblock/LGA_2018");
+		props.putFilename("ABS/1270.0.55.003_NonAbsMeshblock/POA",
+				"/data/2016/ABS/1270.0.55.003_NonAbsMeshblock/POA_2016");
 		props.putFilename("ABS/2074.0_MeshblockCounts", "/data/2016/ABS/2074.0_MeshblockCounts/2016");
-		//props.putFilename("ABS/3222.0_PopnProjections", "/data/2016/ABS/3222.0_PopnProjections/");
-		//props.putFilename("ABS/5368.0_IntlTrade", "/data/2016/ABS/5368.0_IntlTrade/");
-		//props.putFilename("ABS/5368.0.55.006_Exporters", "/data/2016/ABS/5368.0.55.006_Exporters/");
-		//props.putFilename("ABS/5512.0_GovtFinStats", "/data/2016/ABS/5512.0_GovtFinStats/");
-		//props.putFilename("ABS/5676.0_BusinessIndicators", "/data/2016/ABS/5676.0_BusinessIndicators/");
-		//props.putFilename("ABS/6524.0.55.002_IncomeByLGA", "/data/2016/ABS/6524.0.55.002_IncomeByLGA/");
-		//props.putFilename("ABS/8155.0_IndustryByDivision", "/data/2016/ABS/8155.0_IndustryByDivision/");
-		//props.putFilename("ABS/8165.0_CountOfBusinesses", "/data/2016/ABS/8165.0_CountOfBusinesses/");
-		//props.putFilename("ABS/8167.0_BusMktAndComp", "/data/2016/ABS/8167.0_BusMktAndComp/");
+		// props.putFilename("ABS/3222.0_PopnProjections",
+		// "/data/2016/ABS/3222.0_PopnProjections/");
+		// props.putFilename("ABS/5368.0_IntlTrade",
+		// "/data/2016/ABS/5368.0_IntlTrade/");
+		// props.putFilename("ABS/5368.0.55.006_Exporters",
+		// "/data/2016/ABS/5368.0.55.006_Exporters/");
+		// props.putFilename("ABS/5512.0_GovtFinStats",
+		// "/data/2016/ABS/5512.0_GovtFinStats/");
+		// props.putFilename("ABS/5676.0_BusinessIndicators",
+		// "/data/2016/ABS/5676.0_BusinessIndicators/");
+		// props.putFilename("ABS/6524.0.55.002_IncomeByLGA",
+		// "/data/2016/ABS/6524.0.55.002_IncomeByLGA/");
+		// props.putFilename("ABS/8155.0_IndustryByDivision",
+		// "/data/2016/ABS/8155.0_IndustryByDivision/");
+		// props.putFilename("ABS/8165.0_CountOfBusinesses",
+		// "/data/2016/ABS/8165.0_CountOfBusinesses/");
+		// props.putFilename("ABS/8167.0_BusMktAndComp",
+		// "/data/2016/ABS/8167.0_BusMktAndComp/");
 		props.putFilename("ADI", "/data/2016/ADI/");
 		props.putFilename("ATO", "/data/2016/ATO/");
-		//props.putFilename("ATO/Company", "/data/2016/ATO/Company/");
-		//props.putFilename("ATO/Individual", "/data/2016/ATO/Individual/");
+		// props.putFilename("ATO/Company", "/data/2016/ATO/Company/");
+		// props.putFilename("ATO/Individual", "/data/2016/ATO/Individual/");
 		props.putFilename("FxRates", "/data/2016/FxRates/");
 		props.putFilename("RBA", "/data/2016/RBA/");
-		//props.putFilename("RBA/E_HouseholdBusiness", "/data/2016/RBA/E_HouseholdBusiness/");
+		// props.putFilename("RBA/E_HouseholdBusiness",
+		// "/data/2016/RBA/E_HouseholdBusiness/");
 		props.setRbaE1DateString("Jun-2018");
 		props.setAbs1410Year("2016");
 		props.setAbs8155Year("2016-17");

@@ -17,7 +17,7 @@ public class ExchangeRateList implements Serializable {
 
 	public ExchangeRateList() {
 		super();
-		fxRate = null;
+		fxRate = new ArrayList<Float>(13);
 	}
 
 	public ExchangeRateList(int size) {

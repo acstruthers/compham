@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -541,6 +542,33 @@ public class PropertiesXml implements Serializable {
 	 */
 	public void setFxRateCustomPath(Map<String, ExchangeRateList> fxRateCustomPath) {
 		this.fxRate = fxRateCustomPath;
+	}
+
+	/**
+	 * Sets the cusotm FX rate for a particular currency in a given period
+	 * 
+	 * @param fxRateCustomPath
+	 */
+	public void addFxRateCustomPath(String currency, float fxRate) {
+		if (this.fxRate == null) {
+			this.fxRate = new HashMap<String, ExchangeRateList>();
+		}
+		ExchangeRateList ratesList = null;
+		if (this.fxRate.containsKey(currency)) {
+			ratesList = this.fxRate.get(currency);
+		} else {
+			ratesList = new ExchangeRateList();
+			this.fxRate.put(currency, ratesList);
+		}
+		ratesList.addFxRate(fxRate);
+	}
+
+	public float getFxRateCustomPath(String currency, int iteration) {
+		float rate = 0f;
+		if (this.fxRate != null && this.fxRate.containsKey(currency)) {
+			rate = this.fxRate.get(currency).getFxRate(iteration);
+		}
+		return rate;
 	}
 
 	/**
