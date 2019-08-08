@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,7 @@ import xyz.struthers.rhul.ham.agent.ForeignCountry;
 import xyz.struthers.rhul.ham.agent.Household;
 import xyz.struthers.rhul.ham.agent.Individual;
 import xyz.struthers.rhul.ham.agent.ReserveBankOfAustralia;
+import xyz.struthers.rhul.ham.config.ExchangeRateList;
 import xyz.struthers.rhul.ham.config.PropertiesXml;
 import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 import xyz.struthers.rhul.ham.data.Currencies;
@@ -215,6 +217,24 @@ public class AustralianEconomy implements Serializable {
 			this.currencies.prepareFxRatesRandom5yrUp(iteration, this.random);
 		} else if (properties.getFxRateStrategy() == Currencies.RANDOM_5YR_DOWN) {
 			this.currencies.prepareFxRatesRandom5yrDown(iteration, this.random);
+		} else if (properties.getFxRateStrategy() == Currencies.CUSTOM_PATH) {
+			Map<String, ExchangeRateList> ratesListProperties = this.properties.getFxRateCustomPath();
+			Set<String> currencyCodes = ratesListProperties.keySet();
+			Map<String, TFloatArrayList> customRates = new HashMap<String, TFloatArrayList>(currencyCodes.size());
+			for (String ccy : currencyCodes) {
+				// get list from properties map
+				List<Float> origList = ratesListProperties.get(ccy).getFxRates();
+
+				// convert ExchangeRateList to Trove List
+				TFloatArrayList newList = new TFloatArrayList(origList.size());
+				for (float ccyRate : origList) {
+					newList.add(ccyRate);
+				}
+
+				// put in new map
+				customRates.put(ccy, newList);
+			}
+			this.currencies.prepareFxRatesCustomPath(iteration, customRates);
 		} else {
 			// same FX rates for all iterations
 			this.currencies.prepareFxRatesSame(iteration);
@@ -905,7 +925,7 @@ public class AustralianEconomy implements Serializable {
 		Set<String> filenames = new HashSet<String>((int) Math.ceil(8 / 0.75) + 1);
 
 		// FIXME: filenames were all identicsal
-		
+
 		String filename = this.saveGovernmentSummaryToFile(iteration, scenarioName);
 		filenames.add(filename);
 		filename = this.saveRbaSummaryToFile(iteration, scenarioName);
