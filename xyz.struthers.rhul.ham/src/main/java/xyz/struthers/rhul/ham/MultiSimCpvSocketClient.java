@@ -45,7 +45,7 @@ public class MultiSimCpvSocketClient {
 		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline_seed-03.xml" });
 		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-04.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline_seed-04.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-05.xml");
+		/*appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-05.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline_seed-05.xml" });
 		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-06.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline_seed-06.xml" });
@@ -54,7 +54,7 @@ public class MultiSimCpvSocketClient {
 		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-08.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline_seed-08.xml" });
 		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-09.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline_seed-09.xml" });
+		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline_seed-09.xml" });*/
 		System.gc();
 
 		// effect of ADI failure on Govt bal sht
@@ -68,7 +68,7 @@ public class MultiSimCpvSocketClient {
 		 */
 
 		// 10% change in FX rates by country
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.3_FX_Rates_10pc-country-CNY.xml");
+		/*appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.3_FX_Rates_10pc-country-CNY.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/4.3_FX_Rates_10pc-country-CNY.xml" });
 		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.3_FX_Rates_10pc-country-JPY.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/4.3_FX_Rates_10pc-country-JPY.xml" });
@@ -113,7 +113,7 @@ public class MultiSimCpvSocketClient {
 		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_50pc.xml" });
 		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_75pc.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_75pc.xml" });
-		System.gc();
+		System.gc();*/
 		
 		// 10% change in FX rates
 		/*appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 06_FX_Rates_10pc-all-currencies.xml");
