@@ -227,6 +227,7 @@ public abstract class Serialization {
 			int to = Math.min(bytes.length, messageSize);
 			while (to - from > 0) {
 				// send data
+				// FIXME Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: arraycopy: source index -2145386496 out of bounds for byte[2140006438]
 				byte[] msg = Arrays.copyOfRange(bytes, from, to);
 				dos.writeInt(MSG_TYPE_BODY);
 				dos.writeInt(to - from); // length of this message
