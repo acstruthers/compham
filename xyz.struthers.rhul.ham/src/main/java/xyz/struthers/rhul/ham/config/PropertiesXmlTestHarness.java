@@ -65,17 +65,17 @@ public class PropertiesXmlTestHarness {
 		// scenario descriptors
 		props.setScenarioName("Baseline");
 		props.setSaveIterationSummary(0, true);
-		props.setSaveIterationSummary(1, true);
-		props.setSaveIterationSummary(2, true);
-		props.setSaveIterationSummary(3, true);
-		props.setSaveIterationSummary(4, true);
-		props.setSaveIterationSummary(5, true);
-		props.setSaveIterationSummary(6, true);
-		props.setSaveIterationSummary(7, true);
-		props.setSaveIterationSummary(8, true);
-		props.setSaveIterationSummary(9, true);
-		props.setSaveIterationSummary(10, true);
-		props.setSaveIterationSummary(11, true);
+		props.setSaveIterationSummary(1, false);
+		props.setSaveIterationSummary(2, false);
+		props.setSaveIterationSummary(3, false);
+		props.setSaveIterationSummary(4, false);
+		props.setSaveIterationSummary(5, false);
+		props.setSaveIterationSummary(6, false);
+		props.setSaveIterationSummary(7, false);
+		props.setSaveIterationSummary(8, false);
+		props.setSaveIterationSummary(9, false);
+		props.setSaveIterationSummary(10, false);
+		props.setSaveIterationSummary(11, false);
 		props.setSaveIterationSummary(12, true);
 
 		// static config constants
@@ -106,16 +106,18 @@ public class PropertiesXmlTestHarness {
 		props.setAllowNegativerates(false); // allow negative interest rates?
 		props.setFcsLimitPerAdi(15000000000f); // AUD 15Bn limit per ADI
 		props.setFcsLimitPerDepositor(250000f); // AUD 250k limit per depositor
-		props.setFxRateStrategy(Currencies.SAME);
+		props.setFxRateStrategy(Currencies.SAME); // SAME = 0, CUSTOM = 7
 
-		props.addFxRateCustomPath("USD", 0.95f);
-		props.addFxRateCustomPath("USD", 0.95f);
-		props.addFxRateCustomPath("USD", 0.95f);
-		props.addFxRateCustomPath("CAD", 1.05f);
-		props.addFxRateCustomPath("CAD", 1.05f);
-		props.addFxRateCustomPath("CAD", 1.05f);
+		props.addFxRateCustomPath("USD", 0.7391f);
+		props.addFxRateCustomPath("USD", 0.7391f);
+		props.addFxRateCustomPath("USD", 0.7391f);
+		props.addFxRateCustomPath("CAD", 0.9771f);
+		props.addFxRateCustomPath("CAD", 0.9771f);
+		props.addFxRateCustomPath("CAD", 0.9771f);
+		
+		// FIXME: add code elsewhere to actually read the custom FX rates and use them in the model
 
-		props.setInterestRateStrategy(ReserveBankOfAustralia.RATES_SAME);
+		props.setInterestRateStrategy(ReserveBankOfAustralia.RATES_SAME); // SAME = 0, CUSTOM = 1
 		props.setInterestRateCustomPath(0, 1.50f);
 		props.setInterestRateCustomPath(1, 1.50f);
 		props.setInterestRateCustomPath(2, 1.50f);

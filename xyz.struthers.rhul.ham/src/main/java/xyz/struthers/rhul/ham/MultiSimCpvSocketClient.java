@@ -109,12 +109,10 @@ public class MultiSimCpvSocketClient {
 		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_20pc.xml" });
 		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_25pc.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_25pc.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_30pc.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_30pc.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_40pc.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_40pc.xml" });
 		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_50pc.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_50pc.xml" });
+		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_75pc.xml");
+		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_75pc.xml" });
 		System.gc();
 		
 		// 10% change in FX rates
