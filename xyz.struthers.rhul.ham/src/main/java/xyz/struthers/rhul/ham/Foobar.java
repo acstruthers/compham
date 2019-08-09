@@ -73,6 +73,9 @@ public class Foobar {
 		System.out.println("Float.MIN_VALUE: " + Float.MIN_VALUE);
 		System.out.println("Float.MAX_VALUE: " + Float.MAX_VALUE);
 		System.out.println("Float.SIZE: " + Float.SIZE);
+		System.out.println("Integer.MIN_VALUE: " + Integer.MIN_VALUE);
+		System.out.println("Integer.MAX_VALUE: " + Integer.MAX_VALUE);
+		System.out.println("Integer.SIZE: " + Integer.SIZE);
 
 		List<Integer> list = new ArrayList<Integer>(3);
 		Integer int1 = 1;

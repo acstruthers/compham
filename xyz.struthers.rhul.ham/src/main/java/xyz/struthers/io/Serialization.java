@@ -223,22 +223,23 @@ public abstract class Serialization {
 			dos.flush();
 		} else {
 			// loop over array, sending body as a series of messages
-			int from = 0;
-			int to = Math.min(bytes.length, messageSize);
+			long from = 0;
+			long to = Math.min(bytes.length, messageSize);
 			while (to - from > 0) {
 				// send data
 				// FIXME Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException:
 				// arraycopy: source index -2145386496 out of bounds for byte[2140006438]
 				try {
-					byte[] msg = Arrays.copyOfRange(bytes, from, to);
+					byte[] msg = Arrays.copyOfRange(bytes, (int) from, (int) to);
 					dos.writeInt(MSG_TYPE_BODY);
-					dos.writeInt(to - from); // length of this message
+					dos.writeInt((int) (to - from)); // length of this message
 					dos.write(msg);
 					dos.flush();
 
 					// set indices for next message
 					from = to;
 					to = Math.min(bytes.length, from + messageSize);
+					// FIXME: is the line above summing two big integers, overflowing, and resulting in a negative integer?
 				} catch (ArrayIndexOutOfBoundsException e) {
 					System.err.println("ARRAY OUT OF BOUNDS: from = " + from + ", to = " + to + ", bytes.length = "
 							+ bytes.length + ", messageSize = " + messageSize);
@@ -297,6 +298,7 @@ public abstract class Serialization {
 
 		// read message body
 		while (dis.readInt() != -1) {
+			// FIXME: is this reading one int too many and going too far into the stream?
 			int msgLength = dis.readInt();
 			byte[] msgBytes = new byte[msgLength];
 			dis.readFully(msgBytes);
