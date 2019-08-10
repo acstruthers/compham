@@ -118,6 +118,7 @@ public class PropertiesXmlTestHarness {
 		// FIXME: add code elsewhere to actually read the custom FX rates and use them in the model
 
 		props.setInterestRateStrategy(ReserveBankOfAustralia.RATES_SAME); // SAME = 0, CUSTOM = 1
+		props.setInitialCashRate(1.5f);
 		props.setInterestRateCustomPath(0, 1.50f);
 		props.setInterestRateCustomPath(1, 1.50f);
 		props.setInterestRateCustomPath(2, 1.50f);

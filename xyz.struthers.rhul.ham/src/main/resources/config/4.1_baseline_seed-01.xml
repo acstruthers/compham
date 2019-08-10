@@ -58,7 +58,7 @@
         </entry>
     </exchangeRateCustomPath>
     <interestRateStrategy>0</interestRateStrategy>
-    <initialCashRate>0.0</initialCashRate>
+    <initialCashRate>1.5</initialCashRate>
     <interestRateCustomPath>
         <cashRate>1.5</cashRate>
         <cashRate>1.5</cashRate>
