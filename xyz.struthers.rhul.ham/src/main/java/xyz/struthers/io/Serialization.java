@@ -179,6 +179,8 @@ public abstract class Serialization {
 	 * 
 	 * @param dos
 	 * @param object
+	 * @param objectType  - a custom object type flag determined by the calling
+	 *                    class
 	 * @param bufferSize
 	 * @param messageSize
 	 * @throws IOException
@@ -239,7 +241,8 @@ public abstract class Serialization {
 					// set indices for next message
 					from = to;
 					to = Math.min(bytes.length, from + messageSize);
-					// FIXME: is the line above summing two big integers, overflowing, and resulting in a negative integer?
+					// FIXME: is the line above summing two big integers, overflowing, and resulting
+					// in a negative integer?
 				} catch (ArrayIndexOutOfBoundsException e) {
 					System.err.println("ARRAY OUT OF BOUNDS: from = " + from + ", to = " + to + ", bytes.length = "
 							+ bytes.length + ", messageSize = " + messageSize);
@@ -297,7 +300,7 @@ public abstract class Serialization {
 		int i = 0;
 
 		// read message body
-		while (dis.readInt() != -1) {
+		while (dis.readInt() != MSG_TYPE_END) {
 			// FIXME: is this reading one int too many and going too far into the stream?
 			int msgLength = dis.readInt();
 			byte[] msgBytes = new byte[msgLength];

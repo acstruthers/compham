@@ -117,8 +117,21 @@ public class CpvSocketClient {
 			// OUTBOUND
 			// send CPV inputs to server for processing
 			System.out.println(new Date(System.currentTimeMillis()) + ": serializing CPV inputs.");
-			Serialization.writeToDataStream(dos, cpvInputs, properties.getSocketBufferBytes(),
+			//Serialization.writeToDataStream(dos, cpvInputs, properties.getSocketBufferBytes(),
+			//		properties.getSocketMessageBytes(), CompressionType.NO_COMPRESSION);
+			
+			// The above ran into memory/size issues, so split it into its components
+			Serialization.writeToDataStream(dos, cpvInputs.getLiabilitiesAmounts(), properties.getSocketBufferBytes(),
 					properties.getSocketMessageBytes(), CompressionType.NO_COMPRESSION);
+			Serialization.writeToDataStream(dos, cpvInputs.getLiabilitiesIndices(), properties.getSocketBufferBytes(),
+					properties.getSocketMessageBytes(), CompressionType.NO_COMPRESSION);
+			Serialization.writeToDataStream(dos, cpvInputs.getOperatingCashFlow(), properties.getSocketBufferBytes(),
+					properties.getSocketMessageBytes(), CompressionType.NO_COMPRESSION);
+			Serialization.writeToDataStream(dos, cpvInputs.getLiquidAssets(), properties.getSocketBufferBytes(),
+					properties.getSocketMessageBytes(), CompressionType.NO_COMPRESSION);
+			Serialization.writeToDataStream(dos, cpvInputs.getIteration(), properties.getSocketBufferBytes(),
+					properties.getSocketMessageBytes(), CompressionType.NO_COMPRESSION);
+			
 			/*
 			 * byte[] bytes = null; byte compression = 1; switch (compression) { case 1: //
 			 * GZIP compression bytes = Serialization.toBytesGZIP(cpvInputs,

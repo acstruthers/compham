@@ -44,6 +44,12 @@ public class CpvSocketClientHandler extends Thread {
 		// byte compression = Byte.valueOf(null); // use the same compression for input
 		// & output
 
+		List<TFloatArrayList> liabilitiesAmounts = null;
+		List<TIntArrayList> liabilitiesIndices = null;
+		TFloatArrayList operatingCashFlow = null;
+		TFloatArrayList liquidAssets = null;
+		int iteration = 0;
+		
 		// receive CPV input from client
 		try {
 			// read stream
@@ -59,7 +65,15 @@ public class CpvSocketClientHandler extends Thread {
 			 * Serialization.toObjectFromDeflater(bytes); break; default: // no compression
 			 * cpvInputs = (ClearingPaymentInputs) Serialization.toObject(bytes); break; }
 			 */
-			cpvInputs = (ClearingPaymentInputs) Serialization.readObjectFromStream(dis);
+			//cpvInputs = (ClearingPaymentInputs) Serialization.readObjectFromStream(dis);
+
+			// The above ran into memory/size issues, so split it into its components
+			liabilitiesAmounts = (List<TFloatArrayList>) Serialization.readObjectFromStream(dis);
+			liabilitiesIndices = (List<TIntArrayList>) Serialization.readObjectFromStream(dis);
+			operatingCashFlow = (TFloatArrayList) Serialization.readObjectFromStream(dis);
+			liquidAssets = (TFloatArrayList) Serialization.readObjectFromStream(dis);
+			iteration = (int) Serialization.readObjectFromStream(dis);
+
 		} catch (IOException e) {
 			cpvInputs = null;
 			e.printStackTrace();
@@ -68,12 +82,12 @@ public class CpvSocketClientHandler extends Thread {
 
 		// process CPV inputs
 		System.out.println(new Date(System.currentTimeMillis()) + ": CPV inputs unmarshalled.");
-		List<TFloatArrayList> liabilitiesAmounts = cpvInputs.getLiabilitiesAmounts();
-		List<TIntArrayList> liabilitiesIndices = cpvInputs.getLiabilitiesIndices();
-		TFloatArrayList operatingCashFlow = cpvInputs.getOperatingCashFlow();
-		TFloatArrayList liquidAssets = cpvInputs.getLiquidAssets();
-		int iteration = cpvInputs.getIteration();
-		cpvInputs.clear(); // FIXME: make sure this doesn't delete the underlying data (i.e. the above
+		//List<TFloatArrayList> liabilitiesAmounts = cpvInputs.getLiabilitiesAmounts();
+		//List<TIntArrayList> liabilitiesIndices = cpvInputs.getLiabilitiesIndices();
+		//TFloatArrayList operatingCashFlow = cpvInputs.getOperatingCashFlow();
+		//TFloatArrayList liquidAssets = cpvInputs.getLiquidAssets();
+		//int iteration = cpvInputs.getIteration();
+		//cpvInputs.clear(); // FIXME: make sure this doesn't delete the underlying data (i.e. the above
 							// assignment makes copies rather than just referencing the underlying arrays).
 		cpvInputs = null;
 		System.gc();
