@@ -131,8 +131,6 @@ public class Currency implements Serializable {
 		if (this.exchangeRate.size() > iteration) {
 			this.exchangeRate.set(iteration, exchangeRate);
 		} else if (this.exchangeRate.size() == iteration) {
-			this.exchangeRate.set(iteration, exchangeRate);
-		} else if (this.exchangeRate.size() == (iteration - 1)) {
 			this.exchangeRate.add(exchangeRate);
 		} else {
 			result = 1;
