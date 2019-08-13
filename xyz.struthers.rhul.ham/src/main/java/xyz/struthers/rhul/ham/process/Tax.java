@@ -298,7 +298,7 @@ public abstract class Tax {
 		}
 
 		// convert annual tax amount back to monthly equivalent
-		return incomeTax / NUM_MONTHS;
+		return Math.max(0f, incomeTax) / NUM_MONTHS;
 	}
 
 	/**

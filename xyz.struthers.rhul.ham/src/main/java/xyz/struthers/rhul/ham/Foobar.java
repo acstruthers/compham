@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.apache.commons.collections.ListUtils;
 
+import xyz.struthers.rhul.ham.process.Tax;
+
 /**
  * Tests how to use the resource stream
  * 
@@ -20,6 +22,10 @@ public class Foobar {
 	}
 
 	public static void main(String[] args) {
+		float income = 276.87f;
+		float tax = Tax.calculateIndividualIncomeTax(income);
+		System.out.println("Tax on " + income + " is " + tax);
+		
 		String foo = "Total Australia";
 		System.out.println("==>" + foo.substring(6) + ".");
 

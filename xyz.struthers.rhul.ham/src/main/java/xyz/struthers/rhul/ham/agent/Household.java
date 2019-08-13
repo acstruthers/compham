@@ -983,6 +983,7 @@ public class Household extends Agent {
 	 * @param pnlIncomeTaxExpense the pnlIncomeTaxExpense to set
 	 */
 	public void setPnlIncomeTaxExpense(float pnlIncomeTaxExpense) {
+		// FIXME: income tax expense often exceeds income. FIX THIS
 		this.pnlIncomeTaxExpense = pnlIncomeTaxExpense;
 	}
 
