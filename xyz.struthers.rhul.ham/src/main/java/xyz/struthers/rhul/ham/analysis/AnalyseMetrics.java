@@ -47,7 +47,79 @@ public class AnalyseMetrics {
 		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline_SUMMARY_Household_012.csv");
 		processHouseholdMetricsCsv(
 				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline_SUMMARY_Household_012.csv",
+				"Baseline", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-01_SUMMARY_Household_000.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-01_SUMMARY_Household_000.csv",
 				"Baseline-01", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-01_SUMMARY_Household_012.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-01_SUMMARY_Household_012.csv",
+				"Baseline-01", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-02_SUMMARY_Household_000.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-02_SUMMARY_Household_000.csv",
+				"Baseline-02", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-02_SUMMARY_Household_012.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-02_SUMMARY_Household_012.csv",
+				"Baseline-02", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-03_SUMMARY_Household_000.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-03_SUMMARY_Household_000.csv",
+				"Baseline-03", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-03_SUMMARY_Household_012.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-03_SUMMARY_Household_012.csv",
+				"Baseline-03", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-04_SUMMARY_Household_000.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-04_SUMMARY_Household_000.csv",
+				"Baseline-04", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-04_SUMMARY_Household_012.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-04_SUMMARY_Household_012.csv",
+				"Baseline-04", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-05_SUMMARY_Household_000.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-05_SUMMARY_Household_000.csv",
+				"Baseline-05", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-05_SUMMARY_Household_012.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-05_SUMMARY_Household_012.csv",
+				"Baseline-05", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-06_SUMMARY_Household_000.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-06_SUMMARY_Household_000.csv",
+				"Baseline-06", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-06_SUMMARY_Household_012.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-06_SUMMARY_Household_012.csv",
+				"Baseline-06", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-07_SUMMARY_Household_000.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-07_SUMMARY_Household_000.csv",
+				"Baseline-07", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-07_SUMMARY_Household_012.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-07_SUMMARY_Household_012.csv",
+				"Baseline-07", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-08_SUMMARY_Household_000.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-08_SUMMARY_Household_000.csv",
+				"Baseline-08", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-08_SUMMARY_Household_012.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-08_SUMMARY_Household_012.csv",
+				"Baseline-08", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-09_SUMMARY_Household_000.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-09_SUMMARY_Household_000.csv",
+				"Baseline-09", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-09_SUMMARY_Household_012.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-09_SUMMARY_Household_012.csv",
+				"Baseline-09", true, 12);
 	}
 
 	private static void processHouseholdMetricsCsv(String inFileResourceLocation, String scenario, boolean append,
@@ -57,33 +129,69 @@ public class AnalyseMetrics {
 		float meanIncome = 0f;
 		float meanExpenses = 0f;
 		float housingCostsOver30pc = 0f; // % of households in mtg distress
-		float housingCostsOver30pcTop5pc = 0f;
 		float housingCostsOver30pcTop1pc = 0f;
+		float housingCostsOver30pcTop5pc = 0f;
 		float housingCostsOver30pcBottom95pc = 0f;
+		float housingCostsOver30pcDecile1 = 0f;
+		float housingCostsOver30pcDecile2 = 0f;
+		float housingCostsOver30pcDecile3 = 0f;
+		float housingCostsOver30pcDecile4 = 0f;
+		float housingCostsOver30pcDecile5 = 0f;
+		float housingCostsOver30pcDecile6 = 0f;
+		float housingCostsOver30pcDecile7 = 0f;
+		float housingCostsOver30pcDecile8 = 0f;
+		float housingCostsOver30pcDecile9 = 0f;
+		float housingCostsOver30pcDecile10 = 0f;
+		float totalIncomePercentEarnedByTop1pc = 0f;
 		float totalIncomePercentEarnedByTop5pc = 0f; // % of assets controlled by top 5% of income (Kumhof, et al, 2015)
 		float debtToIncome = 0f; // household debt-to-income ratio (Kumhof, et al, 2015)
+		float debtToIncomeTop1pc = 0f;
 		float debtToIncomeTop5pc = 0f;
 		float debtToIncomeBottom95pc = 0f;
 		float debtToNetWorth = 0f; // household debt-to-net worth ratio (Kumhof, et al, 2015)
+		float debtToNetWorthTop1pc = 0f;
 		float debtToNetWorthTop5pc = 0f;
 		float debtToNetWorthBottom95pc = 0f;
-		float wealthPercentHeldByTop5pc = 0f; // share of net worth held by top 5% of income distribution (Kumhof, et
-												// al, 2015)
 		float wealthPercentHeldByTop1pc = 0f;
+		float wealthPercentHeldByTop5pc = 0f; // share of net worth held by top 5% of income (Kumhof, et al, 2015)
 		float incomeToHendersonPercent = 0f;
+		float incomeToHendersonPercentTop1pc = 0f;
+		float incomeToHendersonPercentTop5pc = 0f;
+		float incomeToHendersonPercentBottom95pc = 0f;
 
 		// local working variables
 		int householdCount = 0;
 		int householdCountTop5pc = 0;
 		int householdCountTop1pc = 0;
+		int householdCountDecile1 = 0;
+		int householdCountDecile2 = 0;
+		int householdCountDecile3 = 0;
+		int householdCountDecile4 = 0;
+		int householdCountDecile5 = 0;
+		int householdCountDecile6 = 0;
+		int householdCountDecile7 = 0;
+		int householdCountDecile8 = 0;
+		int householdCountDecile9 = 0;
 		int housingCostsOver30pcCount = 0;
-		int housingCostsOver30pcCountTop5pc = 0;
 		int housingCostsOver30pcCountTop1pc = 0;
+		int housingCostsOver30pcCountTop5pc = 0;
 		int housingCostsOver30pcCountBottom95pc = 0;
+		int housingCostsOver30pcCountDecile1 = 0;
+		int housingCostsOver30pcCountDecile2 = 0;
+		int housingCostsOver30pcCountDecile3 = 0;
+		int housingCostsOver30pcCountDecile4 = 0;
+		int housingCostsOver30pcCountDecile5 = 0;
+		int housingCostsOver30pcCountDecile6 = 0;
+		int housingCostsOver30pcCountDecile7 = 0;
+		int housingCostsOver30pcCountDecile8 = 0;
+		int housingCostsOver30pcCountDecile9 = 0;
+		int housingCostsOver30pcCountDecile10 = 0;
 		float totalDebt = 0f;
+		float totalDebtTop1pc = 0f;
 		float totalDebtTop5pc = 0f;
 		float totalDebtBottom95pc = 0f;
 		float totalIncome = 0f;
+		float totalIncomeTop1pc = 0f;
 		float totalIncomeTop5pc = 0f;
 		float totalIncomeBottom95pc = 0f;
 		float totalExpenses = 0f;
@@ -97,8 +205,17 @@ public class AnalyseMetrics {
 		float totalHendersonBottom95pc = 0f;
 
 		ArrayList<Float> incomeList = new ArrayList<Float>();
-		float top5pcThreshold = 0f;
 		float top1pcThreshold = 0f;
+		float top5pcThreshold = 0f;
+		float decileThreshold1 = 0f; // top 10% of all income
+		float decileThreshold2 = 0f; // top 20-11% of all income
+		float decileThreshold3 = 0f; // top 30-21% of all income
+		float decileThreshold4 = 0f; // top 40-31% of all income
+		float decileThreshold5 = 0f; // top 50-41% of all income
+		float decileThreshold6 = 0f; // top 60-51% of all income
+		float decileThreshold7 = 0f; // top 70-61% of all income
+		float decileThreshold8 = 0f; // top 80-71% of all income
+		float decileThreshold9 = 0f; // top 90-81% of all income
 		/*
 		 * Read in the file, sort by income, and determine 5% and 1% income thresholds
 		 * 
@@ -134,6 +251,15 @@ public class AnalyseMetrics {
 		Collections.sort(incomeList);
 		top5pcThreshold = incomeList.get((int) (householdCount * 0.95f));
 		top1pcThreshold = incomeList.get((int) (householdCount * 0.99f));
+		decileThreshold1 = incomeList.get((int) (householdCount * 0.9f));
+		decileThreshold2 = incomeList.get((int) (householdCount * 0.8f));
+		decileThreshold3 = incomeList.get((int) (householdCount * 0.7f));
+		decileThreshold4 = incomeList.get((int) (householdCount * 0.6f));
+		decileThreshold5 = incomeList.get((int) (householdCount * 0.5f));
+		decileThreshold6 = incomeList.get((int) (householdCount * 0.4f));
+		decileThreshold7 = incomeList.get((int) (householdCount * 0.3f));
+		decileThreshold8 = incomeList.get((int) (householdCount * 0.2f));
+		decileThreshold9 = incomeList.get((int) (householdCount * 0.1f));
 
 		// read CSV filea second time, and calculate metrics
 		reader = null;
@@ -153,7 +279,7 @@ public class AnalyseMetrics {
 					float netWorth = Float.valueOf(line[13].replace(",", ""))
 							- Float.valueOf(line[16].replace(",", ""));
 
-					// FIXME: update metrics
+					// update metrics
 					if (income > top5pcThreshold) {
 						// add to top 5% metrics
 						householdCountTop5pc++;
@@ -168,8 +294,10 @@ public class AnalyseMetrics {
 						if (income > top1pcThreshold) {
 							// add to top 1% metrics
 							householdCountTop1pc++;
-							totalNetWorthTop1pc += netWorth;
+							totalIncomeTop1pc += income;
 							totalHendersonTop1pc += henderson;
+							totalDebtTop1pc += debt;
+							totalNetWorthTop1pc += netWorth;
 							if (housingCosts > 0.3 * income) {
 								// mortgage distress in top 1% of income
 								housingCostsOver30pcCountTop1pc++;
@@ -178,9 +306,9 @@ public class AnalyseMetrics {
 					} else {
 						// add to bottom 95% metrics
 						totalIncomeBottom95pc += income;
+						totalHendersonBottom95pc += henderson;
 						totalDebtBottom95pc += debt;
 						totalNetWorthBottom95pc += netWorth;
-						totalHendersonBottom95pc += henderson;
 						if (housingCosts > 0.3 * income) {
 							// mortgage distress in bottom 95% of income
 							housingCostsOver30pcCountBottom95pc++;
@@ -191,19 +319,72 @@ public class AnalyseMetrics {
 						housingCostsOver30pcCount++;
 					}
 					// add to overall metrics
-					totalDebt += debt;
 					totalIncome += income;
-					totalExpenses += expenses;
-					totalNetWorth += netWorth;
 					totalHenderson += henderson;
+					totalExpenses += expenses;
+					totalDebt += debt;
+					totalNetWorth += netWorth;
 
+					// decile metrics
+					if (income > decileThreshold1) {
+						householdCountDecile1++;
+						if (housingCosts > 0.3 * income) {
+							housingCostsOver30pcCountDecile1++;
+						}
+					} else if (income > decileThreshold2) {
+						householdCountDecile2++;
+						if (housingCosts > 0.3 * income) {
+							housingCostsOver30pcCountDecile2++;
+						}
+					} else if (income > decileThreshold3) {
+						householdCountDecile3++;
+						if (housingCosts > 0.3 * income) {
+							housingCostsOver30pcCountDecile3++;
+						}
+					} else if (income > decileThreshold4) {
+						householdCountDecile4++;
+						if (housingCosts > 0.3 * income) {
+							housingCostsOver30pcCountDecile4++;
+						}
+					} else if (income > decileThreshold5) {
+						householdCountDecile5++;
+						if (housingCosts > 0.3 * income) {
+							housingCostsOver30pcCountDecile5++;
+						}
+					} else if (income > decileThreshold6) {
+						householdCountDecile6++;
+						if (housingCosts > 0.3 * income) {
+							housingCostsOver30pcCountDecile6++;
+						}
+					} else if (income > decileThreshold7) {
+						householdCountDecile7++;
+						if (housingCosts > 0.3 * income) {
+							housingCostsOver30pcCountDecile7++;
+						}
+					} else if (income > decileThreshold8) {
+						householdCountDecile8++;
+						if (housingCosts > 0.3 * income) {
+							housingCostsOver30pcCountDecile8++;
+						}
+					} else if (income > decileThreshold9) {
+						householdCountDecile9++;
+						if (housingCosts > 0.3 * income) {
+							housingCostsOver30pcCountDecile9++;
+						}
+					} else {
+						if (housingCosts > 0.3 * income) {
+							housingCostsOver30pcCountDecile10++;
+						}
+					}
 				} catch (NumberFormatException e) {
 					// do nothing and leave it as zero.
 				}
 			}
 			reader.close();
 			reader = null;
-		} catch (FileNotFoundException e) {
+		} catch (
+
+		FileNotFoundException e) {
 			// open file
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -219,16 +400,41 @@ public class AnalyseMetrics {
 		housingCostsOver30pcTop1pc = housingCostsOver30pcCountTop1pc / Float.valueOf(householdCountTop1pc);
 		housingCostsOver30pcBottom95pc = housingCostsOver30pcCountBottom95pc
 				/ Float.valueOf(householdCount - householdCountTop5pc);
+		totalIncomePercentEarnedByTop1pc = totalIncomeTop1pc / totalIncome;
 		totalIncomePercentEarnedByTop5pc = totalIncomeTop5pc / totalIncome;
-		debtToIncome = totalDebt / totalIncome; // household debt-to-income ratio (Kumhof, et al, 2015)
+		debtToIncome = totalDebt / totalIncome; // household
+												// debt-to-income
+												// ratio
+												// (Kumhof,
+												// et
+												// al,
+												// 2015)
+		debtToIncomeTop1pc = totalDebtTop1pc / totalIncomeTop1pc;
 		debtToIncomeTop5pc = totalDebtTop5pc / totalIncomeTop5pc;
 		debtToIncomeBottom95pc = totalDebtBottom95pc / totalIncomeBottom95pc;
 		debtToNetWorth = totalDebt / totalNetWorth;
+		debtToNetWorthTop1pc = totalDebtTop1pc / totalNetWorthTop1pc;
 		debtToNetWorthTop5pc = totalDebtTop5pc / totalNetWorthTop5pc;
 		debtToNetWorthBottom95pc = totalDebtBottom95pc / totalNetWorthBottom95pc;
-		wealthPercentHeldByTop5pc = totalNetWorthTop5pc / totalNetWorth;
 		wealthPercentHeldByTop1pc = totalNetWorthTop1pc / totalNetWorth;
+		wealthPercentHeldByTop5pc = totalNetWorthTop5pc / totalNetWorth;
 		incomeToHendersonPercent = totalIncome / totalHenderson;
+		incomeToHendersonPercentTop1pc = totalIncomeTop1pc / totalHendersonTop1pc;
+		incomeToHendersonPercentTop5pc = totalIncomeTop5pc / totalHendersonTop5pc;
+		incomeToHendersonPercentBottom95pc = totalIncomeBottom95pc / totalHendersonBottom95pc;
+
+		housingCostsOver30pcDecile1 = housingCostsOver30pcCountDecile1 / householdCountDecile1;
+		housingCostsOver30pcDecile2 = housingCostsOver30pcCountDecile2 / householdCountDecile2;
+		housingCostsOver30pcDecile3 = housingCostsOver30pcCountDecile3 / householdCountDecile3;
+		housingCostsOver30pcDecile4 = housingCostsOver30pcCountDecile4 / householdCountDecile4;
+		housingCostsOver30pcDecile5 = housingCostsOver30pcCountDecile5 / householdCountDecile5;
+		housingCostsOver30pcDecile6 = housingCostsOver30pcCountDecile6 / householdCountDecile6;
+		housingCostsOver30pcDecile7 = housingCostsOver30pcCountDecile7 / householdCountDecile7;
+		housingCostsOver30pcDecile8 = housingCostsOver30pcCountDecile8 / householdCountDecile8;
+		housingCostsOver30pcDecile9 = housingCostsOver30pcCountDecile9 / householdCountDecile9;
+		housingCostsOver30pcDecile10 = housingCostsOver30pcCountDecile10 / (householdCount - householdCountDecile9
+				- householdCountDecile8 - householdCountDecile7 - householdCountDecile6 - householdCountDecile5
+				- householdCountDecile4 - householdCountDecile3 - householdCountDecile2 - householdCountDecile1);
 
 		// save CSV file in a format that R can graph
 		DecimalFormat wholeNumber = new DecimalFormat("000");
@@ -257,6 +463,24 @@ public class AnalyseMetrics {
 					+ properties.getCsvSeparator() + housingCostsOver30pc).split(properties.getCsvSeparator());
 			csvWriter.writeNext(entries);
 			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "housingCostsOver30pcTop1pc"
+					+ properties.getCsvSeparator() + housingCostsOver30pcTop1pc).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "housingCostsOver30pcTop5pc"
+					+ properties.getCsvSeparator() + housingCostsOver30pcTop5pc).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator()
+					+ "housingCostsOver30pcBottom95pc" + properties.getCsvSeparator() + housingCostsOver30pcBottom95pc)
+							.split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator()
+					+ "totalIncomePercentEarnedByTop1pc" + properties.getCsvSeparator()
+					+ totalIncomePercentEarnedByTop1pc).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
 					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator()
 					+ "totalIncomePercentEarnedByTop5pc" + properties.getCsvSeparator()
 					+ totalIncomePercentEarnedByTop5pc).split(properties.getCsvSeparator());
@@ -264,6 +488,10 @@ public class AnalyseMetrics {
 			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
 					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "debtToIncome"
 					+ properties.getCsvSeparator() + debtToIncome).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "debtToIncomeTop1pc"
+					+ properties.getCsvSeparator() + debtToIncomeTop1pc).split(properties.getCsvSeparator());
 			csvWriter.writeNext(entries);
 			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
 					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "debtToIncomeTop5pc"
@@ -278,6 +506,10 @@ public class AnalyseMetrics {
 					+ properties.getCsvSeparator() + debtToNetWorth).split(properties.getCsvSeparator());
 			csvWriter.writeNext(entries);
 			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "debtToNetWorthTop1pc"
+					+ properties.getCsvSeparator() + debtToNetWorthTop1pc).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
 					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "debtToNetWorthTop5pc"
 					+ properties.getCsvSeparator() + debtToNetWorthTop5pc).split(properties.getCsvSeparator());
 			csvWriter.writeNext(entries);
@@ -286,16 +518,72 @@ public class AnalyseMetrics {
 					+ properties.getCsvSeparator() + debtToNetWorthBottom95pc).split(properties.getCsvSeparator());
 			csvWriter.writeNext(entries);
 			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
-					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "wealthPercentHeldByTop5pc"
-					+ properties.getCsvSeparator() + wealthPercentHeldByTop5pc).split(properties.getCsvSeparator());
-			csvWriter.writeNext(entries);
-			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
 					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "wealthPercentHeldByTop1pc"
 					+ properties.getCsvSeparator() + wealthPercentHeldByTop1pc).split(properties.getCsvSeparator());
 			csvWriter.writeNext(entries);
 			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "wealthPercentHeldByTop5pc"
+					+ properties.getCsvSeparator() + wealthPercentHeldByTop5pc).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
 					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "incomeToHendersonPercent"
 					+ properties.getCsvSeparator() + incomeToHendersonPercent).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator()
+					+ "incomeToHendersonPercentTop1pc" + properties.getCsvSeparator() + incomeToHendersonPercentTop1pc)
+							.split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator()
+					+ "incomeToHendersonPercentTop5pc" + properties.getCsvSeparator() + incomeToHendersonPercentTop5pc)
+							.split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator()
+					+ "incomeToHendersonPercentBottom95pc" + properties.getCsvSeparator()
+					+ incomeToHendersonPercentBottom95pc).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "housingCostsOver30pcDecile1"
+					+ properties.getCsvSeparator() + housingCostsOver30pcDecile1).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "housingCostsOver30pcDecile2"
+					+ properties.getCsvSeparator() + housingCostsOver30pcDecile2).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "housingCostsOver30pcDecile3"
+					+ properties.getCsvSeparator() + housingCostsOver30pcDecile3).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "housingCostsOver30pcDecile4"
+					+ properties.getCsvSeparator() + housingCostsOver30pcDecile4).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "housingCostsOver30pcDecile5"
+					+ properties.getCsvSeparator() + housingCostsOver30pcDecile5).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "housingCostsOver30pcDecile6"
+					+ properties.getCsvSeparator() + housingCostsOver30pcDecile6).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "housingCostsOver30pcDecile7"
+					+ properties.getCsvSeparator() + housingCostsOver30pcDecile7).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "housingCostsOver30pcDecile8"
+					+ properties.getCsvSeparator() + housingCostsOver30pcDecile8).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "housingCostsOver30pcDecile9"
+					+ properties.getCsvSeparator() + housingCostsOver30pcDecile9).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "housingCostsOver30pcDecile10"
+					+ properties.getCsvSeparator() + housingCostsOver30pcDecile10).split(properties.getCsvSeparator());
 			csvWriter.writeNext(entries);
 
 			writer.close();
