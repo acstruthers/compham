@@ -1,10 +1,37 @@
 package xyz.struthers.rhul.ham.analysis;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.text.DecimalFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriterBuilder;
+import com.opencsv.ICSVWriter;
+
+import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.map.TObjectFloatMap;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectFloatHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import xyz.struthers.rhul.ham.config.PropertiesXml;
+import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
+
 /**
  * @author Adam Struthers
  * @since 2019-08-14
  */
 public class AnalyseLgas {
+
+	public static final int NUM_LGAS = 550;
+
+	private static PropertiesXml properties;
 
 	public AnalyseLgas() {
 		super();
@@ -14,19 +41,220 @@ public class AnalyseLgas {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		PropertiesXmlFactory.propertiesXmlFilename = "D:\\compham-config\\4.1_baseline.xml";
+		properties = PropertiesXmlFactory.getProperties();
 
+		// overwrite existing file
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline_SUMMARY_Household_000.csv");
+		processLgaMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline_SUMMARY_Household_000.csv",
+				"Baseline", false, 0);
+
+		// append to file
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline_SUMMARY_Household_012.csv");
+		processLgaMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline_SUMMARY_Household_012.csv",
+				"Baseline", true, 12);
 	}
 
-	private static void processHouseholdMetricsCsv(String inFileResourceLocation, String scenario, boolean append,
+	/**
+	 * mortgage distress<br>
+	 * wealth inequality
+	 * 
+	 * @param inFileResourceLocation
+	 * @param scenario
+	 * @param append
+	 * @param iteration
+	 */
+	private static void processLgaMetricsCsv(String inFileResourceLocation, String scenario, boolean append,
 			int iteration) {
-		
-		
-		// open file
-		// update counts in LGA map
-		
+
+		// declare local variables
+		TObjectFloatMap<String> housingCostsOver30pc = new TObjectFloatHashMap<String>(NUM_LGAS);
+		TObjectFloatMap<String> incomeEarnedTop5pc = new TObjectFloatHashMap<String>(NUM_LGAS);
+		TObjectFloatMap<String> incomeEarnedTop5pcAU = new TObjectFloatHashMap<String>(NUM_LGAS);
+
+		// working variables
+		TObjectIntMap<String> lgaHouseholdCount = new TObjectIntHashMap<String>(NUM_LGAS);
+		TObjectIntMap<String> lgaHousingCostsOver30pcCount = new TObjectIntHashMap<String>(NUM_LGAS);
+		TObjectFloatMap<String> lgaTotalIncome = new TObjectFloatHashMap<String>(NUM_LGAS);
+		TObjectFloatMap<String> lgaTotalIncomeTop1pc = new TObjectFloatHashMap<String>(NUM_LGAS);
+		TObjectFloatMap<String> lgaTotalIncomeTop5pc = new TObjectFloatHashMap<String>(NUM_LGAS);
+		TObjectFloatMap<String> nationalTotalIncomeTop1pc = new TObjectFloatHashMap<String>(NUM_LGAS);
+		TObjectFloatMap<String> nationalTotalIncomeTop5pc = new TObjectFloatHashMap<String>(NUM_LGAS);
+
+		// open file and sort incomes within each LGA, and nationally
+		// then calculate top 1% and top 5% threshold incomes
+		Map<String, TFloatArrayList> lgaIncomeLists = new HashMap<String, TFloatArrayList>(NUM_LGAS);
+		TFloatArrayList nationalIncomeList = new TFloatArrayList(10000000);
+		CSVReader reader = null;
+		try {
+			Reader fr = new FileReader(inFileResourceLocation);
+			reader = new CSVReader(fr);
+			String[] line = reader.readNext(); // read and discard header row
+			while ((line = reader.readNext()) != null) {
+				try {
+					// update national income list
+					float income = Float.valueOf(line[0].replace(",", ""));
+					nationalIncomeList.add(income);
+
+					// update LGA income list
+					String lgaCode = line[0];
+					if (!lgaIncomeLists.containsKey(lgaCode)) {
+						lgaIncomeLists.put(lgaCode, new TFloatArrayList());
+					}
+					TFloatArrayList lgaList = lgaIncomeLists.get(lgaCode);
+					lgaList.add(income);
+					lgaIncomeLists.put(lgaCode, lgaList); // this line might be redundant
+				} catch (NumberFormatException e) {
+					// do nothing and leave it as zero.
+				}
+			}
+			reader.close();
+			reader = null;
+		} catch (FileNotFoundException e) {
+			// open file
+			e.printStackTrace();
+		} catch (IOException e) {
+			// read next
+			e.printStackTrace();
+		}
+		// sort national income list, and determine thresholds
+		nationalIncomeList.sort();
+		float nationalThresholdTop1pc = nationalIncomeList.get((int) (nationalIncomeList.size() * 0.99f));
+		float nationalThresholdTop5pc = nationalIncomeList.get((int) (nationalIncomeList.size() * 0.95f));
+		TObjectFloatMap<String> lgaThresholdTop1pc = new TObjectFloatHashMap<String>();
+		TObjectFloatMap<String> lgaThresholdTop5pc = new TObjectFloatHashMap<String>();
+		for (String lga : lgaIncomeLists.keySet()) {
+			TFloatArrayList lgaList = lgaIncomeLists.get(lga);
+			lgaList.sort();
+			// lgaIncomeLists.put(lga, lgaList); // this line might be redundant
+
+			float threshold = lgaList.get((int) (lgaList.size() * 0.99f));
+			lgaThresholdTop1pc.put(lga, threshold);
+			threshold = lgaList.get((int) (lgaList.size() * 0.95f));
+			lgaThresholdTop5pc.put(lga, threshold);
+		}
+
+		/**
+		 * nationalThresholdTop1pc, nationalThresholdTop5pc<br>
+		 * lgaThresholdTop1pc, lgaThresholdTop5pc
+		 */
+		// open file and calculate metrics
+		reader = null;
+		try {
+			Reader fr = new FileReader(inFileResourceLocation);
+			reader = new CSVReader(fr);
+			String[] line = reader.readNext(); // read and discard header row
+			while ((line = reader.readNext()) != null) {
+				try {
+					// update counts in LGA map
+					String lgaCode = line[6];
+					int householdCount = 1;
+					int housingCostsOver30pcCount = 0;
+					float totalIncome = 0f;
+					float totalIncomeTop1pc = 0f;
+					float totalIncomeTop5pc = 0f;
+					float totalIncomeTop1pcAU = 0f;
+					float totalIncomeTop5pcAU = 0f;
+
+					if (lgaHouseholdCount.containsKey(lgaCode)) {
+						householdCount = lgaHouseholdCount.get(lgaCode);
+						housingCostsOver30pcCount = lgaHousingCostsOver30pcCount.get(lgaCode);
+						totalIncome = lgaTotalIncome.get(lgaCode);
+						totalIncomeTop1pc = lgaTotalIncomeTop1pc.get(lgaCode);
+						totalIncomeTop5pc = lgaTotalIncomeTop5pc.get(lgaCode);
+						totalIncomeTop1pcAU = nationalTotalIncomeTop1pc.get(lgaCode);
+						totalIncomeTop5pcAU = nationalTotalIncomeTop5pc.get(lgaCode);
+					}
+					/*
+					 * We could measure separately: the top 1% and top 5% based on income within
+					 * that LGA; and also the top 1% and 5% based on national income. The former
+					 * would reveal where inequality exists within an LGA, while the latter would
+					 * show how the rich and poor are distributed across LGAs.
+					 */
+					float income = Float.valueOf(line[0].replace(",", ""));
+					float housingCosts = Float.valueOf(line[0].replace(",", ""));
+					int mtgDistress = housingCosts > (income * 0.3f) ? 1 : 0;
+					housingCostsOver30pcCount += mtgDistress;
+
+					lgaHouseholdCount.put(lgaCode, householdCount);
+					lgaHousingCostsOver30pcCount.put(lgaCode, housingCostsOver30pcCount);
+					lgaTotalIncome.put(lgaCode, totalIncome + income);
+					if (income > lgaThresholdTop5pc.get(lgaCode)) {
+						lgaTotalIncomeTop5pc.put(lgaCode, totalIncomeTop5pc + income);
+						if (income > lgaThresholdTop1pc.get(lgaCode)) {
+							lgaTotalIncomeTop1pc.put(lgaCode, totalIncomeTop1pc + income);
+						}
+					}
+					if (income > nationalThresholdTop5pc) {
+						nationalTotalIncomeTop5pc.put(lgaCode, totalIncomeTop5pcAU + income);
+						if (income > nationalThresholdTop1pc) {
+							nationalTotalIncomeTop1pc.put(lgaCode, totalIncomeTop1pcAU + income);
+						}
+					}
+
+					// incomeList.add(income);
+				} catch (NumberFormatException e) {
+					// do nothing and leave it as zero.
+				}
+			}
+			reader.close();
+			reader = null;
+		} catch (FileNotFoundException e) {
+			// open file
+			e.printStackTrace();
+		} catch (IOException e) {
+			// read next
+			e.printStackTrace();
+		}
+
 		// calculate ratios for each LGA
-		
+		for (String lga : lgaHouseholdCount.keySet()) {
+			housingCostsOver30pc.put(lga, lgaHousingCostsOver30pcCount.get(lga) / lgaHouseholdCount.get(lga));
+			incomeEarnedTop5pc.put(lga, lgaTotalIncomeTop5pc.get(lga) / lgaTotalIncome.get(lga));
+			incomeEarnedTop5pcAU.put(lga, nationalTotalIncomeTop5pc.get(lga) / lgaTotalIncome.get(lga));
+		}
+
 		// write LGA metrics to file
+		// save CSV file in a format that R can graph
+		DecimalFormat wholeNumber = new DecimalFormat("000");
+		String outFilename = properties.getOutputDirectory() + "R_GRAPH_LGA.csv";
+		Writer writer;
+		try {
+			writer = new FileWriter(outFilename, append); // overwrites existing file if append == false
+			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
+			String[] entries = { "scenario", "iteration", "agentType", "metric", "LGA", "value" };
+			if (!append) {
+				// first file, so write column headers
+				csvWriter.writeNext(entries);
+			}
+
+			// write metrics to file
+			for (String lga : housingCostsOver30pc.keySet()) {
+				entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+						+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "housingCostsOver30pc"
+						+ properties.getCsvSeparator() + lga + properties.getCsvSeparator()
+						+ housingCostsOver30pc.get(lga)).split(properties.getCsvSeparator());
+				csvWriter.writeNext(entries);
+				entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+						+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "incomeEarnedTop5pc"
+						+ properties.getCsvSeparator() + lga + properties.getCsvSeparator()
+						+ incomeEarnedTop5pc.get(lga)).split(properties.getCsvSeparator());
+				csvWriter.writeNext(entries);
+				entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+						+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "incomeEarnedTop5pcAU"
+						+ properties.getCsvSeparator() + lga + properties.getCsvSeparator()
+						+ incomeEarnedTop5pcAU.get(lga)).split(properties.getCsvSeparator());
+				csvWriter.writeNext(entries);
+			}
+
+			writer.close();
+		} catch (IOException e) {
+			// new FileWriter
+			e.printStackTrace();
+		} finally {
+			writer = null;
+		}
 	}
 }
