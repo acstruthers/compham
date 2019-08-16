@@ -241,6 +241,9 @@ public class Household extends Agent {
 		sb.append("StudentLoans" + separator);
 		sb.append("TotalLiabilities");
 
+		sb.append("DefaultIteration" + separator);
+		sb.append("DefaultOrder" + separator);
+
 		return sb.toString();
 	}
 
@@ -288,6 +291,9 @@ public class Household extends Agent {
 		sb.append(decimal.format(this.bsLoans) + separator);
 		sb.append(decimal.format(this.bsStudentLoans) + separator);
 		sb.append(decimal.format(this.getBsTotalLiabilities()));
+
+		sb.append(this.defaultIteration + separator);
+		sb.append(this.defaultOrder + separator);
 
 		return sb.toString();
 	}

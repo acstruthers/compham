@@ -95,7 +95,7 @@ public class AnalyseLgas {
 			while ((line = reader.readNext()) != null) {
 				try {
 					// update national income list
-					float income = Float.valueOf(line[0].replace(",", ""));
+					float income = Float.valueOf(line[6].replace(",", ""));
 					nationalIncomeList.add(income);
 
 					// update LGA income list
@@ -173,8 +173,9 @@ public class AnalyseLgas {
 					 * would reveal where inequality exists within an LGA, while the latter would
 					 * show how the rich and poor are distributed across LGAs.
 					 */
-					float income = Float.valueOf(line[0].replace(",", ""));
-					float housingCosts = Float.valueOf(line[0].replace(",", ""));
+					float income = Float.valueOf(line[6].replace(",", ""));
+					float housingCosts = Float.valueOf(line[10].replace(",", ""))
+							+ Float.valueOf(line[11].replace(",", ""));
 					int mtgDistress = housingCosts > (income * 0.3f) ? 1 : 0;
 					housingCostsOver30pcCount += mtgDistress;
 
