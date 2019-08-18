@@ -155,10 +155,39 @@ public class AnalyseHomeOwnership {
 					float housingCosts = rent + mortgage;
 					int defaultIteration = Integer.valueOf(line[17].replace(",", ""));
 
-					int bin = (int) Math.floor(housingCosts / grossIncome / BIN_SIZE);
+					// FIXME: bin calcs gave indices between -9 and 180, so it's probably wrong.
+					// change to a series of nested IF statements
+					// int bin = (int) Math.floor(housingCosts / grossIncome / BIN_SIZE);
+					// bin = Math.min(9, bin);
+					// bin = Math.max(0, 9);
+
+					float ratio = grossIncome > 0f ? housingCosts / grossIncome : 1f;
+					int bin = 0;
+					if (ratio < 0.1f) {
+						bin = 0;
+					} else if (ratio < 0.2f) {
+						bin = 1;
+					} else if (ratio < 0.3f) {
+						bin = 2;
+					} else if (ratio < 0.4f) {
+						bin = 3;
+					} else if (ratio < 0.5f) {
+						bin = 4;
+					} else if (ratio < 0.6f) {
+						bin = 5;
+					} else if (ratio < 0.7f) {
+						bin = 6;
+					} else if (ratio < 0.8f) {
+						bin = 7;
+					} else if (ratio < 0.9f) {
+						bin = 8;
+					} else {
+						bin = 9;
+					}
+
 					if (rent > 0f) {
 						// renting
-						rentCount.set(bin, rentCount.get(bin) + 1);
+						rentCount.set(bin, rentCount.get(bin));// + 1);
 						if (defaultIteration > 0) {
 							// household has defaulted
 							rentDefaultCount.set(bin, rentDefaultCount.get(bin) + 1);
@@ -185,8 +214,8 @@ public class AnalyseHomeOwnership {
 			e.printStackTrace();
 		}
 		for (int i = 0; i < 10; i++) {
-			ownDefaultPercent.add(ownDefaultCount.get(i) / ownCount.get(i));
-			rentDefaultPercent.add(rentDefaultCount.get(i) / rentCount.get(i));
+			ownDefaultPercent.add(ownCount.get(i) > 0 ? ownDefaultCount.get(i) / ownCount.get(i) : 0f);
+			rentDefaultPercent.add(rentCount.get(i) > 0 ? rentDefaultCount.get(i) / rentCount.get(i) : 0f);
 		}
 
 		// write metrics to file
