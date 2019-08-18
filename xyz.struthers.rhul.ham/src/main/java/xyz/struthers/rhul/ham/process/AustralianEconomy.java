@@ -924,8 +924,6 @@ public class AustralianEconomy implements Serializable {
 	public Set<String> saveSummaryToFile(int iteration, String scenarioName) {
 		Set<String> filenames = new HashSet<String>((int) Math.ceil(8 / 0.75) + 1);
 
-		// FIXME: filenames were all identicsal
-
 		String filename = this.saveGovernmentSummaryToFile(iteration, scenarioName);
 		filenames.add(filename);
 		filename = this.saveRbaSummaryToFile(iteration, scenarioName);
