@@ -37,9 +37,9 @@ public class MultiSimCpvSocketClient {
 		System.gc();*/
 
 		// using different random seeds (model error box plots)
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-01.xml");
+		/*appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-01.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline_seed-01.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-02.xml");
+		*/appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-02.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline_seed-02.xml" });
 		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-03.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline_seed-03.xml" });
