@@ -187,7 +187,7 @@ public class AnalyseHomeOwnership {
 
 					if (rent > 0f) {
 						// renting
-						rentCount.set(bin, rentCount.get(bin));// + 1);
+						rentCount.set(bin, rentCount.get(bin) + 1);
 						if (defaultIteration > 0) {
 							// household has defaulted
 							rentDefaultCount.set(bin, rentDefaultCount.get(bin) + 1);
@@ -214,8 +214,11 @@ public class AnalyseHomeOwnership {
 			e.printStackTrace();
 		}
 		for (int i = 0; i < 10; i++) {
-			ownDefaultPercent.add(ownCount.get(i) > 0 ? ownDefaultCount.get(i) / ownCount.get(i) : 0f);
-			rentDefaultPercent.add(rentCount.get(i) > 0 ? rentDefaultCount.get(i) / rentCount.get(i) : 0f);
+			ownDefaultPercent.add(
+					ownCount.get(i) > 0 ? Float.valueOf(ownDefaultCount.get(i)) / Float.valueOf(ownCount.get(i)) : 0f);
+			rentDefaultPercent
+					.add(rentCount.get(i) > 0 ? Float.valueOf(rentDefaultCount.get(i)) / Float.valueOf(rentCount.get(i))
+							: 0f);
 		}
 
 		// write metrics to file

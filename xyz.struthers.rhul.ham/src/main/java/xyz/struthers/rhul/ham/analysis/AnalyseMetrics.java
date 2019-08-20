@@ -495,6 +495,12 @@ public class AnalyseMetrics {
 		decileThreshold8 = incomeList.get((int) (householdCount * 0.2f));
 		decileThreshold9 = incomeList.get((int) (householdCount * 0.1f));
 
+		System.out.println("Thresholds: " + top1pcThreshold + ", " + top5pcThreshold);
+		System.out.println("Thresholds: (1) = " + decileThreshold1 + ", (2) = " + decileThreshold2 + ", (3) = "
+				+ decileThreshold3 + ", (4) = " + decileThreshold4 + ", (5) = " + decileThreshold5 + ", (6) = "
+				+ decileThreshold6 + ", (7) = " + decileThreshold7 + ", (8) = " + decileThreshold8 + ", (9) = "
+				+ decileThreshold9);
+
 		// read CSV filea second time, and calculate metrics
 		reader = null;
 		try {
@@ -521,7 +527,7 @@ public class AnalyseMetrics {
 						totalHendersonTop5pc += henderson;
 						totalDebtTop5pc += debt;
 						totalNetWorthTop5pc += netWorth;
-						if (housingCosts > 0.3 * income) {
+						if (housingCosts > 0.3f * income) {
 							// mortgage distress in top 5% of income
 							housingCostsOver30pcCountTop5pc++;
 						}
@@ -532,7 +538,7 @@ public class AnalyseMetrics {
 							totalHendersonTop1pc += henderson;
 							totalDebtTop1pc += debt;
 							totalNetWorthTop1pc += netWorth;
-							if (housingCosts > 0.3 * income) {
+							if (housingCosts > 0.3f * income) {
 								// mortgage distress in top 1% of income
 								housingCostsOver30pcCountTop1pc++;
 							}
@@ -543,12 +549,12 @@ public class AnalyseMetrics {
 						totalHendersonBottom95pc += henderson;
 						totalDebtBottom95pc += debt;
 						totalNetWorthBottom95pc += netWorth;
-						if (housingCosts > 0.3 * income) {
+						if (housingCosts > 0.3f * income) {
 							// mortgage distress in bottom 95% of income
 							housingCostsOver30pcCountBottom95pc++;
 						}
 					}
-					if (housingCosts > 0.3 * income) {
+					if (housingCosts > 0.3f * income) {
 						// mortgage distress
 						housingCostsOver30pcCount++;
 					}
@@ -562,51 +568,51 @@ public class AnalyseMetrics {
 					// decile metrics
 					if (income > decileThreshold1) {
 						householdCountDecile1++;
-						if (housingCosts > 0.3 * income) {
+						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile1++;
 						}
 					} else if (income > decileThreshold2) {
 						householdCountDecile2++;
-						if (housingCosts > 0.3 * income) {
+						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile2++;
 						}
 					} else if (income > decileThreshold3) {
 						householdCountDecile3++;
-						if (housingCosts > 0.3 * income) {
+						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile3++;
 						}
 					} else if (income > decileThreshold4) {
 						householdCountDecile4++;
-						if (housingCosts > 0.3 * income) {
+						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile4++;
 						}
 					} else if (income > decileThreshold5) {
 						householdCountDecile5++;
-						if (housingCosts > 0.3 * income) {
+						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile5++;
 						}
 					} else if (income > decileThreshold6) {
 						householdCountDecile6++;
-						if (housingCosts > 0.3 * income) {
+						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile6++;
 						}
 					} else if (income > decileThreshold7) {
 						householdCountDecile7++;
-						if (housingCosts > 0.3 * income) {
+						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile7++;
 						}
 					} else if (income > decileThreshold8) {
 						householdCountDecile8++;
-						if (housingCosts > 0.3 * income) {
+						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile8++;
 						}
 					} else if (income > decileThreshold9) {
 						householdCountDecile9++;
-						if (housingCosts > 0.3 * income) {
+						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile9++;
 						}
 					} else {
-						if (housingCosts > 0.3 * income) {
+						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile10++;
 						}
 					}
@@ -629,10 +635,12 @@ public class AnalyseMetrics {
 		// calculate ratio metrics
 		meanIncome = totalIncome / householdCount;
 		meanExpenses = totalExpenses / householdCount;
-		housingCostsOver30pc = housingCostsOver30pcCount / Float.valueOf(householdCount);
-		housingCostsOver30pcTop5pc = housingCostsOver30pcCountTop5pc / Float.valueOf(householdCountTop5pc);
-		housingCostsOver30pcTop1pc = housingCostsOver30pcCountTop1pc / Float.valueOf(householdCountTop1pc);
-		housingCostsOver30pcBottom95pc = housingCostsOver30pcCountBottom95pc
+		housingCostsOver30pc = Float.valueOf(housingCostsOver30pcCount) / Float.valueOf(householdCount);
+		housingCostsOver30pcTop5pc = Float.valueOf(housingCostsOver30pcCountTop5pc)
+				/ Float.valueOf(householdCountTop5pc);
+		housingCostsOver30pcTop1pc = Float.valueOf(housingCostsOver30pcCountTop1pc)
+				/ Float.valueOf(householdCountTop1pc);
+		housingCostsOver30pcBottom95pc = Float.valueOf(housingCostsOver30pcCountBottom95pc)
 				/ Float.valueOf(householdCount - householdCountTop5pc);
 		totalIncomePercentEarnedByTop1pc = totalIncomeTop1pc / totalIncome;
 		totalIncomePercentEarnedByTop5pc = totalIncomeTop5pc / totalIncome;
@@ -657,18 +665,28 @@ public class AnalyseMetrics {
 		incomeToHendersonPercentTop5pc = totalIncomeTop5pc / totalHendersonTop5pc;
 		incomeToHendersonPercentBottom95pc = totalIncomeBottom95pc / totalHendersonBottom95pc;
 
-		housingCostsOver30pcDecile1 = housingCostsOver30pcCountDecile1 / householdCountDecile1;
-		housingCostsOver30pcDecile2 = housingCostsOver30pcCountDecile2 / householdCountDecile2;
-		housingCostsOver30pcDecile3 = housingCostsOver30pcCountDecile3 / householdCountDecile3;
-		housingCostsOver30pcDecile4 = housingCostsOver30pcCountDecile4 / householdCountDecile4;
-		housingCostsOver30pcDecile5 = housingCostsOver30pcCountDecile5 / householdCountDecile5;
-		housingCostsOver30pcDecile6 = housingCostsOver30pcCountDecile6 / householdCountDecile6;
-		housingCostsOver30pcDecile7 = housingCostsOver30pcCountDecile7 / householdCountDecile7;
-		housingCostsOver30pcDecile8 = housingCostsOver30pcCountDecile8 / householdCountDecile8;
-		housingCostsOver30pcDecile9 = housingCostsOver30pcCountDecile9 / householdCountDecile9;
-		housingCostsOver30pcDecile10 = housingCostsOver30pcCountDecile10 / (householdCount - householdCountDecile9
-				- householdCountDecile8 - householdCountDecile7 - householdCountDecile6 - householdCountDecile5
-				- householdCountDecile4 - householdCountDecile3 - householdCountDecile2 - householdCountDecile1);
+		housingCostsOver30pcDecile1 = Float.valueOf(housingCostsOver30pcCountDecile1)
+				/ Float.valueOf(householdCountDecile1);
+		housingCostsOver30pcDecile2 = Float.valueOf(housingCostsOver30pcCountDecile2)
+				/ Float.valueOf(householdCountDecile2);
+		housingCostsOver30pcDecile3 = Float.valueOf(housingCostsOver30pcCountDecile3)
+				/ Float.valueOf(householdCountDecile3);
+		housingCostsOver30pcDecile4 = Float.valueOf(housingCostsOver30pcCountDecile4)
+				/ Float.valueOf(householdCountDecile4);
+		housingCostsOver30pcDecile5 = Float.valueOf(housingCostsOver30pcCountDecile5)
+				/ Float.valueOf(householdCountDecile5);
+		housingCostsOver30pcDecile6 = Float.valueOf(housingCostsOver30pcCountDecile6)
+				/ Float.valueOf(householdCountDecile6);
+		housingCostsOver30pcDecile7 = Float.valueOf(housingCostsOver30pcCountDecile7)
+				/ Float.valueOf(householdCountDecile7);
+		housingCostsOver30pcDecile8 = Float.valueOf(housingCostsOver30pcCountDecile8)
+				/ Float.valueOf(householdCountDecile8);
+		housingCostsOver30pcDecile9 = Float.valueOf(housingCostsOver30pcCountDecile9)
+				/ Float.valueOf(householdCountDecile9);
+		housingCostsOver30pcDecile10 = Float.valueOf(housingCostsOver30pcCountDecile10)
+				/ Float.valueOf(householdCount - householdCountDecile9 - householdCountDecile8 - householdCountDecile7
+						- householdCountDecile6 - householdCountDecile5 - householdCountDecile4 - householdCountDecile3
+						- householdCountDecile2 - householdCountDecile1);
 
 		// save CSV file in a format that R can graph
 		DecimalFormat wholeNumber = new DecimalFormat("000");

@@ -212,9 +212,9 @@ public class AnalyseLgas {
 
 		// calculate ratios for each LGA
 		for (String lga : lgaHouseholdCount.keySet()) {
-			housingCostsOver30pc.put(lga, lgaHousingCostsOver30pcCount.get(lga) / lgaHouseholdCount.get(lga));
-			incomeEarnedTop5pc.put(lga, lgaTotalIncomeTop5pc.get(lga) / lgaTotalIncome.get(lga));
-			incomeEarnedTop5pcAU.put(lga, nationalTotalIncomeTop5pc.get(lga) / lgaTotalIncome.get(lga));
+			housingCostsOver30pc.put(lga, Float.valueOf(lgaHousingCostsOver30pcCount.get(lga)) / Float.valueOf(lgaHouseholdCount.get(lga)));
+			incomeEarnedTop5pc.put(lga, Float.valueOf(lgaTotalIncomeTop5pc.get(lga)) / Float.valueOf(lgaTotalIncome.get(lga)));
+			incomeEarnedTop5pcAU.put(lga, Float.valueOf(nationalTotalIncomeTop5pc.get(lga)) / Float.valueOf(lgaTotalIncome.get(lga)));
 		}
 
 		// write LGA metrics to file
