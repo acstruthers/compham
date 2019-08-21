@@ -616,6 +616,7 @@ public class AustralianEconomy implements Serializable {
 				+ wholeNumber.format(iteration) + ".csv";
 		String[] entries = { "IterationNo", "AgentType", "ExogenousIncome", "TotalIncome" };
 		Writer writer;
+		float exogeneousIncomeMultiplier = this.properties.getExogeneousIncomeMultiplier();
 		// households
 		if (iteration == 0) {
 			try {
@@ -628,7 +629,7 @@ public class AustralianEconomy implements Serializable {
 					// calculate exogeneous cash flow (i.e. not from another Agent)
 					float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
 					float calibratedIncome = household.getGrossIncome();
-					float exogeneousIncome = calibratedIncome - receivable;
+					float exogeneousIncome = (calibratedIncome - receivable) * exogeneousIncomeMultiplier;
 					this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
 
 					// save ratio of exogeneous to total income to CSV so it can be graphed
@@ -650,7 +651,7 @@ public class AustralianEconomy implements Serializable {
 				// calculate exogeneous cash flow (i.e. not from another Agent)
 				float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
 				float calibratedIncome = household.getGrossIncome();
-				float exogeneousIncome = calibratedIncome - receivable;
+				float exogeneousIncome = (calibratedIncome - receivable) * exogeneousIncomeMultiplier;
 				this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
 			}
 		}
@@ -667,7 +668,7 @@ public class AustralianEconomy implements Serializable {
 					// calculate exogeneous cash flow (i.e. not from another Agent)
 					float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
 					float calibratedIncome = business.getTotalIncome();
-					float exogeneousIncome = calibratedIncome - receivable;
+					float exogeneousIncome = (calibratedIncome - receivable) * exogeneousIncomeMultiplier;
 					this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
 
 					// save ratio of exogeneous to total income to CSV so it can be graphed
@@ -689,7 +690,7 @@ public class AustralianEconomy implements Serializable {
 				// calculate exogeneous cash flow (i.e. not from another Agent)
 				float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
 				float calibratedIncome = business.getTotalIncome();
-				float exogeneousIncome = calibratedIncome - receivable;
+				float exogeneousIncome = (calibratedIncome - receivable) * exogeneousIncomeMultiplier;
 				this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
 			}
 		}
@@ -706,7 +707,7 @@ public class AustralianEconomy implements Serializable {
 					// calculate exogeneous cash flow (i.e. not from another Agent)
 					float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
 					float calibratedIncome = adi.getTotalIncome();
-					float exogeneousIncome = calibratedIncome - receivable;
+					float exogeneousIncome = (calibratedIncome - receivable) * exogeneousIncomeMultiplier;
 					this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
 
 					// save ratio of exogeneous to total income to CSV so it can be graphed
@@ -728,7 +729,7 @@ public class AustralianEconomy implements Serializable {
 				// calculate exogeneous cash flow (i.e. not from another Agent)
 				float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
 				float calibratedIncome = adi.getTotalIncome();
-				float exogeneousIncome = calibratedIncome - receivable;
+				float exogeneousIncome = (calibratedIncome - receivable) * exogeneousIncomeMultiplier;
 				this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
 			}
 		}
@@ -742,7 +743,7 @@ public class AustralianEconomy implements Serializable {
 			// calculate exogeneous cash flow (i.e. not from another Agent)
 			float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
 			float calibratedIncome = this.government.getTotalIncome();
-			float exogeneousIncome = calibratedIncome - receivable;
+			float exogeneousIncome = (calibratedIncome - receivable) * exogeneousIncomeMultiplier;
 			this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
 		}
 
@@ -755,7 +756,7 @@ public class AustralianEconomy implements Serializable {
 			// calculate exogeneous cash flow (i.e. not from another Agent)
 			float receivable = receivableFromAnotherAgent.get(paymentClearingIndex);
 			float calibratedIncome = this.rba.getTotalIncome();
-			float exogeneousIncome = calibratedIncome - receivable;
+			float exogeneousIncome = (calibratedIncome - receivable) * exogeneousIncomeMultiplier;
 			this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
 		}
 	}

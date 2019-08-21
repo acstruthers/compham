@@ -18,5 +18,7 @@ public class AnalyseAll {
 		AnalyseMetrics.main(args);
 		AnalyseLgas.main(args);
 		AnalyseHomeOwnership.main(args);
+		// AnalyseRealIncome.main(args);
+		AnalyseDefaults.main(args);
 	}
 }

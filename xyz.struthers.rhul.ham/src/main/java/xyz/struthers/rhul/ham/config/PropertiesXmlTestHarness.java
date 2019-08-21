@@ -27,6 +27,7 @@ public class PropertiesXmlTestHarness {
 
 		// set properties filename
 		String filename = args[0];
+		filename = "D:/compham-config/00_baseline-test-harness.xml";
 
 		writeBaselineToFile(filename); // "D:/compham-config/00_baseline-test-harness.xml"
 		// readXmlFromFile("D:/compham-config/00_baseline.xml");
@@ -97,6 +98,8 @@ public class PropertiesXmlTestHarness {
 		props.setRandomSeed(20180630L);
 
 		// scenario parameters
+		props.setExogeneousIncomeMultiplier(0.5f);
+		props.setExogeneousExpenseMultiplier(0.5f);
 		props.setMortgageRentConversionRatio(0.50f);
 		props.setSuperannuationHaircut(0.30f);
 		props.setInvestmentHaircut(0.50f);
@@ -114,8 +117,9 @@ public class PropertiesXmlTestHarness {
 		props.addFxRateCustomPath("CAD", 0.9771f);
 		props.addFxRateCustomPath("CAD", 0.9771f);
 		props.addFxRateCustomPath("CAD", 0.9771f);
-		
-		// FIXME: add code elsewhere to actually read the custom FX rates and use them in the model
+
+		// FIXME: add code elsewhere to actually read the custom FX rates and use them
+		// in the model
 
 		props.setInterestRateStrategy(ReserveBankOfAustralia.RATES_SAME); // SAME = 0, CUSTOM = 1
 		props.setInitialCashRate(1.5f);

@@ -67,6 +67,8 @@ public class PropertiesXml implements Serializable {
 	// private int totalPopulationAU = 25000000;
 
 	// scenario parameters
+	private float exogeneousIncomeMultiplier;// = 0.50f;
+	private float exogeneousExpenseMultiplier;// = 0.50f;
 	/**
 	 * In the event of Household default mortgage repayments are switched over to be
 	 * rent payments that are this proportion of the original mortgage repayment
@@ -388,6 +390,34 @@ public class PropertiesXml implements Serializable {
 	 */
 	public void setTimestamp(String timestamp) {
 		this.timestamp = timestamp;
+	}
+
+	/**
+	 * @return the exogeneousIncomeMultiplier
+	 */
+	public float getExogeneousIncomeMultiplier() {
+		return exogeneousIncomeMultiplier;
+	}
+
+	/**
+	 * @param exogeneousIncomeMultiplier the exogeneousIncomeMultiplier to set
+	 */
+	public void setExogeneousIncomeMultiplier(float exogeneousIncomeMultiplier) {
+		this.exogeneousIncomeMultiplier = exogeneousIncomeMultiplier;
+	}
+
+	/**
+	 * @return the exogeneousExpenseMultiplier
+	 */
+	public float getExogeneousExpenseMultiplier() {
+		return exogeneousExpenseMultiplier;
+	}
+
+	/**
+	 * @param exogeneousExpenseMultiplier the exogeneousExpenseMultiplier to set
+	 */
+	public void setExogeneousExpenseMultiplier(float exogeneousExpenseMultiplier) {
+		this.exogeneousExpenseMultiplier = exogeneousExpenseMultiplier;
 	}
 
 	/**
