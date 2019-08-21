@@ -19,7 +19,7 @@
     <numberOfIterations>13</numberOfIterations>
     <homeDirectory>D:\Git\compham\xyz.struthers.rhul.ham</homeDirectory>
     <resourceDirectory>D:\Git\compham\xyz.struthers.rhul.ham\src\main\resources</resourceDirectory>
-    <outputDirectory>D:\compham-output\</outputDirectory>
+    <outputDirectory>D:\OneDrive\Dissertation\Results\Summary Data\</outputDirectory>
     <csvSeparator>,</csvSeparator>
     <cpvServerHost>Adam-E590</cpvServerHost>
     <economyClientHost>Adam-NUC</economyClientHost>
@@ -29,7 +29,9 @@
     <socketMessageBytes>10485760</socketMessageBytes>
     <superannuationGuaranteeRate>0.095</superannuationGuaranteeRate>
     <randomSeed>8</randomSeed>
-    <mortgageRentConversionRatio>0.5</mortgageRentConversionRatio>
+    <exogeneousIncomeMultiplier>0.5</exogeneousIncomeMultiplier>
+    <exogeneousExpenseMultiplier>0.5</exogeneousExpenseMultiplier>
+	<mortgageRentConversionRatio>0.5</mortgageRentConversionRatio>
     <superannuationHaircut>0.3</superannuationHaircut>
     <investmentHaircut>0.5</investmentHaircut>
     <foreignInvestmentHaircut>0.75</foreignInvestmentHaircut>
