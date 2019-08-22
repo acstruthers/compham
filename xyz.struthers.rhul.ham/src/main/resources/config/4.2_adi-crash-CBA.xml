@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <propertiesXml>
-    <scenarioName>Baseline-07</scenarioName>
+    <scenarioName>Baseline</scenarioName>
     <saveIteration>
         <saveSummary>true</saveSummary>
         <saveSummary>false</saveSummary>
@@ -28,11 +28,11 @@
     <socketBufferBytes>1000000000</socketBufferBytes>
     <socketMessageBytes>10485760</socketMessageBytes>
     <superannuationGuaranteeRate>0.095</superannuationGuaranteeRate>
-    <randomSeed>7</randomSeed>
-    <isBankCrashScenario>false</isBankCrashScenario>
+    <randomSeed>20180630</randomSeed>
+    <isBankCrashScenario>true</isBankCrashScenario>
     <fcsAdiLimit>2.0E10</fcsAdiLimit>
-    <fcsCustomerLimit>250000.0</fcsCustomerLimit>
-    <crashedBankShortNames></crashedBankShortNames>
+    <fcsCustomerLimit>25000.0</fcsCustomerLimit>
+    <crashedBankShortNames>CBA</crashedBankShortNames>
     <crashedBankIndustry></crashedBankIndustry>
 	<exogeneousIncomeMultiplier>0.5</exogeneousIncomeMultiplier>
     <exogeneousExpenseMultiplier>0.5</exogeneousExpenseMultiplier>

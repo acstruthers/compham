@@ -29,7 +29,12 @@
     <socketMessageBytes>10485760</socketMessageBytes>
     <superannuationGuaranteeRate>0.095</superannuationGuaranteeRate>
     <randomSeed>5</randomSeed>
-    <exogeneousIncomeMultiplier>0.5</exogeneousIncomeMultiplier>
+    <isBankCrashScenario>false</isBankCrashScenario>
+    <fcsAdiLimit>2.0E10</fcsAdiLimit>
+    <fcsCustomerLimit>250000.0</fcsCustomerLimit>
+    <crashedBankShortNames></crashedBankShortNames>
+    <crashedBankIndustry></crashedBankIndustry>
+	<exogeneousIncomeMultiplier>0.5</exogeneousIncomeMultiplier>
     <exogeneousExpenseMultiplier>0.5</exogeneousExpenseMultiplier>
 	<mortgageRentConversionRatio>0.5</mortgageRentConversionRatio>
     <superannuationHaircut>0.3</superannuationHaircut>
