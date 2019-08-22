@@ -48,17 +48,17 @@ public class AnalyseExogeneous {
 		// overwrite existing file
 		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline_EXOGENEOUS_000.csv");
 		processExogeneousDataCsv(
-				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline_EXOGENEOUS_000.csv", "Baseline",
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_EXOGENEOUS_000.csv", "Baseline",
 				false, 0);
 
 		// append to file
 		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-01_EXOGENEOUS_000.csv");
 		processExogeneousDataCsv(
-				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-01_EXOGENEOUS_000.csv",
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-01_EXOGENEOUS_000.csv",
 				"Baseline-01", true, 0);
 		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-02_EXOGENEOUS_000.csv");
 		processExogeneousDataCsv(
-				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-02_EXOGENEOUS_000.csv",
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-02_EXOGENEOUS_000.csv",
 				"Baseline-02", true, 0);
 
 		System.out.println(new Date(System.currentTimeMillis()) + ": FINISHED");

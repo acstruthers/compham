@@ -40,87 +40,88 @@ public class AnalyseDefaults {
 		// FIXME: defaults haven't been included in the FX and inflation scenarios yet
 
 		// overwrite existing file
+
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline_SUMMARY_Household_000.csv");
+		processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_SUMMARY_Household_000.csv",
+				"Baseline", false, 0);
+
+		// append to file
 		/*
 		 * System.out.println(new Date(System.currentTimeMillis()) +
-		 * ": processing Baseline_SUMMARY_Household_000.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline_SUMMARY_Household_000.csv"
-		 * , "Baseline", false, 0);
-		 * 
-		 * // append to file System.out.println(new Date(System.currentTimeMillis()) +
-		 * ": processing Baseline_SUMMARY_Household_012.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline_SUMMARY_Household_012.csv"
+		 * ": processing Baseline_SUMMARY_Household_012.csv");
+		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_SUMMARY_Household_012.csv"
 		 * , "Baseline", true, 12); System.out.println(new
 		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-01_SUMMARY_Household_000.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-01_SUMMARY_Household_000.csv"
+		 * ": processing Baseline-01_SUMMARY_Household_000.csv");
+		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-01_SUMMARY_Household_000.csv"
 		 * , "Baseline-01", true, 0); System.out.println(new
 		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-01_SUMMARY_Household_012.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-01_SUMMARY_Household_012.csv"
+		 * ": processing Baseline-01_SUMMARY_Household_012.csv");
+		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-01_SUMMARY_Household_012.csv"
 		 * , "Baseline-01", true, 12); System.out.println(new
 		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-02_SUMMARY_Household_000.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-02_SUMMARY_Household_000.csv"
+		 * ": processing Baseline-02_SUMMARY_Household_000.csv");
+		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-02_SUMMARY_Household_000.csv"
 		 * , "Baseline-02", true, 0); System.out.println(new
 		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-02_SUMMARY_Household_012.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-02_SUMMARY_Household_012.csv"
+		 * ": processing Baseline-02_SUMMARY_Household_012.csv");
+		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-02_SUMMARY_Household_012.csv"
 		 * , "Baseline-02", true, 12); System.out.println(new
 		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-03_SUMMARY_Household_000.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-03_SUMMARY_Household_000.csv"
+		 * ": processing Baseline-03_SUMMARY_Household_000.csv");
+		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-03_SUMMARY_Household_000.csv"
 		 * , "Baseline-03", true, 0); System.out.println(new
 		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-03_SUMMARY_Household_012.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-03_SUMMARY_Household_012.csv"
+		 * ": processing Baseline-03_SUMMARY_Household_012.csv");
+		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-03_SUMMARY_Household_012.csv"
 		 * , "Baseline-03", true, 12); System.out.println(new
 		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-04_SUMMARY_Household_000.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-04_SUMMARY_Household_000.csv"
+		 * ": processing Baseline-04_SUMMARY_Household_000.csv");
+		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-04_SUMMARY_Household_000.csv"
 		 * , "Baseline-04", true, 0); System.out.println(new
 		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-04_SUMMARY_Household_012.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-04_SUMMARY_Household_012.csv"
+		 * ": processing Baseline-04_SUMMARY_Household_012.csv");
+		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-04_SUMMARY_Household_012.csv"
 		 * , "Baseline-04", true, 12); System.out.println(new
 		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-05_SUMMARY_Household_000.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-05_SUMMARY_Household_000.csv"
+		 * ": processing Baseline-05_SUMMARY_Household_000.csv");
+		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-05_SUMMARY_Household_000.csv"
 		 * , "Baseline-05", true, 0); System.out.println(new
 		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-05_SUMMARY_Household_012.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-05_SUMMARY_Household_012.csv"
+		 * ": processing Baseline-05_SUMMARY_Household_012.csv");
+		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-05_SUMMARY_Household_012.csv"
 		 * , "Baseline-05", true, 12); System.out.println(new
 		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-06_SUMMARY_Household_000.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-06_SUMMARY_Household_000.csv"
+		 * ": processing Baseline-06_SUMMARY_Household_000.csv");
+		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-06_SUMMARY_Household_000.csv"
 		 * , "Baseline-06", true, 0); System.out.println(new
 		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-06_SUMMARY_Household_012.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-06_SUMMARY_Household_012.csv"
+		 * ": processing Baseline-06_SUMMARY_Household_012.csv");
+		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-06_SUMMARY_Household_012.csv"
 		 * , "Baseline-06", true, 12); System.out.println(new
 		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-07_SUMMARY_Household_000.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-07_SUMMARY_Household_000.csv"
+		 * ": processing Baseline-07_SUMMARY_Household_000.csv");
+		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-07_SUMMARY_Household_000.csv"
 		 * , "Baseline-07", true, 0); System.out.println(new
 		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-07_SUMMARY_Household_012.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-07_SUMMARY_Household_012.csv"
+		 * ": processing Baseline-07_SUMMARY_Household_012.csv");
+		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-07_SUMMARY_Household_012.csv"
 		 * , "Baseline-07", true, 12); System.out.println(new
 		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-08_SUMMARY_Household_000.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-08_SUMMARY_Household_000.csv"
+		 * ": processing Baseline-08_SUMMARY_Household_000.csv");
+		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-08_SUMMARY_Household_000.csv"
 		 * , "Baseline-08", true, 0); System.out.println(new
 		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-08_SUMMARY_Household_012.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-08_SUMMARY_Household_012.csv"
+		 * ": processing Baseline-08_SUMMARY_Household_012.csv");
+		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-08_SUMMARY_Household_012.csv"
 		 * , "Baseline-08", true, 12); System.out.println(new
 		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-09_SUMMARY_Household_000.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-09_SUMMARY_Household_000.csv"
+		 * ": processing Baseline-09_SUMMARY_Household_000.csv");
+		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-09_SUMMARY_Household_000.csv"
 		 * , "Baseline-09", true, 0); System.out.println(new
 		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-09_SUMMARY_Household_012.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline-09_SUMMARY_Household_012.csv"
+		 * ": processing Baseline-09_SUMMARY_Household_012.csv");
+		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-09_SUMMARY_Household_012.csv"
 		 * , "Baseline-09", true, 12);
 		 */
 
@@ -128,202 +129,218 @@ public class AnalyseDefaults {
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing FX-Rates-10pc-CNY_SUMMARY_Household_000.csv");
 		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-CNY_SUMMARY_Household_000.csv",
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-CNY_SUMMARY_Household_000.csv",
 				"FX-Rates-10pc-CNY", true, 0);
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing FX-Rates-10pc-CNY_SUMMARY_Household_012.csv");
 		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-CNY_SUMMARY_Household_012.csv",
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-CNY_SUMMARY_Household_012.csv",
 				"FX-Rates-10pc-CNY", true, 12);
-		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing FX-Rates-10pc-EUR_SUMMARY_Household_000.csv");
-		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-EUR_SUMMARY_Household_000.csv",
-				"FX-Rates-10pc-EUR", true, 0);
-		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing FX-Rates-10pc-EUR_SUMMARY_Household_012.csv");
-		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-EUR_SUMMARY_Household_012.csv",
-				"FX-Rates-10pc-EUR", true, 12);
 		/*
+		 * System.out.println( new Date(System.currentTimeMillis()) +
+		 * ": processing FX-Rates-10pc-EUR_SUMMARY_Household_000.csv");
+		 * processDefaultsCsv(
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-EUR_SUMMARY_Household_000.csv"
+		 * , "FX-Rates-10pc-EUR", true, 0); System.out.println( new
+		 * Date(System.currentTimeMillis()) +
+		 * ": processing FX-Rates-10pc-EUR_SUMMARY_Household_012.csv");
+		 * processDefaultsCsv(
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-EUR_SUMMARY_Household_012.csv"
+		 * , "FX-Rates-10pc-EUR", true, 12);
 		 * System.out.println( new Date(System.currentTimeMillis()) +
 		 * ": processing FX-Rates-10pc-INR_SUMMARY_Household_000.csv");
 		 * processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-INR_SUMMARY_Household_000.csv"
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-INR_SUMMARY_Household_000.csv"
 		 * , "FX-Rates-10pc-INR", true, 0); System.out.println( new
 		 * Date(System.currentTimeMillis()) +
 		 * ": processing FX-Rates-10pc-INR_SUMMARY_Household_012.csv");
 		 * processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-INR_SUMMARY_Household_012.csv"
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-INR_SUMMARY_Household_012.csv"
 		 * , "FX-Rates-10pc-INR", true, 12); System.out.println( new
 		 * Date(System.currentTimeMillis()) +
 		 * ": processing FX-Rates-10pc-JPY_SUMMARY_Household_000.csv");
 		 * processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-JPY_SUMMARY_Household_000.csv"
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-JPY_SUMMARY_Household_000.csv"
 		 * , "FX-Rates-10pc-JPY", true, 0); System.out.println( new
 		 * Date(System.currentTimeMillis()) +
 		 * ": processing FX-Rates-10pc-JPY_SUMMARY_Household_012.csv");
 		 * processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-JPY_SUMMARY_Household_012.csv"
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-JPY_SUMMARY_Household_012.csv"
 		 * , "FX-Rates-10pc-JPY", true, 12); System.out.println( new
 		 * Date(System.currentTimeMillis()) +
 		 * ": processing FX-Rates-10pc-KRW_SUMMARY_Household_000.csv");
 		 * processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-KRW_SUMMARY_Household_000.csv"
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-KRW_SUMMARY_Household_000.csv"
 		 * , "FX-Rates-10pc-KRW", true, 0); System.out.println( new
 		 * Date(System.currentTimeMillis()) +
 		 * ": processing FX-Rates-10pc-KRW_SUMMARY_Household_012.csv");
 		 * processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-KRW_SUMMARY_Household_012.csv"
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-KRW_SUMMARY_Household_012.csv"
 		 * , "FX-Rates-10pc-KRW", true, 12); System.out.println( new
 		 * Date(System.currentTimeMillis()) +
 		 * ": processing FX-Rates-10pc-MYR_SUMMARY_Household_000.csv");
 		 * processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-MYR_SUMMARY_Household_000.csv"
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-MYR_SUMMARY_Household_000.csv"
 		 * , "FX-Rates-10pc-MYR", true, 0); System.out.println( new
 		 * Date(System.currentTimeMillis()) +
 		 * ": processing FX-Rates-10pc-MYR_SUMMARY_Household_012.csv");
 		 * processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-MYR_SUMMARY_Household_012.csv"
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-MYR_SUMMARY_Household_012.csv"
 		 * , "FX-Rates-10pc-MYR", true, 12); System.out.println( new
 		 * Date(System.currentTimeMillis()) +
 		 * ": processing FX-Rates-10pc-NZD_SUMMARY_Household_000.csv");
 		 * processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-NZD_SUMMARY_Household_000.csv"
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-NZD_SUMMARY_Household_000.csv"
 		 * , "FX-Rates-10pc-NZD", true, 0); System.out.println( new
 		 * Date(System.currentTimeMillis()) +
 		 * ": processing FX-Rates-10pc-NZD_SUMMARY_Household_012.csv");
 		 * processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-NZD_SUMMARY_Household_012.csv"
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-NZD_SUMMARY_Household_012.csv"
 		 * , "FX-Rates-10pc-NZD", true, 12); System.out.println( new
 		 * Date(System.currentTimeMillis()) +
 		 * ": processing FX-Rates-10pc-SGD_SUMMARY_Household_000.csv");
 		 * processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-SGD_SUMMARY_Household_000.csv"
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-SGD_SUMMARY_Household_000.csv"
 		 * , "FX-Rates-10pc-SGD", true, 0); System.out.println( new
 		 * Date(System.currentTimeMillis()) +
 		 * ": processing FX-Rates-10pc-SGD_SUMMARY_Household_012.csv");
 		 * processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-SGD_SUMMARY_Household_012.csv"
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-SGD_SUMMARY_Household_012.csv"
 		 * , "FX-Rates-10pc-SGD", true, 12); System.out.println( new
 		 * Date(System.currentTimeMillis()) +
 		 * ": processing FX-Rates-10pc-THB_SUMMARY_Household_000.csv");
 		 * processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-THB_SUMMARY_Household_000.csv"
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-THB_SUMMARY_Household_000.csv"
 		 * , "FX-Rates-10pc-THB", true, 0); System.out.println( new
 		 * Date(System.currentTimeMillis()) +
 		 * ": processing FX-Rates-10pc-THB_SUMMARY_Household_012.csv");
 		 * processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-THB_SUMMARY_Household_012.csv"
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-THB_SUMMARY_Household_012.csv"
 		 * , "FX-Rates-10pc-THB", true, 12); System.out.println( new
 		 * Date(System.currentTimeMillis()) +
 		 * ": processing FX-Rates-10pc-USD_SUMMARY_Household_000.csv");
 		 * processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-USD_SUMMARY_Household_000.csv"
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-USD_SUMMARY_Household_000.csv"
 		 * , "FX-Rates-10pc-USD", true, 0); System.out.println( new
 		 * Date(System.currentTimeMillis()) +
 		 * ": processing FX-Rates-10pc-USD_SUMMARY_Household_012.csv");
 		 * processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\FX-Rates-10pc-USD_SUMMARY_Household_012.csv"
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-USD_SUMMARY_Household_012.csv"
 		 * , "FX-Rates-10pc-USD", true, 12);
 		 */
 
 		// inflation rates
-		/*
-		 * System.out.println( new Date(System.currentTimeMillis()) +
-		 * ": processing Inflation-01pc_SUMMARY_Household_000.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-01pc_SUMMARY_Household_000.csv"
-		 * , "Inflation-01pc", true, 0); System.out.println( new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Inflation-01pc_SUMMARY_Household_012.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-01pc_SUMMARY_Household_012.csv"
-		 * , "Inflation-01pc", true, 12); System.out.println( new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Inflation-02pc_SUMMARY_Household_000.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-02pc_SUMMARY_Household_000.csv"
-		 * , "Inflation-02pc", true, 0); System.out.println( new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Inflation-02pc_SUMMARY_Household_012.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-02pc_SUMMARY_Household_012.csv"
-		 * , "Inflation-02pc", true, 12); System.out.println( new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Inflation-03pc_SUMMARY_Household_000.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-03pc_SUMMARY_Household_000.csv"
-		 * , "Inflation-03pc", true, 0); System.out.println( new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Inflation-03pc_SUMMARY_Household_012.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-03pc_SUMMARY_Household_012.csv"
-		 * , "Inflation-03pc", true, 12); System.out.println( new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Inflation-04pc_SUMMARY_Household_000.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-04pc_SUMMARY_Household_000.csv"
-		 * , "Inflation-04pc", true, 0); System.out.println( new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Inflation-04pc_SUMMARY_Household_012.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-04pc_SUMMARY_Household_012.csv"
-		 * , "Inflation-04pc", true, 12); System.out.println( new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Inflation-05pc_SUMMARY_Household_000.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-05pc_SUMMARY_Household_000.csv"
-		 * , "Inflation-05pc", true, 0); System.out.println( new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Inflation-05pc_SUMMARY_Household_012.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-05pc_SUMMARY_Household_012.csv"
-		 * , "Inflation-05pc", true, 12); System.out.println( new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Inflation-10pc_SUMMARY_Household_000.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-10pc_SUMMARY_Household_000.csv"
-		 * , "Inflation-10pc", true, 0); System.out.println( new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Inflation-10pc_SUMMARY_Household_012.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-10pc_SUMMARY_Household_012.csv"
-		 * , "Inflation-10pc", true, 12); System.out.println( new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Inflation-15pc_SUMMARY_Household_000.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-15pc_SUMMARY_Household_000.csv"
-		 * , "Inflation-15pc", true, 0); System.out.println( new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Inflation-15pc_SUMMARY_Household_012.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-15pc_SUMMARY_Household_012.csv"
-		 * , "Inflation-15pc", true, 12); System.out.println( new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Inflation-20pc_SUMMARY_Household_000.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-20pc_SUMMARY_Household_000.csv"
-		 * , "Inflation-20pc", true, 0); System.out.println( new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Inflation-20pc_SUMMARY_Household_012.csv"); processDefaultsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-20pc_SUMMARY_Household_012.csv"
-		 * , "Inflation-20pc", true, 12);
-		 */
+
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-01pc_SUMMARY_Household_000.csv");
+		processDefaultsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-01pc_SUMMARY_Household_000.csv",
+				"Inflation-01pc", true, 0);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-01pc_SUMMARY_Household_012.csv");
+		processDefaultsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-01pc_SUMMARY_Household_012.csv",
+				"Inflation-01pc", true, 12);
+		/*System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-02pc_SUMMARY_Household_000.csv");
+		processDefaultsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-02pc_SUMMARY_Household_000.csv",
+				"Inflation-02pc", true, 0);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-02pc_SUMMARY_Household_012.csv");
+		processDefaultsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-02pc_SUMMARY_Household_012.csv",
+				"Inflation-02pc", true, 12);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-03pc_SUMMARY_Household_000.csv");
+		processDefaultsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-03pc_SUMMARY_Household_000.csv",
+				"Inflation-03pc", true, 0);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-03pc_SUMMARY_Household_012.csv");
+		processDefaultsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-03pc_SUMMARY_Household_012.csv",
+				"Inflation-03pc", true, 12);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-04pc_SUMMARY_Household_000.csv");
+		processDefaultsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-04pc_SUMMARY_Household_000.csv",
+				"Inflation-04pc", true, 0);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-04pc_SUMMARY_Household_012.csv");
+		processDefaultsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-04pc_SUMMARY_Household_012.csv",
+				"Inflation-04pc", true, 12);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-05pc_SUMMARY_Household_000.csv");
+		processDefaultsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-05pc_SUMMARY_Household_000.csv",
+				"Inflation-05pc", true, 0);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-05pc_SUMMARY_Household_012.csv");
+		processDefaultsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-05pc_SUMMARY_Household_012.csv",
+				"Inflation-05pc", true, 12);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-10pc_SUMMARY_Household_000.csv");
+		processDefaultsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-10pc_SUMMARY_Household_000.csv",
+				"Inflation-10pc", true, 0);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-10pc_SUMMARY_Household_012.csv");
+		processDefaultsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-10pc_SUMMARY_Household_012.csv",
+				"Inflation-10pc", true, 12);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-15pc_SUMMARY_Household_000.csv");
+		processDefaultsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-15pc_SUMMARY_Household_000.csv",
+				"Inflation-15pc", true, 0);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-15pc_SUMMARY_Household_012.csv");
+		processDefaultsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-15pc_SUMMARY_Household_012.csv",
+				"Inflation-15pc", true, 12);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-20pc_SUMMARY_Household_000.csv");
+		processDefaultsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-20pc_SUMMARY_Household_000.csv",
+				"Inflation-20pc", true, 0);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-20pc_SUMMARY_Household_012.csv");
+		processDefaultsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-20pc_SUMMARY_Household_012.csv",
+				"Inflation-20pc", true, 12);
+
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing Inflation-25pc_SUMMARY_Household_000.csv");
 		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-25pc_SUMMARY_Household_000.csv",
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-25pc_SUMMARY_Household_000.csv",
 				"Inflation-25pc", true, 0);
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing Inflation-25pc_SUMMARY_Household_012.csv");
 		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-25pc_SUMMARY_Household_012.csv",
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-25pc_SUMMARY_Household_012.csv",
 				"Inflation-25pc", true, 12);
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing Inflation-50pc_SUMMARY_Household_000.csv");
 		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-50pc_SUMMARY_Household_000.csv",
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-50pc_SUMMARY_Household_000.csv",
 				"Inflation-50pc", true, 0);
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing Inflation-50pc_SUMMARY_Household_012.csv");
 		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-50pc_SUMMARY_Household_012.csv",
-				"Inflation-50pc", true, 12);
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-50pc_SUMMARY_Household_012.csv",
+				"Inflation-50pc", true, 12);*/
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing Inflation-75pc_SUMMARY_Household_000.csv");
 		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-75pc_SUMMARY_Household_000.csv",
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-75pc_SUMMARY_Household_000.csv",
 				"Inflation-75pc", true, 0);
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing Inflation-75pc_SUMMARY_Household_012.csv");
 		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Inflation-75pc_SUMMARY_Household_012.csv",
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-75pc_SUMMARY_Household_012.csv",
 				"Inflation-75pc", true, 12);
 
 		System.out.println(new Date(System.currentTimeMillis()) + ": FINISHED ANALYSING DEFAULTS");

@@ -47,13 +47,13 @@ public class AnalyseLgas {
 		// overwrite existing file
 		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline_SUMMARY_Household_000.csv");
 		processLgaMetricsCsv(
-				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline_SUMMARY_Household_000.csv",
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_SUMMARY_Household_000.csv",
 				"Baseline", false, 0);
 
 		// append to file
 		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline_SUMMARY_Household_012.csv");
 		processLgaMetricsCsv(
-				"D:\\OneDrive\\Dissertation\\Results & Analysis\\Summary Data\\Baseline_SUMMARY_Household_012.csv",
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_SUMMARY_Household_012.csv",
 				"Baseline", true, 12);
 	}
 

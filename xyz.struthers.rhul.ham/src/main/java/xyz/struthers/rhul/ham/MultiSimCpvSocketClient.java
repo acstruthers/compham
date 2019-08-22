@@ -311,6 +311,12 @@ public class MultiSimCpvSocketClient {
 		 * "D:/compham-config/06_FX_Rates_10pc-currency-ZAR.xml" }); System.gc();
 		 */
 
+		// ADI crash
+		appendToFile(progressFilename,
+				new Date(System.currentTimeMillis()) + ": Running simulation for 4.2_adi-crash-CBA.xml");
+		CpvSocketClient.main(new String[] { "D:/compham-config/4.2_adi-crash-CBA.xml" });
+		System.gc();
+		
 		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": FINISHED");
 		AnalyseAll.main(args);
 		appendToFile(progressFilename, "...I think I deserve a drink now!");
