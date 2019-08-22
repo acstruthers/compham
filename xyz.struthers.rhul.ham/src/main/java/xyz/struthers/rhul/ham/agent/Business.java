@@ -336,6 +336,8 @@ public class Business extends Agent implements Employer {
 		sb.append("ForeignEquities" + separator);
 		sb.append("TotalLiabilities" + separator);
 		sb.append("Loans" + separator);
+		sb.append("DefaultIteration" + separator);
+		sb.append("DefaultOrder");
 
 		return sb.toString();
 	}
@@ -376,6 +378,8 @@ public class Business extends Agent implements Employer {
 		sb.append(decimal.format(this.foreignEquities) + separator);
 		sb.append(decimal.format(this.totalLiabilities) + separator);
 		sb.append(decimal.format(this.loans) + separator);
+		sb.append(decimal.format(this.defaultIteration) + separator);
+		sb.append(decimal.format(this.defaultOrder));
 
 		return sb.toString();
 	}

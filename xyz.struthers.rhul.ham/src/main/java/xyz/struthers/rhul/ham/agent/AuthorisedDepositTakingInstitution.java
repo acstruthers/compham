@@ -413,7 +413,9 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		sb.append("CurrentDepositRate" + separator);
 		sb.append("CurrentLoanRate" + separator);
 		sb.append("CurrentBorrowingsRate" + separator);
-		sb.append("CurrentGovtBondRate");
+		sb.append("CurrentGovtBondRate" + separator);
+		sb.append("DefaultIteration" + separator);
+		sb.append("DefaultOrder");
 
 		return sb.toString();
 	}
@@ -503,6 +505,8 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		sb.append(percent.format(this.loanRate != null ? this.loanRate.get(iteration) : 0) + separator);
 		sb.append(percent.format(this.borrowingsRate != null ? this.borrowingsRate.get(iteration) : 0) + separator);
 		sb.append(percent.format(this.govtBondRate != null ? this.govtBondRate.get(iteration) : 0));
+		sb.append(decimal.format(this.defaultIteration) + separator);
+		sb.append(decimal.format(this.defaultOrder));
 
 		return sb.toString();
 	}

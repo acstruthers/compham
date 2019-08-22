@@ -66,6 +66,13 @@ public class PropertiesXml implements Serializable {
 	// private int peoplePerAgent = 1; // change to 1000 if 1 is too slow.
 	// private int totalPopulationAU = 25000000;
 
+	// scenario parameters - bank crash only
+	private boolean isBankCrashScenario;// = true
+	private float fcsAdiLimit;// = 20 billion
+	private float fcsCustomerLimit;// = 250,000
+	private String crashedBankShortNames;// = {"CBA"}
+	private String crashedBankIndustry;// = {"Mutual ADI"}
+
 	// scenario parameters
 	private float exogeneousIncomeMultiplier;// = 0.50f;
 	private float exogeneousExpenseMultiplier;// = 0.50f;
@@ -390,6 +397,76 @@ public class PropertiesXml implements Serializable {
 	 */
 	public void setTimestamp(String timestamp) {
 		this.timestamp = timestamp;
+	}
+
+	/**
+	 * @return the isBankCrashScenario
+	 */
+	public boolean isBankCrashScenario() {
+		return isBankCrashScenario;
+	}
+
+	/**
+	 * @param isBankCrashScenario the isBankCrashScenario to set
+	 */
+	public void setBankCrashScenario(boolean isBankCrashScenario) {
+		this.isBankCrashScenario = isBankCrashScenario;
+	}
+
+	/**
+	 * @return the fcsAdiLimit
+	 */
+	public float getFcsAdiLimit() {
+		return fcsAdiLimit;
+	}
+
+	/**
+	 * @param fcsAdiLimit the fcsAdiLimit to set
+	 */
+	public void setFcsAdiLimit(float fcsAdiLimit) {
+		this.fcsAdiLimit = fcsAdiLimit;
+	}
+
+	/**
+	 * @return the fcsCustomerLimit
+	 */
+	public float getFcsCustomerLimit() {
+		return fcsCustomerLimit;
+	}
+
+	/**
+	 * @param fcsCustomerLimit the fcsCustomerLimit to set
+	 */
+	public void setFcsCustomerLimit(float fcsCustomerLimit) {
+		this.fcsCustomerLimit = fcsCustomerLimit;
+	}
+
+	/**
+	 * @return the crashedBankShortNames
+	 */
+	public String getCrashedBankShortNames() {
+		return crashedBankShortNames;
+	}
+
+	/**
+	 * @param crashedBankShortNames the crashedBankShortNames to set
+	 */
+	public void setCrashedBankShortNames(String crashedBankShortNames) {
+		this.crashedBankShortNames = crashedBankShortNames;
+	}
+
+	/**
+	 * @return the crashedBankIndustry
+	 */
+	public String getCrashedBankIndustry() {
+		return crashedBankIndustry;
+	}
+
+	/**
+	 * @param crashedBankIndustry the crashedBankIndustry to set
+	 */
+	public void setCrashedBankIndustry(String crashedBankIndustry) {
+		this.crashedBankIndustry = crashedBankIndustry;
 	}
 
 	/**

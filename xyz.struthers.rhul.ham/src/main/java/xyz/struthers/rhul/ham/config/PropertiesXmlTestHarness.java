@@ -97,6 +97,13 @@ public class PropertiesXmlTestHarness {
 		props.setSuperannuationGuaranteeRate(0.095f); // 9.5%
 		props.setRandomSeed(20180630L);
 
+		// scenario parameters - bank crash only
+		props.setBankCrashScenario(true);
+		props.setFcsAdiLimit(20000000000f);
+		props.setFcsCustomerLimit(250000f);
+		props.setCrashedBankShortNames("CBA");
+		props.setCrashedBankIndustry("Mutual ADI");
+
 		// scenario parameters
 		props.setExogeneousIncomeMultiplier(0.5f);
 		props.setExogeneousExpenseMultiplier(0.5f);

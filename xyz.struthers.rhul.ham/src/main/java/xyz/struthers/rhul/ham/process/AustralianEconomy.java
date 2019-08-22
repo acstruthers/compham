@@ -258,6 +258,11 @@ public class AustralianEconomy implements Serializable {
 			adi.setGovtBondRate(iteration);
 		}
 
+		if (this.properties.isBankCrashScenario()) {
+			// simulate bank crash, applying FCS per the properties file
+			this.simulateBankCrash();
+		}
+
 		// prepare the inputs to the Clearing Payments Vector algorithm
 		this.preparePaymentsClearingVectorInputs(iteration, scenarioName);
 
@@ -366,6 +371,65 @@ public class AustralianEconomy implements Serializable {
 	public void updateOneMonth(ClearingPaymentOutputs cpvOutput) {
 		this.clearingPaymentVectorOutput = cpvOutput;
 		this.processPaymentsClearingVectorOutputs();
+	}
+
+	/**
+	 * FIXME: Update the relevant ADIs and all linked agents to simulate a bank
+	 * crashing.
+	 * 
+	 * MAYBE: It might be enough to zero out the bank's liquid assets, but we might
+	 * also need to update customers' balances per the FCS too?
+	 * 
+	 * After this, the caller should run the usual method to prepare CPV inputs. The
+	 * CPV algorithm will calculate all cash flows.
+	 */
+	void simulateBankCrash() {
+		// get properties to determine which bank to crash
+		String[] adiShortName = this.properties.getCrashedBankShortNames().split(",");
+		String[] adiIndustry = this.properties.getCrashedBankIndustry().split(",");
+
+		Set<AuthorisedDepositTakingInstitution> crashedAdis = new HashSet<AuthorisedDepositTakingInstitution>();
+
+		for (AuthorisedDepositTakingInstitution adi : this.adis) {
+			checkAdiName: for (int i = 0; i < adiShortName.length; i++) {
+				if (adi.getShortName().equalsIgnoreCase(adiShortName[i])) {
+					// flag the ADI as a failed one
+					crashedAdis.add(adi);
+					break checkAdiName;
+				}
+			}
+			checkAdiIndustry: for (int i = 0; i < adiIndustry.length; i++) {
+				if (adi.getAdiCategory().equalsIgnoreCase(adiIndustry[i])) {
+					// flag the ADI as a failed one
+					crashedAdis.add(adi);
+					break checkAdiIndustry;
+				}
+			}
+		}
+
+		// update details for failed banks
+		for (AuthorisedDepositTakingInstitution adi : crashedAdis) {
+			// update the ADI and all linked agents
+			this.crashAdi(adi);
+		}
+
+		// N.B. CPV will flow through the cash flows, so no need to do it here
+	}
+
+	/**
+	 * Updates the relevant details for the failed ADI and any linked agents.
+	 * 
+	 * @param adi
+	 */
+	private void crashAdi(AuthorisedDepositTakingInstitution adi) {
+		// get properties to determine what rules to apply
+		float fcsAdiLimit = this.properties.getFcsAdiLimit();
+		float fcsCustomerLimit = this.properties.getFcsCustomerLimit();
+
+		// FIXME: implement logic to wipe out the bank's assets so it defaults during
+		// the CPV calculations
+
+		// TODO probably need to apply FCS limit to depositors' accounts too
 	}
 
 	/**
