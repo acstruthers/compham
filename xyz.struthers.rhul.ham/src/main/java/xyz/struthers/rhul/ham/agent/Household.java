@@ -11,6 +11,7 @@ import gnu.trove.list.array.TFloatArrayList;
 import xyz.struthers.lang.CustomMath;
 import xyz.struthers.rhul.ham.config.PropertiesXml;
 import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
+import xyz.struthers.rhul.ham.process.AustralianEconomy;
 import xyz.struthers.rhul.ham.process.Clearable;
 import xyz.struthers.rhul.ham.process.NodePayment;
 import xyz.struthers.rhul.ham.process.Tax;
@@ -459,7 +460,10 @@ public class Household extends Agent {
 	public List<NodePayment> getAmountsPayable(int iteration) {
 		// MAYBE: donations don't currently go anywhere
 
-		int numberOfCreditors = 1; // government
+		float payable = 0f;
+		float calibratedExpenses = this.getTotalExpenses();
+
+		int numberOfCreditors = 2; // government + exogeneous
 		if (this.suppliers != null && this.pnlLivingExpenses > 0d) {
 			numberOfCreditors += this.suppliers.size();
 		}
@@ -480,18 +484,21 @@ public class Household extends Agent {
 				// split expenses per the ABS 6530.0 ratios
 				float expense = totalExpense * this.supplierRatios.get(supIdx);
 				liabilities.add(new NodePayment(index, expense));
+				payable += expense;
 			}
 		}
 
 		// calculate rent due to landlord
 		if (this.landlord != null && this.pnlRentExpense > 0d) {
 			liabilities.add(new NodePayment(this.landlord.getPaymentClearingIndex(), this.pnlRentExpense));
+			payable += this.pnlRentExpense;
 		}
 
 		// calculate loan repayment due to bank
 		if (this.loanAdi != null && (this.pnlMortgageRepayments > 0d || this.pnlRentInterestExpense > 0d)) {
 			liabilities.add(new NodePayment(this.loanAdi.getPaymentClearingIndex(),
 					this.pnlMortgageRepayments + this.pnlRentInterestExpense));
+			payable += this.pnlMortgageRepayments + this.pnlRentInterestExpense;
 		}
 
 		// calculate income tax due to government
@@ -500,6 +507,13 @@ public class Household extends Agent {
 			incomeTax += Tax.calculateIndividualIncomeTax(individuals[indivIdx].getGrossIncome());
 		}
 		liabilities.add(new NodePayment(this.govt.getPaymentClearingIndex(), incomeTax));
+		payable += incomeTax;
+
+		// calculate exogeneous expenses
+		float exogeneousExpenseMultiplier = properties.getExogeneousExpenseMultiplier();
+		float exogeneousExpenses = Math.max(0f, calibratedExpenses - payable) * exogeneousExpenseMultiplier;
+		liabilities.add(new NodePayment(AustralianEconomy.getExogeneousExpenseAgent().getPaymentClearingIndex(),
+				exogeneousExpenses));
 
 		liabilities.trimToSize();
 		return liabilities;

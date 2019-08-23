@@ -11,6 +11,7 @@ import gnu.trove.list.array.TFloatArrayList;
 import xyz.struthers.rhul.ham.config.PropertiesXml;
 import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 import xyz.struthers.rhul.ham.data.CalibrateEconomy;
+import xyz.struthers.rhul.ham.process.AustralianEconomy;
 import xyz.struthers.rhul.ham.process.Clearable;
 import xyz.struthers.rhul.ham.process.Employer;
 import xyz.struthers.rhul.ham.process.NodePayment;
@@ -433,7 +434,11 @@ public class Business extends Agent implements Employer {
 
 	@Override
 	public List<NodePayment> getAmountsPayable(int iteration) {
-		int numberOfCreditors = 1; // government
+
+		float payable = 0f;
+		float calibratedExpenses = this.getTotalExpenses();
+
+		int numberOfCreditors = 2; // government + exogeneous
 		if (this.employees != null && this.wageExpenses > 0d) {
 			numberOfCreditors += this.employees.size();
 		}
@@ -458,6 +463,7 @@ public class Business extends Agent implements Employer {
 				float monthlyWagesIncludingSuper = employee.getPnlWagesSalaries()
 						* (1f + properties.getSuperannuationGuaranteeRate());
 				liabilities.add(new NodePayment(index, monthlyWagesIncludingSuper));
+				payable += monthlyWagesIncludingSuper;
 			}
 		}
 
@@ -467,6 +473,7 @@ public class Business extends Agent implements Employer {
 				int index = supplier.getPaymentClearingIndex();
 				float expense = this.otherExpenses / this.domesticSuppliers.size();
 				liabilities.add(new NodePayment(index, expense));
+				payable += expense;
 			}
 		}
 
@@ -486,23 +493,33 @@ public class Business extends Agent implements Employer {
 				float exchRateAdjustment = currentExchangeRate / exchangeRates.get(0);
 				expense *= exchRateAdjustment;
 				liabilities.add(new NodePayment(index, expense));
+				payable += expense;
 			}
 		}
 
 		// calculate rent due to landlord
 		if (this.landlord != null && this.rentExpense > 0d) {
 			liabilities.add(new NodePayment(this.landlord.getPaymentClearingIndex(), this.rentExpense));
+			payable += this.rentExpense;
 		}
 
 		// calculate interest due to bank
 		if (this.adi != null && this.interestExpense > 0d) {
 			liabilities.add(new NodePayment(this.adi.getPaymentClearingIndex(), this.interestExpense));
+			payable += this.interestExpense;
 		}
 
 		// calculate tax due to government (payroll & income)
 		float totalTax = this.payrollTaxExpense
 				+ Tax.calculateCompanyTax(this.totalIncome, this.totalIncome - this.totalExpenses);
 		liabilities.add(new NodePayment(govt.getPaymentClearingIndex(), totalTax));
+		payable += totalTax;
+
+		// calculate exogeneous expenses
+		float exogeneousExpenseMultiplier = properties.getExogeneousExpenseMultiplier();
+		float exogeneousExpenses = Math.max(0f, calibratedExpenses - payable) * exogeneousExpenseMultiplier;
+		liabilities.add(new NodePayment(AustralianEconomy.getExogeneousExpenseAgent().getPaymentClearingIndex(),
+				exogeneousExpenses));
 
 		liabilities.trimToSize();
 		return liabilities;

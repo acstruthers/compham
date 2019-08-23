@@ -367,6 +367,9 @@ public class AnalyseMetrics {
 		// overall mean metrics (to test model error)
 		float meanIncome = 0f;
 		float meanExpenses = 0f;
+		float debtFree = 0f;
+		float mtgCostsOver30pc = 0f;
+		float mtgCostsOver30pcOwnerOccupied = 0f;
 		float housingCostsOver30pc = 0f; // % of households in mtg distress
 		float housingCostsOver30pcTop1pc = 0f;
 		float housingCostsOver30pcTop5pc = 0f;
@@ -400,6 +403,7 @@ public class AnalyseMetrics {
 
 		// local working variables
 		int householdCount = 0;
+		int householdCountOwnerOccupied = 0;
 		int householdCountTop5pc = 0;
 		int householdCountTop1pc = 0;
 		int householdCountDecile1 = 0;
@@ -411,6 +415,9 @@ public class AnalyseMetrics {
 		int householdCountDecile7 = 0;
 		int householdCountDecile8 = 0;
 		int householdCountDecile9 = 0;
+		int debtFreeCount = 0;
+		int mtgCostsOver30pcCount = 0;
+		int mtgCostsOver30pcCountOwnerOccupied = 0;
 		int housingCostsOver30pcCount = 0;
 		int housingCostsOver30pcCountTop1pc = 0;
 		int housingCostsOver30pcCountTop5pc = 0;
@@ -506,7 +513,7 @@ public class AnalyseMetrics {
 				+ decileThreshold6 + ", (7) = " + decileThreshold7 + ", (8) = " + decileThreshold8 + ", (9) = "
 				+ decileThreshold9);
 
-		// read CSV filea second time, and calculate metrics
+		// read CSV file a second time, and calculate metrics
 		reader = null;
 		try {
 			Reader fr = new FileReader(inFileResourceLocation);
@@ -516,8 +523,9 @@ public class AnalyseMetrics {
 				try {
 					// get values for this household
 					float income = Float.valueOf(line[6].replace(",", ""));
-					float housingCosts = Float.valueOf(line[10].replace(",", ""))
-							+ Float.valueOf(line[11].replace(",", ""));
+					float mtgCosts = Float.valueOf(line[11].replace(",", ""));
+					float rentCosts = Float.valueOf(line[10].replace(",", ""));
+					float housingCosts = rentCosts + mtgCosts;
 					float henderson = Float.valueOf(line[9].replace(",", ""));
 					float expenses = housingCosts + henderson + Float.valueOf(line[12].replace(",", ""));
 					float debt = Float.valueOf(line[14].replace(",", ""));
@@ -562,6 +570,20 @@ public class AnalyseMetrics {
 					if (housingCosts > 0.3f * income) {
 						// mortgage distress
 						housingCostsOver30pcCount++;
+					}
+					if (mtgCosts > 0.3f * income) {
+						// mortgage distress
+						mtgCostsOver30pcCount++;
+						if (rentCosts <= 1f) {
+							mtgCostsOver30pcCountOwnerOccupied++;
+						}
+					}
+					if (rentCosts <= 1f && mtgCosts > 0f) {
+						// owner occupied borrowing households (van Onselen, 2019)
+						householdCountOwnerOccupied++;
+					}
+					if (debt <= 1f) {
+						debtFreeCount++;
 					}
 					// add to overall metrics
 					totalIncome += income;
@@ -638,8 +660,12 @@ public class AnalyseMetrics {
 		}
 
 		// calculate ratio metrics
-		meanIncome = totalIncome / householdCount;
-		meanExpenses = totalExpenses / householdCount;
+		meanIncome = totalIncome / Float.valueOf(householdCount);
+		meanExpenses = totalExpenses / Float.valueOf(householdCount);
+		debtFree = Float.valueOf(debtFreeCount) / Float.valueOf(householdCount);
+		mtgCostsOver30pc = Float.valueOf(mtgCostsOver30pcCount) / Float.valueOf(householdCount);
+		mtgCostsOver30pcOwnerOccupied = Float.valueOf(mtgCostsOver30pcCountOwnerOccupied)
+				/ Float.valueOf(householdCount);
 		housingCostsOver30pc = Float.valueOf(housingCostsOver30pcCount) / Float.valueOf(householdCount);
 		housingCostsOver30pcTop5pc = Float.valueOf(housingCostsOver30pcCountTop5pc)
 				/ Float.valueOf(householdCountTop5pc);
@@ -714,6 +740,38 @@ public class AnalyseMetrics {
 			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
 					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "meanExpenses"
 					+ properties.getCsvSeparator() + meanExpenses).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "householdCount"
+					+ properties.getCsvSeparator() + householdCount).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "householdCountOwnerOccupied"
+					+ properties.getCsvSeparator() + householdCountOwnerOccupied).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "debtFreeCount"
+					+ properties.getCsvSeparator() + debtFreeCount).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "mtgCostsOver30pcCount"
+					+ properties.getCsvSeparator() + mtgCostsOver30pcCount).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator()
+					+ "mtgCostsOver30pcCountOwnerOccupied" + properties.getCsvSeparator()
+					+ mtgCostsOver30pcCountOwnerOccupied).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "mtgCostsOver30pc"
+					+ properties.getCsvSeparator() + mtgCostsOver30pc).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator()
+					+ "mtgCostsOver30pcOwnerOccupied" + properties.getCsvSeparator() + mtgCostsOver30pcOwnerOccupied)
+							.split(properties.getCsvSeparator());
 			csvWriter.writeNext(entries);
 			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
 					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "housingCostsOver30pc"

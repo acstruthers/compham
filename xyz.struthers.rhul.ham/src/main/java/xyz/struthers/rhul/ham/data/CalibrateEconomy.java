@@ -30,6 +30,7 @@ import xyz.struthers.lang.CustomMath;
 import xyz.struthers.rhul.ham.agent.AustralianGovernment;
 import xyz.struthers.rhul.ham.agent.AuthorisedDepositTakingInstitution;
 import xyz.struthers.rhul.ham.agent.Business;
+import xyz.struthers.rhul.ham.agent.ExogeneousExpenseAgent;
 import xyz.struthers.rhul.ham.agent.ForeignCountry;
 import xyz.struthers.rhul.ham.agent.Household;
 import xyz.struthers.rhul.ham.agent.Individual;
@@ -90,6 +91,7 @@ public class CalibrateEconomy {
 	// private Currencies currencies;
 	private AustralianGovernment govt;
 	private ReserveBankOfAustralia rba;
+	ExogeneousExpenseAgent exogeneousExpenseAgent;
 
 	// field variables
 	private Random random;
@@ -176,6 +178,7 @@ public class CalibrateEconomy {
 			this.businesses = this.economy.getBusinesses();
 			this.adis = this.economy.getAdis();
 			this.countries = this.economy.getCountries();
+			this.exogeneousExpenseAgent = AustralianEconomy.getExogeneousExpenseAgent();
 			// this.currencies = this.economy.getCurrencies();
 
 			/*
@@ -241,6 +244,7 @@ public class CalibrateEconomy {
 			for (int i = 0; i < this.countries.length; i++) {
 				this.countries[i].setPaymentClearingIndex(paymentClearingIdx++);
 			}
+			this.exogeneousExpenseAgent.setPaymentClearingIndex(paymentClearingIdx++);
 			this.indicesAssigned = true;
 		}
 	}
@@ -383,6 +387,8 @@ public class CalibrateEconomy {
 		for (int i = 0; i < this.households.length; i++) {
 			this.households[i].setGovt(this.govt);
 		}
+
+		// exogeneous expenses are static, so no need to set them here (save RAM)
 	}
 
 	/**

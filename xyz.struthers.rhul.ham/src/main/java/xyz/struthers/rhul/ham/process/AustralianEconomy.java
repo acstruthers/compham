@@ -37,6 +37,7 @@ import gnu.trove.list.array.TIntArrayList;
 import xyz.struthers.rhul.ham.agent.AustralianGovernment;
 import xyz.struthers.rhul.ham.agent.AuthorisedDepositTakingInstitution;
 import xyz.struthers.rhul.ham.agent.Business;
+import xyz.struthers.rhul.ham.agent.ExogeneousExpenseAgent;
 import xyz.struthers.rhul.ham.agent.ForeignCountry;
 import xyz.struthers.rhul.ham.agent.Household;
 import xyz.struthers.rhul.ham.agent.Individual;
@@ -79,6 +80,7 @@ public class AustralianEconomy implements Serializable {
 	Currencies currencies;
 	ReserveBankOfAustralia rba;
 	AustralianGovernment government;
+	static ExogeneousExpenseAgent exogeneousExpenseAgent;
 	PropertiesXml properties;
 	Random random;
 
@@ -126,6 +128,7 @@ public class AustralianEconomy implements Serializable {
 		this.currencies = null;
 		this.rba = null;
 		this.government = null;
+		exogeneousExpenseAgent = null;
 
 		// Process
 		this.payments = null;
@@ -456,14 +459,15 @@ public class AustralianEconomy implements Serializable {
 	 * of the CPV.
 	 */
 	void preparePaymentsClearingVectorInputs(int iteration, String scenarioName) {
-		// initialise local variables
+		// initialise local variables (incl. RBA, govt & exogeneous)
 		int totalAgentCount = 1 + 1 + this.households.length + this.businesses.length + this.adis.length
-				+ this.countries.length;
+				+ this.countries.length + 1;
 		this.liabilitiesAmounts = new ArrayList<TFloatArrayList>(totalAgentCount);
 		this.liabilitiesIndices = new ArrayList<TIntArrayList>(totalAgentCount);
 		this.operatingCashFlow = new TFloatArrayList(totalAgentCount);
 		this.liquidAssets = new TFloatArrayList(totalAgentCount);
 		ArrayList<Float> receivableFromAnotherAgent = new ArrayList<Float>(totalAgentCount);
+		ArrayList<Float> payableToAnotherAgent = new ArrayList<Float>(totalAgentCount);
 		for (int i = 0; i < totalAgentCount; i++) {
 			// initialise them so we can use set without getting index out of bounds errors
 			this.liabilitiesAmounts.add(new TFloatArrayList());
@@ -471,6 +475,7 @@ public class AustralianEconomy implements Serializable {
 			this.operatingCashFlow.add(0f);
 			this.liquidAssets.add(0f);
 			receivableFromAnotherAgent.add(0f);
+			payableToAnotherAgent.add(0f);
 		}
 
 		// households
@@ -486,6 +491,7 @@ public class AustralianEconomy implements Serializable {
 				liabilityAmounts.add(liabAmt);
 				int liabIdx = nodePayments.get(creditorIdx).getRecipientIndex();
 				liabilityIndices.add(liabIdx);
+				payableToAnotherAgent.set(paymentClearingIndex, payableToAnotherAgent.get(creditorIdx) + liabAmt);
 
 				// add liabilities to recipient's receivables so we can calculate exogeneous
 				// cash flow. N.B. exogeneous cash flow calculated below after all liabilities
@@ -516,6 +522,7 @@ public class AustralianEconomy implements Serializable {
 				liabilityAmounts.add(liabAmt);
 				int liabIdx = nodePayments.get(creditorIdx).getRecipientIndex();
 				liabilityIndices.add(liabIdx);
+				payableToAnotherAgent.set(paymentClearingIndex, payableToAnotherAgent.get(creditorIdx) + liabAmt);
 
 				// add liabilities to recipient's receivables so we can calculate exogeneous
 				// cash flow. N.B. exogeneous cash flow calculated below after all liabilities
@@ -547,6 +554,7 @@ public class AustralianEconomy implements Serializable {
 				liabilityAmounts.add(liabAmt);
 				int liabIdx = nodePayments.get(creditorIdx).getRecipientIndex();
 				liabilityIndices.add(liabIdx);
+				payableToAnotherAgent.set(paymentClearingIndex, payableToAnotherAgent.get(creditorIdx) + liabAmt);
 
 				// add liabilities to recipient's receivables so we can calculate exogeneous
 				// cash flow. N.B. exogeneous cash flow calculated below after all liabilities
@@ -576,6 +584,7 @@ public class AustralianEconomy implements Serializable {
 				liabilityAmounts.add(liabAmt);
 				int liabIdx = nodePayments.get(creditorIdx).getRecipientIndex();
 				liabilityIndices.add(liabIdx);
+				payableToAnotherAgent.set(paymentClearingIndex, payableToAnotherAgent.get(creditorIdx) + liabAmt);
 
 				// add liabilities to recipient's receivables so we can calculate exogeneous
 				// cash flow. N.B. exogeneous cash flow calculated below after all liabilities
@@ -617,6 +626,7 @@ public class AustralianEconomy implements Serializable {
 				liabilityAmounts.add(liabAmt);
 				int liabIdx = nodePayments.get(creditorIdx).getRecipientIndex();
 				liabilityIndices.add(liabIdx);
+				payableToAnotherAgent.set(paymentClearingIndex, payableToAnotherAgent.get(creditorIdx) + liabAmt);
 
 				// add liabilities to recipient's receivables so we can calculate exogeneous
 				// cash flow. N.B. exogeneous cash flow calculated below after all liabilities
@@ -646,6 +656,7 @@ public class AustralianEconomy implements Serializable {
 				liabilityAmounts.add(liabAmt);
 				int liabIdx = nodePayments.get(creditorIdx).getRecipientIndex();
 				liabilityIndices.add(liabIdx);
+				payableToAnotherAgent.set(paymentClearingIndex, payableToAnotherAgent.get(creditorIdx) + liabAmt);
 
 				// add liabilities to recipient's receivables so we can calculate exogeneous
 				// cash flow. N.B. exogeneous cash flow calculated below after all liabilities
@@ -676,11 +687,13 @@ public class AustralianEconomy implements Serializable {
 		// create CSV file header
 		DecimalFormat wholeNumber = new DecimalFormat("000");
 		DecimalFormat decimalFormat = new DecimalFormat("#,##0.00");
-		String filename = properties.getOutputDirectory() + scenarioName + "_EXOGENEOUS_"
+		String filename = properties.getOutputDirectory() + scenarioName + "_EXOGENEOUS_INCOME_"
 				+ wholeNumber.format(iteration) + ".csv";
-		String[] entries = { "IterationNo", "AgentType", "ExogenousIncome", "TotalIncome" };
+		String[] entries = { "IterationNo", "AgentType", "ExogenousIncome", "TotalIncome", "ExogeneousExpense",
+				"TotalExpense" };
 		Writer writer;
 		float exogeneousIncomeMultiplier = this.properties.getExogeneousIncomeMultiplier();
+		float exogeneousExpenseMultiplier = this.properties.getExogeneousExpenseMultiplier();
 		// households
 		if (iteration == 0) {
 			try {
@@ -696,9 +709,14 @@ public class AustralianEconomy implements Serializable {
 					float exogeneousIncome = (calibratedIncome - receivable) * exogeneousIncomeMultiplier;
 					this.operatingCashFlow.set(paymentClearingIndex, exogeneousIncome);
 
+					float payable = payableToAnotherAgent.get(paymentClearingIndex);
+					float calibratedExpense = household.getTotalExpenses();
+					float exogeneousExpense = (calibratedExpense - payable) * exogeneousExpenseMultiplier;
+
 					// save ratio of exogeneous to total income to CSV so it can be graphed
 					entries = new String[] { String.valueOf(iteration), "H", decimalFormat.format(exogeneousIncome),
-							decimalFormat.format(calibratedIncome) };
+							decimalFormat.format(calibratedIncome), decimalFormat.format(exogeneousExpense),
+							decimalFormat.format(calibratedExpense) };
 					csvWriter.writeNext(entries);
 				}
 				writer.close();
@@ -1766,6 +1784,20 @@ public class AustralianEconomy implements Serializable {
 	 */
 	public void setGovernment(AustralianGovernment government) {
 		this.government = government;
+	}
+
+	/**
+	 * @return the exogeneousExpenseAgent
+	 */
+	public static ExogeneousExpenseAgent getExogeneousExpenseAgent() {
+		return exogeneousExpenseAgent;
+	}
+
+	/**
+	 * @param exogeneousExpenseAgent the exogeneousExpenseAgent to set
+	 */
+	public static void setExogeneousExpenseAgent(ExogeneousExpenseAgent exogeneousExpenseAgent) {
+		exogeneousExpenseAgent = exogeneousExpenseAgent;
 	}
 
 	/**

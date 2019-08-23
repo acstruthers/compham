@@ -12,6 +12,7 @@ import gnu.trove.map.hash.TObjectFloatHashMap;
 import xyz.struthers.rhul.ham.config.PropertiesXml;
 import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 import xyz.struthers.rhul.ham.data.CalibrateEconomy;
+import xyz.struthers.rhul.ham.process.AustralianEconomy;
 import xyz.struthers.rhul.ham.process.Clearable;
 import xyz.struthers.rhul.ham.process.Employer;
 import xyz.struthers.rhul.ham.process.NodePayment;
@@ -567,7 +568,11 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 
 	@Override
 	public List<NodePayment> getAmountsPayable(int iteration) {
-		int numberOfCreditors = 1; // government
+
+		float payable = 0f;
+		float calibratedExpenses = this.getTotalExpensesExcludingTax() + this.getPnlIncomeTaxExpense();
+
+		int numberOfCreditors = 2; // government + exogeneous
 		if (this.employees != null && this.pnlPersonnelExpenses > 0d) {
 			numberOfCreditors += this.employees.size();
 		}
@@ -595,6 +600,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 				float monthlyWagesIncludingSuper = employee.getPnlWagesSalaries()
 						* (1f + properties.getSuperannuationGuaranteeRate());
 				liabilities.add(new NodePayment(index, monthlyWagesIncludingSuper));
+				payable += monthlyWagesIncludingSuper;
 			}
 		}
 
@@ -604,6 +610,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 				int index = this.domesticSuppliers.get(busIdx).getPaymentClearingIndex();
 				float expense = this.pnlOtherExpenses * this.domesticSupplierRatios.get(busIdx);
 				liabilities.add(new NodePayment(index, expense));
+				payable += expense;
 			}
 		}
 
@@ -623,6 +630,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 			}
 			float monthlyInterest = depositor.getBsBankDeposits() * this.depositRate.get(iteration) / NUMBER_MONTHS;
 			liabilities.add(new NodePayment(index, monthlyInterest));
+			payable += monthlyInterest;
 		}
 
 		// calculate amount due to business depositors
@@ -631,6 +639,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 				int index = depositor.getPaymentClearingIndex();
 				float monthlyInterest = depositor.getBankDeposits() * this.depositRate.get(iteration) / NUMBER_MONTHS;
 				liabilities.add(new NodePayment(index, monthlyInterest));
+				payable += monthlyInterest;
 			}
 		}
 
@@ -643,6 +652,7 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 				float monthlyInterest = this.adiInvestorAmounts.get(adiIdx)
 						* this.borrowingsRate.get(borrowingsRateMonth) / NUMBER_MONTHS;
 				liabilities.add(new NodePayment(index, monthlyInterest));
+				payable += monthlyInterest;
 			}
 		}
 
@@ -658,12 +668,20 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		float totalTax = payrollTax + Tax.calculateCompanyTax(this.getTotalIncome(),
 				this.getTotalIncome() - this.getTotalExpensesExcludingTax() - payrollTax);
 		liabilities.add(new NodePayment(this.govt.getPaymentClearingIndex(), totalTax));
+		payable += totalTax;
 
 		// calculate Committed Liquidity Facility (CLF) fees due to RBA
 		if (this.pnlCommittedLiquidityFacilityFees > 0f) {
 			liabilities
 					.add(new NodePayment(this.rba.getPaymentClearingIndex(), this.pnlCommittedLiquidityFacilityFees));
+			payable += this.pnlCommittedLiquidityFacilityFees;
 		}
+
+		// calculate exogeneous expenses
+		float exogeneousExpenseMultiplier = properties.getExogeneousExpenseMultiplier();
+		float exogeneousExpenses = Math.max(0f, calibratedExpenses - payable) * exogeneousExpenseMultiplier;
+		liabilities.add(new NodePayment(AustralianEconomy.getExogeneousExpenseAgent().getPaymentClearingIndex(),
+				exogeneousExpenses));
 
 		liabilities.trimToSize();
 		return liabilities;
