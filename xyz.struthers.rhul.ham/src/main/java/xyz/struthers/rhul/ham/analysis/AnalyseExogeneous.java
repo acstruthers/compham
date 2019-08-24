@@ -52,14 +52,14 @@ public class AnalyseExogeneous {
 				false, 0);
 
 		// append to file
-		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-01_EXOGENEOUS_000.csv");
+		/*System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-01_EXOGENEOUS_000.csv");
 		processExogeneousDataCsv(
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-01_EXOGENEOUS_000.csv",
 				"Baseline-01", true, 0);
 		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-02_EXOGENEOUS_000.csv");
 		processExogeneousDataCsv(
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-02_EXOGENEOUS_000.csv",
-				"Baseline-02", true, 0);
+				"Baseline-02", true, 0);*/
 
 		System.out.println(new Date(System.currentTimeMillis()) + ": FINISHED");
 		System.out.println("See " + properties.getOutputDirectory() + "R_GRAPH_Exogeneous.csv for results");
