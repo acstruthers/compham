@@ -605,6 +605,50 @@ public class Business extends Agent implements Employer {
 		return status;
 	}
 
+	public void applyInflation(float monthlyInflationRate, int iteration) {
+		this.salesDomestic = this.salesDomestic * (1f + monthlyInflationRate);
+		this.salesGovernment = this.salesGovernment * (1f + monthlyInflationRate);
+		this.salesForeign = this.salesForeign * (1f + monthlyInflationRate);
+
+		// interest income responds to interest rates, not inflation
+
+		// rent responds to inflation, but with a 12 month lag
+		if ((iteration % 12) == 0) {
+			// TODO: increase rent income & expense
+
+			// re-calculate income tax expense
+		}
+
+		this.otherIncome = this.otherIncome * (1f + monthlyInflationRate);
+		this.totalIncome = this.salesDomestic + this.salesGovernment + this.salesForeign + this.interestIncome
+				+ this.rentIncome + this.otherIncome;
+
+		// changes in wage expenses are delayed by 12 months
+		if ((iteration % 12) == 0) {
+			// TODO: increase wage expenses
+			// TODO: increase superannuation expenses
+			// TODO: increase payroll tax expenses
+
+			// re-calculate income tax expense
+		}
+
+		// Foreign expenses respond to FX rates, not inflation
+		// Interest expense responds to interest rates, not inflation
+		// mortgages never respond to inflation - only interest rates
+		// Depreciation expense responds to inflation with a 12 month lag
+		if ((iteration % 12) == 0) {
+			// TODO increase depreciation 20% at a time, assuming 5 year life of assets
+
+		}
+
+		// N.B. Donations do not respond to inflation
+
+		// increase living expenses, work expenses & other expenses by inflation rate
+		this.otherExpenses = this.otherExpenses * (1f + monthlyInflationRate);
+
+		// TODO re-calculate income tax expense
+	}
+
 	private int makeBusinessBankrupt(int iteration) {
 		// business is bankrupt, so fire all employees
 		if (this.employees != null) {

@@ -33,7 +33,7 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 	private static PropertiesXml properties = PropertiesXmlFactory.getProperties();
 
 	// interest rate scenarios
-	//public static final float OCR_INITIAL = 0.015f;
+	// public static final float OCR_INITIAL = 0.015f;
 	public static final int RATES_SAME = 0;
 	public static final int RATES_CUSTOM = 1;
 
@@ -377,6 +377,32 @@ public final class ReserveBankOfAustralia extends Agent implements Employer {
 	@Override
 	public void setIndustryDivisionCode(char industryDivisionCode) {
 		this.industryDivisionCode = industryDivisionCode;
+	}
+
+	public void applyInflation(float monthlyInflationRate, int iteration) {
+		// interest income & expense don't respond to inflation
+		// CLF fees don't vary with inflation
+		/// FX doesnt' vary with inflation
+		// AUD securities don't vary with inflation
+
+		this.pnlOtherIncome = this.pnlOtherIncome * (1f + monthlyInflationRate);
+
+		// changes in wages are delayed by 12 months
+		if ((iteration % 12) == 0) {
+			// TODO: increase personnel expenses
+
+			// re-calculate income tax expense
+		}
+
+		// Depreciation expense responds to inflation with a 12 month lag
+		if ((iteration % 12) == 0) {
+			// TODO increase depreciation 20% at a time, assuming 5 year life of assets
+
+		}
+
+		this.pnlOtherExpenses = this.pnlOtherExpenses * (1f + monthlyInflationRate);
+
+		// TODO: update distribution payable to Commonwealth
 	}
 
 	/**

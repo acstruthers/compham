@@ -737,6 +737,36 @@ public abstract class AuthorisedDepositTakingInstitution extends Agent implement
 		return status;
 	}
 
+	public void applyInflation(float monthlyInflationRate, int iteration) {
+		// interest income & expense don't respond to inflation, only interest rates
+		// trading income doesn't respond to inflation
+		// investment income doesn't respond to inflation
+
+		this.pnlOtherIncome = this.pnlOtherIncome * (1f + monthlyInflationRate);
+
+		// changes in wages are delayed by 12 months
+		if ((iteration % 12) == 0) {
+			// TODO: increase personnel expenses
+
+			// re-calculate income tax expense
+		}
+
+		// loan impairment doesn't respond to inflation
+		// CLF fees don't vary with inflation
+		// Depreciation expense responds to inflation with a 12 month lag
+		if ((iteration % 12) == 0) {
+			// TODO increase depreciation 20% at a time, assuming 5 year life of assets
+
+		}
+
+		this.pnlOtherExpenses = this.pnlOtherExpenses * (1f + monthlyInflationRate);
+
+		// re-calculate income tax expense
+		float grossRevenue = this.getTotalIncome();
+		float taxableRevenue = grossRevenue - this.getTotalExpensesExcludingTax();
+		this.pnlIncomeTaxExpense = Tax.calculateCompanyTax(this.getTotalIncome(), taxableRevenue);
+	}
+
 	private int makeAdiBankrupt(int iteration) {
 		// ADI is bankrupt, so fire all employees
 		for (Individual employee : this.employees) {

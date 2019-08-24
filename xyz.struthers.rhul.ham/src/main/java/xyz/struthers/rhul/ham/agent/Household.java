@@ -588,6 +588,33 @@ public class Household extends Agent {
 		return status;
 	}
 
+	public void applyInflation(float monthlyInflationRate, int iteration) {
+		// changes in domestic income are delayed by 12 months
+		if ((iteration % 12) == 0) {
+			// TODO: increase income
+
+			// re-calculate income tax expense
+		}
+
+		// N.B. Foreign income responds to FX rates, not inflation
+
+		// mortgages never respond to inflation - only interest rates
+
+		// rent responds to inflation, but with a 12 month lag
+		if ((iteration % 12) == 0) {
+			// TODO: increase rent income & expense
+
+			// re-calculate income tax expense
+		}
+
+		// N.B. Donations do not respond to inflation
+
+		// increase living expenses, work expenses & other expenses by inflation rate
+		this.pnlLivingExpenses = this.pnlLivingExpenses * (1f + monthlyInflationRate);
+		this.pnlWorkRelatedExpenses = this.pnlWorkRelatedExpenses * (1f + monthlyInflationRate);
+		this.pnlOtherDiscretionaryExpenses = this.pnlOtherDiscretionaryExpenses * (1f + monthlyInflationRate);
+	}
+
 	private int makeHouseholdBankrupt(int iteration) {
 		// leave superannuation alone because it's not enough to avoid bankruptcy
 		this.bsBankDeposits = 0f;

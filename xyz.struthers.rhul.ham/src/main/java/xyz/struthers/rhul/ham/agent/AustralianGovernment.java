@@ -358,6 +358,33 @@ public final class AustralianGovernment extends Agent implements Employer {
 		this.industryDivisionCode = industryDivisionCode;
 	}
 
+	public void applyInflation(float monthlyInflationRate, int iteration) {
+		this.pnlTaxIncome = this.pnlTaxIncome * (1f + monthlyInflationRate);
+		this.pnlSaleOfGoodsAndServices = this.pnlSaleOfGoodsAndServices * (1f + monthlyInflationRate);
+
+		// interest income & expense don't respond to inflation
+
+		this.pnlOtherIncome = this.pnlOtherIncome * (1f + monthlyInflationRate);
+
+		// changes in wages are delayed by 12 months
+		if ((iteration % 12) == 0) {
+			// TODO: increase personnel expenses
+
+			// re-calculate income tax expense
+		}
+
+		// Depreciation expense responds to inflation with a 12 month lag
+		if ((iteration % 12) == 0) {
+			// TODO increase depreciation 20% at a time, assuming 5 year life of assets
+
+		}
+
+		this.pnlDepreciationAmortisation = this.pnlDepreciationAmortisation * (1f + monthlyInflationRate);
+		this.pnlOtherExpenses = this.pnlOtherExpenses * (1f + monthlyInflationRate);
+		this.pnlNetAcquisitionOfNonFinancialAssets = this.pnlNetAcquisitionOfNonFinancialAssets
+				* (1f + monthlyInflationRate);
+	}
+
 	/**
 	 * @return the name
 	 */

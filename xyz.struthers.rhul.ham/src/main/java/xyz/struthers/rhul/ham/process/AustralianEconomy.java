@@ -261,6 +261,15 @@ public class AustralianEconomy implements Serializable {
 			adi.setGovtBondRate(iteration);
 		}
 
+		// FIXME: HACK apply CPI to non-housing expenses
+		float monthlyInflationRate = 0f;
+		if (this.properties.getScenarioName().equalsIgnoreCase("Inflation-05pc")) {
+			monthlyInflationRate = 0.05f / 12f;
+		} else if (this.properties.getScenarioName().equalsIgnoreCase("Inflation-10pc")) {
+			monthlyInflationRate = 0.10f / 12f;
+		}
+		this.applyInflation(monthlyInflationRate, iteration);
+
 		if (this.properties.isBankCrashScenario()) {
 			// simulate bank crash, applying FCS per the properties file
 			this.simulateBankCrash();
@@ -374,6 +383,20 @@ public class AustralianEconomy implements Serializable {
 	public void updateOneMonth(ClearingPaymentOutputs cpvOutput) {
 		this.clearingPaymentVectorOutput = cpvOutput;
 		this.processPaymentsClearingVectorOutputs();
+	}
+
+	public void applyInflation(float monthlyInflationRate, int iteration) {
+		for (Household household : this.households) {
+			household.applyInflation(monthlyInflationRate, iteration);
+		}
+		for (Business business : this.businesses) {
+			business.applyInflation(monthlyInflationRate, iteration);
+		}
+		for (AuthorisedDepositTakingInstitution adi : this.adis) {
+			adi.applyInflation(monthlyInflationRate, iteration);
+		}
+		rba.applyInflation(monthlyInflationRate, iteration);
+		government.applyInflation(monthlyInflationRate, iteration);
 	}
 
 	/**
