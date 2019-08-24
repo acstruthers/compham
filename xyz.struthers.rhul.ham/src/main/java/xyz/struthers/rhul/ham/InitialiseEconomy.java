@@ -8,6 +8,7 @@ import java.util.Date;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import xyz.struthers.rhul.ham.agent.ExogeneousExpenseAgent;
 import xyz.struthers.rhul.ham.data.CalibrateAdis;
 import xyz.struthers.rhul.ham.data.CalibrateBusinesses;
 import xyz.struthers.rhul.ham.data.CalibrateCountries;
@@ -70,7 +71,7 @@ public class InitialiseEconomy {
 		memoryBefore = memoryAfter;
 
 		System.out.println("Started MeshblockMapping: " + new Date(System.currentTimeMillis()));
-		//AreaMapping mb = ctx.getBean(AreaMapping.class);
+		// AreaMapping mb = ctx.getBean(AreaMapping.class);
 		/*
 		 * String gccsa = mb.getGccsaCodeFromLga("10050");
 		 * System.out.println("GCCSA is: " + gccsa + " (should be 1RNSW)"); gccsa =
@@ -163,6 +164,10 @@ public class InitialiseEconomy {
 		System.out.println("MEMORY CONSUMED BY HOUSEHOLDS: " + formatter.format(megabytesAfter - megabytesBefore)
 				+ "MB (CURRENT TOTAL IS: " + formatter.format(megabytesAfter) + "MB)");
 		memoryBefore = memoryAfter;
+
+		ExogeneousExpenseAgent exoExp = new ExogeneousExpenseAgent();
+		AustralianEconomy.setExogeneousExpenseAgent(exoExp);
+
 		/*
 		 * System.out.println(new Date(System.currentTimeMillis()) +
 		 * ": Starting export of agents to CSV"); AustralianEconomy auEconomy =
@@ -198,7 +203,7 @@ public class InitialiseEconomy {
 	public AustralianEconomy getEconomy() {
 		return economy;
 	}
-	
+
 	public void close() {
 		this.economy = null;
 	}

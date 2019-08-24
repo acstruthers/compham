@@ -885,11 +885,15 @@ public class AustralianEconomy implements Serializable {
 					this.reassignCustomersToAnotherAdi(
 							this.adis[cpvIdx - 2 - this.households.length - this.businesses.length]);
 				}
-			} else {
+			} else if (cpvIdx < (this.adis.length + this.businesses.length + this.households.length
+					+ this.countries.length + 2)) {
 				// foreign countries
 				this.countries[cpvIdx - 2 - this.households.length - this.businesses.length - this.adis.length]
 						.processClearingPaymentVectorOutput(equityOfNode.get(cpvIdx), iteration,
 								defaultOrderOfNode.get(cpvIdx));
+			} else {
+				// exogeneous expense
+				// it's a dummy agent, so nothing to update
 			}
 		}
 	}
@@ -1796,8 +1800,15 @@ public class AustralianEconomy implements Serializable {
 	/**
 	 * @param exogeneousExpenseAgent the exogeneousExpenseAgent to set
 	 */
-	public static void setExogeneousExpenseAgent(ExogeneousExpenseAgent exogeneousExpenseAgent) {
-		exogeneousExpenseAgent = exogeneousExpenseAgent;
+	public static void setExogeneousExpenseAgent(ExogeneousExpenseAgent agent) {
+		exogeneousExpenseAgent = agent;
+	}
+
+	public static void setExogeneousExpenseAgentPaymentClearingIndex(int index) {
+		if (exogeneousExpenseAgent == null) {
+			exogeneousExpenseAgent = new ExogeneousExpenseAgent();
+		}
+		exogeneousExpenseAgent.setPaymentClearingIndex(index);
 	}
 
 	/**

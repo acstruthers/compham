@@ -244,7 +244,11 @@ public class CalibrateEconomy {
 			for (int i = 0; i < this.countries.length; i++) {
 				this.countries[i].setPaymentClearingIndex(paymentClearingIdx++);
 			}
-			this.exogeneousExpenseAgent.setPaymentClearingIndex(paymentClearingIdx++);
+			//this.exogeneousExpenseAgent = new ExogeneousExpenseAgent();
+			// this.exogeneousExpenseAgent = AustralianEconomy.getExogeneousExpenseAgent();
+			//this.exogeneousExpenseAgent.setPaymentClearingIndex(paymentClearingIdx++);
+			//AustralianEconomy.setExogeneousExpenseAgent(this.exogeneousExpenseAgent);
+			AustralianEconomy.setExogeneousExpenseAgentPaymentClearingIndex(paymentClearingIdx++);
 			this.indicesAssigned = true;
 		}
 	}
