@@ -261,13 +261,8 @@ public class AustralianEconomy implements Serializable {
 			adi.setGovtBondRate(iteration);
 		}
 
-		// FIXME: HACK apply CPI to non-housing expenses
-		float monthlyInflationRate = 0f;
-		if (this.properties.getScenarioName().equalsIgnoreCase("Inflation-05pc")) {
-			monthlyInflationRate = 0.05f / 12f;
-		} else if (this.properties.getScenarioName().equalsIgnoreCase("Inflation-10pc")) {
-			monthlyInflationRate = 0.10f / 12f;
-		}
+		// apply CPI to non-housing expenses
+		float monthlyInflationRate = this.properties.getInflationRatePerAnnum() / 12f;
 		this.applyInflation(monthlyInflationRate, iteration);
 
 		if (this.properties.isBankCrashScenario()) {

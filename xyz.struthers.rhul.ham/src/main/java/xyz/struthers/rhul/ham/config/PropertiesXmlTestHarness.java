@@ -107,6 +107,7 @@ public class PropertiesXmlTestHarness {
 		// scenario parameters
 		props.setExogeneousIncomeMultiplier(0.5f);
 		props.setExogeneousExpenseMultiplier(0.5f);
+		props.setInflationRatePerAnnum(0.1f);
 		props.setMortgageRentConversionRatio(0.50f);
 		props.setSuperannuationHaircut(0.30f);
 		props.setInvestmentHaircut(0.50f);

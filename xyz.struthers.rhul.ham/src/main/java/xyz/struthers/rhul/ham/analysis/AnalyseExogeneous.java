@@ -52,14 +52,42 @@ public class AnalyseExogeneous {
 				false, 0);
 
 		// append to file
-		/*System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-01_EXOGENEOUS_000.csv");
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-01_EXOGENEOUS_000.csv");
 		processExogeneousDataCsv(
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-01_EXOGENEOUS_000.csv",
 				"Baseline-01", true, 0);
 		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-02_EXOGENEOUS_000.csv");
 		processExogeneousDataCsv(
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-02_EXOGENEOUS_000.csv",
-				"Baseline-02", true, 0);*/
+				"Baseline-02", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-03_EXOGENEOUS_000.csv");
+		processExogeneousDataCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-03_EXOGENEOUS_000.csv",
+				"Baseline-03", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-04_EXOGENEOUS_000.csv");
+		processExogeneousDataCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-04_EXOGENEOUS_000.csv",
+				"Baseline-04", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-05_EXOGENEOUS_000.csv");
+		processExogeneousDataCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-05_EXOGENEOUS_000.csv",
+				"Baseline-05", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-06_EXOGENEOUS_000.csv");
+		processExogeneousDataCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-06_EXOGENEOUS_000.csv",
+				"Baseline-06", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-07_EXOGENEOUS_000.csv");
+		processExogeneousDataCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-07_EXOGENEOUS_000.csv",
+				"Baseline-07", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-08_EXOGENEOUS_000.csv");
+		processExogeneousDataCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-08_EXOGENEOUS_000.csv",
+				"Baseline-08", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-09_EXOGENEOUS_000.csv");
+		processExogeneousDataCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-09_EXOGENEOUS_000.csv",
+				"Baseline-09", true, 0);
 
 		System.out.println(new Date(System.currentTimeMillis()) + ": FINISHED");
 		System.out.println("See " + properties.getOutputDirectory() + "R_GRAPH_Exogeneous.csv for results");

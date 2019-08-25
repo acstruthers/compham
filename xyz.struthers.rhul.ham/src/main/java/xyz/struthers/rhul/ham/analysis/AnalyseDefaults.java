@@ -46,12 +46,12 @@ public class AnalyseDefaults {
 				"Baseline", false, 0);
 
 		// append to file
+
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline_SUMMARY_Household_012.csv");
+		processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_SUMMARY_Household_012.csv",
+				"Baseline", true, 12);
 		/*
 		 * System.out.println(new Date(System.currentTimeMillis()) +
-		 * ": processing Baseline_SUMMARY_Household_012.csv");
-		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_SUMMARY_Household_012.csv"
-		 * , "Baseline", true, 12); System.out.println(new
-		 * Date(System.currentTimeMillis()) +
 		 * ": processing Baseline-01_SUMMARY_Household_000.csv");
 		 * processDefaultsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-01_SUMMARY_Household_000.csv"
 		 * , "Baseline-01", true, 0); System.out.println(new
@@ -146,8 +146,8 @@ public class AnalyseDefaults {
 		 * ": processing FX-Rates-10pc-EUR_SUMMARY_Household_012.csv");
 		 * processDefaultsCsv(
 		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-EUR_SUMMARY_Household_012.csv"
-		 * , "FX-Rates-10pc-EUR", true, 12);
-		 * System.out.println( new Date(System.currentTimeMillis()) +
+		 * , "FX-Rates-10pc-EUR", true, 12); System.out.println( new
+		 * Date(System.currentTimeMillis()) +
 		 * ": processing FX-Rates-10pc-INR_SUMMARY_Household_000.csv");
 		 * processDefaultsCsv(
 		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-INR_SUMMARY_Household_000.csv"
@@ -241,36 +241,32 @@ public class AnalyseDefaults {
 		processDefaultsCsv(
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-01pc_SUMMARY_Household_012.csv",
 				"Inflation-01pc", true, 12);
-		/*System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-02pc_SUMMARY_Household_000.csv");
-		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-02pc_SUMMARY_Household_000.csv",
-				"Inflation-02pc", true, 0);
-		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-02pc_SUMMARY_Household_012.csv");
-		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-02pc_SUMMARY_Household_012.csv",
-				"Inflation-02pc", true, 12);
-		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-03pc_SUMMARY_Household_000.csv");
-		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-03pc_SUMMARY_Household_000.csv",
-				"Inflation-03pc", true, 0);
-		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-03pc_SUMMARY_Household_012.csv");
-		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-03pc_SUMMARY_Household_012.csv",
-				"Inflation-03pc", true, 12);
-		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-04pc_SUMMARY_Household_000.csv");
-		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-04pc_SUMMARY_Household_000.csv",
-				"Inflation-04pc", true, 0);
-		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-04pc_SUMMARY_Household_012.csv");
-		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-04pc_SUMMARY_Household_012.csv",
-				"Inflation-04pc", true, 12);*/
+		/*
+		 * System.out.println( new Date(System.currentTimeMillis()) +
+		 * ": processing Inflation-02pc_SUMMARY_Household_000.csv"); processDefaultsCsv(
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-02pc_SUMMARY_Household_000.csv"
+		 * , "Inflation-02pc", true, 0); System.out.println( new
+		 * Date(System.currentTimeMillis()) +
+		 * ": processing Inflation-02pc_SUMMARY_Household_012.csv"); processDefaultsCsv(
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-02pc_SUMMARY_Household_012.csv"
+		 * , "Inflation-02pc", true, 12); System.out.println( new
+		 * Date(System.currentTimeMillis()) +
+		 * ": processing Inflation-03pc_SUMMARY_Household_000.csv"); processDefaultsCsv(
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-03pc_SUMMARY_Household_000.csv"
+		 * , "Inflation-03pc", true, 0); System.out.println( new
+		 * Date(System.currentTimeMillis()) +
+		 * ": processing Inflation-03pc_SUMMARY_Household_012.csv"); processDefaultsCsv(
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-03pc_SUMMARY_Household_012.csv"
+		 * , "Inflation-03pc", true, 12); System.out.println( new
+		 * Date(System.currentTimeMillis()) +
+		 * ": processing Inflation-04pc_SUMMARY_Household_000.csv"); processDefaultsCsv(
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-04pc_SUMMARY_Household_000.csv"
+		 * , "Inflation-04pc", true, 0); System.out.println( new
+		 * Date(System.currentTimeMillis()) +
+		 * ": processing Inflation-04pc_SUMMARY_Household_012.csv"); processDefaultsCsv(
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-04pc_SUMMARY_Household_012.csv"
+		 * , "Inflation-04pc", true, 12);
+		 */
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing Inflation-05pc_SUMMARY_Household_000.csv");
 		processDefaultsCsv(
@@ -291,26 +287,24 @@ public class AnalyseDefaults {
 		processDefaultsCsv(
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-10pc_SUMMARY_Household_012.csv",
 				"Inflation-10pc", true, 12);
-		/*System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-15pc_SUMMARY_Household_000.csv");
-		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-15pc_SUMMARY_Household_000.csv",
-				"Inflation-15pc", true, 0);
-		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-15pc_SUMMARY_Household_012.csv");
-		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-15pc_SUMMARY_Household_012.csv",
-				"Inflation-15pc", true, 12);
-		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-20pc_SUMMARY_Household_000.csv");
-		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-20pc_SUMMARY_Household_000.csv",
-				"Inflation-20pc", true, 0);
-		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-20pc_SUMMARY_Household_012.csv");
-		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-20pc_SUMMARY_Household_012.csv",
-				"Inflation-20pc", true, 12);
+		/*
+		 * System.out.println( new Date(System.currentTimeMillis()) +
+		 * ": processing Inflation-15pc_SUMMARY_Household_000.csv"); processDefaultsCsv(
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-15pc_SUMMARY_Household_000.csv"
+		 * , "Inflation-15pc", true, 0); System.out.println( new
+		 * Date(System.currentTimeMillis()) +
+		 * ": processing Inflation-15pc_SUMMARY_Household_012.csv"); processDefaultsCsv(
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-15pc_SUMMARY_Household_012.csv"
+		 * , "Inflation-15pc", true, 12); System.out.println( new
+		 * Date(System.currentTimeMillis()) +
+		 * ": processing Inflation-20pc_SUMMARY_Household_000.csv"); processDefaultsCsv(
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-20pc_SUMMARY_Household_000.csv"
+		 * , "Inflation-20pc", true, 0); System.out.println( new
+		 * Date(System.currentTimeMillis()) +
+		 * ": processing Inflation-20pc_SUMMARY_Household_012.csv"); processDefaultsCsv(
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-20pc_SUMMARY_Household_012.csv"
+		 * , "Inflation-20pc", true, 12);
+		 */
 
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing Inflation-25pc_SUMMARY_Household_000.csv");
@@ -331,7 +325,8 @@ public class AnalyseDefaults {
 				new Date(System.currentTimeMillis()) + ": processing Inflation-50pc_SUMMARY_Household_012.csv");
 		processDefaultsCsv(
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-50pc_SUMMARY_Household_012.csv",
-				"Inflation-50pc", true, 12);*/
+				"Inflation-50pc", true, 12);
+
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing Inflation-75pc_SUMMARY_Household_000.csv");
 		processDefaultsCsv(

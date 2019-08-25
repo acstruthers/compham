@@ -37,6 +37,7 @@
     <crashedBankIndustry></crashedBankIndustry>
 	<exogeneousIncomeMultiplier>0.5</exogeneousIncomeMultiplier>
     <exogeneousExpenseMultiplier>0.5</exogeneousExpenseMultiplier>
+	<inflationRatePerAnnum>0.1</inflationRatePerAnnum>
 	<mortgageRentConversionRatio>0.5</mortgageRentConversionRatio>
 	<superannuationHaircut>0.3</superannuationHaircut>
 	<investmentHaircut>0.5</investmentHaircut>

@@ -76,6 +76,7 @@ public class PropertiesXml implements Serializable {
 	// scenario parameters
 	private float exogeneousIncomeMultiplier;// = 0.50f;
 	private float exogeneousExpenseMultiplier;// = 0.50f;
+	private float inflationRatePerAnnum;
 	/**
 	 * In the event of Household default mortgage repayments are switched over to be
 	 * rent payments that are this proportion of the original mortgage repayment
@@ -495,6 +496,20 @@ public class PropertiesXml implements Serializable {
 	 */
 	public void setExogeneousExpenseMultiplier(float exogeneousExpenseMultiplier) {
 		this.exogeneousExpenseMultiplier = exogeneousExpenseMultiplier;
+	}
+
+	/**
+	 * @return the inflationRatePerAnnum
+	 */
+	public float getInflationRatePerAnnum() {
+		return inflationRatePerAnnum;
+	}
+
+	/**
+	 * @param inflationRatePerAnnum the inflationRatePerAnnum to set
+	 */
+	public void setInflationRatePerAnnum(float inflationRatePerAnnum) {
+		this.inflationRatePerAnnum = inflationRatePerAnnum;
 	}
 
 	/**
