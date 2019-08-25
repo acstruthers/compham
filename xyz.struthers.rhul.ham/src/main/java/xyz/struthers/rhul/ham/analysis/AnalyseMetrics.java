@@ -372,6 +372,16 @@ public class AnalyseMetrics {
 		float meanExpenses = 0f;
 		float debtFree = 0f;
 		float mtgCostsOver30pc = 0f;
+		float mtgCostsOver30pcDecile1 = 0f;
+		float mtgCostsOver30pcDecile2 = 0f;
+		float mtgCostsOver30pcDecile3 = 0f;
+		float mtgCostsOver30pcDecile4 = 0f;
+		float mtgCostsOver30pcDecile5 = 0f;
+		float mtgCostsOver30pcDecile6 = 0f;
+		float mtgCostsOver30pcDecile7 = 0f;
+		float mtgCostsOver30pcDecile8 = 0f;
+		float mtgCostsOver30pcDecile9 = 0f;
+		float mtgCostsOver30pcDecile10 = 0f;
 		float mtgCostsOver30pcOwnerOccupied = 0f;
 		float housingCostsOver30pc = 0f; // % of households in mtg distress
 		float housingCostsOver30pcTop1pc = 0f;
@@ -462,6 +472,16 @@ public class AnalyseMetrics {
 		int debtFreeCount = 0;
 		int mtgCostsOver30pcCount = 0;
 		int mtgCostsOver30pcCountOwnerOccupied = 0;
+		int mtgCostsOver30pcCountDecile1 = 0;
+		int mtgCostsOver30pcCountDecile2 = 0;
+		int mtgCostsOver30pcCountDecile3 = 0;
+		int mtgCostsOver30pcCountDecile4 = 0;
+		int mtgCostsOver30pcCountDecile5 = 0;
+		int mtgCostsOver30pcCountDecile6 = 0;
+		int mtgCostsOver30pcCountDecile7 = 0;
+		int mtgCostsOver30pcCountDecile8 = 0;
+		int mtgCostsOver30pcCountDecile9 = 0;
+		int mtgCostsOver30pcCountDecile10 = 0;
 		int housingCostsOver30pcCount = 0;
 		int housingCostsOver30pcCountTop1pc = 0;
 		int housingCostsOver30pcCountTop5pc = 0;
@@ -686,6 +706,9 @@ public class AnalyseMetrics {
 						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile1++;
 						}
+						if (mtgCosts > 0.3f * income) {
+							mtgCostsOver30pcCountDecile1++;
+						}
 					} else if (income > decileThreshold2) {
 						householdCountDecile2++;
 						totalDebtDecile2 += debt;
@@ -694,6 +717,9 @@ public class AnalyseMetrics {
 						totalHousingDecile2 += rentCosts > 0f ? rentCosts : mtgCosts;
 						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile2++;
+						}
+						if (mtgCosts > 0.3f * income) {
+							mtgCostsOver30pcCountDecile2++;
 						}
 					} else if (income > decileThreshold3) {
 						householdCountDecile3++;
@@ -704,6 +730,9 @@ public class AnalyseMetrics {
 						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile3++;
 						}
+						if (mtgCosts > 0.3f * income) {
+							mtgCostsOver30pcCountDecile3++;
+						}
 					} else if (income > decileThreshold4) {
 						householdCountDecile4++;
 						totalDebtDecile4 += debt;
@@ -712,6 +741,9 @@ public class AnalyseMetrics {
 						totalHousingDecile4 += rentCosts > 0f ? rentCosts : mtgCosts;
 						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile4++;
+						}
+						if (mtgCosts > 0.3f * income) {
+							mtgCostsOver30pcCountDecile4++;
 						}
 					} else if (income > decileThreshold5) {
 						householdCountDecile5++;
@@ -722,6 +754,9 @@ public class AnalyseMetrics {
 						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile5++;
 						}
+						if (mtgCosts > 0.3f * income) {
+							mtgCostsOver30pcCountDecile5++;
+						}
 					} else if (income > decileThreshold6) {
 						householdCountDecile6++;
 						totalDebtDecile6 += debt;
@@ -730,6 +765,9 @@ public class AnalyseMetrics {
 						totalHousingDecile6 += rentCosts > 0f ? rentCosts : mtgCosts;
 						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile6++;
+						}
+						if (mtgCosts > 0.3f * income) {
+							mtgCostsOver30pcCountDecile6++;
 						}
 					} else if (income > decileThreshold7) {
 						householdCountDecile7++;
@@ -740,6 +778,9 @@ public class AnalyseMetrics {
 						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile7++;
 						}
+						if (mtgCosts > 0.3f * income) {
+							mtgCostsOver30pcCountDecile7++;
+						}
 					} else if (income > decileThreshold8) {
 						householdCountDecile8++;
 						totalDebtDecile8 += debt;
@@ -748,6 +789,9 @@ public class AnalyseMetrics {
 						totalHousingDecile8 += rentCosts > 0f ? rentCosts : mtgCosts;
 						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile8++;
+						}
+						if (mtgCosts > 0.3f * income) {
+							mtgCostsOver30pcCountDecile8++;
 						}
 					} else if (income > decileThreshold9) {
 						householdCountDecile9++;
@@ -758,6 +802,9 @@ public class AnalyseMetrics {
 						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile9++;
 						}
+						if (mtgCosts > 0.3f * income) {
+							mtgCostsOver30pcCountDecile9++;
+						}
 					} else {
 						householdCountDecile10++;
 						totalDebtDecile10 += debt;
@@ -766,6 +813,9 @@ public class AnalyseMetrics {
 						totalHousingDecile10 += rentCosts > 0f ? rentCosts : mtgCosts;
 						if (housingCosts > 0.3f * income) {
 							housingCostsOver30pcCountDecile10++;
+						}
+						if (mtgCosts > 0.3f * income) {
+							mtgCostsOver30pcCountDecile10++;
 						}
 					}
 				} catch (NumberFormatException e) {
@@ -791,6 +841,16 @@ public class AnalyseMetrics {
 		mtgCostsOver30pc = Float.valueOf(mtgCostsOver30pcCount) / Float.valueOf(householdCount);
 		mtgCostsOver30pcOwnerOccupied = Float.valueOf(mtgCostsOver30pcCountOwnerOccupied)
 				/ Float.valueOf(householdCount);
+		mtgCostsOver30pcDecile1 = Float.valueOf(mtgCostsOver30pcCountDecile1) / Float.valueOf(householdCountDecile1);
+		mtgCostsOver30pcDecile2 = Float.valueOf(mtgCostsOver30pcCountDecile2) / Float.valueOf(householdCountDecile2);
+		mtgCostsOver30pcDecile3 = Float.valueOf(mtgCostsOver30pcCountDecile3) / Float.valueOf(householdCountDecile3);
+		mtgCostsOver30pcDecile4 = Float.valueOf(mtgCostsOver30pcCountDecile4) / Float.valueOf(householdCountDecile4);
+		mtgCostsOver30pcDecile5 = Float.valueOf(mtgCostsOver30pcCountDecile5) / Float.valueOf(householdCountDecile5);
+		mtgCostsOver30pcDecile6 = Float.valueOf(mtgCostsOver30pcCountDecile6) / Float.valueOf(householdCountDecile6);
+		mtgCostsOver30pcDecile7 = Float.valueOf(mtgCostsOver30pcCountDecile7) / Float.valueOf(householdCountDecile7);
+		mtgCostsOver30pcDecile8 = Float.valueOf(mtgCostsOver30pcCountDecile8) / Float.valueOf(householdCountDecile8);
+		mtgCostsOver30pcDecile9 = Float.valueOf(mtgCostsOver30pcCountDecile9) / Float.valueOf(householdCountDecile9);
+		mtgCostsOver30pcDecile10 = Float.valueOf(mtgCostsOver30pcCountDecile10) / Float.valueOf(householdCountDecile10);
 		housingCostsOver30pc = Float.valueOf(housingCostsOver30pcCount) / Float.valueOf(householdCount);
 		housingCostsOver30pcTop5pc = Float.valueOf(housingCostsOver30pcCountTop5pc)
 				/ Float.valueOf(householdCountTop5pc);
@@ -926,6 +986,46 @@ public class AnalyseMetrics {
 					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator()
 					+ "mtgCostsOver30pcCountOwnerOccupied" + properties.getCsvSeparator()
 					+ mtgCostsOver30pcCountOwnerOccupied).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "mtgCostsOver30pcCountDecile1"
+					+ properties.getCsvSeparator() + mtgCostsOver30pcCountDecile1).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "mtgCostsOver30pcCountDecile2"
+					+ properties.getCsvSeparator() + mtgCostsOver30pcCountDecile2).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "mtgCostsOver30pcCountDecile3"
+					+ properties.getCsvSeparator() + mtgCostsOver30pcCountDecile3).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "mtgCostsOver30pcCountDecile4"
+					+ properties.getCsvSeparator() + mtgCostsOver30pcCountDecile4).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "mtgCostsOver30pcCountDecile5"
+					+ properties.getCsvSeparator() + mtgCostsOver30pcCountDecile5).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "mtgCostsOver30pcCountDecile6"
+					+ properties.getCsvSeparator() + mtgCostsOver30pcCountDecile6).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "mtgCostsOver30pcCountDecile7"
+					+ properties.getCsvSeparator() + mtgCostsOver30pcCountDecile7).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "mtgCostsOver30pcCountDecile8"
+					+ properties.getCsvSeparator() + mtgCostsOver30pcCountDecile8).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "mtgCostsOver30pcCountDecile9"
+					+ properties.getCsvSeparator() + mtgCostsOver30pcCountDecile9).split(properties.getCsvSeparator());
+			csvWriter.writeNext(entries);
+			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+					+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "mtgCostsOver30pcCountDecile10"
+					+ properties.getCsvSeparator() + mtgCostsOver30pcCountDecile10).split(properties.getCsvSeparator());
 			csvWriter.writeNext(entries);
 
 			entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
