@@ -124,6 +124,19 @@ public class AnalyseHomeOwnership {
 		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-09_SUMMARY_Household_012.csv"
 		 * , "Baseline", true, 12);
 		 */
+		
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Inflation-05pc_SUMMARY_Household_000.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-05pc_SUMMARY_Household_000.csv", "Inflation-05pc",
+				true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Inflation-05pc_SUMMARY_Household_012.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-05pc_SUMMARY_Household_012.csv", "Inflation-05pc",
+				true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Inflation-10pc_SUMMARY_Household_000.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-10pc_SUMMARY_Household_000.csv", "Inflation-10pc",
+				true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Inflation-10pc_SUMMARY_Household_012.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-10pc_SUMMARY_Household_012.csv", "Inflation-10pc",
+				true, 12);
 	}
 
 	private static void processCsv(String inFileResourceLocation, String scenario, boolean append, int iteration) {

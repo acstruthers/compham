@@ -270,7 +270,7 @@ public class AnalyseDefaults {
 				new Date(System.currentTimeMillis()) + ": processing Inflation-04pc_SUMMARY_Household_012.csv");
 		processDefaultsCsv(
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-04pc_SUMMARY_Household_012.csv",
-				"Inflation-04pc", true, 12);
+				"Inflation-04pc", true, 12);*/
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing Inflation-05pc_SUMMARY_Household_000.csv");
 		processDefaultsCsv(
@@ -291,7 +291,7 @@ public class AnalyseDefaults {
 		processDefaultsCsv(
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-10pc_SUMMARY_Household_012.csv",
 				"Inflation-10pc", true, 12);
-		System.out.println(
+		/*System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing Inflation-15pc_SUMMARY_Household_000.csv");
 		processDefaultsCsv(
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-15pc_SUMMARY_Household_000.csv",

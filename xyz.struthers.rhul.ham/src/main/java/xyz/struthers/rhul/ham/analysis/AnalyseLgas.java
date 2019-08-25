@@ -46,15 +46,34 @@ public class AnalyseLgas {
 
 		// overwrite existing file
 		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline_SUMMARY_Household_000.csv");
-		processLgaMetricsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_SUMMARY_Household_000.csv",
+		processLgaMetricsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_SUMMARY_Household_000.csv",
 				"Baseline", false, 0);
 
 		// append to file
 		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline_SUMMARY_Household_012.csv");
-		processLgaMetricsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_SUMMARY_Household_012.csv",
+		processLgaMetricsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_SUMMARY_Household_012.csv",
 				"Baseline", true, 12);
+
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-05pc_SUMMARY_Household_000.csv");
+		processLgaMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-05pc_SUMMARY_Household_000.csv",
+				"Inflation-05pc", true, 0);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-05pc_SUMMARY_Household_012.csv");
+		processLgaMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-05pc_SUMMARY_Household_012.csv",
+				"Inflation-05pc", true, 12);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-10pc_SUMMARY_Household_000.csv");
+		processLgaMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-10pc_SUMMARY_Household_000.csv",
+				"Inflation-10pc", true, 0);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-10pc_SUMMARY_Household_012.csv");
+		processLgaMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-10pc_SUMMARY_Household_012.csv",
+				"Inflation-10pc", true, 12);
 	}
 
 	/**
@@ -212,9 +231,12 @@ public class AnalyseLgas {
 
 		// calculate ratios for each LGA
 		for (String lga : lgaHouseholdCount.keySet()) {
-			housingCostsOver30pc.put(lga, Float.valueOf(lgaHousingCostsOver30pcCount.get(lga)) / Float.valueOf(lgaHouseholdCount.get(lga)));
-			incomeEarnedTop5pc.put(lga, Float.valueOf(lgaTotalIncomeTop5pc.get(lga)) / Float.valueOf(lgaTotalIncome.get(lga)));
-			incomeEarnedTop5pcAU.put(lga, Float.valueOf(nationalTotalIncomeTop5pc.get(lga)) / Float.valueOf(lgaTotalIncome.get(lga)));
+			housingCostsOver30pc.put(lga,
+					Float.valueOf(lgaHousingCostsOver30pcCount.get(lga)) / Float.valueOf(lgaHouseholdCount.get(lga)));
+			incomeEarnedTop5pc.put(lga,
+					Float.valueOf(lgaTotalIncomeTop5pc.get(lga)) / Float.valueOf(lgaTotalIncome.get(lga)));
+			incomeEarnedTop5pcAU.put(lga,
+					Float.valueOf(nationalTotalIncomeTop5pc.get(lga)) / Float.valueOf(lgaTotalIncome.get(lga)));
 		}
 
 		// write LGA metrics to file
