@@ -589,22 +589,24 @@ public class Household extends Agent {
 	}
 
 	public void applyInflation(float monthlyInflationRate, int iteration) {
-		// changes in domestic income are delayed by 12 months
-		if ((iteration % 12) == 0) {
-			// TODO: increase income
-
-			// re-calculate income tax expense
-		}
+		// changes in wage expenses are delayed
+		// EBAs last for 3 years on average, so divide the rate by 3
+		// TODO: increase income
+		this.pnlWagesSalaries = this.pnlWagesSalaries * (1f + monthlyInflationRate / 36f);
+		this.pnlUnemploymentBenefits = this.pnlUnemploymentBenefits * (1f + monthlyInflationRate / 36f);
+		this.pnlOtherSocialSecurityIncome = this.pnlOtherSocialSecurityIncome * (1f + monthlyInflationRate / 36f);
+		// shares are an inflation hedge, so increase investment income at inflation
+		this.pnlInvestmentIncome = this.pnlInvestmentIncome * (1f + monthlyInflationRate);
 
 		// N.B. Foreign income responds to FX rates, not inflation
 
 		// mortgages never respond to inflation - only interest rates
 
-		// rent responds to inflation, but with a 12 month lag
-		if ((iteration % 12) == 0) {
-			// TODO: increase rent income & expense
-
-			// re-calculate income tax expense
+		// rent responds to inflation, but with a 6 month lag
+		if (iteration >= 6) {
+			// increase rent income & expense
+			this.pnlRentIncome = this.pnlRentIncome * (1f + monthlyInflationRate);
+			this.pnlRentExpense = this.pnlRentExpense * (1f + monthlyInflationRate);
 		}
 
 		// N.B. Donations do not respond to inflation

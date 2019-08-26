@@ -612,41 +612,40 @@ public class Business extends Agent implements Employer {
 
 		// interest income responds to interest rates, not inflation
 
-		// rent responds to inflation, but with a 12 month lag
-		if ((iteration % 12) == 0) {
-			// TODO: increase rent income & expense
-
-			// re-calculate income tax expense
+		// rent responds to inflation, but with a 6 month lag
+		if (iteration >= 6) {
+			// increase rent income & expense
+			this.rentIncome = this.rentIncome * (1f + monthlyInflationRate);
+			this.rentExpense = this.rentExpense * (1f + monthlyInflationRate);
 		}
 
 		this.otherIncome = this.otherIncome * (1f + monthlyInflationRate);
 		this.totalIncome = this.salesDomestic + this.salesGovernment + this.salesForeign + this.interestIncome
 				+ this.rentIncome + this.otherIncome;
 
-		// changes in wage expenses are delayed by 12 months
-		if ((iteration % 12) == 0) {
-			// TODO: increase wage expenses
-			// TODO: increase superannuation expenses
-			// TODO: increase payroll tax expenses
-
-			// re-calculate income tax expense
-		}
+		// changes in wage expenses are delayed
+		// EBAs last for 3 years on average, so divide the rate by 3
+		// increase wage expenses
+		this.wageExpenses = this.wageExpenses * (1f + monthlyInflationRate / 36f);
+		// increase superannuation expenses
+		this.superannuationExpense = this.superannuationExpense * (1f + monthlyInflationRate / 36f);
+		// increase payroll tax expenses
+		this.payrollTaxExpense = this.payrollTaxExpense * (1f + monthlyInflationRate / 36f);
 
 		// Foreign expenses respond to FX rates, not inflation
 		// Interest expense responds to interest rates, not inflation
 		// mortgages never respond to inflation - only interest rates
-		// Depreciation expense responds to inflation with a 12 month lag
-		if ((iteration % 12) == 0) {
-			// TODO increase depreciation 20% at a time, assuming 5 year life of assets
 
-		}
+		// Depreciation expense responds to inflation with a lag
+		// increase depreciation 20% at a time, assuming 5 year life of assets
+		this.depreciationExpense = this.depreciationExpense * (1f + monthlyInflationRate * 0.2f);
 
 		// N.B. Donations do not respond to inflation
 
 		// increase living expenses, work expenses & other expenses by inflation rate
 		this.otherExpenses = this.otherExpenses * (1f + monthlyInflationRate);
 
-		// TODO re-calculate income tax expense
+		// re-calculate income tax expense during CPV input preparation
 	}
 
 	private int makeBusinessBankrupt(int iteration) {

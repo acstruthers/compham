@@ -366,20 +366,15 @@ public final class AustralianGovernment extends Agent implements Employer {
 
 		this.pnlOtherIncome = this.pnlOtherIncome * (1f + monthlyInflationRate);
 
-		// changes in wages are delayed by 12 months
-		if ((iteration % 12) == 0) {
-			// TODO: increase personnel expenses
+		// changes in wage expenses are delayed
+		// EBAs last for 3 years on average, so divide the rate by 3
+		// increase personnel expenses
+		this.pnlPersonnelExpenses = this.pnlPersonnelExpenses * (1f + monthlyInflationRate / 36f);
 
-			// re-calculate income tax expense
-		}
+		// Depreciation expense responds to inflation with a lag
+		// increase depreciation 20% at a time, assuming 5 year life of assets
+		this.pnlDepreciationAmortisation = this.pnlDepreciationAmortisation * (1f + monthlyInflationRate * 0.2f);
 
-		// Depreciation expense responds to inflation with a 12 month lag
-		if ((iteration % 12) == 0) {
-			// TODO increase depreciation 20% at a time, assuming 5 year life of assets
-
-		}
-
-		this.pnlDepreciationAmortisation = this.pnlDepreciationAmortisation * (1f + monthlyInflationRate);
 		this.pnlOtherExpenses = this.pnlOtherExpenses * (1f + monthlyInflationRate);
 		this.pnlNetAcquisitionOfNonFinancialAssets = this.pnlNetAcquisitionOfNonFinancialAssets
 				* (1f + monthlyInflationRate);

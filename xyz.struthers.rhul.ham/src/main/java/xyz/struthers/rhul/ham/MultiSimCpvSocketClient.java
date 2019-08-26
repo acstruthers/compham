@@ -146,11 +146,11 @@ public class MultiSimCpvSocketClient {
 		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_04pc.xml" });
 		appendToFile(progressFilename,
 				new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_05pc.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_05pc.xml" });
+		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_05pc.xml" });*/
 		appendToFile(progressFilename,
 				new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_10pc.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_10pc.xml" });
-		appendToFile(progressFilename,
+		/*appendToFile(progressFilename,
 				new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_15pc.xml");
 		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_15pc.xml" });
 		appendToFile(progressFilename,
