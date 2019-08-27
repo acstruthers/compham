@@ -122,6 +122,32 @@ public class AnalyseMetrics {
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-09_SUMMARY_Household_012.csv",
 				"Baseline-09", true, 12);
 
+		// ADI failure
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing ADI-CBA_SUMMARY_Household_000.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\ADI-CBA_SUMMARY_Household_000.csv",
+				"ADI-CBA", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing ADI-CBA_SUMMARY_Household_012.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\ADI-CBA_SUMMARY_Household_012.csv",
+				"ADI-CBA", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing ADI-CBA-no-limit_SUMMARY_Household_000.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\ADI-CBA-no-limit_SUMMARY_Household_000.csv",
+				"ADI-CBA-no-limit", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing ADI-CBA-no-limit_SUMMARY_Household_012.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\ADI-CBA-no-limit_SUMMARY_Household_012.csv",
+				"ADI-CBA-no-limit", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing ADI-Mutuals_SUMMARY_Household_000.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\ADI-Mutuals_SUMMARY_Household_000.csv",
+				"ADI-Mutuals", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing ADI-Mutuals_SUMMARY_Household_012.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\ADI-Mutuals_SUMMARY_Household_012.csv",
+				"ADI-Mutuals", true, 12);
+		
 		// country currency crashes
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing FX-Rates-10pc-CNY_SUMMARY_Household_000.csv");

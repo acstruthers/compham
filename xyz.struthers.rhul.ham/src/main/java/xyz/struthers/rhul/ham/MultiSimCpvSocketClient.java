@@ -34,10 +34,11 @@ public class MultiSimCpvSocketClient {
 		appendToFile(progressFilename, new Date(System.currentTimeMillis()) + ": STARTED");
 
 		// baseline (exogeneous cash flow histograms)
-		/*appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline.xml" });
-		System.gc();*/
+		/*
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.1_baseline.xml"); CpvSocketClient.main(new
+		 * String[] { "D:/compham-config/4.1_baseline.xml" }); System.gc();
+		 */
 
 		// using different random seeds (model error box plots)
 		/*
@@ -81,90 +82,97 @@ public class MultiSimCpvSocketClient {
 		 */
 
 		// effect of ADI failure on Govt bal sht
-		/*
-		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
-		 * ": Running simulation for 04_ADI_Failure_Major-Bank-with-FCS-limit.xml");
-		 * CpvSocketClient.main(new String[] {
-		 * "D:/compham-config/04_ADI_Failure_Major-Bank-with-FCS-limit.xml" });
-		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
-		 * ": Running simulation for 04_ADI_Failure_Major-Bank-without-FCS-limit.xml");
-		 * CpvSocketClient.main(new String[] {
-		 * "D:/compham-config/04_ADI_Failure_Major-Bank-without-FCS-limit.xml" });
-		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
-		 * ": Running simulation for 04_ADI_Failure_Mutual-ADIs-with-FCS-limit.xml");
-		 * CpvSocketClient.main(new String[] {
-		 * "D:/compham-config/04_ADI_Failure_Mutual-ADIs-with-FCS-limit.xml" });
-		 * System.gc();
-		 */
+		appendToFile(progressFilename, new Date(System.currentTimeMillis())
+				+ ": Running simulation for 4.2_adi-crash-CBA.xml");
+		CpvSocketClient.main(new String[] { "D:/compham-config/4.2_adi-crash-CBA.xml" });
+		appendToFile(progressFilename, new Date(System.currentTimeMillis())
+				+ ": Running simulation for 4.2_adi-crash-CBA-no-limit.xml");
+		CpvSocketClient.main(new String[] { "D:/compham-config/4.2_adi-crash-CBA-no-limit.xml" });
+		appendToFile(progressFilename, new Date(System.currentTimeMillis())
+				+ ": Running simulation for 4.2_adi-crash-mutuals.xml");
+		CpvSocketClient.main(new String[] { "D:/compham-config/4.2_adi-crash-mutuals.xml" });
+		System.gc();
 
 		// 10% change in FX rates by country
-		/*appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.3_FX_Rates_10pc-country-CNY.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.3_FX_Rates_10pc-country-CNY.xml" });
-		appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.3_FX_Rates_10pc-country-JPY.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.3_FX_Rates_10pc-country-JPY.xml" });
-
-		appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.3_FX_Rates_10pc-country-KRW.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.3_FX_Rates_10pc-country-KRW.xml" });
-		appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.3_FX_Rates_10pc-country-USD.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.3_FX_Rates_10pc-country-USD.xml" });
-		appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.3_FX_Rates_10pc-country-INR.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.3_FX_Rates_10pc-country-INR.xml" });
-		appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.3_FX_Rates_10pc-country-THB.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.3_FX_Rates_10pc-country-THB.xml" });
-		appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.3_FX_Rates_10pc-country-MYR.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.3_FX_Rates_10pc-country-MYR.xml" });
-		appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.3_FX_Rates_10pc-country-SGD.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.3_FX_Rates_10pc-country-SGD.xml" });
-		appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.3_FX_Rates_10pc-country-EUR.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.3_FX_Rates_10pc-country-EUR.xml" });
-		appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.3_FX_Rates_10pc-country-NZD.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.3_FX_Rates_10pc-country-NZD.xml" });
-		System.gc();*/
+		/*
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.3_FX_Rates_10pc-country-CNY.xml");
+		 * CpvSocketClient.main(new String[] {
+		 * "D:/compham-config/4.3_FX_Rates_10pc-country-CNY.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.3_FX_Rates_10pc-country-JPY.xml");
+		 * CpvSocketClient.main(new String[] {
+		 * "D:/compham-config/4.3_FX_Rates_10pc-country-JPY.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.3_FX_Rates_10pc-country-KRW.xml");
+		 * CpvSocketClient.main(new String[] {
+		 * "D:/compham-config/4.3_FX_Rates_10pc-country-KRW.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.3_FX_Rates_10pc-country-USD.xml");
+		 * CpvSocketClient.main(new String[] {
+		 * "D:/compham-config/4.3_FX_Rates_10pc-country-USD.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.3_FX_Rates_10pc-country-INR.xml");
+		 * CpvSocketClient.main(new String[] {
+		 * "D:/compham-config/4.3_FX_Rates_10pc-country-INR.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.3_FX_Rates_10pc-country-THB.xml");
+		 * CpvSocketClient.main(new String[] {
+		 * "D:/compham-config/4.3_FX_Rates_10pc-country-THB.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.3_FX_Rates_10pc-country-MYR.xml");
+		 * CpvSocketClient.main(new String[] {
+		 * "D:/compham-config/4.3_FX_Rates_10pc-country-MYR.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.3_FX_Rates_10pc-country-SGD.xml");
+		 * CpvSocketClient.main(new String[] {
+		 * "D:/compham-config/4.3_FX_Rates_10pc-country-SGD.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.3_FX_Rates_10pc-country-EUR.xml");
+		 * CpvSocketClient.main(new String[] {
+		 * "D:/compham-config/4.3_FX_Rates_10pc-country-EUR.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.3_FX_Rates_10pc-country-NZD.xml");
+		 * CpvSocketClient.main(new String[] {
+		 * "D:/compham-config/4.3_FX_Rates_10pc-country-NZD.xml" }); System.gc();
+		 */
 
 		// Proxying various inflation rates by changing FX rates uniformly
-		/*appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_01pc.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_01pc.xml" });
-		appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_02pc.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_02pc.xml" });
-		appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_03pc.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_03pc.xml" });
-		appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_04pc.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_04pc.xml" });
-		appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_05pc.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_05pc.xml" });*/
-		appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_10pc.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_10pc.xml" });
-		/*appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_15pc.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_15pc.xml" });
-		appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_20pc.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_20pc.xml" });*/
-		appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_25pc.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_25pc.xml" });
-		appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_50pc.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_50pc.xml" });
-		appendToFile(progressFilename,
-				new Date(System.currentTimeMillis()) + ": Running simulation for 4.5_Inflation_75pc.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.5_Inflation_75pc.xml" });
+		/*
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.5_Inflation_01pc.xml"); CpvSocketClient.main(new
+		 * String[] { "D:/compham-config/4.5_Inflation_01pc.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.5_Inflation_02pc.xml"); CpvSocketClient.main(new
+		 * String[] { "D:/compham-config/4.5_Inflation_02pc.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.5_Inflation_03pc.xml"); CpvSocketClient.main(new
+		 * String[] { "D:/compham-config/4.5_Inflation_03pc.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.5_Inflation_04pc.xml"); CpvSocketClient.main(new
+		 * String[] { "D:/compham-config/4.5_Inflation_04pc.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.5_Inflation_05pc.xml"); CpvSocketClient.main(new
+		 * String[] { "D:/compham-config/4.5_Inflation_05pc.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.5_Inflation_10pc.xml"); CpvSocketClient.main(new
+		 * String[] { "D:/compham-config/4.5_Inflation_10pc.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.5_Inflation_15pc.xml"); CpvSocketClient.main(new
+		 * String[] { "D:/compham-config/4.5_Inflation_15pc.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.5_Inflation_20pc.xml"); CpvSocketClient.main(new
+		 * String[] { "D:/compham-config/4.5_Inflation_20pc.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.5_Inflation_25pc.xml"); CpvSocketClient.main(new
+		 * String[] { "D:/compham-config/4.5_Inflation_25pc.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.5_Inflation_50pc.xml"); CpvSocketClient.main(new
+		 * String[] { "D:/compham-config/4.5_Inflation_50pc.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.5_Inflation_75pc.xml"); CpvSocketClient.main(new
+		 * String[] { "D:/compham-config/4.5_Inflation_75pc.xml" });
+		 */
 		System.gc();
 
 		// 10% change in FX rates
