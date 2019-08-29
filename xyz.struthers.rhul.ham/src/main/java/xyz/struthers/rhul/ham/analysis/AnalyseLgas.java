@@ -45,35 +45,47 @@ public class AnalyseLgas {
 		properties = PropertiesXmlFactory.getProperties();
 
 		// overwrite existing file
-		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline_SUMMARY_Household_000.csv");
-		processLgaMetricsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_SUMMARY_Household_000.csv",
-				"Baseline", false, 0);
+		/*
+		 * System.out.println(new Date(System.currentTimeMillis()) +
+		 * ": processing Baseline_SUMMARY_Household_000.csv");
+		 * processLgaMetricsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_SUMMARY_Household_000.csv"
+		 * , "Baseline", false, 0);
+		 * 
+		 * // append to file System.out.println(new Date(System.currentTimeMillis()) +
+		 * ": processing Baseline_SUMMARY_Household_012.csv");
+		 * processLgaMetricsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_SUMMARY_Household_012.csv"
+		 * , "Baseline", true, 12);
+		 */
 
-		// append to file
-		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline_SUMMARY_Household_012.csv");
-		processLgaMetricsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_SUMMARY_Household_012.csv",
-				"Baseline", true, 12);
+		/*
+		 * System.out.println( new Date(System.currentTimeMillis()) +
+		 * ": processing Inflation-05pc_SUMMARY_Household_000.csv");
+		 * processLgaMetricsCsv(
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-05pc_SUMMARY_Household_000.csv"
+		 * , "Inflation-05pc", true, 0); System.out.println( new
+		 * Date(System.currentTimeMillis()) +
+		 * ": processing Inflation-05pc_SUMMARY_Household_012.csv");
+		 * processLgaMetricsCsv(
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-05pc_SUMMARY_Household_012.csv"
+		 * , "Inflation-05pc", true, 12); System.out.println( new
+		 * Date(System.currentTimeMillis()) +
+		 * ": processing Inflation-10pc_SUMMARY_Household_000.csv");
+		 * processLgaMetricsCsv(
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-10pc_SUMMARY_Household_000.csv"
+		 * , "Inflation-10pc", true, 0); System.out.println( new
+		 * Date(System.currentTimeMillis()) +
+		 * ": processing Inflation-10pc_SUMMARY_Household_012.csv");
+		 * processLgaMetricsCsv(
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-10pc_SUMMARY_Household_012.csv"
+		 * , "Inflation-10pc", true, 12);
+		 */
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-75pc_SUMMARY_Household_012.csv");
+		processLgaMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-75pc_SUMMARY_Household_012.csv",
+				"Inflation-75pc", false, 12); // TODO HACK: change false back to true
 
-		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-05pc_SUMMARY_Household_000.csv");
-		processLgaMetricsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-05pc_SUMMARY_Household_000.csv",
-				"Inflation-05pc", true, 0);
-		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-05pc_SUMMARY_Household_012.csv");
-		processLgaMetricsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-05pc_SUMMARY_Household_012.csv",
-				"Inflation-05pc", true, 12);
-		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-10pc_SUMMARY_Household_000.csv");
-		processLgaMetricsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-10pc_SUMMARY_Household_000.csv",
-				"Inflation-10pc", true, 0);
-		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-10pc_SUMMARY_Household_012.csv");
-		processLgaMetricsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-10pc_SUMMARY_Household_012.csv",
-				"Inflation-10pc", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": FINISHED");
 	}
 
 	/**
@@ -92,6 +104,9 @@ public class AnalyseLgas {
 		TObjectFloatMap<String> housingCostsOver30pc = new TObjectFloatHashMap<String>(NUM_LGAS);
 		TObjectFloatMap<String> incomeEarnedTop5pc = new TObjectFloatHashMap<String>(NUM_LGAS);
 		TObjectFloatMap<String> incomeEarnedTop5pcAU = new TObjectFloatHashMap<String>(NUM_LGAS);
+		TObjectIntMap<String> housingCostsOver30pcRank = new TObjectIntHashMap<String>(NUM_LGAS);
+		TObjectIntMap<String> incomeEarnedTop5pcRank = new TObjectIntHashMap<String>(NUM_LGAS);
+		TObjectIntMap<String> incomeEarnedTop5pcAURank = new TObjectIntHashMap<String>(NUM_LGAS);
 
 		// working variables
 		TObjectIntMap<String> lgaHouseholdCount = new TObjectIntHashMap<String>(NUM_LGAS);
@@ -168,8 +183,8 @@ public class AnalyseLgas {
 			while ((line = reader.readNext()) != null) {
 				try {
 					// update counts in LGA map
-					String lgaCode = line[6];
-					int householdCount = 1;
+					String lgaCode = line[2];
+					int householdCount = 0;
 					int housingCostsOver30pcCount = 0;
 					float totalIncome = 0f;
 					float totalIncomeTop1pc = 0f;
@@ -198,6 +213,7 @@ public class AnalyseLgas {
 					int mtgDistress = housingCosts > (income * 0.3f) ? 1 : 0;
 					housingCostsOver30pcCount += mtgDistress;
 
+					householdCount++;
 					lgaHouseholdCount.put(lgaCode, householdCount);
 					lgaHousingCostsOver30pcCount.put(lgaCode, housingCostsOver30pcCount);
 					lgaTotalIncome.put(lgaCode, totalIncome + income);
@@ -239,6 +255,86 @@ public class AnalyseLgas {
 					Float.valueOf(nationalTotalIncomeTop5pc.get(lga)) / Float.valueOf(lgaTotalIncome.get(lga)));
 		}
 
+		// calculate scale for shading the heat map
+		float minimumScaleHousingCostsOver30pc = 1f;
+		float minimumScaleIncomeEarnedTop5pc = 1f;
+		float minimumScaleIncomeEarnedTop5pcAU = 1f;
+		float maximumScaleHousingCostsOver30pc = 0f;
+		float maximumScaleIncomeEarnedTop5pc = 0f;
+		float maximumScaleIncomeEarnedTop5pcAU = 0f;
+		for (String lga : lgaHouseholdCount.keySet()) {
+			minimumScaleHousingCostsOver30pc = Math.min(minimumScaleHousingCostsOver30pc,
+					housingCostsOver30pc.get(lga));
+			minimumScaleIncomeEarnedTop5pc = Math.min(minimumScaleIncomeEarnedTop5pc, incomeEarnedTop5pc.get(lga));
+			minimumScaleIncomeEarnedTop5pcAU = Math.min(minimumScaleIncomeEarnedTop5pcAU,
+					incomeEarnedTop5pcAU.get(lga));
+			maximumScaleHousingCostsOver30pc = Math.max(maximumScaleHousingCostsOver30pc,
+					housingCostsOver30pc.get(lga));
+			maximumScaleIncomeEarnedTop5pc = Math.max(maximumScaleIncomeEarnedTop5pc, incomeEarnedTop5pc.get(lga));
+			maximumScaleIncomeEarnedTop5pcAU = Math.max(maximumScaleIncomeEarnedTop5pcAU,
+					incomeEarnedTop5pcAU.get(lga));
+		}
+		float[] scaleThresholdHousingCostsOver30pc = new float[9];
+		float[] scaleThresholdIncomeEarnedTop5pc = new float[9];
+		float[] scaleThresholdIncomeEarnedTop5pcAU = new float[9];
+		for (int i = 0; i < 9; i++) {
+			scaleThresholdHousingCostsOver30pc[i] = (maximumScaleHousingCostsOver30pc
+					- minimumScaleHousingCostsOver30pc) * Float.valueOf(i);
+			scaleThresholdIncomeEarnedTop5pc[i] = (maximumScaleIncomeEarnedTop5pc - minimumScaleIncomeEarnedTop5pc)
+					* Float.valueOf(i);
+			scaleThresholdIncomeEarnedTop5pcAU[i] = (maximumScaleIncomeEarnedTop5pcAU
+					- minimumScaleIncomeEarnedTop5pcAU) * Float.valueOf(i);
+		}
+		for (String lga : lgaHouseholdCount.keySet()) {
+			// add rank for housing stress (controls shading in heat map)
+			int rank = 0;
+			float value = housingCostsOver30pc.get(lga);
+			if (value > 0.8) {
+				rank = 5;
+			} else if (value > 0.6) {
+				rank = 4;
+			} else if (value > 0.4) {
+				rank = 3;
+			} else if (value > 0.2) {
+				rank = 2;
+			} else {
+				rank = 1;
+			}
+			housingCostsOver30pcRank.put(lga, rank);
+
+			// add rank for top 5% income (controls shading in heat map)
+			rank = 0;
+			value = incomeEarnedTop5pc.get(lga);
+			if (value > 0.8) {
+				rank = 5;
+			} else if (value > 0.6) {
+				rank = 4;
+			} else if (value > 0.4) {
+				rank = 3;
+			} else if (value > 0.2) {
+				rank = 2;
+			} else {
+				rank = 1;
+			}
+			incomeEarnedTop5pcRank.put(lga, rank);
+
+			// add rank for top 5% income (controls shading in heat map)
+			rank = 0;
+			value = incomeEarnedTop5pcAU.get(lga);
+			if (value > 0.8) {
+				rank = 5;
+			} else if (value > 0.6) {
+				rank = 4;
+			} else if (value > 0.4) {
+				rank = 3;
+			} else if (value > 0.2) {
+				rank = 2;
+			} else {
+				rank = 1;
+			}
+			incomeEarnedTop5pcAURank.put(lga, rank);
+		}
+
 		// write LGA metrics to file
 		// save CSV file in a format that R can graph
 		DecimalFormat wholeNumber = new DecimalFormat("000");
@@ -247,7 +343,7 @@ public class AnalyseLgas {
 		try {
 			writer = new FileWriter(outFilename, append); // overwrites existing file if append == false
 			ICSVWriter csvWriter = new CSVWriterBuilder(writer).build();
-			String[] entries = { "scenario", "iteration", "agentType", "metric", "LGA", "value" };
+			String[] entries = { "scenario", "iteration", "agentType", "metric", "LGA", "value", "rank" };
 			if (!append) {
 				// first file, so write column headers
 				csvWriter.writeNext(entries);
@@ -258,17 +354,20 @@ public class AnalyseLgas {
 				entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
 						+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "housingCostsOver30pc"
 						+ properties.getCsvSeparator() + lga + properties.getCsvSeparator()
-						+ housingCostsOver30pc.get(lga)).split(properties.getCsvSeparator());
+						+ housingCostsOver30pc.get(lga) + properties.getCsvSeparator()
+						+ housingCostsOver30pcRank.get(lga)).split(properties.getCsvSeparator());
 				csvWriter.writeNext(entries);
 				entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
 						+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "incomeEarnedTop5pc"
 						+ properties.getCsvSeparator() + lga + properties.getCsvSeparator()
-						+ incomeEarnedTop5pc.get(lga)).split(properties.getCsvSeparator());
+						+ incomeEarnedTop5pc.get(lga) + properties.getCsvSeparator() + incomeEarnedTop5pcRank.get(lga))
+								.split(properties.getCsvSeparator());
 				csvWriter.writeNext(entries);
 				entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
 						+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "incomeEarnedTop5pcAU"
 						+ properties.getCsvSeparator() + lga + properties.getCsvSeparator()
-						+ incomeEarnedTop5pcAU.get(lga)).split(properties.getCsvSeparator());
+						+ incomeEarnedTop5pcAU.get(lga) + properties.getCsvSeparator()
+						+ incomeEarnedTop5pcAURank.get(lga)).split(properties.getCsvSeparator());
 				csvWriter.writeNext(entries);
 			}
 
