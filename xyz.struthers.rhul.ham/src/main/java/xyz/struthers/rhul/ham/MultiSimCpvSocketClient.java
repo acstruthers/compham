@@ -41,57 +41,50 @@ public class MultiSimCpvSocketClient {
 		 */
 
 		// using different random seeds (model error box plots)
-		/*
-		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
-		 * ": Running simulation for 4.1_baseline_seed-01.xml");
-		 * CpvSocketClient.main(new String[] {
-		 * "D:/compham-config/4.1_baseline_seed-01.xml" });
-		 * 
-		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
-		 * ": Running simulation for 4.1_baseline_seed-02.xml");
-		 * CpvSocketClient.main(new String[] {
-		 * "D:/compham-config/4.1_baseline_seed-02.xml" });
-		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
-		 * ": Running simulation for 4.1_baseline_seed-03.xml");
-		 * CpvSocketClient.main(new String[] {
-		 * "D:/compham-config/4.1_baseline_seed-03.xml" });
-		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
-		 * ": Running simulation for 4.1_baseline_seed-04.xml");
-		 * CpvSocketClient.main(new String[] {
-		 * "D:/compham-config/4.1_baseline_seed-04.xml" });
-		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
-		 * ": Running simulation for 4.1_baseline_seed-05.xml");
-		 * CpvSocketClient.main(new String[] {
-		 * "D:/compham-config/4.1_baseline_seed-05.xml" });
-		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
-		 * ": Running simulation for 4.1_baseline_seed-06.xml");
-		 * CpvSocketClient.main(new String[] {
-		 * "D:/compham-config/4.1_baseline_seed-06.xml" });
-		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
-		 * ": Running simulation for 4.1_baseline_seed-07.xml");
-		 * CpvSocketClient.main(new String[] {
-		 * "D:/compham-config/4.1_baseline_seed-07.xml" });
-		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
-		 * ": Running simulation for 4.1_baseline_seed-08.xml");
-		 * CpvSocketClient.main(new String[] {
-		 * "D:/compham-config/4.1_baseline_seed-08.xml" });
-		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
-		 * ": Running simulation for 4.1_baseline_seed-09.xml");
-		 * CpvSocketClient.main(new String[] {
-		 * "D:/compham-config/4.1_baseline_seed-09.xml" }); System.gc();
-		 */
+
+		appendToFile(progressFilename,
+				new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-01.xml");
+		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline_seed-01.xml" });
+		appendToFile(progressFilename,
+				new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-02.xml");
+		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline_seed-02.xml" });
+		appendToFile(progressFilename,
+				new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-03.xml");
+		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline_seed-03.xml" });
+		appendToFile(progressFilename,
+				new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-04.xml");
+		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline_seed-04.xml" });
+		appendToFile(progressFilename,
+				new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-05.xml");
+		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline_seed-05.xml" });
+		appendToFile(progressFilename,
+				new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-06.xml");
+		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline_seed-06.xml" });
+		appendToFile(progressFilename,
+				new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-07.xml");
+		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline_seed-07.xml" });
+		appendToFile(progressFilename,
+				new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-08.xml");
+		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline_seed-08.xml" });
+		appendToFile(progressFilename,
+				new Date(System.currentTimeMillis()) + ": Running simulation for 4.1_baseline_seed-09.xml");
+		CpvSocketClient.main(new String[] { "D:/compham-config/4.1_baseline_seed-09.xml" });
+		System.gc();
 
 		// effect of ADI failure on Govt bal sht
-		appendToFile(progressFilename, new Date(System.currentTimeMillis())
-				+ ": Running simulation for 4.2_adi-crash-CBA.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.2_adi-crash-CBA.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis())
-				+ ": Running simulation for 4.2_adi-crash-CBA-no-limit.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.2_adi-crash-CBA-no-limit.xml" });
-		appendToFile(progressFilename, new Date(System.currentTimeMillis())
-				+ ": Running simulation for 4.2_adi-crash-mutuals.xml");
-		CpvSocketClient.main(new String[] { "D:/compham-config/4.2_adi-crash-mutuals.xml" });
-		System.gc();
+		/*
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.2_adi-crash-CBA.xml"); CpvSocketClient.main(new
+		 * String[] { "D:/compham-config/4.2_adi-crash-CBA.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.2_adi-crash-CBA-no-limit.xml");
+		 * CpvSocketClient.main(new String[] {
+		 * "D:/compham-config/4.2_adi-crash-CBA-no-limit.xml" });
+		 * appendToFile(progressFilename, new Date(System.currentTimeMillis()) +
+		 * ": Running simulation for 4.2_adi-crash-mutuals.xml");
+		 * CpvSocketClient.main(new String[] {
+		 * "D:/compham-config/4.2_adi-crash-mutuals.xml" }); System.gc();
+		 */
 
 		// 10% change in FX rates by country
 		/*

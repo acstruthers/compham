@@ -705,7 +705,7 @@ public class AustralianEconomy implements Serializable {
 		// create CSV file header
 		DecimalFormat wholeNumber = new DecimalFormat("000");
 		DecimalFormat decimalFormat = new DecimalFormat("#,##0.00");
-		String filename = properties.getOutputDirectory() + scenarioName + "_EXOGENEOUS_INCOME_"
+		String filename = properties.getOutputDirectory() + scenarioName + "_EXOGENEOUS_"
 				+ wholeNumber.format(iteration) + ".csv";
 		String[] entries = { "IterationNo", "AgentType", "ExogenousIncome", "TotalIncome", "ExogeneousExpense",
 				"TotalExpense" };

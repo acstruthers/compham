@@ -24,6 +24,8 @@ import xyz.struthers.rhul.ham.config.PropertiesXml;
 import xyz.struthers.rhul.ham.config.PropertiesXmlFactory;
 
 /**
+ * FIXME: add metrics (counts) so I can calcualte the tables
+ * 
  * @author Adam Struthers
  * @since 2019-08-14
  */
