@@ -230,7 +230,7 @@ public class AustralianEconomy implements Serializable {
 
 				// convert ExchangeRateList to Trove List
 				TFloatArrayList newList = new TFloatArrayList(origList.size());
-				for (float ccyRate : origList) {
+				for (float ccyRate : origList) { // FIXME: null pointer exception (15% for 5yrs)
 					newList.add(ccyRate);
 				}
 

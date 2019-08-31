@@ -124,7 +124,7 @@
 				<fxRates>2.11057083564179</fxRates>
 				<fxRates>2.08418870019627</fxRates>
 				<fxRates>2.05813634144382</fxRates>
-				<fxRates>14.9410105162664</fxRates>
+				<fxRates>2.03240963717577</fxRates>
 				<fxRates>2.00700451671107</fxRates>
 				<fxRates>1.98191696025219</fxRates>
 				<fxRates>1.95714299824903</fxRates>
@@ -190,7 +190,7 @@
 				<fxRates>15.5156029935328</fxRates>
 				<fxRates>15.3216579561136</fxRates>
 				<fxRates>15.1301372316622</fxRates>
-				<fxRates>0.941121797566568</fxRates>
+				<fxRates>14.9410105162664</fxRates>
 				<fxRates>14.7542478848131</fxRates>
 				<fxRates>14.5698197862529</fxRates>
 				<fxRates>14.3876970389248</fxRates>
@@ -256,7 +256,7 @@
 				<fxRates>0.97731489872826</fxRates>
 				<fxRates>0.965098462494157</fxRates>
 				<fxRates>0.95303473171298</fxRates>
-				<fxRates>0.212329637842044</fxRates>
+				<fxRates>0.941121797566568</fxRates>
 				<fxRates>0.929357775096986</fxRates>
 				<fxRates>0.917740802908273</fxRates>
 				<fxRates>0.90626904287192</fxRates>
@@ -322,7 +322,7 @@
 				<fxRates>0.220495284501077</fxRates>
 				<fxRates>0.217739093444813</fxRates>
 				<fxRates>0.215017354776753</fxRates>
-				<fxRates>0.829535073114547</fxRates>
+				<fxRates>0.212329637842044</fxRates>
 				<fxRates>0.209675517369018</fxRates>
 				<fxRates>0.207054573401905</fxRates>
 				<fxRates>0.204466391234382</fxRates>
@@ -388,7 +388,7 @@
 				<fxRates>0.861436838535386</fxRates>
 				<fxRates>0.850668878053694</fxRates>
 				<fxRates>0.840035517078022</fxRates>
-				<fxRates>2.11641959615325</fxRates>
+				<fxRates>0.829535073114547</fxRates>
 				<fxRates>0.819165884700615</fxRates>
 				<fxRates>0.808926311141858</fxRates>
 				<fxRates>0.798814732252584</fxRates>
@@ -454,7 +454,7 @@
 				<fxRates>2.19781159954986</fxRates>
 				<fxRates>2.17033895455549</fxRates>
 				<fxRates>2.14320971762355</fxRates>
-				<fxRates>0.731631528012543</fxRates>
+				<fxRates>2.11641959615325</fxRates>
 				<fxRates>2.08996435120134</fxRates>
 				<fxRates>2.06383979681132</fxRates>
 				<fxRates>2.03804179935118</fxRates>
@@ -520,7 +520,7 @@
 				<fxRates>0.759768177248498</fxRates>
 				<fxRates>0.750271075032891</fxRates>
 				<fxRates>0.74089268659498</fxRates>
-				<fxRates>0.550202483659417</fxRates>
+				<fxRates>0.731631528012543</fxRates>
 				<fxRates>0.722486133912386</fxRates>
 				<fxRates>0.713455057238481</fxRates>
 				<fxRates>0.704536869023001</fxRates>
@@ -586,7 +586,7 @@
 				<fxRates>0.571361842843308</fxRates>
 				<fxRates>0.564219819807766</fxRates>
 				<fxRates>0.557167072060169</fxRates>
-				<fxRates>357.381768688739</fxRates>
+				<fxRates>0.550202483659417</fxRates>
 				<fxRates>0.543324952613675</fxRates>
 				<fxRates>0.536533390706004</fxRates>
 				<fxRates>0.529826723322179</fxRates>
@@ -652,7 +652,7 @@
 				<fxRates>371.12574374164</fxRates>
 				<fxRates>366.48667194487</fxRates>
 				<fxRates>361.905588545559</fxRates>
-				<fxRates>4.07766224833496</fxRates>
+				<fxRates>357.381768688739</fxRates>
 				<fxRates>352.91449658013</fxRates>
 				<fxRates>348.503065372879</fxRates>
 				<fxRates>344.146777055718</fxRates>
@@ -696,66 +696,66 @@
 			<key>CNY</key>
 			<value>
 				<fxRates>4.8888</fxRates>
-				<fxRates>5.37768</fxRates>
-				<fxRates>5.310459</fxRates>
-				<fxRates>5.2440782625</fxRates>
-				<fxRates>5.17852728421875</fxRates>
-				<fxRates>5.11379569316602</fxRates>
-				<fxRates>5.04987324700144</fxRates>
-				<fxRates>4.98674983141392</fxRates>
-				<fxRates>4.92441545852125</fxRates>
-				<fxRates>4.86286026528973</fxRates>
-				<fxRates>4.80207451197361</fxRates>
-				<fxRates>4.74204858057394</fxRates>
-				<fxRates>4.68277297331677</fxRates>
-				<fxRates>4.62423831115031</fxRates>
-				<fxRates>4.56643533226093</fxRates>
-				<fxRates>4.50935489060767</fxRates>
-				<fxRates>4.45298795447507</fxRates>
-				<fxRates>4.39732560504413</fxRates>
-				<fxRates>4.34235903498108</fxRates>
-				<fxRates>4.28807954704382</fxRates>
-				<fxRates>4.23447855270577</fxRates>
-				<fxRates>4.18154757079695</fxRates>
-				<fxRates>4.12927822616199</fxRates>
-				<fxRates>12.3991034953451</fxRates>
-				<fxRates>4.02669147023078</fxRates>
-				<fxRates>3.97635782685289</fxRates>
-				<fxRates>3.92665335401723</fxRates>
-				<fxRates>3.87757018709202</fxRates>
-				<fxRates>3.82910055975337</fxRates>
-				<fxRates>3.78123680275645</fxRates>
-				<fxRates>3.73397134272199</fxRates>
-				<fxRates>3.68729670093797</fxRates>
-				<fxRates>3.64120549217624</fxRates>
-				<fxRates>3.59569042352404</fxRates>
-				<fxRates>3.55074429322999</fxRates>
-				<fxRates>3.50635998956462</fxRates>
-				<fxRates>3.46253048969506</fxRates>
-				<fxRates>3.41924885857387</fxRates>
-				<fxRates>3.3765082478417</fxRates>
-				<fxRates>3.33430189474368</fxRates>
-				<fxRates>3.29262312105938</fxRates>
-				<fxRates>3.25146533204614</fxRates>
-				<fxRates>3.21082201539556</fxRates>
-				<fxRates>3.17068674020312</fxRates>
-				<fxRates>3.13105315595058</fxRates>
-				<fxRates>3.0919149915012</fxRates>
-				<fxRates>3.05326605410743</fxRates>
-				<fxRates>3.01510022843109</fxRates>
-				<fxRates>2.9774114755757</fxRates>
-				<fxRates>2.94019383213101</fxRates>
-				<fxRates>2.90344140922937</fxRates>
-				<fxRates>2.867148391614</fxRates>
-				<fxRates>2.83130903671883</fxRates>
-				<fxRates>2.79591767375984</fxRates>
-				<fxRates>2.76096870283784</fxRates>
-				<fxRates>2.72645659405237</fxRates>
-				<fxRates>2.69237588662672</fxRates>
-				<fxRates>2.65872118804388</fxRates>
-				<fxRates>2.62548717319333</fxRates>
-				<fxRates>2.59266858352842</fxRates>
-				<fxRates>2.56026022623431</fxRates>
+				<fxRates>4.82769</fxRates>
+				<fxRates>4.767343875</fxRates>
+				<fxRates>4.7077520765625</fxRates>
+				<fxRates>4.64890517560547</fxRates>
+				<fxRates>4.5907938609104</fxRates>
+				<fxRates>4.53340893764902</fxRates>
+				<fxRates>4.47674132592841</fxRates>
+				<fxRates>4.4207820593543</fxRates>
+				<fxRates>4.36552228361237</fxRates>
+				<fxRates>4.31095325506722</fxRates>
+				<fxRates>4.25706633937888</fxRates>
+				<fxRates>4.20385301013664</fxRates>
+				<fxRates>4.15130484750994</fxRates>
+				<fxRates>4.09941353691606</fxRates>
+				<fxRates>4.04817086770461</fxRates>
+				<fxRates>3.99756873185831</fxRates>
+				<fxRates>3.94759912271008</fxRates>
+				<fxRates>3.8982541336762</fxRates>
+				<fxRates>3.84952595700525</fxRates>
+				<fxRates>3.80140688254268</fxRates>
+				<fxRates>3.7538892965109</fxRates>
+				<fxRates>3.70696568030451</fxRates>
+				<fxRates>3.66062860930071</fxRates>
+				<fxRates>3.61487075168445</fxRates>
+				<fxRates>3.56968486728839</fxRates>
+				<fxRates>3.52506380644729</fxRates>
+				<fxRates>3.4810005088667</fxRates>
+				<fxRates>3.43748800250586</fxRates>
+				<fxRates>3.39451940247454</fxRates>
+				<fxRates>3.35208790994361</fxRates>
+				<fxRates>3.31018681106931</fxRates>
+				<fxRates>3.26880947593095</fxRates>
+				<fxRates>3.22794935748181</fxRates>
+				<fxRates>3.18759999051329</fxRates>
+				<fxRates>3.14775499063187</fxRates>
+				<fxRates>3.10840805324898</fxRates>
+				<fxRates>3.06955295258336</fxRates>
+				<fxRates>3.03118354067607</fxRates>
+				<fxRates>2.99329374641762</fxRates>
+				<fxRates>2.9558775745874</fxRates>
+				<fxRates>2.91892910490506</fxRates>
+				<fxRates>2.88244249109374</fxRates>
+				<fxRates>2.84641195995507</fxRates>
+				<fxRates>2.81083181045564</fxRates>
+				<fxRates>2.77569641282494</fxRates>
+				<fxRates>2.74100020766463</fxRates>
+				<fxRates>2.70673770506882</fxRates>
+				<fxRates>2.67290348375546</fxRates>
+				<fxRates>2.63949219020852</fxRates>
+				<fxRates>2.60649853783091</fxRates>
+				<fxRates>2.57391730610802</fxRates>
+				<fxRates>2.54174333978167</fxRates>
+				<fxRates>2.5099715480344</fxRates>
+				<fxRates>2.47859690368397</fxRates>
+				<fxRates>2.44761444238792</fxRates>
+				<fxRates>2.41701926185808</fxRates>
+				<fxRates>2.38680652108485</fxRates>
+				<fxRates>2.35697143957129</fxRates>
+				<fxRates>2.32750929657665</fxRates>
+				<fxRates>2.29841543036944</fxRates>
 			</value>
 		</entry>
 		<entry>
@@ -784,7 +784,7 @@
 				<fxRates>12.8759408274329</fxRates>
 				<fxRates>12.71499156709</fxRates>
 				<fxRates>12.5560541725013</fxRates>
-				<fxRates>3.58104617793057</fxRates>
+				<fxRates>12.3991034953451</fxRates>
 				<fxRates>12.2441147016533</fxRates>
 				<fxRates>12.0910632678826</fxRates>
 				<fxRates>11.9399249770341</fxRates>
@@ -850,7 +850,7 @@
 				<fxRates>3.71876391745978</fxRates>
 				<fxRates>3.67227936849154</fxRates>
 				<fxRates>3.62637587638539</fxRates>
-				<fxRates>10.0267236836139</fxRates>
+				<fxRates>3.58104617793057</fxRates>
 				<fxRates>3.53628310070644</fxRates>
 				<fxRates>3.49207956194761</fxRates>
 				<fxRates>3.44842856742327</fxRates>
@@ -916,7 +916,7 @@
 				<fxRates>10.4123254468922</fxRates>
 				<fxRates>10.2821713788061</fxRates>
 				<fxRates>10.153644236571</fxRates>
-				<fxRates>0.475025116539922</fxRates>
+				<fxRates>10.0267236836139</fxRates>
 				<fxRates>9.90138963756869</fxRates>
 				<fxRates>9.77762226709908</fxRates>
 				<fxRates>9.65540198876034</fxRates>
@@ -982,7 +982,7 @@
 				<fxRates>0.493293349346481</fxRates>
 				<fxRates>0.48712718247965</fxRates>
 				<fxRates>0.481038092698655</fxRates>
-				<fxRates>1.16639182643012</fxRates>
+				<fxRates>0.475025116539922</fxRates>
 				<fxRates>0.469087302583173</fxRates>
 				<fxRates>0.463223711300883</fxRates>
 				<fxRates>0.457433414909622</fxRates>
@@ -1048,7 +1048,7 @@
 				<fxRates>1.21124822809599</fxRates>
 				<fxRates>1.19610762524479</fxRates>
 				<fxRates>1.18115627992923</fxRates>
-				<fxRates>0.421861838995258</fxRates>
+				<fxRates>1.16639182643012</fxRates>
 				<fxRates>1.15181192859974</fxRates>
 				<fxRates>1.13741427949224</fxRates>
 				<fxRates>1.12319660099859</fxRates>
@@ -1114,7 +1114,7 @@
 				<fxRates>0.438085550160479</fxRates>
 				<fxRates>0.432609480783473</fxRates>
 				<fxRates>0.427201862273679</fxRates>
-				<fxRates>4.34314026397621</fxRates>
+				<fxRates>0.421861838995258</fxRates>
 				<fxRates>0.416588566007818</fxRates>
 				<fxRates>0.41138120893272</fxRates>
 				<fxRates>0.406238943821061</fxRates>
@@ -1180,7 +1180,7 @@
 				<fxRates>4.51016616364186</fxRates>
 				<fxRates>4.45378908659634</fxRates>
 				<fxRates>4.39811672301388</fxRates>
-				<fxRates>155.137972843718</fxRates>
+				<fxRates>4.34314026397621</fxRates>
 				<fxRates>4.28885101067651</fxRates>
 				<fxRates>4.23524037304305</fxRates>
 				<fxRates>4.18229986838001</fxRates>
@@ -1246,7 +1246,7 @@
 				<fxRates>161.104176537725</fxRates>
 				<fxRates>159.090374331004</fxRates>
 				<fxRates>157.101744651866</fxRates>
-				<fxRates>7946.03804653476</fxRates>
+				<fxRates>155.137972843718</fxRates>
 				<fxRates>153.198748183171</fxRates>
 				<fxRates>151.283763830882</fxRates>
 				<fxRates>149.392716782996</fxRates>
@@ -1312,7 +1312,7 @@
 				<fxRates>8251.62204171636</fxRates>
 				<fxRates>8148.47676619491</fxRates>
 				<fxRates>8046.62080661747</fxRates>
-				<fxRates>2.02338760434287</fxRates>
+				<fxRates>7946.03804653476</fxRates>
 				<fxRates>7846.71257095307</fxRates>
 				<fxRates>7748.62866381616</fxRates>
 				<fxRates>7651.77080551846</fxRates>
@@ -1378,7 +1378,7 @@
 				<fxRates>2.10120183884754</fxRates>
 				<fxRates>2.07493681586194</fxRates>
 				<fxRates>2.04900010566367</fxRates>
-				<fxRates>37.9480972670921</fxRates>
+				<fxRates>2.02338760434287</fxRates>
 				<fxRates>1.99809525928859</fxRates>
 				<fxRates>1.97311906854748</fxRates>
 				<fxRates>1.94845508019064</fxRates>
@@ -1444,7 +1444,7 @@
 				<fxRates>39.4074825738961</fxRates>
 				<fxRates>38.9148890417224</fxRates>
 				<fxRates>38.4284529287009</fxRates>
-				<fxRates>61.2650615310473</fxRates>
+				<fxRates>37.9480972670921</fxRates>
 				<fxRates>37.4737460512534</fxRates>
 				<fxRates>37.0053242256128</fxRates>
 				<fxRates>36.5427576727926</fxRates>
@@ -1510,7 +1510,7 @@
 				<fxRates>63.6211567520951</fxRates>
 				<fxRates>62.8258922926939</fxRates>
 				<fxRates>62.0405686390352</fxRates>
-				<fxRates>616.177362313788</fxRates>
+				<fxRates>61.2650615310473</fxRates>
 				<fxRates>60.4992482619092</fxRates>
 				<fxRates>59.7430076586353</fxRates>
 				<fxRates>58.9962200629024</fxRates>
@@ -1576,7 +1576,7 @@
 				<fxRates>639.873944058501</fxRates>
 				<fxRates>631.87551975777</fxRates>
 				<fxRates>623.977075760798</fxRates>
-				<fxRates>0.169746601307325</fxRates>
+				<fxRates>616.177362313788</fxRates>
 				<fxRates>608.475145284865</fxRates>
 				<fxRates>600.869205968805</fxRates>
 				<fxRates>593.358340894194</fxRates>
@@ -1642,7 +1642,7 @@
 				<fxRates>0.176274614927725</fxRates>
 				<fxRates>0.174071182241128</fxRates>
 				<fxRates>0.171895292463114</fxRates>
-				<fxRates>89.2641927725523</fxRates>
+				<fxRates>0.169746601307325</fxRates>
 				<fxRates>0.167624768790984</fxRates>
 				<fxRates>0.165529459181096</fxRates>
 				<fxRates>0.163460340941333</fxRates>
@@ -1708,7 +1708,7 @@
 				<fxRates>92.6970618947929</fxRates>
 				<fxRates>91.5383486211079</fxRates>
 				<fxRates>90.3941192633441</fxRates>
-				<fxRates>5.32914459702594</fxRates>
+				<fxRates>89.2641927725523</fxRates>
 				<fxRates>88.1483903628954</fxRates>
 				<fxRates>87.0465354833592</fxRates>
 				<fxRates>85.9584537898172</fxRates>
@@ -1774,7 +1774,7 @@
 				<fxRates>5.53408966365193</fxRates>
 				<fxRates>5.46491354285628</fxRates>
 				<fxRates>5.39660212357057</fxRates>
-				<fxRates>1822.66333926732</fxRates>
+				<fxRates>5.32914459702594</fxRates>
 				<fxRates>5.26253028956312</fxRates>
 				<fxRates>5.19674866094358</fxRates>
 				<fxRates>5.13178930268178</fxRates>
@@ -1840,7 +1840,7 @@
 				<fxRates>1892.75823962175</fxRates>
 				<fxRates>1869.09876162648</fxRates>
 				<fxRates>1845.73502710615</fxRates>
-				<fxRates>11.375699170932</fxRates>
+				<fxRates>1822.66333926732</fxRates>
 				<fxRates>1799.88004752648</fxRates>
 				<fxRates>1777.3815469324</fxRates>
 				<fxRates>1755.16427759574</fxRates>
@@ -1906,7 +1906,7 @@
 				<fxRates>11.8131790294828</fxRates>
 				<fxRates>11.6655142916142</fxRates>
 				<fxRates>11.5196953629691</fxRates>
-				<fxRates>2.23413058042271</fxRates>
+				<fxRates>11.375699170932</fxRates>
 				<fxRates>11.2335029312953</fxRates>
 				<fxRates>11.0930841446541</fxRates>
 				<fxRates>10.9544205928459</fxRates>
@@ -1972,7 +1972,7 @@
 				<fxRates>2.32004944269404</fxRates>
 				<fxRates>2.29104882466036</fxRates>
 				<fxRates>2.26241071435211</fxRates>
-				<fxRates>4.55633923372289</fxRates>
+				<fxRates>2.23413058042271</fxRates>
 				<fxRates>2.20620394816742</fxRates>
 				<fxRates>2.17862639881533</fxRates>
 				<fxRates>2.15139356883014</fxRates>
@@ -2038,7 +2038,7 @@
 				<fxRates>4.73156421229582</fxRates>
 				<fxRates>4.67241965964213</fxRates>
 				<fxRates>4.6140144138966</fxRates>
-				<fxRates>0.816393260661218</fxRates>
+				<fxRates>4.55633923372289</fxRates>
 				<fxRates>4.49938499330135</fxRates>
 				<fxRates>4.44314268088509</fxRates>
 				<fxRates>4.38760339737403</fxRates>
@@ -2104,7 +2104,7 @@
 				<fxRates>0.847789626091533</fxRates>
 				<fxRates>0.837192255765389</fxRates>
 				<fxRates>0.826727352568322</fxRates>
-				<fxRates>0.216072781848322</fxRates>
+				<fxRates>0.816393260661218</fxRates>
 				<fxRates>0.806188344902953</fxRates>
 				<fxRates>0.796110990591666</fxRates>
 				<fxRates>0.78615960320927</fxRates>
@@ -2170,7 +2170,7 @@
 				<fxRates>0.224382380108553</fxRates>
 				<fxRates>0.221577600357196</fxRates>
 				<fxRates>0.218807880352731</fxRates>
-				<fxRates>1.83589944390677</fxRates>
+				<fxRates>0.216072781848322</fxRates>
 				<fxRates>0.213371872075218</fxRates>
 				<fxRates>0.210704723674278</fxRates>
 				<fxRates>0.208070914628349</fxRates>
@@ -2236,7 +2236,7 @@
 				<fxRates>1.90650337048442</fxRates>
 				<fxRates>1.88267207835336</fxRates>
 				<fxRates>1.85913867737395</fxRates>
-				<fxRates>1.81751019132622</fxRates>
+				<fxRates>1.83589944390677</fxRates>
 				<fxRates>1.81295070085794</fxRates>
 				<fxRates>1.79028881709721</fxRates>
 				<fxRates>1.7679102068835</fxRates>
@@ -2302,7 +2302,7 @@
 				<fxRates>1.88740691498852</fxRates>
 				<fxRates>1.86381432855116</fxRates>
 				<fxRates>1.84051664944427</fxRates>
-				<fxRates>29.810309012575</fxRates>
+				<fxRates>1.81751019132622</fxRates>
 				<fxRates>1.79479131393464</fxRates>
 				<fxRates>1.77235642251046</fxRates>
 				<fxRates>1.75020196722908</fxRates>
@@ -2368,7 +2368,7 @@
 				<fxRates>30.9567361089861</fxRates>
 				<fxRates>30.5697769076238</fxRates>
 				<fxRates>30.1876546962785</fxRates>
-				<fxRates>66.6691753347539</fxRates>
+				<fxRates>29.810309012575</fxRates>
 				<fxRates>29.4376801499178</fxRates>
 				<fxRates>29.0697091480438</fxRates>
 				<fxRates>28.7063377836933</fxRates>
@@ -2434,7 +2434,7 @@
 				<fxRates>69.2330987434949</fxRates>
 				<fxRates>68.3676850092012</fxRates>
 				<fxRates>67.5130889465862</fxRates>
-				<fxRates>2.06968682885582</fxRates>
+				<fxRates>66.6691753347539</fxRates>
 				<fxRates>65.8358106430695</fxRates>
 				<fxRates>65.0128630100311</fxRates>
 				<fxRates>64.2002022224057</fxRates>
@@ -2500,7 +2500,7 @@
 				<fxRates>2.14928161134146</fxRates>
 				<fxRates>2.12241559119969</fxRates>
 				<fxRates>2.09588539630969</fxRates>
-				<fxRates>35.2298199497485</fxRates>
+				<fxRates>2.06968682885582</fxRates>
 				<fxRates>2.04381574349512</fxRates>
 				<fxRates>2.01826804670143</fxRates>
 				<fxRates>1.99303969611767</fxRates>
@@ -2566,7 +2566,7 @@
 				<fxRates>36.5846673676347</fxRates>
 				<fxRates>36.1273590255392</fxRates>
 				<fxRates>35.67576703772</fxRates>
-				<fxRates>2.10822421484725</fxRates>
+				<fxRates>35.2298199497485</fxRates>
 				<fxRates>34.7894472003767</fxRates>
 				<fxRates>34.354579110372</fxRates>
 				<fxRates>33.9251468714923</fxRates>
@@ -2632,7 +2632,7 @@
 				<fxRates>2.18930104515422</fxRates>
 				<fxRates>2.16193478208979</fxRates>
 				<fxRates>2.13491059731367</fxRates>
-				<fxRates>7.58146076226171</fxRates>
+				<fxRates>2.10822421484725</fxRates>
 				<fxRates>2.08187141216165</fxRates>
 				<fxRates>2.05584801950963</fxRates>
 				<fxRates>2.03014991926576</fxRates>
@@ -2698,7 +2698,7 @@
 				<fxRates>7.87302406154076</fxRates>
 				<fxRates>7.7746112607715</fxRates>
 				<fxRates>7.67742862001185</fxRates>
-				<fxRates>4.9426865057612</fxRates>
+				<fxRates>7.58146076226171</fxRates>
 				<fxRates>7.48669250273343</fxRates>
 				<fxRates>7.39310884644927</fxRates>
 				<fxRates>7.30069498586865</fxRates>
@@ -2764,7 +2764,7 @@
 				<fxRates>5.13276939745078</fxRates>
 				<fxRates>5.06860977998265</fxRates>
 				<fxRates>5.00525215773286</fxRates>
-				<fxRates>0.754619029711433</fxRates>
+				<fxRates>4.9426865057612</fxRates>
 				<fxRates>4.88090292443919</fxRates>
 				<fxRates>4.8198916378837</fxRates>
 				<fxRates>4.75964299241015</fxRates>
@@ -2830,7 +2830,7 @@
 				<fxRates>0.783639718586671</fxRates>
 				<fxRates>0.773844222104338</fxRates>
 				<fxRates>0.764171169328034</fxRates>
-				<fxRates>18.3226112889847</fxRates>
+				<fxRates>0.754619029711433</fxRates>
 				<fxRates>0.74518629184004</fxRates>
 				<fxRates>0.73587146319204</fxRates>
 				<fxRates>0.726673069902139</fxRates>
@@ -2896,7 +2896,7 @@
 				<fxRates>19.0272513532604</fxRates>
 				<fxRates>18.7894107113447</fxRates>
 				<fxRates>18.5545430774528</fxRates>
-				<fxRates>2.59741547290643</fxRates>
+				<fxRates>18.3226112889847</fxRates>
 				<fxRates>18.0935786478724</fxRates>
 				<fxRates>17.867408914774</fxRates>
 				<fxRates>17.6440663033393</fxRates>
@@ -2962,7 +2962,7 @@
 				<fxRates>2.69730532904718</fxRates>
 				<fxRates>2.66358901243409</fxRates>
 				<fxRates>2.63029414977866</fxRates>
-				<fxRates>16.8475175317595</fxRates>
+				<fxRates>2.59741547290643</fxRates>
 				<fxRates>2.5649477794951</fxRates>
 				<fxRates>2.53288593225141</fxRates>
 				<fxRates>2.50122485809827</fxRates>
@@ -3028,7 +3028,7 @@
 				<fxRates>17.4954293195079</fxRates>
 				<fxRates>17.2767364530141</fxRates>
 				<fxRates>17.0607772473514</fxRates>
-				<fxRates>1278.3674672134</fxRates>
+				<fxRates>16.8475175317595</fxRates>
 				<fxRates>16.6369235626125</fxRates>
 				<fxRates>16.4289620180799</fxRates>
 				<fxRates>16.2235999928539</fxRates>
@@ -3094,7 +3094,7 @@
 				<fxRates>1327.5301613326</fxRates>
 				<fxRates>1310.93603431594</fxRates>
 				<fxRates>1294.54933388699</fxRates>
-				<fxRates>0.553422231454376</fxRates>
+				<fxRates>1278.3674672134</fxRates>
 				<fxRates>1262.38787387324</fxRates>
 				<fxRates>1246.60802544982</fxRates>
 				<fxRates>1231.0254251317</fxRates>
@@ -3160,7 +3160,7 @@
 				<fxRates>0.574705413779925</fxRates>
 				<fxRates>0.567521596107676</fxRates>
 				<fxRates>0.56042757615633</fxRates>
-				<fxRates>12706.7721117315</fxRates>
+				<fxRates>0.553422231454376</fxRates>
 				<fxRates>0.546504453561196</fxRates>
 				<fxRates>0.539673147891681</fxRates>
 				<fxRates>0.532927233543035</fxRates>
@@ -3226,7 +3226,7 @@
 				<fxRates>13195.4415800911</fxRates>
 				<fxRates>13030.49856034</fxRates>
 				<fxRates>12867.6173283357</fxRates>
-				<fxRates>318.764908090056</fxRates>
+				<fxRates>12706.7721117315</fxRates>
 				<fxRates>12547.9374603349</fxRates>
 				<fxRates>12391.0882420807</fxRates>
 				<fxRates>12236.1996390547</fxRates>
@@ -3292,7 +3292,7 @@
 				<fxRates>331.023778934544</fxRates>
 				<fxRates>326.885981697863</fxRates>
 				<fxRates>322.799906926639</fxRates>
-				<fxRates>57.4263801199068</fxRates>
+				<fxRates>318.764908090056</fxRates>
 				<fxRates>314.780346738931</fxRates>
 				<fxRates>310.845592404694</fxRates>
 				<fxRates>306.960022499635</fxRates>
@@ -3358,7 +3358,7 @@
 				<fxRates>59.6348496191828</fxRates>
 				<fxRates>58.889413998943</fxRates>
 				<fxRates>58.1532963239562</fxRates>
-				<fxRates>7.45996919505812</fxRates>
+				<fxRates>57.4263801199068</fxRates>
 				<fxRates>56.708550368408</fxRates>
 				<fxRates>55.9996934888029</fxRates>
 				<fxRates>55.2996973201928</fxRates>
@@ -3424,7 +3424,7 @@
 				<fxRates>7.74686024405728</fxRates>
 				<fxRates>7.65002449100657</fxRates>
 				<fxRates>7.55439918486899</fxRates>
-				<fxRates></fxRates>
+				<fxRates>7.45996919505812</fxRates>
 				<fxRates>7.3667195801199</fxRates>
 				<fxRates>7.2746355853684</fxRates>
 				<fxRates>7.18370264055129</fxRates>
@@ -3466,69 +3466,69 @@
 		</entry>
 	</exchangeRateCustomPath>
 	<interestRateStrategy>0</interestRateStrategy>
-	<initialCashRate>1.5</initialCashRate>
+	<initialCashRate>0.015</initialCashRate>
 	<interestRateCustomPath>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
-		<cashRate>1.5</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
+		<cashRate>0.015</cashRate>
 	</interestRateCustomPath>
 	<householdSavingRatio>0.011013304</householdSavingRatio>
 	<useActualWages>true</useActualWages>
