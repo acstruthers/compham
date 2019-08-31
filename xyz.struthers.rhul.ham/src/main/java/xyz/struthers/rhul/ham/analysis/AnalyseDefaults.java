@@ -337,6 +337,11 @@ public class AnalyseDefaults {
 		processDefaultsCsv(
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-75pc_SUMMARY_Household_012.csv",
 				"Inflation-75pc", true, 12);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-15pc-5yrs_SUMMARY_Household_060.csv");
+		processDefaultsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-15pc-5yrs_SUMMARY_Household_060.csv",
+				"Inflation-15pc-5yrs", true, 60);
 
 		System.out.println(new Date(System.currentTimeMillis()) + ": FINISHED ANALYSING DEFAULTS");
 	}
