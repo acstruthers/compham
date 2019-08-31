@@ -350,23 +350,73 @@ public class AnalyseLgas {
 			// write metrics to file
 			for (String lga : housingCostsOver30pc.keySet()) {
 				entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
-						+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "housingCostsOver30pc"
+						+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "housingCostsOver30pcCount"
 						+ properties.getCsvSeparator() + lga + properties.getCsvSeparator()
 						+ housingCostsOver30pc.get(lga) + properties.getCsvSeparator()
 						+ housingCostsOver30pcRank.get(lga)).split(properties.getCsvSeparator());
 				csvWriter.writeNext(entries);
 				entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
-						+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "incomeEarnedTop5pc"
+						+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "incomeEarnedTop5pcCount"
 						+ properties.getCsvSeparator() + lga + properties.getCsvSeparator()
 						+ incomeEarnedTop5pc.get(lga) + properties.getCsvSeparator() + incomeEarnedTop5pcRank.get(lga))
 								.split(properties.getCsvSeparator());
 				csvWriter.writeNext(entries);
 				entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
-						+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "incomeEarnedTop5pcAU"
+						+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "incomeEarnedTop5pcAUCount"
 						+ properties.getCsvSeparator() + lga + properties.getCsvSeparator()
 						+ incomeEarnedTop5pcAU.get(lga) + properties.getCsvSeparator()
 						+ incomeEarnedTop5pcAURank.get(lga)).split(properties.getCsvSeparator());
 				csvWriter.writeNext(entries);
+
+				entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+						+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "lgaHouseholdCount"
+						+ properties.getCsvSeparator() + lga + properties.getCsvSeparator()
+						+ lgaHouseholdCount.get(lga) + properties.getCsvSeparator()
+						+ lgaHouseholdCount.get(lga)).split(properties.getCsvSeparator());
+				csvWriter.writeNext(entries);
+				entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+						+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "lgaHousingCostsOver30pcCount"
+						+ properties.getCsvSeparator() + lga + properties.getCsvSeparator()
+						+ lgaHousingCostsOver30pcCount.get(lga) + properties.getCsvSeparator()
+						+ lgaHousingCostsOver30pcCount.get(lga)).split(properties.getCsvSeparator());
+				csvWriter.writeNext(entries);
+				entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+						+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "lgaTotalIncome"
+						+ properties.getCsvSeparator() + lga + properties.getCsvSeparator()
+						+ lgaTotalIncome.get(lga) + properties.getCsvSeparator()
+						+ lgaTotalIncome.get(lga)).split(properties.getCsvSeparator());
+				csvWriter.writeNext(entries);
+				entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+						+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "lgaTotalIncomeTop1pc"
+						+ properties.getCsvSeparator() + lga + properties.getCsvSeparator()
+						+ lgaTotalIncomeTop1pc.get(lga) + properties.getCsvSeparator()
+						+ lgaTotalIncomeTop1pc.get(lga)).split(properties.getCsvSeparator());
+				csvWriter.writeNext(entries);
+				entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+						+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "lgaTotalIncomeTop5pc"
+						+ properties.getCsvSeparator() + lga + properties.getCsvSeparator()
+						+ lgaTotalIncomeTop5pc.get(lga) + properties.getCsvSeparator()
+						+ lgaTotalIncomeTop5pc.get(lga)).split(properties.getCsvSeparator());
+				csvWriter.writeNext(entries);
+				entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+						+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "nationalTotalIncomeTop1pc"
+						+ properties.getCsvSeparator() + lga + properties.getCsvSeparator()
+						+ nationalTotalIncomeTop1pc.get(lga) + properties.getCsvSeparator()
+						+ nationalTotalIncomeTop1pc.get(lga)).split(properties.getCsvSeparator());
+				csvWriter.writeNext(entries);
+				entries = (scenario + properties.getCsvSeparator() + wholeNumber.format(iteration)
+						+ properties.getCsvSeparator() + "H" + properties.getCsvSeparator() + "nationalTotalIncomeTop5pc"
+						+ properties.getCsvSeparator() + lga + properties.getCsvSeparator()
+						+ nationalTotalIncomeTop5pc.get(lga) + properties.getCsvSeparator()
+						+ nationalTotalIncomeTop5pc.get(lga)).split(properties.getCsvSeparator());
+				csvWriter.writeNext(entries);
+
+				/*
+				 *   
+				 *   
+				 * 
+				 * 
+				 */
 			}
 
 			writer.close();
