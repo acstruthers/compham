@@ -131,7 +131,7 @@ public class AnalyseLgas {
 					nationalIncomeList.add(income);
 
 					// update LGA income list
-					String lgaCode = line[0];
+					String lgaCode = line[2];
 					if (!lgaIncomeLists.containsKey(lgaCode)) {
 						lgaIncomeLists.put(lgaCode, new TFloatArrayList());
 					}
