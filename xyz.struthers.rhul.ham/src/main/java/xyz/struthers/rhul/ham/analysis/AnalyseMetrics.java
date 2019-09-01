@@ -262,15 +262,20 @@ public class AnalyseMetrics {
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-50pc_SUMMARY_Household_012.csv",
 				"Inflation-50pc", true, 12);
 		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-60pc_SUMMARY_Household_012.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-60pc_SUMMARY_Household_012.csv",
+				"Inflation-60pc", true, 12);
+		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing Inflation-75pc_SUMMARY_Household_012.csv");
 		processHouseholdMetricsCsv(
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-75pc_SUMMARY_Household_012.csv",
 				"Inflation-75pc", true, 12);
 		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-15pc-5yrs_SUMMARY_Household_060.csv");
+				new Date(System.currentTimeMillis()) + ": processing Inflation-15pc-5yrs_SUMMARY_Household_048.csv");
 		processHouseholdMetricsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-15pc-5yrs_SUMMARY_Household_060.csv",
-				"Inflation-15pc-5yrs", true, 60);
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-15pc-5yrs_SUMMARY_Household_048.csv",
+				"Inflation-15pc-4yrs", true, 60);
 	}
 
 	private static void processHouseholdMetricsCsv(String inFileResourceLocation, String scenario, boolean append,
