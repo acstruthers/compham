@@ -60,16 +60,14 @@
 		<saveSummary>false</saveSummary>
 		<saveSummary>false</saveSummary>
 		<saveSummary>false</saveSummary>
-		<saveSummary>false</saveSummary>
-		<saveSummary>false</saveSummary>
+		<saveSummary>true</saveSummary>
+		<saveSummary>true</saveSummary>
 		<saveSummary>true</saveSummary>
 	</saveIteration>
 	<numberOfIterations>61</numberOfIterations>
 	<homeDirectory>D:\Git\compham\xyz.struthers.rhul.ham</homeDirectory>
-	<resourceDirectory>D:\Git\compham\xyz.struthers.rhul.ham\src\main\resources
-	</resourceDirectory>
-	<outputDirectory>D:\OneDrive\Dissertation\Results\Summary Data\
-	</outputDirectory>
+	<resourceDirectory>D:\Git\compham\xyz.struthers.rhul.ham\src\main\resources</resourceDirectory>
+	<outputDirectory>D:\OneDrive\Dissertation\Results\Summary Data\</outputDirectory>
 	<csvSeparator>,</csvSeparator>
 	<cpvServerHost>Adam-E590</cpvServerHost>
 	<economyClientHost>Adam-NUC</economyClientHost>
