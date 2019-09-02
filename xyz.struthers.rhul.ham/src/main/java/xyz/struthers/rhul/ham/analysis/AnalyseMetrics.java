@@ -323,7 +323,7 @@ public class AnalyseMetrics {
 		float housingCostsOver30pcDecile10 = 0f;
 		float totalIncomePercentEarnedByTop1pc = 0f;
 		float totalIncomePercentEarnedByTop5pc = 0f; // % of assets controlled by top 5% of income (Kumhof, et al, 2015)
-		float totalIncomePercentEarnedByDecile1 = 0f; // NEW *******************
+		float totalIncomePercentEarnedByDecile1 = 0f;
 		float totalIncomePercentEarnedByDecile2 = 0f;
 		float totalIncomePercentEarnedByDecile3 = 0f;
 		float totalIncomePercentEarnedByDecile4 = 0f;
@@ -337,7 +337,7 @@ public class AnalyseMetrics {
 		float debtToIncomeTop1pc = 0f;
 		float debtToIncomeTop5pc = 0f;
 		float debtToIncomeBottom95pc = 0f;
-		float debtToIncomeDecile1 = 0f; // NEW ******************
+		float debtToIncomeDecile1 = 0f;
 		float debtToIncomeDecile2 = 0f;
 		float debtToIncomeDecile3 = 0f;
 		float debtToIncomeDecile4 = 0f;
@@ -357,7 +357,7 @@ public class AnalyseMetrics {
 		float incomeToHendersonPercentTop1pc = 0f;
 		float incomeToHendersonPercentTop5pc = 0f;
 		float incomeToHendersonPercentBottom95pc = 0f;
-		float incomeToHendersonPercentDecile1 = 0f; // NEW **************
+		float incomeToHendersonPercentDecile1 = 0f;
 		float incomeToHendersonPercentDecile2 = 0f;
 		float incomeToHendersonPercentDecile3 = 0f;
 		float incomeToHendersonPercentDecile4 = 0f;
@@ -367,7 +367,7 @@ public class AnalyseMetrics {
 		float incomeToHendersonPercentDecile8 = 0f;
 		float incomeToHendersonPercentDecile9 = 0f;
 		float incomeToHendersonPercentDecile10 = 0f;
-		float incomeToHendersonAndHousingPercentDecile1 = 0f; // NEW **************
+		float incomeToHendersonAndHousingPercentDecile1 = 0f;
 		float incomeToHendersonAndHousingPercentDecile2 = 0f;
 		float incomeToHendersonAndHousingPercentDecile3 = 0f;
 		float incomeToHendersonAndHousingPercentDecile4 = 0f;
@@ -616,7 +616,7 @@ public class AnalyseMetrics {
 							mtgCostsOver30pcCountOwnerOccupied++;
 						}
 					}
-					if (rentCosts <= 1f && mtgCosts > 0f) {
+					if (rentCosts <= 1f && mtgCosts > 1f) {
 						// owner occupied borrowing households (van Onselen, 2019)
 						householdCountOwnerOccupied++;
 					}
