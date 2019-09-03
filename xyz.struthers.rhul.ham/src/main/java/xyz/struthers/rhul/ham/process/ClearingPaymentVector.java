@@ -384,7 +384,7 @@ public class ClearingPaymentVector implements Serializable {
 				System.out.println("default order[" + i + "] = " + this.defaultOrderOfNode.get(i));
 			}
 		}
-		while (order < this.agentCount && !systemCleared) {
+		while ((order < this.agentCount) && !systemCleared) {
 			if (DEBUG_DEFAULTS) {
 				System.out.println("Calculating CPV for round " + order + " (i.e. default order " + order + ")");
 			}
@@ -434,13 +434,15 @@ public class ClearingPaymentVector implements Serializable {
 							+ this.totalLiabilitiesOfNode.get(fromIdx));
 				}
 				// check for negative equity to see who defaulted in this round
-				if ((this.exogeneousNominalCashFlow.get(fromIdx) + paidToNode) < this.totalLiabilitiesOfNode
-						.get(fromIdx)) {
+				// if (this.exogeneousNominalCashFlow.get(fromIdx) + paidToNode <
+				// this.totalLiabilitiesOfNode
+				// .get(fromIdx)) {
+				if (this.exogeneousNominalCashFlow.get(fromIdx) + paidToNode < oldPaymentClearingVector.get(fromIdx)) {
 					// node defaulted, so reduce its payment so that its cash flow to equity is zero
 					systemCleared = false;
 					this.defaultOrderOfNode.set(fromIdx, order); // node defaulted in this round of algorithm
 					this.clearingPaymentVector.set(fromIdx, this.exogeneousNominalCashFlow.get(fromIdx) + paidToNode);
-					if (DEBUG_DEFAULTS) {
+					if (DEBUG_DEFAULTS || true) {
 						System.out.println(
 								"INSIDE DEFAULT IF STATEMENT (fromIdx = " + fromIdx + ", order = " + order + ")");
 					}
