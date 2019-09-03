@@ -179,6 +179,12 @@ public class ClearingPaymentVector implements Serializable {
 	 * technically insolvent, so should never get to the point where this payment
 	 * clearing vector algorithm finds it defaulting on its obligations.
 	 * 
+	 * NOTE: The caller needs to subtract the liquid assets from the CPV outputs.
+	 * This algorithm includes them as if they're an exogeneous cash flow. That
+	 * ensures that nodes don't default just because they made a loss in a single
+	 * period - they only default when they make a loss that's big enough to use up
+	 * all their liquid assets too.
+	 * 
 	 * @param liabilitiesAmounts - amounts owed by every node to the other nodes
 	 *                           they're connected to
 	 * @param liabilitiesIndices - indices of the sub-list to designate which node
@@ -203,12 +209,16 @@ public class ClearingPaymentVector implements Serializable {
 		ClearingPaymentOutputs result = null;
 
 		if (liabilitiesAmounts.size() == liabilitiesIndices.size()
-				&& liabilitiesAmounts.size() == operatingCashFlow.size()) {
+				&& liabilitiesAmounts.size() == operatingCashFlow.size()
+				&& liabilitiesAmounts.size() == liquidAssets.size()) {
 			// must be the same number of agents in each argument
 
 			// set input values
 			this.agentCount = liabilitiesAmounts.size();
 			this.exogeneousNominalCashFlow = operatingCashFlow;
+			for (int i = 0; i < liquidAssets.size(); i++) {
+				this.exogeneousNominalCashFlow.set(i, this.exogeneousNominalCashFlow.get(i) + liquidAssets.get(i));
+			}
 			this.nominalLiabilitiesAmount = liabilitiesAmounts;
 			this.liabilitiesIndex = liabilitiesIndices;
 
@@ -364,14 +374,14 @@ public class ClearingPaymentVector implements Serializable {
 			System.out.println("order " + order);
 			System.out.println("this.agentCount " + this.agentCount);
 			System.out.println("systemCleared " + systemCleared);
-			for (int i=0; i<oldPaymentClearingVector.size(); i++) {
-				System.out.println("old CPV[" + i + "] = "+ oldPaymentClearingVector.get(i));
+			for (int i = 0; i < oldPaymentClearingVector.size(); i++) {
+				System.out.println("old CPV[" + i + "] = " + oldPaymentClearingVector.get(i));
 			}
-			for (int i=0; i<this.clearingPaymentVector.size(); i++) {
-				System.out.println("this CPV[" + i + "] = "+ this.clearingPaymentVector.get(i));
+			for (int i = 0; i < this.clearingPaymentVector.size(); i++) {
+				System.out.println("this CPV[" + i + "] = " + this.clearingPaymentVector.get(i));
 			}
-			for (int i=0; i<this.defaultOrderOfNode.size(); i++) {
-				System.out.println("default order[" + i + "] = "+ this.defaultOrderOfNode.get(i));
+			for (int i = 0; i < this.defaultOrderOfNode.size(); i++) {
+				System.out.println("default order[" + i + "] = " + this.defaultOrderOfNode.get(i));
 			}
 		}
 		while (order < this.agentCount && !systemCleared) {
@@ -390,19 +400,22 @@ public class ClearingPaymentVector implements Serializable {
 				if (DEBUG_DEFAULTS) {
 					System.out.println("fromIdx " + fromIdx);
 				}
-				
+
 				// use clearing payment vector and rel liab matrix to calc total paid to node
 				float paidToNode = 0f;
 				for (int link = 0; link < this.receivablesIndex.get(fromIdx).size(); link++) {
 					int from = this.receivablesIndex.get(fromIdx).get(link).getFromIndex();
 					int to = this.receivablesIndex.get(fromIdx).get(link).getTo();
 					paidToNode += oldPaymentClearingVector.get(from) * this.relativeLiabilitiesAmount.get(from).get(to);
-					
+
 					if (DEBUG_DEFAULTS) {
 						System.out.println("link " + link);
 						System.out.println("from " + from);
 						System.out.println("to " + to);
-						System.out.println("oldPaymentClearingVector.get(from) * this.relativeLiabilitiesAmount.get(from).get(to) " + oldPaymentClearingVector.get(from) * this.relativeLiabilitiesAmount.get(from).get(to));
+						System.out.println(
+								"oldPaymentClearingVector.get(from) * this.relativeLiabilitiesAmount.get(from).get(to) "
+										+ oldPaymentClearingVector.get(from)
+												* this.relativeLiabilitiesAmount.get(from).get(to));
 						System.out.println("paidToNode " + paidToNode);
 					}
 				}
@@ -414,24 +427,29 @@ public class ClearingPaymentVector implements Serializable {
 				 */
 
 				if (DEBUG_DEFAULTS) {
-					System.out.println("this.exogeneousNominalCashFlow.get(" + fromIdx + "): " + this.exogeneousNominalCashFlow.get(fromIdx));
+					System.out.println("this.exogeneousNominalCashFlow.get(" + fromIdx + "): "
+							+ this.exogeneousNominalCashFlow.get(fromIdx));
 					System.out.println("paidToNode: " + paidToNode);
-					System.out.println("this.totalLiabilitiesOfNode.get(" + fromIdx + "): " + this.totalLiabilitiesOfNode
-							.get(fromIdx));
+					System.out.println("this.totalLiabilitiesOfNode.get(" + fromIdx + "): "
+							+ this.totalLiabilitiesOfNode.get(fromIdx));
 				}
 				// check for negative equity to see who defaulted in this round
-				if (this.exogeneousNominalCashFlow.get(fromIdx) + paidToNode < this.totalLiabilitiesOfNode
+				if ((this.exogeneousNominalCashFlow.get(fromIdx) + paidToNode) < this.totalLiabilitiesOfNode
 						.get(fromIdx)) {
 					// node defaulted, so reduce its payment so that its cash flow to equity is zero
 					systemCleared = false;
 					this.defaultOrderOfNode.set(fromIdx, order); // node defaulted in this round of algorithm
 					this.clearingPaymentVector.set(fromIdx, this.exogeneousNominalCashFlow.get(fromIdx) + paidToNode);
 					if (DEBUG_DEFAULTS) {
-						System.out.println("INSIDE DEFAULT IF STATEMENT (fromIdx = " + fromIdx + ", order = " + order + ")");
+						System.out.println(
+								"INSIDE DEFAULT IF STATEMENT (fromIdx = " + fromIdx + ", order = " + order + ")");
 					}
 				} else {
 					this.clearingPaymentVector.set(fromIdx, oldPaymentClearingVector.get(fromIdx));
-					System.out.println("INSIDE DEFAULT ELSE STATEMENT (fromIdx = " + fromIdx + ", order = " + order + ")");
+					if (DEBUG_DEFAULTS) {
+						System.out.println(
+								"INSIDE DEFAULT ELSE STATEMENT (fromIdx = " + fromIdx + ", order = " + order + ")");
+					}
 				}
 			}
 			if (!systemCleared) {
