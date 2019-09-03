@@ -62,6 +62,7 @@ public class RunSimulation {
 
 		ClearingPaymentOutputs result = payment.calculate(liabilitiesAmounts, liabilitiesIndices, operatingCashFlow,
 				liquidAssets);
+		result.setIteration(iteration);
 
 		payment.clearInputsAndWorking();
 		payment = null;

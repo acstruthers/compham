@@ -59,6 +59,7 @@ public class ClearingPaymentVector implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	public static final boolean DEBUG_RAM_USAGE = true;
+	public static final boolean DEBUG_DEFAULTS = false;
 
 	// We know the size in advance, so can use arrays to improve speed & reduce
 	// memory usage because these don't change
@@ -354,29 +355,56 @@ public class ClearingPaymentVector implements Serializable {
 		this.clearingPaymentVector = new TFloatArrayList(this.totalLiabilitiesOfNode);
 		int[] zeros = new int[this.agentCount];
 		Arrays.fill(zeros, 0);
-		// for (int i = 0; i < this.agentCount; i++) { zeros[i] = 0; }
 		this.defaultOrderOfNode = new TIntArrayList(zeros); // no default
 
 		// iteratively calculate payment clearing vector
-		boolean systemCleared = true;
+		boolean systemCleared = false; // FIXME: this was true. Make it false
 		int order = 0;
+		if (DEBUG_DEFAULTS) {
+			System.out.println("order " + order);
+			System.out.println("this.agentCount " + this.agentCount);
+			System.out.println("systemCleared " + systemCleared);
+			for (int i=0; i<oldPaymentClearingVector.size(); i++) {
+				System.out.println("old CPV[" + i + "] = "+ oldPaymentClearingVector.get(i));
+			}
+			for (int i=0; i<this.clearingPaymentVector.size(); i++) {
+				System.out.println("this CPV[" + i + "] = "+ this.clearingPaymentVector.get(i));
+			}
+			for (int i=0; i<this.defaultOrderOfNode.size(); i++) {
+				System.out.println("default order[" + i + "] = "+ this.defaultOrderOfNode.get(i));
+			}
+		}
 		while (order < this.agentCount && !systemCleared) {
+			if (DEBUG_DEFAULTS) {
+				System.out.println("Calculating CPV for round " + order + " (i.e. default order " + order + ")");
+			}
 			// 2. If some nodes default even when all the other nodes pay, try to solve the
 			// system again, assuming that only these "first-order" default occur. If only
 			// first-order defaults occur under this new clearing vector, then terminate the
 			// algorithm.
 			// 3. If second-order defaults occur, then try to clear again
 			// assuming only second-order defaults occur, and so on.
-			System.out.println("CPV order: " + order);
 			order++;
 			systemCleared = true;
 			for (int fromIdx = 0; fromIdx < this.agentCount; fromIdx++) {
+				if (DEBUG_DEFAULTS) {
+					System.out.println("fromIdx " + fromIdx);
+				}
+				
 				// use clearing payment vector and rel liab matrix to calc total paid to node
 				float paidToNode = 0f;
 				for (int link = 0; link < this.receivablesIndex.get(fromIdx).size(); link++) {
 					int from = this.receivablesIndex.get(fromIdx).get(link).getFromIndex();
 					int to = this.receivablesIndex.get(fromIdx).get(link).getTo();
 					paidToNode += oldPaymentClearingVector.get(from) * this.relativeLiabilitiesAmount.get(from).get(to);
+					
+					if (DEBUG_DEFAULTS) {
+						System.out.println("link " + link);
+						System.out.println("from " + from);
+						System.out.println("to " + to);
+						System.out.println("oldPaymentClearingVector.get(from) * this.relativeLiabilitiesAmount.get(from).get(to) " + oldPaymentClearingVector.get(from) * this.relativeLiabilitiesAmount.get(from).get(to));
+						System.out.println("paidToNode " + paidToNode);
+					}
 				}
 
 				/**
@@ -385,6 +413,12 @@ public class ClearingPaymentVector implements Serializable {
 				 * run out of cash too.
 				 */
 
+				if (DEBUG_DEFAULTS) {
+					System.out.println("this.exogeneousNominalCashFlow.get(" + fromIdx + "): " + this.exogeneousNominalCashFlow.get(fromIdx));
+					System.out.println("paidToNode: " + paidToNode);
+					System.out.println("this.totalLiabilitiesOfNode.get(" + fromIdx + "): " + this.totalLiabilitiesOfNode
+							.get(fromIdx));
+				}
 				// check for negative equity to see who defaulted in this round
 				if (this.exogeneousNominalCashFlow.get(fromIdx) + paidToNode < this.totalLiabilitiesOfNode
 						.get(fromIdx)) {
@@ -392,8 +426,12 @@ public class ClearingPaymentVector implements Serializable {
 					systemCleared = false;
 					this.defaultOrderOfNode.set(fromIdx, order); // node defaulted in this round of algorithm
 					this.clearingPaymentVector.set(fromIdx, this.exogeneousNominalCashFlow.get(fromIdx) + paidToNode);
+					if (DEBUG_DEFAULTS) {
+						System.out.println("INSIDE DEFAULT IF STATEMENT (fromIdx = " + fromIdx + ", order = " + order + ")");
+					}
 				} else {
 					this.clearingPaymentVector.set(fromIdx, oldPaymentClearingVector.get(fromIdx));
+					System.out.println("INSIDE DEFAULT ELSE STATEMENT (fromIdx = " + fromIdx + ", order = " + order + ")");
 				}
 			}
 			if (!systemCleared) {
