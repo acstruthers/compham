@@ -28,14 +28,16 @@
     <socketBufferBytes>1000000000</socketBufferBytes>
     <socketMessageBytes>10485760</socketMessageBytes>
     <superannuationGuaranteeRate>0.095</superannuationGuaranteeRate>
-    <randomSeed>5</randomSeed>
+    <randomSeed>669363836</randomSeed>
     <isBankCrashScenario>false</isBankCrashScenario>
     <fcsAdiLimit>2.0E10</fcsAdiLimit>
     <fcsCustomerLimit>250000.0</fcsCustomerLimit>
+    <fcsLimitPerAdi>2.0E10</fcsLimitPerAdi>
+    <fcsLimitPerDepositor>250000.0</fcsLimitPerDepositor>
     <crashedBankShortNames></crashedBankShortNames>
     <crashedBankIndustry></crashedBankIndustry>
-	<exogeneousIncomeMultiplier>0.5</exogeneousIncomeMultiplier>
-    <exogeneousExpenseMultiplier>0.5</exogeneousExpenseMultiplier>
+	<exogeneousIncomeMultiplier>1.0</exogeneousIncomeMultiplier>
+    <exogeneousExpenseMultiplier>1.0</exogeneousExpenseMultiplier>
 	<inflationRatePerAnnum>0.0</inflationRatePerAnnum>
 	<mortgageRentConversionRatio>0.5</mortgageRentConversionRatio>
     <superannuationHaircut>0.3</superannuationHaircut>
@@ -44,8 +46,6 @@
     <unemploymentBenefitPerPerson>1303.5714</unemploymentBenefitPerPerson>
     <adiHqlaProportion>0.75</adiHqlaProportion>
     <allowNegativerates>false</allowNegativerates>
-    <fcsLimitPerAdi>1.5000E10</fcsLimitPerAdi>
-    <fcsLimitPerDepositor>250000.0</fcsLimitPerDepositor>
     <fxRateStrategy>0</fxRateStrategy>
     <exchangeRateCustomPath>
         <entry>
