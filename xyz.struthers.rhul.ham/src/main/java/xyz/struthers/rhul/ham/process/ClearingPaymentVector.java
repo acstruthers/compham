@@ -442,7 +442,7 @@ public class ClearingPaymentVector implements Serializable {
 					systemCleared = false;
 					this.defaultOrderOfNode.set(fromIdx, order); // node defaulted in this round of algorithm
 					this.clearingPaymentVector.set(fromIdx, this.exogeneousNominalCashFlow.get(fromIdx) + paidToNode);
-					if (DEBUG_DEFAULTS || true) {
+					if (DEBUG_DEFAULTS) {
 						System.out.println(
 								"INSIDE DEFAULT IF STATEMENT (fromIdx = " + fromIdx + ", order = " + order + ")");
 					}
