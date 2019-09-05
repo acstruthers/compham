@@ -134,7 +134,7 @@ public class AnalyseDefaults {
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing Inflation-25pc-4yrs_SUMMARY_Household_012.csv");
 		processDefaultsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-25pc-4yrs_SUMMARY_Household_12.csv",
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-25pc-4yrs_SUMMARY_Household_012.csv",
 				"Inflation-25pc-4yrs", true, 12);
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing Inflation-25pc-4yrs_SUMMARY_Household_024.csv");
@@ -186,7 +186,7 @@ public class AnalyseDefaults {
 							entries[i] = line[i];
 						}
 						entries[line.length] = wholeNumber.format(iteration); // add iteration
-						entries[line.length] = wholeNumber.format(inFileResourceLocation); // add filename
+						entries[line.length] = inFileResourceLocation; // add filename
 						csvWriter.writeNext(entries);
 					}
 				} catch (NumberFormatException e) {
