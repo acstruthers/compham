@@ -2,7 +2,7 @@
 <propertiesXml>
 	<scenarioName>Inflation-10pc</scenarioName>
 	<saveIteration>
-		<saveSummary>true</saveSummary>
+		<saveSummary>false</saveSummary>
 		<saveSummary>false</saveSummary>
 		<saveSummary>false</saveSummary>
 		<saveSummary>false</saveSummary>

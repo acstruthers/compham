@@ -50,101 +50,87 @@ public class AnalyseHomeOwnership {
 		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline_SUMMARY_Household_012.csv");
 		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_SUMMARY_Household_012.csv", "Baseline",
 				true, 12);
-		/*
-		 * System.out.println(new Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-01_SUMMARY_Household_000.csv"); processCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-01_SUMMARY_Household_000.csv"
-		 * , "Baseline", true, 0); System.out.println(new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-01_SUMMARY_Household_012.csv"); processCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-01_SUMMARY_Household_012.csv"
-		 * , "Baseline", true, 12); System.out.println(new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-02_SUMMARY_Household_000.csv"); processCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-02_SUMMARY_Household_000.csv"
-		 * , "Baseline", true, 0); System.out.println(new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-02_SUMMARY_Household_012.csv"); processCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-02_SUMMARY_Household_012.csv"
-		 * , "Baseline", true, 12); System.out.println(new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-03_SUMMARY_Household_000.csv"); processCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-03_SUMMARY_Household_000.csv"
-		 * , "Baseline", true, 0); System.out.println(new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-03_SUMMARY_Household_012.csv"); processCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-03_SUMMARY_Household_012.csv"
-		 * , "Baseline", true, 12); System.out.println(new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-04_SUMMARY_Household_000.csv"); processCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-04_SUMMARY_Household_000.csv"
-		 * , "Baseline", true, 0); System.out.println(new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-04_SUMMARY_Household_012.csv"); processCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-04_SUMMARY_Household_012.csv"
-		 * , "Baseline", true, 12); System.out.println(new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-05_SUMMARY_Household_000.csv"); processCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-05_SUMMARY_Household_000.csv"
-		 * , "Baseline", true, 0); System.out.println(new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-05_SUMMARY_Household_012.csv"); processCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-05_SUMMARY_Household_012.csv"
-		 * , "Baseline", true, 12); System.out.println(new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-06_SUMMARY_Household_000.csv"); processCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-06_SUMMARY_Household_000.csv"
-		 * , "Baseline", true, 0); System.out.println(new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-06_SUMMARY_Household_012.csv"); processCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-06_SUMMARY_Household_012.csv"
-		 * , "Baseline", true, 12); System.out.println(new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-07_SUMMARY_Household_000.csv"); processCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-07_SUMMARY_Household_000.csv"
-		 * , "Baseline", true, 0); System.out.println(new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-07_SUMMARY_Household_012.csv"); processCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-07_SUMMARY_Household_012.csv"
-		 * , "Baseline", true, 12); System.out.println(new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-08_SUMMARY_Household_000.csv"); processCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-08_SUMMARY_Household_000.csv"
-		 * , "Baseline", true, 0); System.out.println(new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-08_SUMMARY_Household_012.csv"); processCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-08_SUMMARY_Household_012.csv"
-		 * , "Baseline", true, 12); System.out.println(new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-09_SUMMARY_Household_000.csv"); processCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-09_SUMMARY_Household_000.csv"
-		 * , "Baseline", true, 0); System.out.println(new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing Baseline-09_SUMMARY_Household_012.csv"); processCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-09_SUMMARY_Household_012.csv"
-		 * , "Baseline", true, 12);
-		 */
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-01_SUMMARY_Household_000.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-01_SUMMARY_Household_000.csv",
+				"Baseline", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-01_SUMMARY_Household_012.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-01_SUMMARY_Household_012.csv",
+				"Baseline", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-02_SUMMARY_Household_000.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-02_SUMMARY_Household_000.csv",
+				"Baseline", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-02_SUMMARY_Household_012.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-02_SUMMARY_Household_012.csv",
+				"Baseline", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-03_SUMMARY_Household_000.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-03_SUMMARY_Household_000.csv",
+				"Baseline", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-03_SUMMARY_Household_012.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-03_SUMMARY_Household_012.csv",
+				"Baseline", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-04_SUMMARY_Household_000.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-04_SUMMARY_Household_000.csv",
+				"Baseline", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-04_SUMMARY_Household_012.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-04_SUMMARY_Household_012.csv",
+				"Baseline", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-05_SUMMARY_Household_000.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-05_SUMMARY_Household_000.csv",
+				"Baseline", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-05_SUMMARY_Household_012.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-05_SUMMARY_Household_012.csv",
+				"Baseline", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-06_SUMMARY_Household_000.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-06_SUMMARY_Household_000.csv",
+				"Baseline", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-06_SUMMARY_Household_012.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-06_SUMMARY_Household_012.csv",
+				"Baseline", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-07_SUMMARY_Household_000.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-07_SUMMARY_Household_000.csv",
+				"Baseline", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-07_SUMMARY_Household_012.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-07_SUMMARY_Household_012.csv",
+				"Baseline", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-08_SUMMARY_Household_000.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-08_SUMMARY_Household_000.csv",
+				"Baseline", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-08_SUMMARY_Household_012.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-08_SUMMARY_Household_012.csv",
+				"Baseline", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-09_SUMMARY_Household_000.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-09_SUMMARY_Household_000.csv",
+				"Baseline", true, 0);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline-09_SUMMARY_Household_012.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-09_SUMMARY_Household_012.csv",
+				"Baseline", true, 12);
 
-		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-05pc_SUMMARY_Household_012.csv");
-		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-05pc_SUMMARY_Household_012.csv",
-				"Inflation-05pc", true, 12);
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing Inflation-10pc_SUMMARY_Household_012.csv");
 		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-10pc_SUMMARY_Household_012.csv",
 				"Inflation-10pc", true, 12);
 		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-60pc_SUMMARY_Household_012.csv");
-		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-60pc_SUMMARY_Household_012.csv",
-				"Inflation-60pc", true, 12);
+				new Date(System.currentTimeMillis()) + ": processing Inflation-25pc-4yrs_SUMMARY_Household_012.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-25pc-4yrs_SUMMARY_Household_012.csv",
+				"Inflation-25pc-4yrs", true, 12);
 		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-75pc_SUMMARY_Household_012.csv");
-		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-75pc_SUMMARY_Household_012.csv",
-				"Inflation-75pc", true, 12);
+				new Date(System.currentTimeMillis()) + ": processing Inflation-25pc-4yrs_SUMMARY_Household_024.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-25pc-4yrs_SUMMARY_Household_024.csv",
+				"Inflation-25pc-4yrs", true, 24);
 		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-15pc-5yrs_SUMMARY_Household_048.csv");
-		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-15pc-5yrs_SUMMARY_Household_048.csv",
-				"Inflation-15pc-4yrs", true, 48);
+				new Date(System.currentTimeMillis()) + ": processing Inflation-25pc-4yrs_SUMMARY_Household_036.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-25pc-4yrs_SUMMARY_Household_036.csv",
+				"Inflation-25pc-4yrs", true, 36);
+		/*
+		 * System.out.println( new Date(System.currentTimeMillis()) +
+		 * ": processing Inflation-25pc-4yrs_SUMMARY_Household_048.csv");
+		 * processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-25pc-4yrs_SUMMARY_Household_048.csv"
+		 * , "Inflation-25pc-4yrs", true, 48);
+		 */
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation100pc_SUMMARY_Household_012.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-100pc_SUMMARY_Household_012.csv",
+				"Inflation-100pc", true, 12);
 	}
 
 	private static void processCsv(String inFileResourceLocation, String scenario, boolean append, int iteration) {

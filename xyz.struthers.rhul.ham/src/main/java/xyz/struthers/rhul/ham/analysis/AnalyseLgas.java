@@ -47,7 +47,6 @@ public class AnalyseLgas {
 		properties = PropertiesXmlFactory.getProperties();
 
 		// overwrite existing file
-
 		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline_SUMMARY_Household_000.csv");
 		processLgaMetricsCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_SUMMARY_Household_000.csv",
 				"Baseline", false, 0);
@@ -58,35 +57,37 @@ public class AnalyseLgas {
 				"Baseline", true, 12);
 
 		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-05pc_SUMMARY_Household_000.csv");
-		processLgaMetricsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-05pc_SUMMARY_Household_000.csv",
-				"Inflation-05pc", true, 0);
-		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-05pc_SUMMARY_Household_012.csv");
-		processLgaMetricsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-05pc_SUMMARY_Household_012.csv",
-				"Inflation-05pc", true, 12);
-		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing Inflation-10pc_SUMMARY_Household_012.csv");
 		processLgaMetricsCsv(
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-10pc_SUMMARY_Household_012.csv",
 				"Inflation-10pc", true, 12);
 		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-60pc_SUMMARY_Household_012.csv");
+				new Date(System.currentTimeMillis()) + ": processing Inflation-25pc-4yrs_SUMMARY_Household_012.csv");
 		processLgaMetricsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-60pc_SUMMARY_Household_012.csv",
-				"Inflation-60pc", true, 12);
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-25pc-4yrs_SUMMARY_Household_012.csv",
+				"Inflation-25pc-4yrs", true, 12);
 		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-75pc_SUMMARY_Household_012.csv");
+				new Date(System.currentTimeMillis()) + ": processing Inflation-25pc-4yrs_SUMMARY_Household_024.csv");
 		processLgaMetricsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-75pc_SUMMARY_Household_012.csv",
-				"Inflation-75pc", true, 12);
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-25pc-4yrs_SUMMARY_Household_024.csv",
+				"Inflation-25pc-4yrs", true, 24);
 		System.out.println(
-				new Date(System.currentTimeMillis()) + ": processing Inflation-15pc-5yrs_SUMMARY_Household_048.csv");
+				new Date(System.currentTimeMillis()) + ": processing Inflation-25pc-4yrs_SUMMARY_Household_036.csv");
 		processLgaMetricsCsv(
-				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-15pc-5yrs_SUMMARY_Household_048.csv",
-				"Inflation-15pc-4yrs", true, 48);
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-25pc-4yrs_SUMMARY_Household_036.csv",
+				"Inflation-25pc-4yrs", true, 36);
+		/*
+		 * System.out.println( new Date(System.currentTimeMillis()) +
+		 * ": processing Inflation-25pc-4yrs_SUMMARY_Household_048.csv");
+		 * processLgaMetricsCsv(
+		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-25pc-4yrs_SUMMARY_Household_048.csv"
+		 * , "Inflation-25pc-4yrs", true, 48);
+		 */
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-100pc_SUMMARY_Household_012.csv");
+		processLgaMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-100pc_SUMMARY_Household_012.csv",
+				"Inflation-100pc", true, 12);
 
 		System.out.println(new Date(System.currentTimeMillis()) + ": FINISHED");
 	}
