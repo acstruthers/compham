@@ -42,6 +42,7 @@ public class AnalyseHomeOwnership {
 		properties = PropertiesXmlFactory.getProperties();
 
 		// overwrite existing file
+		System.out.println("START ANALYSING HOME OWNERSHIP");
 		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline_SUMMARY_Household_000.csv");
 		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_SUMMARY_Household_000.csv", "Baseline",
 				false, 0);
@@ -105,6 +106,29 @@ public class AnalyseHomeOwnership {
 		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-09_SUMMARY_Household_012.csv",
 				"Baseline", true, 12);
 
+		// ADI crash
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing ADI-CBA_SUMMARY_Household_012.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\ADI-CBA_SUMMARY_Household_012.csv", "ADI-CBA",
+				true, 12);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing ADI-CBA-no-limit_SUMMARY_Household_012.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\ADI-CBA-no-limit_SUMMARY_Household_012.csv",
+				"ADI-CBA-no-limit", true, 12);
+		System.out.println(new Date(System.currentTimeMillis()) + ": processing ADI-Mutuals_SUMMARY_Household_012.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\ADI-Mutuals_SUMMARY_Household_012.csv",
+				"ADI-Mutuals", true, 12);
+
+		// foreign country
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing FX-Rates-10pc-CNY_SUMMARY_Household_012.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-CNY_SUMMARY_Household_012.csv",
+				"FX-Rates-10pc-CNY", true, 12);
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing FX-Rates-10pc-JPY_SUMMARY_Household_012.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-JPY_SUMMARY_Household_012.csv",
+				"FX-Rates-10pc-JPY", true, 12);
+
+		// inflation
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing Inflation-10pc_SUMMARY_Household_012.csv");
 		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-10pc_SUMMARY_Household_012.csv",
@@ -121,16 +145,17 @@ public class AnalyseHomeOwnership {
 				new Date(System.currentTimeMillis()) + ": processing Inflation-25pc-4yrs_SUMMARY_Household_036.csv");
 		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-25pc-4yrs_SUMMARY_Household_036.csv",
 				"Inflation-25pc-4yrs", true, 36);
-		/*
-		 * System.out.println( new Date(System.currentTimeMillis()) +
-		 * ": processing Inflation-25pc-4yrs_SUMMARY_Household_048.csv");
-		 * processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-25pc-4yrs_SUMMARY_Household_048.csv"
-		 * , "Inflation-25pc-4yrs", true, 48);
-		 */
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-25pc-4yrs_SUMMARY_Household_048.csv");
+		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-25pc-4yrs_SUMMARY_Household_048.csv",
+				"Inflation-25pc-4yrs", true, 48);
+
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing Inflation100pc_SUMMARY_Household_012.csv");
 		processCsv("D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-100pc_SUMMARY_Household_012.csv",
 				"Inflation-100pc", true, 12);
+
+		System.out.println("END ANALYSING HOME OWNERSHIP");
 	}
 
 	private static void processCsv(String inFileResourceLocation, String scenario, boolean append, int iteration) {

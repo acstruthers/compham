@@ -38,7 +38,7 @@ public class AnalyseMetrics {
 		properties = PropertiesXmlFactory.getProperties();
 
 		// overwrite existing file
-
+		System.out.println("START ANALYSING METRICS");
 		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline_SUMMARY_Household_000.csv");
 		processHouseholdMetricsCsv(
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_SUMMARY_Household_000.csv", "Baseline",
@@ -143,7 +143,11 @@ public class AnalyseMetrics {
 		processHouseholdMetricsCsv(
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-CNY_SUMMARY_Household_012.csv",
 				"FX-Rates-10pc-CNY", true, 12);
-
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing FX-Rates-10pc-JPY_SUMMARY_Household_012.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-JPY_SUMMARY_Household_012.csv",
+				"FX-Rates-10pc-JPY", true, 12);
 		/*
 		 * System.out.println( new Date(System.currentTimeMillis()) +
 		 * ": processing FX-Rates-10pc-EUR_SUMMARY_Household_012.csv");
@@ -155,11 +159,6 @@ public class AnalyseMetrics {
 		 * processHouseholdMetricsCsv(
 		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-INR_SUMMARY_Household_012.csv"
 		 * , "FX-Rates-10pc-INR", true, 12); System.out.println( new
-		 * Date(System.currentTimeMillis()) +
-		 * ": processing FX-Rates-10pc-JPY_SUMMARY_Household_012.csv");
-		 * processHouseholdMetricsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\FX-Rates-10pc-JPY_SUMMARY_Household_012.csv"
-		 * , "FX-Rates-10pc-JPY", true, 12); System.out.println( new
 		 * Date(System.currentTimeMillis()) +
 		 * ": processing FX-Rates-10pc-KRW_SUMMARY_Household_012.csv");
 		 * processHouseholdMetricsCsv(
@@ -213,18 +212,19 @@ public class AnalyseMetrics {
 		processHouseholdMetricsCsv(
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-25pc-4yrs_SUMMARY_Household_036.csv",
 				"Inflation-25pc-4yrs", true, 36);
-		/*
-		 * System.out.println( new Date(System.currentTimeMillis()) +
-		 * ": processing Inflation-25pc-4yrs_SUMMARY_Household_048.csv");
-		 * processHouseholdMetricsCsv(
-		 * "D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-25pc-4yrs_SUMMARY_Household_048.csv"
-		 * , "Inflation-25pc-4yrs", true, 48);
-		 */
+		System.out.println(
+				new Date(System.currentTimeMillis()) + ": processing Inflation-25pc-4yrs_SUMMARY_Household_048.csv");
+		processHouseholdMetricsCsv(
+				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-25pc-4yrs_SUMMARY_Household_048.csv",
+				"Inflation-25pc-4yrs", true, 48);
+
 		System.out.println(
 				new Date(System.currentTimeMillis()) + ": processing Inflation-100pc_SUMMARY_Household_012.csv");
 		processHouseholdMetricsCsv(
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Inflation-100pc_SUMMARY_Household_012.csv",
 				"Inflation-100pc", true, 12);
+		
+		System.out.println("END ANALYSING METRICS");
 	}
 
 	private static void processHouseholdMetricsCsv(String inFileResourceLocation, String scenario, boolean append,

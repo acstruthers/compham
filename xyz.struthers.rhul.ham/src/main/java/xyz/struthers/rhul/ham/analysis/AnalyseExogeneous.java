@@ -46,6 +46,7 @@ public class AnalyseExogeneous {
 		properties = PropertiesXmlFactory.getProperties();
 
 		// overwrite existing file
+		System.out.println("START ANALYSING EXOGENEOUS");
 		System.out.println(new Date(System.currentTimeMillis()) + ": processing Baseline_EXOGENEOUS_000.csv");
 		processExogeneousDataCsv(
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline_EXOGENEOUS_000.csv", "Baseline",
@@ -89,7 +90,7 @@ public class AnalyseExogeneous {
 				"D:\\OneDrive\\Dissertation\\Results\\Summary Data\\Baseline-09_EXOGENEOUS_000.csv",
 				"Baseline-09", true, 0);
 
-		System.out.println(new Date(System.currentTimeMillis()) + ": FINISHED");
+		System.out.println("END ANALYSING EXOGENEOUS");
 		System.out.println("See " + properties.getOutputDirectory() + "R_GRAPH_Exogeneous.csv for results");
 	}
 
