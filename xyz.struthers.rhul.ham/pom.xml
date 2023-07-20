@@ -49,7 +49,7 @@
 			weaver plugin 7 is for Java 8 (version 1.6 is for Java 7) -->
 		<version.aspectj>1.9.2</version.aspectj>
 		<version.aspectjlib>1.6.2</version.aspectjlib>
-		<version.org.springframework>5.1.4.RELEASE</version.org.springframework>
+		<version.org.springframework>5.2.24.RELEASE</version.org.springframework>
 		<version.org.springframework.boot>2.1.2.RELEASE</version.org.springframework.boot>
 
 		<version.maven>3.6.0</version.maven>
