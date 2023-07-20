@@ -50,7 +50,7 @@
 		<version.aspectj>1.9.2</version.aspectj>
 		<version.aspectjlib>1.6.2</version.aspectjlib>
 		<version.org.springframework>5.1.4.RELEASE</version.org.springframework>
-		<version.org.springframework.boot>2.1.2.RELEASE</version.org.springframework.boot>
+		<version.org.springframework.boot>2.2.11.RELEASE</version.org.springframework.boot>
 
 		<version.maven>3.6.0</version.maven>
 		<version.maven-enforcer-plugin>3.0.0-M2</version.maven-enforcer-plugin>
